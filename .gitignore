@@ -1,0 +1,9 @@
+.idea
+
+target
+
+game/target
+commons/target
+entities/target
+client/target
+server/target
