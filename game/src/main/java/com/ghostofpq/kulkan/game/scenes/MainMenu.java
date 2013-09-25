@@ -41,7 +41,6 @@ public class MainMenu implements Scene {
         menu.update();
         if (menu.isFinished()) {
             if (menu.getIndex() == 0) {
-                Game.getInstance().setCurrentScene(NewPlayer.getInstance());
             } else if (menu.getIndex() == 1) {
                 Game.getInstance().setCurrentScene(LoadMenu.getInstance());
             } else if (menu.getIndex() == 2) {

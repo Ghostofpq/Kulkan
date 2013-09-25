@@ -12,6 +12,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class Game {
     }
 
     public static void main(String[] argv) {
-        //System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
+        System.setProperty("org.lwjgl.librarypath", new File("game/target/natives").getAbsolutePath());
         Game g = Game.getInstance();
         g.setCurrentScene(BattleScene.getInstance());
 

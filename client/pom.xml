@@ -103,8 +103,8 @@
             <artifactId>lwjgl</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.cokeandcode.slick</groupId>
-            <artifactId>Slick</artifactId>
+            <groupId>slick</groupId>
+            <artifactId>slick</artifactId>
         </dependency>
         <dependency>
             <groupId>java3d</groupId>
