@@ -1,8 +1,10 @@
 .idea
 
-target
-
-*.iml
+game/game.iml
+commons/commons.iml
+entities/entities.iml
+client/client.iml
+server/server.iml
 
 game/target
 commons/target
