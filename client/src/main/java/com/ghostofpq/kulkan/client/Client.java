@@ -41,6 +41,7 @@ public class Client {
     }
 
     public static void main(String[] argv) {
+
         System.setProperty("org.lwjgl.librarypath", new File("client/target/natives/").getAbsolutePath());
         Client g = Client.getInstance();
         g.setCurrentScene(LoginScene.getInstance());
