@@ -43,4 +43,8 @@ public class InputMap implements Serializable {
         inputMap.put(Keyboard.KEY_S, Input.ZOOM_OUT);
         inputMap.put(Keyboard.KEY_TAB, Input.SWITCH);
     }
+
+    public Input getInput(int inputKey) {
+        return inputMap.get(inputKey);
+    }
 }

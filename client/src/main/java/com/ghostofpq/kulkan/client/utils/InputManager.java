@@ -15,6 +15,10 @@ public class InputManager {
         return instance;
     }
 
+    public InputMap.Input getInput(int inputKey) {
+        return inputMap.getInput(inputKey);
+    }
+
     public void loadInputMap() {
         String path = new StringBuilder().append("./conf/inputs.map").toString();
         try {

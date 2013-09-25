@@ -4,7 +4,10 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.PasswordField;
 import com.ghostofpq.kulkan.client.graphics.TextField;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
+import com.ghostofpq.kulkan.client.utils.InputManager;
+import com.ghostofpq.kulkan.client.utils.InputMap;
 import lombok.extern.slf4j.Slf4j;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 @Slf4j
@@ -61,7 +64,31 @@ public class LoginScene implements Scene {
                 }
             }
         }
+        while (Keyboard.next()) {
+            if (Keyboard.getEventKeyState()) {
+                if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
+                    if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
+                        if (pseudo.hasFocus()) {
+                            pseudo.deleteLastChar();
+                        } else if (password.hasFocus()) {
+                            password.deleteLastChar();
+                        }
+                    } else {
+                        if (pseudo.hasFocus()) {
+                            pseudo.writeChar(Keyboard.getEventCharacter());
+                        } else if (password.hasFocus()) {
+                            password.writeChar(Keyboard.getEventCharacter());
+                        }
+                    }
+                } else {
+                    if (pseudo.hasFocus()) {
+                        pseudo.writeChar(Keyboard.getEventCharacter());
+                    } else if (password.hasFocus()) {
+                        password.writeChar(Keyboard.getEventCharacter());
+                    }
+                }
 
-
+            }
+        }
     }
 }
