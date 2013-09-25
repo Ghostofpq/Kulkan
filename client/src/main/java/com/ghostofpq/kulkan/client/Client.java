@@ -10,6 +10,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import java.io.File;
+
 public class Client {
     private static volatile Client instance = null;
     boolean requestClose;
@@ -39,7 +41,7 @@ public class Client {
     }
 
     public static void main(String[] argv) {
-        //System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
+        System.setProperty("org.lwjgl.librarypath", new File("client/target/natives/").getAbsolutePath());
         Client g = Client.getInstance();
         g.setCurrentScene(LoginScene.getInstance());
 

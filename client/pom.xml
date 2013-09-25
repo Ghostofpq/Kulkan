@@ -11,6 +11,14 @@
 
     <artifactId>client</artifactId>
 
+
+    <properties>
+        <main.class>com.ghostofpq.kulkan.game.main.Game</main.class>
+        <natives>${basedir}/target/natives/</natives>
+        <natives.version>0.0.6</natives.version>
+        <release.natives>natives/</release.natives>
+    </properties>
+
     <build>
         <directory>target</directory>
         <outputDirectory>target/classes</outputDirectory>
@@ -40,6 +48,21 @@
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.googlecode.mavennatives</groupId>
+                <artifactId>maven-nativedependencies-plugin</artifactId>
+                <version>${natives.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpacknatives</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <!--suppress MavenModelInspection (this line is for IDEA) -->
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
