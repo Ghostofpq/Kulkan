@@ -9,7 +9,15 @@ public abstract class HUDElement {
 
     public abstract void draw();
 
-    public abstract boolean isClicked(int mouseX, int mouseY);
+    public boolean isClicked(int mouseX, int mouseY) {
+        boolean result = false;
+        boolean okMouseX = (mouseX >= posX && mouseX <= posX + width);
+        boolean okMouseY = (mouseY >= posY && mouseY <= posY + height);
+        if (okMouseX && okMouseY) {
+            result = true;
+        }
+        return result;
+    }
 
     /*
     GETTERS & SETTERS

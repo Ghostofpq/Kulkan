@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.graphics.HUDElement;
 import com.ghostofpq.kulkan.client.graphics.PasswordField;
 import com.ghostofpq.kulkan.client.graphics.TextField;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
@@ -10,12 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 public class LoginScene implements Scene {
 
     private static volatile LoginScene instance = null;
     private TextField pseudo;
     private PasswordField password;
+    private List<HUDElement> hudElementList;
+    private int indexOnFocus;
 
     private LoginScene() {
     }
@@ -35,7 +41,20 @@ public class LoginScene implements Scene {
     public void init() {
         pseudo = new TextField(200, 200, 300, 50, 10);
         password = new PasswordField(200, 300, 300, 50, 10);
-        pseudo.setHasFocus(true);
+
+        hudElementList = new ArrayList<HUDElement>();
+        hudElementList.add(pseudo);
+        hudElementList.add(password);
+
+        indexOnFocus = 0;
+        setFocusOn(indexOnFocus);
+    }
+
+    public void setFocusOn(int i) {
+        for (HUDElement hudElement : hudElementList) {
+            hudElement.setHasFocus(false);
+        }
+        hudElementList.get(i).setHasFocus(true);
     }
 
     @Override
@@ -53,14 +72,11 @@ public class LoginScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                log.debug("Clic : {}/{}", Mouse.getX(), Mouse.getY());
                 if (pseudo.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    pseudo.setHasFocus(true);
-                    password.setHasFocus(false);
+                    setFocusOn(hudElementList.indexOf(pseudo));
                 }
                 if (password.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    password.setHasFocus(true);
-                    pseudo.setHasFocus(false);
+                    setFocusOn(hudElementList.indexOf(password));
                 }
             }
         }

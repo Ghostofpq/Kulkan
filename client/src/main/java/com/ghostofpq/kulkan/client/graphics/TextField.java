@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 
-import java.awt.*;
-
 @Slf4j
 public class TextField extends HUDElement {
     private final String FONT = "optimus_princeps_16";
@@ -22,17 +20,6 @@ public class TextField extends HUDElement {
         this.height = height;
         this.maxLength = maxLength;
         content = "";
-    }
-
-    @Override
-    public boolean isClicked(int mouseX, int mouseY) {
-        boolean result = false;
-        boolean okMouseX = (mouseX >= posX && mouseX <= posX + width);
-        boolean okMouseY = (mouseY >= posY && mouseY <= posY + height);
-        if (okMouseX && okMouseY) {
-            result = true;
-        }
-        return result;
     }
 
     @Override
