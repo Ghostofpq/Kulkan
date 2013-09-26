@@ -19,6 +19,7 @@ public class TextField extends HUDElement {
         this.width = length;
         this.height = height;
         this.maxLength = maxLength;
+        this.hasFocus = false;
         content = "";
     }
 

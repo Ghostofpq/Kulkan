@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.HUDElement;
 import com.ghostofpq.kulkan.client.graphics.PasswordField;
 import com.ghostofpq.kulkan.client.graphics.TextField;
@@ -21,6 +22,7 @@ public class LoginScene implements Scene {
     private TextField pseudo;
     private PasswordField password;
     private List<HUDElement> hudElementList;
+    private Button button;
     private int indexOnFocus;
 
     private LoginScene() {
@@ -41,10 +43,18 @@ public class LoginScene implements Scene {
     public void init() {
         pseudo = new TextField(200, 200, 300, 50, 10);
         password = new PasswordField(200, 300, 300, 50, 10);
+        button = new Button(200, 400, 300, 50, "CONNECT") {
+            @Override
+            public void onClick() {
+                log.debug("click {} / {}",pseudo.getContent(),password.getContent());
+            }
+        };
+
 
         hudElementList = new ArrayList<HUDElement>();
         hudElementList.add(pseudo);
         hudElementList.add(password);
+        hudElementList.add(button);
 
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
@@ -64,8 +74,9 @@ public class LoginScene implements Scene {
     @Override
     public void render() {
         GraphicsManager.getInstance().make2D();
-        pseudo.draw();
-        password.draw();
+        for (HUDElement hudElement : hudElementList) {
+            hudElement.draw();
+        }
     }
 
     @Override
@@ -77,6 +88,10 @@ public class LoginScene implements Scene {
                 }
                 if (password.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
                     setFocusOn(hudElementList.indexOf(password));
+                }
+                if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    setFocusOn(hudElementList.indexOf(button));
+                    button.onClick();
                 }
             }
         }
