@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 
+import java.awt.*;
+
 @Slf4j
 public class TextField extends HUDElement {
     private final String FONT = "optimus_princeps_16";
@@ -54,10 +56,10 @@ public class TextField extends HUDElement {
         GL11.glEnd();
 
 
-        int posXText = posX + (width - FontManager.getInstance().getFontMap().get(FONT).getWidth(content)) / 2;
-        int posYText = posY + (height - FontManager.getInstance().getFontMap().get(FONT).getHeight(content)) / 2;
+        int posXText = posX + (width - FontManager.getInstance().getFontMap().get(FONT).getWidth(getContentToPrint())) / 2;
+        int posYText = posY + (height - FontManager.getInstance().getFontMap().get(FONT).getHeight(getContentToPrint())) / 2;
 
-        FontManager.getInstance().drawString(FONT, posXText, posYText, content, Color.white);
+        FontManager.getInstance().drawString(FONT, posXText, posYText, getContentToPrint(), Color.white);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 

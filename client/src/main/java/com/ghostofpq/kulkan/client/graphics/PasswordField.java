@@ -6,8 +6,12 @@ public class PasswordField extends TextField {
         super(posX, posY, length, height, maxLength);
     }
 
+    @Override
     public String getContentToPrint() {
-        String result = new String(content);
-        return result.replaceAll("[\\x21-\\x7E]", "*");
+        StringBuilder result = new StringBuilder();
+        for(int i=0; i<content.length();i++){
+            result.append("*");
+        }
+        return result.toString();
     }
 }
