@@ -50,10 +50,12 @@ public class LoginScene implements Scene {
             public void onClick() {
                 try {
                     MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudo.getContent(), password.getContent());
-                    Client.getInstance().sendMessage(authenticationRequest);
+                    Client.getInstance().authenticate(authenticationRequest);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 log.debug("click {} / {}", pseudo.getContent(), password.getContent());

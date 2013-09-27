@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.client.scenes.Scene;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -24,6 +25,8 @@ public class Client {
     private static volatile Client instance = null;
     private final String HOST = "localhost";
     private final String QUEUE_NAME = "hello";
+    private String authenticationQueueName = "authentication";
+    private String replyQueueName;
     private Scene currentScene;
     private Player player;
     private long lastTimeTick;
@@ -87,15 +90,44 @@ public class Client {
         factory.setHost(HOST);
         connection = factory.newConnection();
         channel = connection.createChannel();
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        log.debug(" [*] Waiting for messages. To exit press CTRL+C");
+
+        replyQueueName = channel.queueDeclare().getQueue();
         consumer = new QueueingConsumer(channel);
-        channel.basicConsume(QUEUE_NAME, true, consumer);
+        channel.basicConsume(replyQueueName, true, consumer);
+
+        // channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+    }
+
+    public Message authenticate(Message message) throws Exception {
+        Message response = null;
+        String corrId = java.util.UUID.randomUUID().toString();
+
+        BasicProperties props = new BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(replyQueueName)
+                .build();
+        channel.basicPublish("", authenticationQueueName, props, message.getBytes());
+        log.debug(" [x] Sent '{}'", message.getType());
+        log.debug(" corrId: {}", corrId);
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = Message.loadFromBytes(delivery.getBody());
+                break;
+            }
+        }
+        log.debug(" [x] Received '{}'", response.getType());
+        return response;
     }
 
     public void sendMessage(Message message) throws InterruptedException, IOException {
         channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
         log.debug(" [x] Sent '{}'", message.getType());
+    }
+
+    public void receiveMessage() {
+
     }
 
     public void run() {
