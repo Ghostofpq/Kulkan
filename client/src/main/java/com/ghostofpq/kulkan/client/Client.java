@@ -4,6 +4,11 @@ import com.ghostofpq.kulkan.client.scenes.LoginScene;
 import com.ghostofpq.kulkan.client.scenes.Scene;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.QueueingConsumer;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
@@ -11,15 +16,22 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 import java.io.File;
+import java.io.IOException;
 
+@Slf4j
 public class Client {
     private static volatile Client instance = null;
-    boolean requestClose;
+    private final String HOST = "localhost";
+    private final String QUEUE_NAME = "hello";
     private Scene currentScene;
     private Player player;
     private long lastTimeTick;
     private int height;
     private int width;
+    private boolean requestClose;
+    private QueueingConsumer consumer;
+    private Connection connection;
+    private Channel channel;
 
     private Client() {
         this.height = 600;
@@ -60,6 +72,29 @@ public class Client {
             System.exit(0);
         }
         GraphicsManager.getInstance().ready3D();
+
+        try {
+            initConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+    private void initConnection() throws IOException {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(HOST);
+        connection = factory.newConnection();
+        channel = connection.createChannel();
+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        log.debug(" [*] Waiting for messages. To exit press CTRL+C");
+        consumer = new QueueingConsumer(channel);
+        channel.basicConsume(QUEUE_NAME, true, consumer);
+    }
+
+    public void sendMessage(String message) throws InterruptedException, IOException {
+        channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+        log.debug(" [x] Sent '{}'", message);
     }
 
     public void run() {
@@ -99,6 +134,13 @@ public class Client {
 
     public void quit() {
         requestClose = true;
+        try {
+            channel.close();
+            connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
 
     /**

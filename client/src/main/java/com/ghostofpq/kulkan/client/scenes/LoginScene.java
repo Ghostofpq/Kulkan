@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +47,14 @@ public class LoginScene implements Scene {
         button = new Button(200, 400, 300, 50, "CONNECT") {
             @Override
             public void onClick() {
-                log.debug("click {} / {}",pseudo.getContent(),password.getContent());
+                try {
+                    Client.getInstance().sendMessage(pseudo.getContent() + "/" + password.getContent());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                log.debug("click {} / {}", pseudo.getContent(), password.getContent());
             }
         };
 
