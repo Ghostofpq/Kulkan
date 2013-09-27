@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.entities.messages;
 
-public enum MessageType {
+import java.io.Serializable;
+
+public enum MessageType implements Serializable {
     GAME_START,
     GAME_END,
 
@@ -15,5 +17,8 @@ public enum MessageType {
 
     CHARACTER_ACTION_MOVE,
     CHARACTER_ACTION_ATTACK,
-    CHARACTER_ACTION_END_TURN;
+    CHARACTER_ACTION_END_TURN,
+
+    AUTHENTICATION_REQUEST,
+    AUTHENTICATION_RESPONSE;
 }

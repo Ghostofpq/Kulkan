@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.entities.messages;
 
-public class MessageGameEnd extends Message {
+import java.io.Serializable;
+
+public class MessageGameEnd extends Message implements Serializable {
     public MessageGameEnd() {
         type = MessageType.GAME_END;
     }

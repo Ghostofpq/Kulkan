@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.client.scenes.LoginScene;
 import com.ghostofpq.kulkan.client.scenes.Scene;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.messages.Message;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -92,9 +93,9 @@ public class Client {
         channel.basicConsume(QUEUE_NAME, true, consumer);
     }
 
-    public void sendMessage(String message) throws InterruptedException, IOException {
+    public void sendMessage(Message message) throws InterruptedException, IOException {
         channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
-        log.debug(" [x] Sent '{}'", message);
+        log.debug(" [x] Sent '{}'", message.getType());
     }
 
     public void run() {

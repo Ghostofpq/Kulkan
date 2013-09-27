@@ -2,7 +2,9 @@ package com.ghostofpq.kulkan.entities.messages;
 
 import com.ghostofpq.kulkan.entities.character.Player;
 
-public class MessageOtherPlayer extends Message {
+import java.io.Serializable;
+
+public class MessageOtherPlayer extends Message implements Serializable {
     private Player otherPlayer;
 
     public MessageOtherPlayer() {

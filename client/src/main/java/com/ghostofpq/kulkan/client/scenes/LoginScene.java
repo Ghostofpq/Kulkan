@@ -8,6 +8,7 @@ import com.ghostofpq.kulkan.client.graphics.TextField;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
+import com.ghostofpq.kulkan.entities.messages.MessageAuthenticationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -48,7 +49,8 @@ public class LoginScene implements Scene {
             @Override
             public void onClick() {
                 try {
-                    Client.getInstance().sendMessage(pseudo.getContent() + "/" + password.getContent());
+                    MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudo.getContent(), password.getContent());
+                    Client.getInstance().sendMessage(authenticationRequest);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

@@ -2,7 +2,9 @@ package com.ghostofpq.kulkan.entities.messages;
 
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 
-public class MessageGameStart extends Message {
+import java.io.Serializable;
+
+public class MessageGameStart extends Message implements Serializable {
     private Battlefield battlefield;
 
     public MessageGameStart() {

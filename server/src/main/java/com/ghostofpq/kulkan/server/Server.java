@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.server;
 
+import com.ghostofpq.kulkan.entities.messages.Message;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -56,8 +57,8 @@ public class Server {
 
     private void receiveMessage() throws InterruptedException {
         QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-        String message = new String(delivery.getBody());
-        log.debug(" [x] Received '{}'", message);
+        Message message = Message.loadFromBytes(delivery.getBody());
+        log.debug(" [x] Received '{}'", message.getType());
     }
 
     public void run() throws IOException, InterruptedException {

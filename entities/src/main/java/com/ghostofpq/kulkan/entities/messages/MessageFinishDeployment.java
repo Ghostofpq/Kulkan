@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.entities.messages;
 
-public class MessageFinishDeployment extends Message {
+import java.io.Serializable;
+
+public class MessageFinishDeployment extends Message implements Serializable {
     public MessageFinishDeployment() {
         type = MessageType.FINISH_DEPLOYMENT;
     }
