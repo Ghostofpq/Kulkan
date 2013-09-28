@@ -4,7 +4,10 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageAuthenticationRequest;
 import com.ghostofpq.kulkan.entities.messages.MessageAuthenticationResponse;
 import com.ghostofpq.kulkan.entities.messages.MessageErrorCode;
+import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -13,6 +16,7 @@ import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 @Slf4j
 public class Server {
@@ -23,7 +27,8 @@ public class Server {
     private QueueingConsumer consumer;
     private Connection connection;
     private Channel channelAuthenticating;
-
+    private MongoClient mongoClient;
+    private DB db;
 
     private Server() {
         requestClose = false;
@@ -48,6 +53,7 @@ public class Server {
 
     private void init() throws IOException {
         initConnection();
+        initDatabase();
     }
 
     private void initConnection() throws IOException {
@@ -61,6 +67,11 @@ public class Server {
         channelAuthenticating.basicConsume(authenticationQueueName, false, consumer);
 
         log.debug(" [*] Waiting for messages. To exit press CTRL+C");
+    }
+
+    private void initDatabase() throws UnknownHostException {
+        mongoClient = new MongoClient("localhost", 27017);
+        db = mongoClient.getDB("kulkan");
     }
 
     private void receiveMessage() throws InterruptedException, IOException {
@@ -79,17 +90,28 @@ public class Server {
                 case AUTHENTICATION_REQUEST:
                     //TODO do stuff;
                     MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
+                    boolean authenticationResult = AuthenticationManager.getInstance().authenticate(authenticationRequest.getPseudo(),
+                            authenticationRequest.getPassword());
+                    String tokenKey = AuthenticationManager.getInstance().getTokenKeyFor(authenticationRequest.getPseudo());
+
+                    MessageErrorCode code;
+                    if (authenticationResult) {
+                        code = MessageErrorCode.OK;
+                        LobbyManager.getInstance().addClient(tokenKey);
+                    } else {
+                        code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
+                    }
+
 
                     MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
                             authenticationRequest.getPseudo(),
                             authenticationRequest.getPassword(),
-                            "123456",
-                            MessageErrorCode.OK);
+                            tokenKey,
+                            code);
 
                     channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
                     channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 
-                    LobbyManager.getInstance().addClient(authenticationResponse.getTokenKey());
 
                     log.debug(" [x] Sent '{}'", authenticationResponse.getType());
             }
@@ -111,5 +133,9 @@ public class Server {
 
     public Connection getConnection() {
         return connection;
+    }
+
+    public DB getDb() {
+        return db;
     }
 }
