@@ -63,14 +63,14 @@ public class LoginScene implements Scene {
                             MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
                             if (response.getErrorCode().equals(MessageErrorCode.OK)) {
                                 closeConnections();
+                                log.debug("AUTH OK : key={}", response.getTokenKey());
                                 Client.getInstance().setTokenKey(response.getTokenKey());
                                 Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                             } else {
-                                log.debug("BAD INFO");
+                                log.debug("AUTH KO : BAD INFO");
                             }
                         }
                     }
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -78,7 +78,6 @@ public class LoginScene implements Scene {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                log.debug("click {} / {}", pseudo.getContent(), password.getContent());
             }
         };
 
@@ -117,7 +116,6 @@ public class LoginScene implements Scene {
                 .build();
         channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, props, message.getBytes());
         log.debug(" [x] Sent '{}'", message.getType());
-        log.debug(" corrId: {}", corrId);
         while (true) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
