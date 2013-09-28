@@ -4,8 +4,6 @@ import com.ghostofpq.kulkan.client.scenes.LoginScene;
 import com.ghostofpq.kulkan.client.scenes.Scene;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.entities.character.Player;
-import com.ghostofpq.kulkan.entities.messages.Message;
-import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -23,19 +21,27 @@ import java.io.IOException;
 @Slf4j
 public class Client {
     private static volatile Client instance = null;
-    private final String HOST = "localhost";
+    public  static final String HOST = "localhost";
     private final String QUEUE_NAME = "hello";
-    private String authenticationQueueName = "authentication";
-    private String replyQueueName;
+
+    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
+    private final String GAME_CLIENT_QUEUE_NAME_BASE = "/client/game";
+    private Channel channelGameOut;
+    private Channel channelGameIn;
+
+
     private Scene currentScene;
     private Player player;
+    private String tokenKey;
+    private int lobbyNumber = 0;
+    private int gameNumber;
     private long lastTimeTick;
     private int height;
     private int width;
     private boolean requestClose;
     private QueueingConsumer consumer;
     private Connection connection;
-    private Channel channel;
+
 
     private Client() {
         this.height = 600;
@@ -89,46 +95,8 @@ public class Client {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
         connection = factory.newConnection();
-        channel = connection.createChannel();
-
-        replyQueueName = channel.queueDeclare().getQueue();
-        consumer = new QueueingConsumer(channel);
-        channel.basicConsume(replyQueueName, true, consumer);
-
-        // channel.queueDeclare(QUEUE_NAME, false, false, false, null);
     }
 
-    public Message authenticate(Message message) throws Exception {
-        Message response = null;
-        String corrId = java.util.UUID.randomUUID().toString();
-
-        BasicProperties props = new BasicProperties
-                .Builder()
-                .correlationId(corrId)
-                .replyTo(replyQueueName)
-                .build();
-        channel.basicPublish("", authenticationQueueName, props, message.getBytes());
-        log.debug(" [x] Sent '{}'", message.getType());
-        log.debug(" corrId: {}", corrId);
-        while (true) {
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
-                response = Message.loadFromBytes(delivery.getBody());
-                break;
-            }
-        }
-        log.debug(" [x] Received '{}'", response.getType());
-        return response;
-    }
-
-    public void sendMessage(Message message) throws InterruptedException, IOException {
-        channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
-        log.debug(" [x] Sent '{}'", message.getType());
-    }
-
-    public void receiveMessage() {
-
-    }
 
     public void run() {
         while (!requestClose) {
@@ -167,13 +135,7 @@ public class Client {
 
     public void quit() {
         requestClose = true;
-        try {
-            channel.close();
-            connection.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(0);
-        }
+
     }
 
     /**
@@ -207,5 +169,17 @@ public class Client {
 
     public void sendRequest() {
         //Todo
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public String getTokenKey() {
+        return tokenKey;
+    }
+
+    public void setTokenKey(String tokenKey) {
+        this.tokenKey = tokenKey;
     }
 }

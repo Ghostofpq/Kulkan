@@ -18,11 +18,17 @@ public class Server {
     private static volatile Server instance = null;
     private final String HOST = "localhost";
     private final String QUEUE_NAME = "hello";
+
     private String authenticationQueueName = "authentication";
+
+    private String lobbyQueueName = "lobby";
+
     private boolean requestClose;
     private QueueingConsumer consumer;
     private Connection connection;
-    private Channel channel;
+    private Channel channelAuthenticating;
+    private Channel channelLobbyIn;
+    private Channel channelLobbyOut;
 
     private Server() {
         requestClose = false;
@@ -53,11 +59,11 @@ public class Server {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
         connection = factory.newConnection();
-        channel = connection.createChannel();
-        channel.queueDeclare(authenticationQueueName, false, false, false, null);
-        channel.basicQos(1);
-        consumer = new QueueingConsumer(channel);
-        channel.basicConsume(authenticationQueueName, false, consumer);
+        channelAuthenticating = connection.createChannel();
+        channelAuthenticating.queueDeclare(authenticationQueueName, false, false, false, null);
+        channelAuthenticating.basicQos(1);
+        consumer = new QueueingConsumer(channelAuthenticating);
+        channelAuthenticating.basicConsume(authenticationQueueName, false, consumer);
 
         log.debug(" [*] Waiting for messages. To exit press CTRL+C");
     }
@@ -84,8 +90,8 @@ public class Server {
                         "123456",
                         MessageErrorCode.OK);
 
-                channel.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
-                channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
+                channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 log.debug(" corrId: {}", props.getCorrelationId());
                 log.debug(" [x] Sent '{}'", authenticationResponse.getType());
         }
@@ -95,7 +101,7 @@ public class Server {
         while (!requestClose) {
             receiveMessage();
         }
-        channel.close();
+        channelAuthenticating.close();
         connection.close();
     }
 

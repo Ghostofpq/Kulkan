@@ -8,7 +8,10 @@ import com.ghostofpq.kulkan.client.graphics.TextField;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
-import com.ghostofpq.kulkan.entities.messages.MessageAuthenticationRequest;
+import com.ghostofpq.kulkan.entities.messages.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -21,11 +24,15 @@ import java.util.List;
 public class LoginScene implements Scene {
 
     private static volatile LoginScene instance = null;
+    private final String AUTHENTICATION_QUEUE_NAME = "authentication";
+    private String authenticationReplyQueueName;
+    private Channel channelAuthenticating;
     private TextField pseudo;
     private PasswordField password;
     private List<HUDElement> hudElementList;
     private Button button;
     private int indexOnFocus;
+    private QueueingConsumer consumer;
 
     private LoginScene() {
     }
@@ -50,7 +57,20 @@ public class LoginScene implements Scene {
             public void onClick() {
                 try {
                     MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudo.getContent(), password.getContent());
-                    Client.getInstance().authenticate(authenticationRequest);
+                    Message result = authenticate(authenticationRequest);
+                    if (null != result) {
+                        if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
+                            MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
+                            if (response.getErrorCode().equals(MessageErrorCode.OK)) {
+                                closeConnections();
+                                Client.getInstance().setTokenKey(response.getTokenKey());
+                                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                            } else {
+                                log.debug("BAD INFO");
+                            }
+                        }
+                    }
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -70,6 +90,43 @@ public class LoginScene implements Scene {
 
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
+
+        try {
+            initConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+    }
+
+    private void initConnection() throws IOException {
+        channelAuthenticating = Client.getInstance().getConnection().createChannel();
+        authenticationReplyQueueName = channelAuthenticating.queueDeclare().getQueue();
+        consumer = new QueueingConsumer(channelAuthenticating);
+        channelAuthenticating.basicConsume(authenticationReplyQueueName, true, consumer);
+    }
+
+    public Message authenticate(Message message) throws Exception {
+        Message response = null;
+        String corrId = java.util.UUID.randomUUID().toString();
+
+        AMQP.BasicProperties props = new AMQP.BasicProperties
+                .Builder()
+                .correlationId(corrId)
+                .replyTo(authenticationReplyQueueName)
+                .build();
+        channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, props, message.getBytes());
+        log.debug(" [x] Sent '{}'", message.getType());
+        log.debug(" corrId: {}", corrId);
+        while (true) {
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                response = Message.loadFromBytes(delivery.getBody());
+                break;
+            }
+        }
+        log.debug(" [x] Received '{}'", response.getType());
+        return response;
     }
 
     public void setFocusOn(int i) {
@@ -132,6 +189,15 @@ public class LoginScene implements Scene {
                 }
 
             }
+        }
+    }
+
+    public void closeConnections() {
+        try {
+            channelAuthenticating.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
         }
     }
 }
