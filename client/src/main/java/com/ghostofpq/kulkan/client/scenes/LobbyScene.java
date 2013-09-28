@@ -114,17 +114,17 @@ public class LobbyScene implements Scene {
 
     public void receiveMessage() {
         try {
-            QueueingConsumer.Delivery delivery = consumerLobbyIn.nextDelivery();
-            Message message = Message.loadFromBytes(delivery.getBody());
-            if (null != message) {
-
-                if (message.getType().equals(MessageType.LOBBY_SERVER)) {
-
-                    MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
-                    String receivedTextMessage = receivedMessage.getMessage(Client.getInstance().getTokenKey());
-                    log.debug(" [x] Received '{}' : [{}]", receivedMessage.getType(), receivedTextMessage);
-                    if (!receivedTextMessage.isEmpty()) {
-                        lobbyText.add(receivedTextMessage);
+            QueueingConsumer.Delivery delivery = consumerLobbyIn.nextDelivery(0);
+            if (null != delivery) {
+                Message message = Message.loadFromBytes(delivery.getBody());
+                if (null != message) {
+                    if (message.getType().equals(MessageType.LOBBY_SERVER)) {
+                        MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
+                        String receivedTextMessage = receivedMessage.getMessage(Client.getInstance().getTokenKey());
+                        log.debug(" [x] Received '{}' : [{}]", receivedMessage.getType(), receivedTextMessage);
+                        if (!receivedTextMessage.isEmpty()) {
+                            lobbyText.add(receivedTextMessage);
+                        }
                     }
                 }
             }

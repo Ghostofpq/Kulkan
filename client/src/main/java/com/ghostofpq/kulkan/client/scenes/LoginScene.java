@@ -106,6 +106,7 @@ public class LoginScene implements Scene {
     }
 
     public Message authenticate(Message message) throws Exception {
+        log.debug("authenticate");
         Message response = null;
         String corrId = java.util.UUID.randomUUID().toString();
 
