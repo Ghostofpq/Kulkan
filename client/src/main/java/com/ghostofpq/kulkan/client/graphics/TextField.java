@@ -68,4 +68,8 @@ public class TextField extends HUDElement {
     public void deleteLastChar() {
         content = content.substring(0, content.length() - 1);
     }
+
+    public void clear() {
+        content = "";
+    }
 }

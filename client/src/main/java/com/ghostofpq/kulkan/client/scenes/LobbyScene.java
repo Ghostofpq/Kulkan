@@ -8,15 +8,14 @@ import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.MessageLobbyClient;
+import com.ghostofpq.kulkan.entities.messages.MessageLobbyServer;
+import com.ghostofpq.kulkan.entities.messages.MessageType;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import com.rabbitmq.client.AMQP.BasicProperties;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.QueueingConsumer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -104,7 +103,10 @@ public class LobbyScene implements Scene {
 
     public void postMessage() {
         try {
-            channelLobbyOut.basicPublish("", LOBBY_CLIENT_QUEUE_NAME_BASE, null, inputText.getContent().getBytes());
+            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
+            log.debug(" [x] Sending '{}' : [{}]", messageLobbyClient.getType(), messageLobbyClient.getLobbyMessage());
+            channelLobbyOut.basicPublish("", LOBBY_CLIENT_QUEUE_NAME_BASE, null, messageLobbyClient.getBytes());
+            inputText.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -115,7 +117,16 @@ public class LobbyScene implements Scene {
             QueueingConsumer.Delivery delivery = consumerLobbyIn.nextDelivery();
             Message message = Message.loadFromBytes(delivery.getBody());
             if (null != message) {
-                log.debug(" [x] Received '{}'", message.getType());
+
+                if (message.getType().equals(MessageType.LOBBY_SERVER)) {
+
+                    MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
+                    String receivedTextMessage = receivedMessage.getMessage(Client.getInstance().getTokenKey());
+                    log.debug(" [x] Received '{}' : [{}]", receivedMessage.getType(), receivedTextMessage);
+                    if (!receivedTextMessage.isEmpty()) {
+                        lobbyText.add(receivedTextMessage);
+                    }
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -128,6 +139,7 @@ public class LobbyScene implements Scene {
 
     @Override
     public void update(long deltaTime) {
+        receiveMessage();
     }
 
     @Override
