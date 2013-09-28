@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.client.scenes;
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.HUDElement;
+import com.ghostofpq.kulkan.client.graphics.TextArea;
 import com.ghostofpq.kulkan.client.graphics.TextField;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
@@ -12,7 +13,6 @@ import com.ghostofpq.kulkan.entities.messages.MessageLobbyClient;
 import com.ghostofpq.kulkan.entities.messages.MessageLobbyServer;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -26,12 +26,9 @@ public class LobbyScene implements Scene {
 
     private static volatile LobbyScene instance = null;
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
-    private final String LOBBY_CLIENT_QUEUE_NAME_BASE = "/client/lobby";
     private Channel channelLobbyOut;
-    private Channel channelLobbyIn;
-    private QueueingConsumer consumerLobbyIn;
-    private List<String> lobbyText;
     private TextField inputText;
+    private TextArea lobbyMessages;
     private Button postButton;
     private Button matchmakingButton;
     private List<HUDElement> hudElementList;
@@ -53,9 +50,9 @@ public class LobbyScene implements Scene {
 
     @Override
     public void init() {
-        lobbyText = new ArrayList<String>();
         hudElementList = new ArrayList<HUDElement>();
         inputText = new TextField(100, 400, 300, 50, 120);
+        lobbyMessages = new TextArea(100, 100, 60, 10);
         postButton = new Button(450, 400, 50, 50, "POST") {
             @Override
             public void onClick() {
@@ -73,6 +70,7 @@ public class LobbyScene implements Scene {
         hudElementList.add(inputText);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
+        hudElementList.add(lobbyMessages);
 
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
@@ -85,13 +83,8 @@ public class LobbyScene implements Scene {
     }
 
     private void initConnection() throws IOException {
-        channelLobbyIn = Client.getInstance().getConnection().createChannel();
         channelLobbyOut = Client.getInstance().getConnection().createChannel();
-
-        channelLobbyIn.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
-        channelLobbyOut.queueDeclare(LOBBY_CLIENT_QUEUE_NAME_BASE, false, false, false, null);
-
-        consumerLobbyIn = new QueueingConsumer(channelLobbyIn);
+        channelLobbyOut.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
     }
 
     public void setFocusOn(int i) {
@@ -104,8 +97,8 @@ public class LobbyScene implements Scene {
     public void postMessage() {
         try {
             MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
-            log.debug(" [x] Sending '{}' : [{}]", messageLobbyClient.getType(), messageLobbyClient.getLobbyMessage());
-            channelLobbyOut.basicPublish("", LOBBY_CLIENT_QUEUE_NAME_BASE, null, messageLobbyClient.getBytes());
+            channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageLobbyClient.getBytes());
+            log.debug(" [-] WRITE ON {} : [{}]", LOBBY_SERVER_QUEUE_NAME_BASE, messageLobbyClient.getLobbyMessage());
             inputText.clear();
         } catch (IOException e) {
             e.printStackTrace();
@@ -113,23 +106,16 @@ public class LobbyScene implements Scene {
     }
 
     public void receiveMessage() {
-        try {
-            QueueingConsumer.Delivery delivery = consumerLobbyIn.nextDelivery(0);
-            if (null != delivery) {
-                Message message = Message.loadFromBytes(delivery.getBody());
-                if (null != message) {
-                    if (message.getType().equals(MessageType.LOBBY_SERVER)) {
-                        MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
-                        String receivedTextMessage = receivedMessage.getMessage(Client.getInstance().getTokenKey());
-                        log.debug(" [x] Received '{}' : [{}]", receivedMessage.getType(), receivedTextMessage);
-                        if (!receivedTextMessage.isEmpty()) {
-                            lobbyText.add(receivedTextMessage);
-                        }
-                    }
+        Message message = Client.getInstance().receiveMessage();
+        if (null != message) {
+            if (message.getType().equals(MessageType.LOBBY_SERVER)) {
+                MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
+                String receivedTextMessage = receivedMessage.getMessage(Client.getInstance().getTokenKey());
+                log.debug(" [x] Received '{}' : [{}]", receivedMessage.getType(), receivedTextMessage);
+                if (!receivedTextMessage.isEmpty()) {
+                    lobbyMessages.addLine(receivedTextMessage);
                 }
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageAuthenticationRequest;
 import com.ghostofpq.kulkan.entities.messages.MessageAuthenticationResponse;
 import com.ghostofpq.kulkan.entities.messages.MessageErrorCode;
+import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -17,18 +18,12 @@ import java.io.IOException;
 public class Server {
     private static volatile Server instance = null;
     private final String HOST = "localhost";
-    private final String QUEUE_NAME = "hello";
-
     private String authenticationQueueName = "authentication";
-
-    private String lobbyQueueName = "lobby";
-
     private boolean requestClose;
     private QueueingConsumer consumer;
     private Connection connection;
     private Channel channelAuthenticating;
-    private Channel channelLobbyIn;
-    private Channel channelLobbyOut;
+
 
     private Server() {
         requestClose = false;
@@ -46,7 +41,7 @@ public class Server {
     }
 
     public static void main(String[] argv) throws IOException, InterruptedException {
-        Server s = new Server();
+        Server s = Server.getInstance();
         s.init();
         s.run();
     }
@@ -69,37 +64,42 @@ public class Server {
     }
 
     private void receiveMessage() throws InterruptedException, IOException {
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
+        if (null != delivery) {
+            log.debug(" [-] RECEIVED MESSAGE ON : {}", authenticationQueueName);
+            BasicProperties props = delivery.getProperties();
+            BasicProperties replyProps = new BasicProperties.Builder()
+                    .correlationId(props.getCorrelationId())
+                    .build();
 
-        BasicProperties props = delivery.getProperties();
-        BasicProperties replyProps = new BasicProperties.Builder()
-                .correlationId(props.getCorrelationId())
-                .build();
+            Message message = Message.loadFromBytes(delivery.getBody());
+            log.debug(" [x] Received '{}'", message.getType());
 
-        Message message = Message.loadFromBytes(delivery.getBody());
-        log.debug(" [x] Received '{}'", message.getType());
+            switch (message.getType()) {
+                case AUTHENTICATION_REQUEST:
+                    //TODO do stuff;
+                    MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
 
-        switch (message.getType()) {
-            case AUTHENTICATION_REQUEST:
-                //TODO do stuff;
-                MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
+                    MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
+                            authenticationRequest.getPseudo(),
+                            authenticationRequest.getPassword(),
+                            "123456",
+                            MessageErrorCode.OK);
 
-                MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
-                        authenticationRequest.getPseudo(),
-                        authenticationRequest.getPassword(),
-                        "123456",
-                        MessageErrorCode.OK);
+                    channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
+                    channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 
-                channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
-                channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-                log.debug(" corrId: {}", props.getCorrelationId());
-                log.debug(" [x] Sent '{}'", authenticationResponse.getType());
+                    LobbyManager.getInstance().addClient(authenticationResponse.getTokenKey());
+
+                    log.debug(" [x] Sent '{}'", authenticationResponse.getType());
+            }
         }
     }
 
     public void run() throws IOException, InterruptedException {
         while (!requestClose) {
             receiveMessage();
+            LobbyManager.getInstance().run();
         }
         channelAuthenticating.close();
         connection.close();
@@ -107,5 +107,9 @@ public class Server {
 
     public void shutDown() {
         requestClose = true;
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 }

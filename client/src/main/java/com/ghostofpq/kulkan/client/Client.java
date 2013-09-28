@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.client.scenes.LoginScene;
 import com.ghostofpq.kulkan.client.scenes.Scene;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.messages.Message;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -20,16 +21,13 @@ import java.io.IOException;
 
 @Slf4j
 public class Client {
+    public static final String HOST = "localhost";
     private static volatile Client instance = null;
-    public  static final String HOST = "localhost";
-    private final String QUEUE_NAME = "hello";
-
+    private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
-    private final String GAME_CLIENT_QUEUE_NAME_BASE = "/client/game";
+    private String clientQueueName;
     private Channel channelGameOut;
-    private Channel channelGameIn;
-
-
+    private Channel channelIn;
     private Scene currentScene;
     private Player player;
     private String tokenKey;
@@ -63,7 +61,6 @@ public class Client {
     }
 
     public static void main(String[] argv) {
-
         System.setProperty("org.lwjgl.librarypath", new File("client/target/natives/").getAbsolutePath());
         Client g = Client.getInstance();
         g.setCurrentScene(LoginScene.getInstance());
@@ -97,6 +94,23 @@ public class Client {
         connection = factory.newConnection();
     }
 
+    public Message receiveMessage() {
+        Message result = null;
+        if (null != consumer) {
+            try {
+                QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
+                if (null != delivery) {
+                    result = Message.loadFromBytes(delivery.getBody());
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            log.debug("Authenticate yourself");
+
+        }
+        return result;
+    }
 
     public void run() {
         while (!requestClose) {
@@ -167,10 +181,6 @@ public class Client {
         this.player = player;
     }
 
-    public void sendRequest() {
-        //Todo
-    }
-
     public Connection getConnection() {
         return connection;
     }
@@ -181,5 +191,14 @@ public class Client {
 
     public void setTokenKey(String tokenKey) {
         this.tokenKey = tokenKey;
+        try {
+            clientQueueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            channelIn = connection.createChannel();
+            channelIn.queueDeclare(clientQueueName, false, false, false, null);
+            consumer = new QueueingConsumer(channelIn);
+            channelIn.basicConsume(clientQueueName, true, consumer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
