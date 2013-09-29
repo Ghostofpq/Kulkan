@@ -96,10 +96,12 @@ public class LobbyScene implements Scene {
 
     public void postMessage() {
         try {
-            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
-            channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageLobbyClient.getBytes());
-            log.debug(" [-] WRITE ON {} : [{}]", LOBBY_SERVER_QUEUE_NAME_BASE, messageLobbyClient.getLobbyMessage());
-            inputText.clear();
+            if (!inputText.getContent().isEmpty()) {
+                MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
+                channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageLobbyClient.getBytes());
+                log.debug(" [-] WRITE ON {} : [{}]", LOBBY_SERVER_QUEUE_NAME_BASE, messageLobbyClient.getLobbyMessage());
+                inputText.clear();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
