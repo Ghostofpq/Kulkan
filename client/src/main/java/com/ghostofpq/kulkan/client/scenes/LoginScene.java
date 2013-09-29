@@ -33,6 +33,7 @@ public class LoginScene implements Scene {
     private Button button;
     private int indexOnFocus;
     private QueueingConsumer consumer;
+    private Button quitButton;
 
     private LoginScene() {
     }
@@ -70,6 +71,8 @@ public class LoginScene implements Scene {
                                 log.debug("AUTH KO : BAD INFO");
                             }
                         }
+                    } else {
+                        log.debug("SERVER DOWN");
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -80,13 +83,21 @@ public class LoginScene implements Scene {
                 }
             }
         };
+        quitButton = new
 
+                Button(550, 50, 50, 50, "QUIT") {
+                    @Override
+                    public void onClick() {
+                        log.debug("QUIT");
+                        Client.getInstance().quit();
+                    }
+                };
 
         hudElementList = new ArrayList<HUDElement>();
         hudElementList.add(pseudo);
         hudElementList.add(password);
         hudElementList.add(button);
-
+        hudElementList.add(quitButton);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
 
@@ -117,14 +128,13 @@ public class LoginScene implements Scene {
                 .build();
         channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, props, message.getBytes());
         log.debug(" [x] Sent '{}'", message.getType());
-        while (true) {
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery(1000);
+        if (null != delivery) {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 response = Message.loadFromBytes(delivery.getBody());
-                break;
+                log.debug(" [x] Received '{}'", response.getType());
             }
         }
-        log.debug(" [x] Received '{}'", response.getType());
         return response;
     }
 
@@ -161,6 +171,10 @@ public class LoginScene implements Scene {
                     setFocusOn(hudElementList.indexOf(button));
                     button.onClick();
                 }
+                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    setFocusOn(hudElementList.indexOf(quitButton));
+                    quitButton.onClick();
+                }
             }
         }
         while (Keyboard.next()) {
@@ -194,9 +208,9 @@ public class LoginScene implements Scene {
     public void closeConnections() {
         try {
             channelAuthenticating.close();
+            log.debug("channelAuthenticating closed");
         } catch (IOException e) {
             e.printStackTrace();
-            System.exit(0);
         }
     }
 }

@@ -122,6 +122,16 @@ public class Client {
                 // waiting for at least 4 millis
             }
         }
+        try {
+            if (null != channelIn) {
+                channelIn.close();
+                log.debug("channelIn closed");
+            }
+            currentScene.closeConnections();
+            connection.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Display.destroy();
     }
 
@@ -149,7 +159,6 @@ public class Client {
 
     public void quit() {
         requestClose = true;
-
     }
 
     /**

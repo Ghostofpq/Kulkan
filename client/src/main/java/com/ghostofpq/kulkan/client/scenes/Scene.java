@@ -9,4 +9,6 @@ public interface Scene {
     public void render();
 
     public void manageInput();
+
+    public void closeConnections();
 }

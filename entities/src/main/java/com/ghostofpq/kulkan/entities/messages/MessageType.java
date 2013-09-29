@@ -23,5 +23,7 @@ public enum MessageType implements Serializable {
     AUTHENTICATION_RESPONSE,
 
     LOBBY_CLIENT,
-    LOBBY_SERVER;
+    LOBBY_SERVER,
+    LOBBY_PING,
+    LOBBY_PONG;
 }

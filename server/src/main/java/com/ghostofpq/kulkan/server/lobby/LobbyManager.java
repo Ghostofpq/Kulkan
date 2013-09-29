@@ -1,10 +1,7 @@
 package com.ghostofpq.kulkan.server.lobby;
 
 
-import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.MessageLobbyClient;
-import com.ghostofpq.kulkan.entities.messages.MessageLobbyServer;
-import com.ghostofpq.kulkan.entities.messages.MessageType;
+import com.ghostofpq.kulkan.entities.messages.*;
 import com.ghostofpq.kulkan.server.Server;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
@@ -21,12 +18,17 @@ public class LobbyManager {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
     private List<String> connectedClients;
+    private List<String> pongClients;
     private Channel channelOut;
     private Channel channelLobbyIn;
     private QueueingConsumer lobbyConsumer;
+    private long lastTimePing;
+
 
     private LobbyManager() {
         connectedClients = new ArrayList<String>();
+        pongClients = new ArrayList<String>();
+        lastTimePing = System.currentTimeMillis();
         try {
             channelOut = Server.getInstance().getConnection().createChannel();
             channelLobbyIn = Server.getInstance().getConnection().createChannel();
@@ -50,32 +52,40 @@ public class LobbyManager {
         return instance;
     }
 
-    public void run() {
-        MessageLobbyClient messageLobbyClient = receiveMessage();
-        if (null != messageLobbyClient) {
-            postMessage(messageLobbyClient);
+    public void run() throws IOException, InterruptedException {
+        receiveMessage();
+
+        if (deltaTimeInMillis() >= 15000) {
+            pingClients();
+            lastTimePing = System.currentTimeMillis();
         }
     }
 
-    public MessageLobbyClient receiveMessage() {
-        MessageLobbyClient result = null;
-        try {
-            QueueingConsumer.Delivery delivery = lobbyConsumer.nextDelivery(1);
-            if (null != delivery) {
-                log.debug(" [-] RECEIVED MESSAGE ON : {}", LOBBY_SERVER_QUEUE_NAME_BASE);
-                Message message = Message.loadFromBytes(delivery.getBody());
-                if (null != message) {
-                    if (message.getType().equals(MessageType.LOBBY_CLIENT)) {
-                        result = (MessageLobbyClient) message;
-                    } else {
+    private long deltaTimeInMillis() {
+        return System.currentTimeMillis() - lastTimePing;
+    }
+
+    public void receiveMessage() throws IOException, InterruptedException {
+        QueueingConsumer.Delivery delivery = lobbyConsumer.nextDelivery(1);
+        if (null != delivery) {
+            log.debug(" [-] RECEIVED MESSAGE ON : {}", LOBBY_SERVER_QUEUE_NAME_BASE);
+            Message message = Message.loadFromBytes(delivery.getBody());
+            if (null != message) {
+                switch (message.getType()) {
+                    case LOBBY_CLIENT:
+                        MessageLobbyClient messageLobbyClient = (MessageLobbyClient) message;
+                        postMessage(messageLobbyClient);
+                        break;
+                    case LOBBY_PONG:
+                        MessageLobbyPong messageLobbyPong = (MessageLobbyPong) message;
+                        pongFor(messageLobbyPong.getKeyToken());
+                        break;
+                    default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
-                    }
+                        break;
                 }
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
-        return result;
     }
 
     public void addClient(String clientKey) {
@@ -85,6 +95,7 @@ public class LobbyManager {
             channelOut.queueDeclare(clientChannelName, false, false, false, null);
             log.debug(" [-] OPENING QUEUE : {}", clientChannelName);
             connectedClients.add(clientKey);
+            pongClients.add(clientKey);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,19 +106,37 @@ public class LobbyManager {
         connectedClients.remove(clientKey);
     }
 
-    public void postMessage(MessageLobbyClient messageLobbyClient) {
+    public void postMessage(MessageLobbyClient messageLobbyClient) throws IOException {
         String message = new StringBuilder().append("[").append(messageLobbyClient.getKeyToken()).append("]  :  ").append(messageLobbyClient.getLobbyMessage()).toString();
-        MessageLobbyServer messageLobbyServer = new MessageLobbyServer(connectedClients, message);
+        MessageLobbyServer messageLobbyServer = new MessageLobbyServer(message);
         log.debug(" [-] LOBBY MESSAGE TO SEND : '{}'", message);
         for (String target : connectedClients) {
             String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(target).toString();
-            try {
-                log.debug(" [-] SENDING TO {}", target);
-                channelOut.basicPublish("", clientChannelName, null, messageLobbyServer.getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
+            log.debug(" [-] SENDING TO {}", target);
+            channelOut.basicPublish("", clientChannelName, null, messageLobbyServer.getBytes());
+        }
+    }
+
+    public void pingClients() throws IOException {
+        List<String> absentClients = new ArrayList<String>();
+        for (String target : connectedClients) {
+            if (pongClients.contains(target)) {
+                log.debug(" [-] SENDING PING TO {}", target);
+                String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(target).toString();
+                MessageLobbyPing messageLobbyPing = new MessageLobbyPing();
+                channelOut.basicPublish("", clientChannelName, null, messageLobbyPing.getBytes());
+            } else {
+                absentClients.add(target);
             }
         }
+        for (String absentClient : absentClients) {
+            removeClient(absentClient);
+        }
+        pongClients = new ArrayList<String>();
+    }
+
+    public void pongFor(String clientKey) {
+        pongClients.add(clientKey);
     }
 
     public void closeChannel() {

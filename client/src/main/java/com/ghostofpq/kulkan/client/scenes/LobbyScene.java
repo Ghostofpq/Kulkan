@@ -10,8 +10,8 @@ import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageLobbyClient;
+import com.ghostofpq.kulkan.entities.messages.MessageLobbyPong;
 import com.ghostofpq.kulkan.entities.messages.MessageLobbyServer;
-import com.ghostofpq.kulkan.entities.messages.MessageType;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
@@ -31,6 +31,7 @@ public class LobbyScene implements Scene {
     private TextArea lobbyMessages;
     private Button postButton;
     private Button matchmakingButton;
+    private Button quitButton;
     private List<HUDElement> hudElementList;
     private int indexOnFocus;
 
@@ -67,11 +68,18 @@ public class LobbyScene implements Scene {
                         enterMatchmaking();
                     }
                 };
+
+        quitButton = new Button(550, 0, 50, 50, "QUIT") {
+            @Override
+            public void onClick() {
+                Client.getInstance().quit();
+            }
+        };
         hudElementList.add(inputText);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
         hudElementList.add(lobbyMessages);
-
+        hudElementList.add(quitButton);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
         try {
@@ -107,16 +115,34 @@ public class LobbyScene implements Scene {
         }
     }
 
+    public void sendLobbyPong() {
+        MessageLobbyPong pong = new MessageLobbyPong(Client.getInstance().getTokenKey());
+        try {
+            channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, pong.getBytes());
+            log.debug(" [-] PONG ON {}", LOBBY_SERVER_QUEUE_NAME_BASE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void receiveMessage() {
         Message message = Client.getInstance().receiveMessage();
         if (null != message) {
-            if (message.getType().equals(MessageType.LOBBY_SERVER)) {
-                MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
-                String receivedTextMessage = receivedMessage.getMessage(Client.getInstance().getTokenKey());
-                log.debug(" [x] Received '{}' : [{}]", receivedMessage.getType(), receivedTextMessage);
-                if (!receivedTextMessage.isEmpty()) {
-                    lobbyMessages.addLine(receivedTextMessage);
-                }
+            switch (message.getType()) {
+                case LOBBY_SERVER:
+                    MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
+                    String receivedTextMessage = receivedMessage.getMessage();
+                    log.debug(" [x] Received Message : [{}]", receivedTextMessage);
+                    if (!receivedTextMessage.isEmpty()) {
+                        lobbyMessages.addLine(receivedTextMessage);
+                    }
+                    break;
+                case LOBBY_PING:
+                    log.debug(" [x] Received Ping");
+                    sendLobbyPong();
+                    break;
+                default:
+
             }
         }
     }
@@ -174,6 +200,15 @@ public class LobbyScene implements Scene {
                 }
 
             }
+        }
+    }
+
+    public void closeConnections() {
+        try {
+            channelLobbyOut.close();
+            log.debug("channelLobbyOut closed");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

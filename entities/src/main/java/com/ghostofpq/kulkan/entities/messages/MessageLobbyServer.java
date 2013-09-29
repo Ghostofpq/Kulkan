@@ -2,22 +2,16 @@ package com.ghostofpq.kulkan.entities.messages;
 
 
 import java.io.Serializable;
-import java.util.List;
 
-public class MessageLobbyServer extends MessageServer implements Serializable {
+public class MessageLobbyServer extends Message implements Serializable {
     private String message;
 
-    public MessageLobbyServer(List<String> targetList, String message) {
+    public MessageLobbyServer(String message) {
         this.type = MessageType.LOBBY_SERVER;
-        this.targetList = targetList;
         this.message = message;
     }
 
-    public String getMessage(String tokenKey) {
-        String result = "";
-        if (targetList.contains(tokenKey)) {
-            result = message;
-        }
-        return result;
+    public String getMessage() {
+        return message;
     }
 }
