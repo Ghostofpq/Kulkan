@@ -179,6 +179,10 @@ public class LobbyScene implements Scene {
                     setFocusOn(hudElementList.indexOf(matchmakingButton));
                     matchmakingButton.onClick();
                 }
+                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    setFocusOn(hudElementList.indexOf(quitButton));
+                    quitButton.onClick();
+                }
             }
         }
         while (Keyboard.next()) {
