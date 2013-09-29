@@ -1,7 +1,6 @@
 package com.ghostofpq.kulkan.server.matchmaking;
 
-import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.MessageMatchFound;
+import com.ghostofpq.kulkan.entities.messages.*;
 import com.ghostofpq.kulkan.server.Server;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
@@ -55,6 +54,7 @@ public class MatchmakingManager {
     public void run() throws IOException, InterruptedException {
         receiveMessage();
         match();
+        checkMatchPropositions();
     }
 
     public void receiveMessage() throws IOException, InterruptedException {
@@ -65,16 +65,20 @@ public class MatchmakingManager {
             if (null != message) {
                 switch (message.getType()) {
                     case MATCHMAKING_SUBSCRIBE:
-                        //addClient();
+                        MessageMatchmakingSubscribe messageMatchmakingSubscribe = (MessageMatchmakingSubscribe) message;
+                        addClient(messageMatchmakingSubscribe.getKeyToken());
                         break;
                     case MATCHMAKING_UNSUBSCRIBE:
-                        //removeClient();
+                        MessageMatchmakingUnsubscribe messageMatchmakingUnsubscribe = (MessageMatchmakingUnsubscribe) message;
+                        removeClient(messageMatchmakingUnsubscribe.getKeyToken());
                         break;
                     case MATCHMAKING_ACCEPT:
-
+                        MessageMatchmakingAccept messageMatchmakingAccept = (MessageMatchmakingAccept) message;
+                        matchMap.get(messageMatchmakingAccept.getMatchKey()).clientAccept(messageMatchmakingAccept.getKeyToken());
                         break;
                     case MATCHMAKING_REFUSE:
-
+                        MessageMatchmakingRefuse messageMatchmakingRefuse = (MessageMatchmakingRefuse) message;
+                        matchMap.get(messageMatchmakingRefuse.getMatchKey()).clientRefuse(messageMatchmakingRefuse.getKeyToken());
                         break;
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -99,6 +103,25 @@ public class MatchmakingManager {
     public void removeClient(String clientKey) {
         log.debug(" [-] REMOVING CLIENT KEY : {}", clientKey);
         subscribedClients.remove(clientKey);
+    }
+
+    public void checkMatchPropositions() {
+        for (Match match : matchMap.values()) {
+            Match.ClientState globalClientState = match.getGlobalClientState();
+            switch (globalClientState) {
+                case ACCEPT:
+                    //CREATE GAME
+                    break;
+                case REFUSE:
+                    List<String> clientsToReinject = match.getClientsToReinject();
+                    for (String client : clientsToReinject) {
+                        addClient(client);
+                    }
+                    break;
+                case PENDING:
+                    break;
+            }
+        }
     }
 
     public void match() {
