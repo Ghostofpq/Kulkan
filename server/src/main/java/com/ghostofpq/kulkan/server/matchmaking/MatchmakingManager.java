@@ -114,7 +114,6 @@ public class MatchmakingManager {
             switch (globalClientState) {
                 case ACCEPT:
                     //CREATE GAME
-                    matchesToRemove.add(matchKey);
                     break;
                 case REFUSE:
                     List<String> clientsToReinject = match.getClientsToReinject();
