@@ -1,7 +1,11 @@
 package com.ghostofpq.kulkan.server.matchmaking;
 
+import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
+import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.*;
 import com.ghostofpq.kulkan.server.Server;
+import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
+import com.ghostofpq.kulkan.server.utils.SaveManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
@@ -65,10 +69,12 @@ public class MatchmakingManager {
                 switch (message.getType()) {
                     case MATCHMAKING_SUBSCRIBE:
                         MessageMatchmakingSubscribe messageMatchmakingSubscribe = (MessageMatchmakingSubscribe) message;
+                        log.debug(" [-] SUBSCRIBE CLIENT : {}", messageMatchmakingSubscribe.getKeyToken());
                         addClient(messageMatchmakingSubscribe.getKeyToken());
                         break;
                     case MATCHMAKING_UNSUBSCRIBE:
                         MessageMatchmakingUnsubscribe messageMatchmakingUnsubscribe = (MessageMatchmakingUnsubscribe) message;
+                        log.debug(" [-] UNSUBSCRIBE CLIENT : {}", messageMatchmakingUnsubscribe.getKeyToken());
                         removeClient(messageMatchmakingUnsubscribe.getKeyToken());
                         break;
                     case MATCHMAKING_ACCEPT:
@@ -119,7 +125,22 @@ public class MatchmakingManager {
             Match.ClientState globalClientState = match.getGlobalClientState();
             switch (globalClientState) {
                 case ACCEPT:
-                    //CREATE GAME
+                    Battlefield battlefield = SaveManager.getInstance().loadMap("mapTest1");
+                    List<Player> playerList = new ArrayList<Player>();
+                    for (String client : match.getAllClients()) {
+                        playerList.add(SaveManager.getInstance().loadPlayer(AuthenticationManager.getInstance().getNameForKey(client)));
+                    }
+                    MessageGameStart messageGameStart = new MessageGameStart(matchKey, battlefield, playerList);
+                    for (String client : match.getAllClients()) {
+                        String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(client).toString();
+                        log.debug(" [-] GAME START FOR {}", client);
+                        try {
+                            channelOut.basicPublish("", clientChannelName, null, messageGameStart.getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    matchesToRemove.add(matchKey);
                     break;
                 case REFUSE:
                     List<String> clientsToReinject = match.getClientsToReinject();

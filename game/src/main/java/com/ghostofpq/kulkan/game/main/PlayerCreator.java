@@ -8,11 +8,11 @@ import com.ghostofpq.kulkan.game.utils.SaveManager;
 
 public class PlayerCreator {
     public static void main(String[] argv) {
-        Player player1 = new Player("Bob");
+        Player player1 = new Player("ghostofpq");
 
-        GameCharacter char1 = new GameCharacter("Bob1Human", RaceType.HUMAN, Gender.MALE);
-        GameCharacter char2 = new GameCharacter("Bob2Elve", RaceType.ELVE, Gender.FEMALE);
-        GameCharacter char3 = new GameCharacter("Bob3Dwarf", RaceType.DWARF, Gender.MALE);
+        GameCharacter char1 = new GameCharacter("ghostofpq1Human", RaceType.HUMAN, Gender.MALE);
+        GameCharacter char2 = new GameCharacter("ghostofpq2Elve", RaceType.ELVE, Gender.FEMALE);
+        GameCharacter char3 = new GameCharacter("ghostofpq3Dwarf", RaceType.DWARF, Gender.MALE);
 
         player1.getTeam().getTeam().add(char1);
         player1.getTeam().getTeam().add(char2);
@@ -21,11 +21,11 @@ public class PlayerCreator {
         SaveManager saveManager = SaveManager.getInstance();
         saveManager.savePlayer(player1);
 
-        Player player2 = new Player("Jack");
+        Player player2 = new Player("azerty");
 
-        GameCharacter char4 = new GameCharacter("Jack1Human", RaceType.HUMAN, Gender.MALE);
-        GameCharacter char5 = new GameCharacter("Jack2Elve", RaceType.ELVE, Gender.FEMALE);
-        GameCharacter char6 = new GameCharacter("Jack3Dwarf", RaceType.DWARF, Gender.MALE);
+        GameCharacter char4 = new GameCharacter("azerty1Human", RaceType.HUMAN, Gender.MALE);
+        GameCharacter char5 = new GameCharacter("azerty2Elve", RaceType.ELVE, Gender.FEMALE);
+        GameCharacter char6 = new GameCharacter("azerty3Dwarf", RaceType.DWARF, Gender.MALE);
 
         player2.getTeam().getTeam().add(char4);
         player2.getTeam().getTeam().add(char5);

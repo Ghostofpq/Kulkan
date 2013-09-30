@@ -1,11 +1,11 @@
 package com.ghostofpq.kulkan.client.graphics;
 
+import com.ghostofpq.kulkan.client.utils.GraphicsManager;
+import com.ghostofpq.kulkan.client.utils.HighlightColor;
+import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.PositionAbsolute;
-import com.ghostofpq.kulkan.game.utils.GraphicsManager;
-import com.ghostofpq.kulkan.game.utils.HighlightColor;
-import com.ghostofpq.kulkan.game.utils.TextureKey;
 
 import java.io.Serializable;
 

@@ -176,6 +176,14 @@ public class LobbyScene implements Scene {
                     matchFound = false;
                     matchId = "";
                     break;
+                case GAME_START:
+                    log.debug(" [x] GAME START");
+                    MessageGameStart messageGameStart = (MessageGameStart) message;
+                    Client.getInstance().setCurrentScene(BattleScene.getInstance());
+                    BattleScene.getInstance().setBattlefield(messageGameStart.getBattlefield());
+                    BattleScene.getInstance().setPlayerList(messageGameStart.getPlayers());
+                    BattleScene.getInstance().setGameId(messageGameStart.getGameID());
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;

@@ -912,7 +912,6 @@ public class BattleScene implements Scene {
                 }
             }
         }
-
     }
 
     private boolean pointOfViewHasChanged() {
