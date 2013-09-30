@@ -610,15 +610,9 @@ public class BattleScene implements Scene {
         GraphicsManager.getInstance().make3D();
         for (int i = 0; i < toDrawList.size(); i++) {
             toDrawList.get(i).draw();
-            // if (toDrawList.get(i).getPosition().equals(cursor)) {
-            //    Cube c = (Cube) toDrawList.get(i);
-            //   log.debug("Cube E:{} W:{} N:{} S:{} Z:{}", c.getFacetEast().isVisible(), c.getFacetWest().isVisible(), c.getFacetNorth().isVisible(), c.getFacetSouth().isVisible(), c.getFacetZenith().isVisible());
-            //}
+
         }
-        /**
-         for (Position position : positionsToDraw) {
-         todraw.get(position).draw();
-         }  */
+
 
     }
 

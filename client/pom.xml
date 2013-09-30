@@ -13,7 +13,7 @@
 
 
     <properties>
-        <main.class>com.ghostofpq.kulkan.game.main.Game</main.class>
+        <main.class>com.ghostofpq.kulkan.game.main.Client</main.class>
         <natives>${basedir}/target/natives/</natives>
         <natives.version>0.0.6</natives.version>
         <release.natives>natives/</release.natives>

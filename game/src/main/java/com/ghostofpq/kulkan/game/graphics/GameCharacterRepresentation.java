@@ -131,10 +131,6 @@ public class GameCharacterRepresentation extends DrawableObject {
 
             if (xDifferent || yDifferent || zDifferent) {
                 this.setMoving(true);
-                //log.debug("to go : {}/{}/{} ({}/{}/{}) => {}/{}/{} ",
-                //        getPositionAbsolute().getX(), getPositionAbsolute().getY(), getPositionAbsolute().getZ(),
-                //        getPosition().getX(), getPosition().getY(), getPosition().getZ(),
-                //        getPositionToGo().getX(), getPositionToGo().getY(), getPositionToGo().getZ());
                 setHeadingAngle(getHeadingAngleFor(getPositionToGo()));
 
                 if (!isJumping()) {
