@@ -3,6 +3,8 @@ package com.ghostofpq.kulkan.server.lobby;
 
 import com.ghostofpq.kulkan.entities.messages.*;
 import com.ghostofpq.kulkan.server.Server;
+import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
+import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
@@ -104,16 +106,22 @@ public class LobbyManager {
     public void removeClient(String clientKey) {
         log.debug(" [-] REMOVING CLIENT KEY : {}", clientKey);
         connectedClients.remove(clientKey);
+        MatchmakingManager.getInstance().removeClient(clientKey);
     }
 
     public void postMessage(MessageLobbyClient messageLobbyClient) throws IOException {
-        String message = new StringBuilder().append("[").append(messageLobbyClient.getKeyToken()).append("]  :  ").append(messageLobbyClient.getLobbyMessage()).toString();
-        MessageLobbyServer messageLobbyServer = new MessageLobbyServer(message);
-        log.debug(" [-] LOBBY MESSAGE TO SEND : '{}'", message);
-        for (String target : connectedClients) {
-            String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(target).toString();
-            log.debug(" [-] SENDING TO {}", target);
-            channelOut.basicPublish("", clientChannelName, null, messageLobbyServer.getBytes());
+        String clientPseudo = AuthenticationManager.getInstance().getNameForKey(messageLobbyClient.getKeyToken());
+        if (clientPseudo != "") {
+            String message = new StringBuilder().append("[").append(clientPseudo).append("]  :  ").append(messageLobbyClient.getLobbyMessage()).toString();
+            MessageLobbyServer messageLobbyServer = new MessageLobbyServer(message);
+            log.debug(" [-] LOBBY MESSAGE TO SEND : '{}'", message);
+            for (String target : connectedClients) {
+                String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(target).toString();
+                log.debug(" [-] SENDING TO {}", target);
+                channelOut.basicPublish("", clientChannelName, null, messageLobbyServer.getBytes());
+            }
+        } else {
+            removeClient(messageLobbyClient.getKeyToken());
         }
     }
 

@@ -104,6 +104,12 @@ public class MatchmakingManager {
     public void removeClient(String clientKey) {
         log.debug(" [-] REMOVING CLIENT KEY : {}", clientKey);
         subscribedClients.remove(clientKey);
+        for (String matchKey : matchMap.keySet()) {
+            Match match = matchMap.get(matchKey);
+            if (match.getAllClients().contains(clientKey)) {
+                match.clientRefuse(clientKey);
+            }
+        }
     }
 
     public void checkMatchPropositions() {

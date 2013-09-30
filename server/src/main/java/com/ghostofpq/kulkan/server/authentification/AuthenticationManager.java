@@ -53,6 +53,18 @@ public class AuthenticationManager {
         return result;
     }
 
+    public String getNameForKey(String key) {
+        String result = "";
+        DBCollection coll = Server.getInstance().getDb().getCollection("users");
+        BasicDBObject query = new BasicDBObject("key", key);
+        DBCursor cursor = coll.find(query);
+        if (cursor.hasNext()) {
+            DBObject obj = cursor.next();
+            result = (String) obj.get("pseudo");
+        }
+        return result;
+    }
+
     private String generateKey() {
         return String.valueOf((int) Math.floor(Math.random() * 10000000));
     }
