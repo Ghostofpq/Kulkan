@@ -107,7 +107,6 @@ public class Client {
             }
         } else {
             log.debug("Authenticate yourself");
-
         }
         return result;
     }

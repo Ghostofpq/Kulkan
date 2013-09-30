@@ -60,7 +60,6 @@ public class MatchmakingManager {
     public void receiveMessage() throws IOException, InterruptedException {
         QueueingConsumer.Delivery delivery = matchmakingConsumer.nextDelivery(1);
         if (null != delivery) {
-            log.debug(" [-] RECEIVED MESSAGE ON : {}", MATCHMAKING_SERVER_QUEUE_NAME_BASE);
             Message message = Message.loadFromBytes(delivery.getBody());
             if (null != message) {
                 switch (message.getType()) {
@@ -94,7 +93,9 @@ public class MatchmakingManager {
             String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(clientKey).toString();
             channelOut.queueDeclare(clientChannelName, false, false, false, null);
             log.debug(" [-] OPENING QUEUE : {}", clientChannelName);
-            subscribedClients.add(clientKey);
+            if (!subscribedClients.contains(clientKey)) {
+                subscribedClients.add(clientKey);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,21 +107,42 @@ public class MatchmakingManager {
     }
 
     public void checkMatchPropositions() {
-        for (Match match : matchMap.values()) {
+        List<String> matchesToRemove = new ArrayList<String>();
+        for (String matchKey : matchMap.keySet()) {
+            Match match = matchMap.get(matchKey);
             Match.ClientState globalClientState = match.getGlobalClientState();
             switch (globalClientState) {
                 case ACCEPT:
                     //CREATE GAME
+                    matchesToRemove.add(matchKey);
                     break;
                 case REFUSE:
                     List<String> clientsToReinject = match.getClientsToReinject();
                     for (String client : clientsToReinject) {
-                        addClient(client);
+                        if (!subscribedClients.contains(client)) {
+                            subscribedClients.add(client);
+                        }
+                        sendAbortMessage(client);
                     }
+                    matchesToRemove.add(matchKey);
                     break;
                 case PENDING:
                     break;
             }
+        }
+        for (String match : matchesToRemove) {
+            matchMap.remove(match);
+        }
+    }
+
+    public void sendAbortMessage(String clientKey) {
+        MessageMatchAbort messageMatchAbort = new MessageMatchAbort();
+        String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(clientKey).toString();
+        log.debug(" [-] MATCH ABORT FOR {}", clientKey);
+        try {
+            channelOut.basicPublish("", clientChannelName, null, messageMatchAbort.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

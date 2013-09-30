@@ -60,7 +60,7 @@ public class TextField extends HUDElement {
     }
 
     public void writeChar(char c) {
-        if (Character.isLetterOrDigit(c)) {
+        if (Character.isLetterOrDigit(c) || Character.isSpaceChar(c)) {
             if (content.length() < maxLength) {
                 content += c;
             }

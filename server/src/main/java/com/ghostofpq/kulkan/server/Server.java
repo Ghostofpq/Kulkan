@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.entities.messages.MessageAuthenticationResponse;
 import com.ghostofpq.kulkan.entities.messages.MessageErrorCode;
 import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
+import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.rabbitmq.client.AMQP.BasicProperties;
@@ -122,6 +123,7 @@ public class Server {
         while (!requestClose) {
             receiveMessage();
             LobbyManager.getInstance().run();
+            MatchmakingManager.getInstance().run();
         }
         channelAuthenticating.close();
         connection.close();

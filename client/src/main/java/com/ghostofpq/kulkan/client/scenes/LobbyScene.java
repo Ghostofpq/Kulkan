@@ -8,10 +8,7 @@ import com.ghostofpq.kulkan.client.graphics.TextField;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
-import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.MessageLobbyClient;
-import com.ghostofpq.kulkan.entities.messages.MessageLobbyPong;
-import com.ghostofpq.kulkan.entities.messages.MessageLobbyServer;
+import com.ghostofpq.kulkan.entities.messages.*;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
@@ -26,12 +23,18 @@ public class LobbyScene implements Scene {
 
     private static volatile LobbyScene instance = null;
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
+    private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
     private Channel channelLobbyOut;
+    private Channel channelMatchmakingOut;
     private TextField inputText;
     private TextArea lobbyMessages;
     private Button postButton;
     private Button matchmakingButton;
     private Button quitButton;
+    private Button acceptButton;
+    private Button refuseButton;
+    private boolean matchFound;
+    private String matchId;
     private List<HUDElement> hudElementList;
     private int indexOnFocus;
 
@@ -76,6 +79,22 @@ public class LobbyScene implements Scene {
                 Client.getInstance().quit();
             }
         };
+
+        acceptButton = new Button(550, 100, 50, 50, "ACCEPT") {
+            @Override
+            public void onClick() {
+                log.debug("ACCEPT");
+                acceptMatch();
+            }
+        };
+
+        refuseButton = new Button(550, 150, 50, 50, "REFUSE") {
+            @Override
+            public void onClick() {
+                log.debug("REFUSE");
+                refuseMatch();
+            }
+        };
         hudElementList.add(inputText);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
@@ -83,6 +102,8 @@ public class LobbyScene implements Scene {
         hudElementList.add(quitButton);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
+        matchFound = false;
+        matchId = "";
         try {
             initConnection();
         } catch (IOException e) {
@@ -94,6 +115,8 @@ public class LobbyScene implements Scene {
     private void initConnection() throws IOException {
         channelLobbyOut = Client.getInstance().getConnection().createChannel();
         channelLobbyOut.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
+        channelMatchmakingOut = Client.getInstance().getConnection().createChannel();
+        channelMatchmakingOut.queueDeclare(MATCHMAKING_SERVER_QUEUE_NAME_BASE, false, false, false, null);
     }
 
     public void setFocusOn(int i) {
@@ -142,14 +165,57 @@ public class LobbyScene implements Scene {
                     log.debug(" [x] Received Ping");
                     sendLobbyPong();
                     break;
+                case MATCHMAKING_MATCH_FOUND:
+                    log.debug(" [x] MATCH FOUND");
+                    MessageMatchFound messageMatchFound = (MessageMatchFound) message;
+                    matchFound = true;
+                    matchId = messageMatchFound.getMatchKey();
+                    break;
+                case MATCHMAKING_MATCH_ABORT:
+                    log.debug(" [x] MATCH ABORT");
+                    matchFound = false;
+                    matchId = "";
+                    break;
                 default:
+                    log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
+                    break;
 
             }
         }
     }
 
-    public void enterMatchmaking() {
+    public void acceptMatch() {
+        MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(Client.getInstance().getTokenKey(), matchId);
+        try {
+            channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingAccept.getBytes());
+            log.debug(" [-] ACCEPT MATCH");
+            matchFound = false;
+            matchId = "";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void refuseMatch() {
+        MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(Client.getInstance().getTokenKey(), matchId);
+        try {
+            channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingRefuse.getBytes());
+            log.debug(" [-] REFUSE MATCH");
+            matchFound = false;
+            matchId = "";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void enterMatchmaking() {
+        MessageMatchmakingSubscribe messageMatchmakingSubscribe = new MessageMatchmakingSubscribe(Client.getInstance().getTokenKey());
+        try {
+            channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingSubscribe.getBytes());
+            log.debug(" [-] SUBSCRIBE MATCHMAKING");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -162,6 +228,10 @@ public class LobbyScene implements Scene {
         GraphicsManager.getInstance().make2D();
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
+        }
+        if (matchFound) {
+            acceptButton.draw();
+            refuseButton.draw();
         }
     }
 
@@ -184,6 +254,13 @@ public class LobbyScene implements Scene {
                     setFocusOn(hudElementList.indexOf(quitButton));
                     quitButton.onClick();
                 }
+                if (acceptButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    acceptButton.onClick();
+                }
+                if (refuseButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    refuseButton.onClick();
+                }
+
             }
         }
         while (Keyboard.next()) {
@@ -212,6 +289,8 @@ public class LobbyScene implements Scene {
         try {
             channelLobbyOut.close();
             log.debug("channelLobbyOut closed");
+            channelMatchmakingOut.close();
+            log.debug("channelMatchmakingOut closed");
         } catch (IOException e) {
             e.printStackTrace();
         }

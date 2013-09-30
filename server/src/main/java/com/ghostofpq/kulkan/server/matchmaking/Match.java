@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class Match {
     private Map<String, ClientState> playersMap;
-    private String gameID;
 
     public Match(List<String> playersList) {
         playersMap = new HashMap<String, ClientState>();
