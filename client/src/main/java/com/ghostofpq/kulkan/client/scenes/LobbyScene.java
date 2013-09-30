@@ -72,6 +72,7 @@ public class LobbyScene implements Scene {
         quitButton = new Button(550, 0, 50, 50, "QUIT") {
             @Override
             public void onClick() {
+                log.debug("QUIT");
                 Client.getInstance().quit();
             }
         };

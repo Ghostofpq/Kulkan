@@ -144,7 +144,9 @@ public class Client {
     }
 
     public void update(long deltaTime) {
-        requestClose = Display.isCloseRequested();
+        if (!requestClose) {
+            requestClose = Display.isCloseRequested();
+        }
         currentScene.update(deltaTime);
     }
 
