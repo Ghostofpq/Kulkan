@@ -63,12 +63,7 @@
             </dependency>
 
 
-            <dependency>
-                <groupId>java3d</groupId>
-                <artifactId>vecmath</artifactId>
-                <version>1.3.1</version>
-            </dependency>
-
+            <!-- LWJGL -->
             <dependency>
                 <groupId>org.lwjgl.lwjgl</groupId>
                 <artifactId>lwjgl</artifactId>
@@ -93,12 +88,9 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
+
+
+            <!-- Utils -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -119,22 +111,44 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>1.0</version>
             </dependency>
+            <dependency>
+                <groupId>java3d</groupId>
+                <artifactId>vecmath</artifactId>
+                <version>1.3.1</version>
+            </dependency>
 
+            <!-- Spring framework -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring</artifactId>
+                <version>2.5.6</version>
+            </dependency>
+
+            <!-- Mongo DB -->
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongo-java-driver</artifactId>
                 <version>2.10.1</version>
             </dependency>
+
+            <!-- RabbitMQ -->
             <dependency>
                 <groupId>com.rabbitmq</groupId>
                 <artifactId>amqp-client</artifactId>
                 <version>3.1.4</version>
+            </dependency>
+
+            <!-- Tests -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
             </dependency>
 
         </dependencies>
