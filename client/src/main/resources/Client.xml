@@ -6,4 +6,8 @@
     <bean id="applicationProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location" value="classpath:application.properties"/>
     </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="hostIp" value="${host.ip}"/>
+    </bean>
 </beans>

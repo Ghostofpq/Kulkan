@@ -15,6 +15,8 @@ import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +64,9 @@ public class Client {
 
     public static void main(String[] argv) {
         System.setProperty("org.lwjgl.librarypath", new File("client/target/natives/").getAbsolutePath());
+        ApplicationContext context = new ClassPathXmlApplicationContext("Client.xml");
+        context.getBean("dataSource");
+
         Client g = Client.getInstance();
         g.setCurrentScene(LoginScene.getInstance());
 
