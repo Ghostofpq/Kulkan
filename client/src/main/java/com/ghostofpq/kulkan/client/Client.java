@@ -23,7 +23,12 @@ import java.io.IOException;
 
 @Slf4j
 public class Client {
-    public static final String HOST = "localhost";
+    //SPRING
+    private String hostIp;
+    private int height;
+    private int width;
+
+
     private static volatile Client instance = null;
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
@@ -36,19 +41,13 @@ public class Client {
     private int lobbyNumber = 0;
     private int gameNumber;
     private long lastTimeTick;
-    private int height;
-    private int width;
     private boolean requestClose;
     private QueueingConsumer consumer;
     private Connection connection;
 
 
     private Client() {
-        this.height = 600;
-        this.width = 800;
-        this.requestClose = false;
-        this.lastTimeTick = Sys.getTime();
-        init();
+
     }
 
     public static Client getInstance() {
@@ -65,15 +64,20 @@ public class Client {
     public static void main(String[] argv) {
         System.setProperty("org.lwjgl.librarypath", new File("client/target/natives/").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("Client.xml");
-        context.getBean("dataSource");
 
-        Client g = Client.getInstance();
+        Client g = ((Client) context.getBean("Client"));
+        g.init();
         g.setCurrentScene(LoginScene.getInstance());
 
         g.run();
     }
 
     public void init() {
+        if (instance == null) {
+            instance = this;
+        }
+        this.requestClose = false;
+        this.lastTimeTick = Sys.getTime();
         try {
             Display.setDisplayMode(new DisplayMode(this.width, this.height));
             Display.setSwapInterval(1);
@@ -95,7 +99,7 @@ public class Client {
 
     private void initConnection() throws IOException {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(HOST);
+        factory.setHost(hostIp);
         connection = factory.newConnection();
     }
 
@@ -215,5 +219,17 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 }
