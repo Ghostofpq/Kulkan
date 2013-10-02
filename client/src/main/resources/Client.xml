@@ -13,7 +13,5 @@
 
     <bean id="Client" class="com.ghostofpq.kulkan.client.Client">
         <property name="hostIp" value="${host.ip}"/>
-        <property name="height" value="${height}"/>
-        <property name="width" value="${width}"/>
     </bean>
 </beans>

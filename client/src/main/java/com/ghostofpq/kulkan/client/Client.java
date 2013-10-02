@@ -28,7 +28,6 @@ public class Client {
     private int height;
     private int width;
 
-
     private static volatile Client instance = null;
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
@@ -51,18 +50,11 @@ public class Client {
     }
 
     public static Client getInstance() {
-        if (instance == null) {
-            synchronized (Client.class) {
-                if (instance == null) {
-                    instance = new Client();
-                }
-            }
-        }
         return instance;
     }
 
     public static void main(String[] argv) {
-        System.setProperty("org.lwjgl.librarypath", new File("client/target/natives/").getAbsolutePath());
+        System.setProperty("org.lwjgl.librarypath", new File("client/target/natives").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("Client.xml");
 
         Client g = ((Client) context.getBean("Client"));
@@ -73,6 +65,8 @@ public class Client {
     }
 
     public void init() {
+        setHeight(600);
+        setWidth(800);
         if (instance == null) {
             instance = this;
         }

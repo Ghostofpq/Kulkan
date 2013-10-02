@@ -16,16 +16,15 @@ public class TextureManager {
         textureMap = new HashMap<TextureKey, Texture>();
 
         try {
-            Texture grass = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/Grass.PNG"));
-            Texture earth = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/Earth.PNG"));
+            Texture grass = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/Grass.PNG"));
+            Texture earth = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/Earth.PNG"));
 
-            Texture highlightB = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/HighlightB.PNG"));
-            Texture highlightG = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/HighlightG.PNG"));
-            Texture highlightR = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/HighlightR.PNG"));
-            Texture charac = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/perso1.png"));
+            Texture highlightB = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/HighlightB.PNG"));
+            Texture highlightG = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/HighlightG.PNG"));
+            Texture highlightR = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/HighlightR.PNG"));
 
-            Texture textfieldNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/field_not_selected.png"));
-            Texture textfieldFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("./resources/textures/field_selected.png"));
+            Texture textfieldNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_not_selected.png"));
+            Texture textfieldFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_selected.png"));
 
             textureMap.put(TextureKey.GRASS, grass);
             textureMap.put(TextureKey.EARTH, earth);
@@ -34,7 +33,6 @@ public class TextureManager {
             textureMap.put(TextureKey.HIGHLIGHT_GREEN, highlightG);
             textureMap.put(TextureKey.HIGHLIGHT_RED, highlightR);
 
-            textureMap.put(TextureKey.CHAR, charac);
 
             textureMap.put(TextureKey.TEXT_FIELD_NO_FOCUS, textfieldNoFocus);
             textureMap.put(TextureKey.TEXT_FIELD_FOCUS, textfieldFocus);
