@@ -22,6 +22,18 @@
         <fileSet>
             <directory>src/main/resources</directory>
             <outputDirectory>resources</outputDirectory>
+            <excludes>
+                <exclude>Client.xml</exclude>
+                <exclude>assembly.xml</exclude>
+                <exclude>application.properties</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>application.properties</include>
+            </includes>
         </fileSet>
     </fileSets>
 </assembly>

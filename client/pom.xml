@@ -29,6 +29,14 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>HUD/**</exclude>
+                    <exclude>spritesheets/**</exclude>
+                    <exclude>textures/**</exclude>
+                    <exclude>application.properties</exclude>
+                    <exclude>assembly.xml</exclude>
+                </excludes>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <testResources>
@@ -45,11 +53,12 @@
                         <manifest>
                             <mainClass>${main.class}</mainClass>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
+                            <classpathPrefix>lib</classpathPrefix>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>com.googlecode.mavennatives</groupId>
                 <artifactId>maven-nativedependencies-plugin</artifactId>
@@ -64,6 +73,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

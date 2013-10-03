@@ -8,7 +8,7 @@
 
 
     <context:property-placeholder
-            location="classpath:application.properties"/>
+            location="classpath:resources/application.properties"/>
     <context:property-placeholder/>
 
     <bean id="Client" class="com.ghostofpq.kulkan.client.Client">

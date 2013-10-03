@@ -23,14 +23,13 @@ import java.io.IOException;
 
 @Slf4j
 public class Client {
+    private static volatile Client instance = null;
+    private final String CLIENT_QUEUE_NAME_BASE = "/client/";
+    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
     //SPRING
     private String hostIp;
     private int height;
     private int width;
-
-    private static volatile Client instance = null;
-    private final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
     private String clientQueueName;
     private Channel channelGameOut;
     private Channel channelIn;
@@ -56,7 +55,6 @@ public class Client {
     public static void main(String[] argv) {
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("Client.xml");
-
         Client g = ((Client) context.getBean("Client"));
         g.init();
         g.setCurrentScene(LoginScene.getInstance());
@@ -65,6 +63,8 @@ public class Client {
     }
 
     public void init() {
+        log.debug("HOST : {}", hostIp);
+
         setHeight(600);
         setWidth(800);
         if (instance == null) {
@@ -173,8 +173,16 @@ public class Client {
         return height;
     }
 
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     public int getWidth() {
         return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public Scene getCurrentScene() {
@@ -217,13 +225,5 @@ public class Client {
 
     public void setHostIp(String hostIp) {
         this.hostIp = hostIp;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
     }
 }
