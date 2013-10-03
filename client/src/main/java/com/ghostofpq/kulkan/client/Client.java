@@ -54,7 +54,7 @@ public class Client {
     }
 
     public static void main(String[] argv) {
-        System.setProperty("org.lwjgl.librarypath", new File("client/target/natives").getAbsolutePath());
+        System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("Client.xml");
 
         Client g = ((Client) context.getBean("Client"));

@@ -6,7 +6,7 @@
     <fileSets>
         <fileSet>
             <directory>target/natives</directory>
-            <outputDirectory>client/target/natives</outputDirectory>
+            <outputDirectory>natives</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/lib</directory>
