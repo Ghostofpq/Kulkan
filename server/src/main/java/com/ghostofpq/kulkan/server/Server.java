@@ -22,7 +22,7 @@ import java.net.UnknownHostException;
 @Slf4j
 public class Server {
     private static volatile Server instance = null;
-    private final String HOST = "192.168.1.24";
+    private final String HOST = "localhost";
     private String authenticationQueueName = "authentication";
     private boolean requestClose;
     private QueueingConsumer consumer;
