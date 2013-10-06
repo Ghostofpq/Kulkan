@@ -96,11 +96,14 @@ public class Game {
                     switch (message.getType()) {
                         case FINISH_DEPLOYMENT:
                             MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = (MessageDeploymentFinishedForPlayer) message;
-                            log.error(" [-] FINISH DEPLOYMENT MESSAGE FROM {}", messageDeploymentFinishedForPlayer.getKeyToken());
+                            log.debug(" [-] FINISH DEPLOYMENT MESSAGE FROM {}", messageDeploymentFinishedForPlayer.getKeyToken());
                             for (GameCharacter gameCharacter : messageDeploymentFinishedForPlayer.getCharacterPositionMap().keySet()) {
-                                log.error("-> {} : {}", gameCharacter.getName(), messageDeploymentFinishedForPlayer.getCharacterPositionMap().get(gameCharacter));
+                                log.debug("-> {} : {}", gameCharacter.getName(), messageDeploymentFinishedForPlayer.getCharacterPositionMap().get(gameCharacter));
                             }
                             characterPositionMap.putAll(messageDeploymentFinishedForPlayer.getCharacterPositionMap());
+                            if (deployIsComplete()) {
+                                log.debug(" [-] DEPLOYMENT IS COMPLETE");
+                            }
                             break;
                         default:
                             log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -112,5 +115,23 @@ public class Game {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean deployIsComplete() {
+        boolean result = true;
+
+        for (Player player : playerList) {
+            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                if (characterPositionMap.containsKey(gameCharacter)) {
+                    result = false;
+                    break;
+                }
+            }
+            if (!result) {
+                break;
+            }
+        }
+
+        return result;
     }
 }
