@@ -181,7 +181,6 @@ public class LobbyScene implements Scene {
                     MessageGameStart messageGameStart = (MessageGameStart) message;
                     Client.getInstance().setCurrentScene(BattleScene.getInstance());
                     BattleScene.getInstance().setBattlefield(messageGameStart.getBattlefield());
-                    BattleScene.getInstance().setPlayerList(messageGameStart.getPlayers());
                     BattleScene.getInstance().setGameId(messageGameStart.getGameID());
                     break;
                 default:

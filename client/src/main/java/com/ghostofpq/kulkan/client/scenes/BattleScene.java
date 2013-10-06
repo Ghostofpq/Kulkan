@@ -4,16 +4,21 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.HighlightColor;
+import com.ghostofpq.kulkan.client.utils.InputManager;
+import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.PositionAbsolute;
+import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
-import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.MessageDeploymentFinishedForPlayer;
+import com.ghostofpq.kulkan.entities.messages.MessageDeploymentStart;
 import com.rabbitmq.client.Channel;
+import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 
 import java.io.IOException;
@@ -46,7 +51,8 @@ public class BattleScene implements Scene {
     private GameCharacterRepresentation currentGameCharacterRepresentation;
     private GameCharacterRepresentation targetGameCharacterRepresentation;
     private MenuSelectAction menuSelectAction;
-    private List<Player> playerList;
+    private int playerNumber;
+    private List<GameCharacter> characterListToDeploy;
     private List<GameCharacterRepresentation> characterRepresentationList;
 
     private BattleScene() {
@@ -112,7 +118,6 @@ public class BattleScene implements Scene {
         }
 
         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
-
     }
 
     @Override
@@ -123,6 +128,109 @@ public class BattleScene implements Scene {
 
     @Override
     public void manageInput() {
+        while (Keyboard.next()) {
+            if (Keyboard.getEventKeyState()) {
+                if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
+                    if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.UP)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                case EAST:
+                                    cursorLeft();
+                                    break;
+                                case NORTH:
+                                    cursorDown();
+                                    break;
+                                case SOUTH:
+                                    cursorUp();
+                                    break;
+                                case WEST:
+                                    cursorRight();
+                                    break;
+                            }
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.DOWN)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                case EAST:
+                                    cursorRight();
+                                    break;
+                                case NORTH:
+                                    cursorUp();
+                                    break;
+                                case SOUTH:
+                                    cursorDown();
+                                    break;
+                                case WEST:
+                                    cursorLeft();
+                                    break;
+                            }
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.LEFT)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                case EAST:
+                                    cursorDown();
+                                    break;
+                                case NORTH:
+                                    cursorRight();
+                                    break;
+                                case SOUTH:
+                                    cursorLeft();
+                                    break;
+                                case WEST:
+                                    cursorUp();
+                                    break;
+                            }
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.RIGHT)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                case EAST:
+                                    cursorUp();
+                                    break;
+                                case NORTH:
+                                    cursorLeft();
+                                    break;
+                                case SOUTH:
+                                    cursorRight();
+                                    break;
+                                case WEST:
+                                    cursorDown();
+                                    break;
+                            }
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_LEFT)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_RIGHT)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_IN)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_OUT)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.VALIDATE)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            placeCharacter();
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.SWITCH)) {
+                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -137,17 +245,6 @@ public class BattleScene implements Scene {
         this.engineIsBusy = engineIsBusy;
     }
 
-    public void setBattlefield(Battlefield battlefield) {
-        this.battlefield = battlefield;
-
-        southPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), battlefield.getDepth());
-        northPointOfView = new PositionAbsolute(0, battlefield.getHeight(), 0);
-        eastPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), 0);
-        westPointOfView = new PositionAbsolute(0, battlefield.getHeight(), battlefield.getDepth());
-
-        extractBattlefieldRepresentation(battlefield);
-    }
-
     public void postMessage(ClientMessage message) {
         try {
             channelGameOut.basicPublish("", gameQueueName, null, message.getBytes());
@@ -160,20 +257,17 @@ public class BattleScene implements Scene {
         Message message = Client.getInstance().receiveMessage();
         if (null != message) {
             switch (message.getType()) {
+                case START_DEPLOYMENT:
+                    MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
+                    characterListToDeploy = messageDeploymentStart.getCharacterList();
+                    playerNumber = messageDeploymentStart.getPlayerNumber();
+                    currentGameCharacter = characterListToDeploy.get(0);
+                    characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
+                    highlightDeploymentZone();
+                    break;
                 default:
                     break;
             }
-        }
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
-        gameQueueName = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameId).toString();
-        try {
-            channelGameOut = Client.getInstance().getConnection().createChannel();
-            channelGameOut.queueDeclare(gameQueueName, false, false, false, null);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -256,6 +350,59 @@ public class BattleScene implements Scene {
             }
         }
         Collections.sort(positionsToSelect);
+    }
+
+    public void placeCharacter() {
+        if (battlefield.getDeploymentZones().get(playerNumber).contains(cursor)) {
+            Position position = new Position(cursor);
+            position.plusY(1);
+            GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(currentGameCharacter, position);
+            characterRepresentationList.add(gameCharacterRepresentation);
+            drawableObjectList.add(gameCharacterRepresentation);
+            sortToDrawList();
+            characterListToDeploy.remove(currentGameCharacter);
+            if (characterListToDeploy.isEmpty()) {
+                characterRenderLeft = null;
+                sendDeploymentResult();
+                cleanHighlightDeploymentZone();
+            } else {
+                currentGameCharacter = characterListToDeploy.get(0);
+                characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
+            }
+            battlefield.getDeploymentZones().get(playerNumber).remove(cursor);
+        }
+    }
+
+    private void sendDeploymentResult() {
+        Map<GameCharacter, Position> gameCharacterPositionMap = new HashMap<GameCharacter, Position>();
+
+        for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
+            gameCharacterPositionMap.put(gameCharacterRepresentation.getCharacter(), gameCharacterRepresentation.getPosition());
+        }
+
+        MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(gameCharacterPositionMap, playerNumber);
+
+        try {
+            channelGameOut.basicPublish("", gameQueueName, null, messageDeploymentFinishedForPlayer.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void highlightDeploymentZone() {
+        List<Position> deploymentZonePlayer = battlefield.getDeploymentZones().get(playerNumber);
+        for (Position deploymentPosition : deploymentZonePlayer) {
+            battlefieldRepresentation.get(deploymentPosition).setHighlight(HighlightColor.GREEN);
+        }
+    }
+
+    private void cleanHighlightDeploymentZone() {
+        List<Position> deploymentZonePlayer = battlefield.getDeploymentZones().get(playerNumber);
+        for (Position deploymentPosition : deploymentZonePlayer) {
+            if (battlefieldRepresentation.get(deploymentPosition).getHighlight().equals(HighlightColor.GREEN)) {
+                battlefieldRepresentation.get(deploymentPosition).setHighlight(HighlightColor.NONE);
+            }
+        }
     }
 
     private int comparePositionForNorthPointOfView(PositionAbsolute thisPosition, PositionAbsolute otherPosition) {
@@ -351,11 +498,148 @@ public class BattleScene implements Scene {
         return result;
     }
 
-    public void setPlayerList(List<Player> playerList) {
-        this.playerList = playerList;
+    private void updateCursorTarget() {
+        targetGameCharacterRepresentation = null;
+        characterRenderRight = null;
+        for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
+            if (cursor.equals(gameCharacterRepresentation.getFootPosition())) {
+                targetGameCharacterRepresentation = gameCharacterRepresentation;
+                characterRenderRight = new CharacterRender(500, 0, 300, 100, 2, targetGameCharacterRepresentation.getCharacter());
+            }
+        }
     }
 
-    private enum BattleSceneState {
-        DEPLOY, PENDING, ACTION, MOVE, ATTACK, END_TURN
+    private void resetOldHighlight() {
+        battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.NONE);
+        if (currentState.equals(BattleSceneState.DEPLOY)) {
+            if (battlefield.getDeploymentZones().get(playerNumber).contains(cursor)) {
+                battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.GREEN);
+            }
+        }
+        if (currentState.equals(BattleSceneState.MOVE)) {
+            if (possiblePositionsToMove.contains(cursor)) {
+                battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.GREEN);
+            }
+        }
+        if (currentState.equals(BattleSceneState.ATTACK)) {
+            if (possiblePositionsToAttack.contains(cursor)) {
+                battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.RED);
+            }
+        }
     }
+
+    private void cursorUp() {
+        if (cursor.getZ() != 0) {
+            resetOldHighlight();
+            cursor.setZ(cursor.getZ() - 1);
+            if (!positionsToSelect.contains(cursor)) {
+                Position closestPosition = getClosestPosition(cursor);
+                cursor = new Position(closestPosition);
+            }
+            battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
+        }
+        updateCursorTarget();
+    }
+
+    private void cursorDown() {
+        if (cursor.getZ() != battlefield.getDepth() - 1) {
+            resetOldHighlight();
+            cursor.setZ(cursor.getZ() + 1);
+            if (!positionsToSelect.contains(cursor)) {
+                Position closestPosition = getClosestPosition(cursor);
+                cursor = new Position(closestPosition);
+            }
+        }
+        updateCursorTarget();
+    }
+
+    private void cursorLeft() {
+        if (cursor.getX() != 0) {
+            resetOldHighlight();
+            cursor.setX(cursor.getX() - 1);
+            if (!positionsToSelect.contains(cursor)) {
+                Position closestPosition = getClosestPosition(cursor);
+                cursor = new Position(closestPosition);
+            }
+        }
+        updateCursorTarget();
+    }
+
+    private void cursorRight() {
+        if (cursor.getX() != battlefield.getLength() - 1) {
+            resetOldHighlight();
+            cursor.setX(cursor.getX() + 1);
+            if (!positionsToSelect.contains(cursor)) {
+                Position closestPosition = getClosestPosition(cursor);
+                cursor = new Position(closestPosition);
+            }
+        }
+        updateCursorTarget();
+    }
+
+    private void cursorTab() {
+        List<Position> possiblePositions = getPossiblePositions(cursor.getX(), cursor.getZ());
+
+        if (possiblePositions.size() != 1) {
+            resetOldHighlight();
+            int i = possiblePositions.indexOf(cursor);
+            if (i == possiblePositions.size() - 1) {
+                i = 0;
+            } else {
+                i++;
+            }
+            cursor.setY(possiblePositions.get(i).getY());
+        }
+    }
+
+    private List<Position> getPossiblePositions(int x, int z) {
+        List<Position> possiblePositions = new ArrayList<Position>();
+        for (Position position : positionsToSelect) {
+            if ((position.getX() == x) && (position.getZ() == z)) {
+                possiblePositions.add(position);
+            }
+        }
+        if (possiblePositions.size() != 1) {
+            Collections.sort(possiblePositions);
+        }
+        return possiblePositions;
+    }
+
+    private Position getClosestPosition(Position cursor) {
+        List<Position> possiblePositions = getPossiblePositions(cursor.getX(), cursor.getZ());
+        for (int delta = 0; delta < battlefield.getHeight() - 1; delta++) {
+            Position deltaUp = new Position(cursor.getX(), cursor.getY() + delta, cursor.getZ());
+            Position deltaDown = new Position(cursor.getX(), cursor.getY() - delta, cursor.getZ());
+            if (possiblePositions.contains(deltaUp)) {
+                return deltaUp;
+            }
+            if (possiblePositions.contains(deltaDown)) {
+                return deltaDown;
+            }
+        }
+        return cursor;
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+        gameQueueName = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameId).toString();
+        try {
+            channelGameOut = Client.getInstance().getConnection().createChannel();
+            channelGameOut.queueDeclare(gameQueueName, false, false, false, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setBattlefield(Battlefield battlefield) {
+        this.battlefield = battlefield;
+
+        southPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), battlefield.getDepth());
+        northPointOfView = new PositionAbsolute(0, battlefield.getHeight(), 0);
+        eastPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), 0);
+        westPointOfView = new PositionAbsolute(0, battlefield.getHeight(), battlefield.getDepth());
+
+        extractBattlefieldRepresentation(battlefield);
+    }
+
 }
