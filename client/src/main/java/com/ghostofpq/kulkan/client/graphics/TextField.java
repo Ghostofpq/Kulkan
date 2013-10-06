@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.client.utils.TextureManager;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
+import org.newdawn.slick.opengl.Texture;
 
 @Slf4j
 public class TextField extends HUDElement {
@@ -27,19 +28,21 @@ public class TextField extends HUDElement {
     public void draw() {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glColor4f(1f, 1f, 1f, 1f);
+        Texture texture;
         if (hasFocus()) {
-            TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_FOCUS).bind();
+            texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_FOCUS);
         } else {
-            TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_NO_FOCUS).bind();
+            texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_NO_FOCUS);
         }
+        texture.bind();
         GL11.glBegin(GL11.GL_QUADS);
         GL11.glTexCoord2d(0, 0);
         GL11.glVertex2f(posX, posY);
-        GL11.glTexCoord2d(1, 0);
+        GL11.glTexCoord2d(texture.getWidth(), 0);
         GL11.glVertex2f(posX + width, posY);
-        GL11.glTexCoord2d(1, 1);
+        GL11.glTexCoord2d(texture.getWidth(), texture.getHeight());
         GL11.glVertex2f(posX + width, posY + height);
-        GL11.glTexCoord2d(0, 1);
+        GL11.glTexCoord2d(0, texture.getHeight());
         GL11.glVertex2f(posX, posY + height);
         GL11.glEnd();
 

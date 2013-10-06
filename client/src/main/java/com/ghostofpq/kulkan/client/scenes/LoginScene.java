@@ -1,13 +1,11 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
-import com.ghostofpq.kulkan.client.graphics.Button;
-import com.ghostofpq.kulkan.client.graphics.HUDElement;
-import com.ghostofpq.kulkan.client.graphics.PasswordField;
-import com.ghostofpq.kulkan.client.graphics.TextField;
+import com.ghostofpq.kulkan.client.graphics.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
+import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.messages.*;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -34,6 +32,7 @@ public class LoginScene implements Scene {
     private int indexOnFocus;
     private QueueingConsumer consumer;
     private Button quitButton;
+    private Background background;
 
     private LoginScene() {
     }
@@ -100,7 +99,7 @@ public class LoginScene implements Scene {
         hudElementList.add(quitButton);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
-
+        background = new Background(TextureKey.LOGIN_BACKGROUND);
         try {
             initConnection();
         } catch (IOException e) {
@@ -152,6 +151,7 @@ public class LoginScene implements Scene {
     @Override
     public void render() {
         GraphicsManager.getInstance().make2D();
+        background.draw();
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
         }

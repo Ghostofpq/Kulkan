@@ -5,6 +5,8 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.*;
 import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
+import com.ghostofpq.kulkan.server.game.GameManager;
+import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.utils.SaveManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
@@ -69,20 +71,20 @@ public class MatchmakingManager {
                 switch (message.getType()) {
                     case MATCHMAKING_SUBSCRIBE:
                         MessageMatchmakingSubscribe messageMatchmakingSubscribe = (MessageMatchmakingSubscribe) message;
-                        log.debug(" [-] SUBSCRIBE CLIENT : {}", messageMatchmakingSubscribe.getKeyToken());
                         addClient(messageMatchmakingSubscribe.getKeyToken());
                         break;
                     case MATCHMAKING_UNSUBSCRIBE:
                         MessageMatchmakingUnsubscribe messageMatchmakingUnsubscribe = (MessageMatchmakingUnsubscribe) message;
-                        log.debug(" [-] UNSUBSCRIBE CLIENT : {}", messageMatchmakingUnsubscribe.getKeyToken());
                         removeClient(messageMatchmakingUnsubscribe.getKeyToken());
                         break;
                     case MATCHMAKING_ACCEPT:
                         MessageMatchmakingAccept messageMatchmakingAccept = (MessageMatchmakingAccept) message;
+                        log.debug(" [-] CLIENT {} ACCEPTS MATCH {}", messageMatchmakingAccept.getKeyToken(), messageMatchmakingAccept.getMatchKey());
                         matchMap.get(messageMatchmakingAccept.getMatchKey()).clientAccept(messageMatchmakingAccept.getKeyToken());
                         break;
                     case MATCHMAKING_REFUSE:
                         MessageMatchmakingRefuse messageMatchmakingRefuse = (MessageMatchmakingRefuse) message;
+                        log.debug(" [-] CLIENT {} REFUSES MATCH {}", messageMatchmakingRefuse.getKeyToken(), messageMatchmakingRefuse.getMatchKey());
                         matchMap.get(messageMatchmakingRefuse.getMatchKey()).clientRefuse(messageMatchmakingRefuse.getKeyToken());
                         break;
                     default:
@@ -95,7 +97,7 @@ public class MatchmakingManager {
 
     public void addClient(String clientKey) {
         try {
-            log.debug(" [-] ADDING CLIENT KEY : {}", clientKey);
+            log.debug(" [-] ADDING CLIENT KEY {}", clientKey);
             String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(clientKey).toString();
             channelOut.queueDeclare(clientChannelName, false, false, false, null);
             log.debug(" [-] OPENING QUEUE : {}", clientChannelName);
@@ -108,7 +110,7 @@ public class MatchmakingManager {
     }
 
     public void removeClient(String clientKey) {
-        log.debug(" [-] REMOVING CLIENT KEY : {}", clientKey);
+        log.debug(" [-] REMOVING CLIENT KEY {}", clientKey);
         subscribedClients.remove(clientKey);
         for (String matchKey : matchMap.keySet()) {
             Match match = matchMap.get(matchKey);
@@ -125,6 +127,7 @@ public class MatchmakingManager {
             Match.ClientState globalClientState = match.getGlobalClientState();
             switch (globalClientState) {
                 case ACCEPT:
+                    log.debug(" [-] GAME {} STARTS ", matchKey);
                     Battlefield battlefield = SaveManager.getInstance().loadMap("mapTest1");
                     List<Player> playerList = new ArrayList<Player>();
                     for (String client : match.getAllClients()) {
@@ -133,16 +136,19 @@ public class MatchmakingManager {
                     MessageGameStart messageGameStart = new MessageGameStart(matchKey, battlefield, playerList);
                     for (String client : match.getAllClients()) {
                         String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(client).toString();
-                        log.debug(" [-] GAME START FOR {}", client);
                         try {
+                            log.debug(" [-] SENDING GAME START TO {}", client);
                             channelOut.basicPublish("", clientChannelName, null, messageGameStart.getBytes());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        LobbyManager.getInstance().removeClient(client);
                     }
+                    GameManager.getInstance().addGame(matchKey, battlefield, playerList);
                     matchesToRemove.add(matchKey);
                     break;
                 case REFUSE:
+                    log.debug(" [-] GAME {} WAS REFUSED ", matchKey);
                     List<String> clientsToReinject = match.getClientsToReinject();
                     for (String client : clientsToReinject) {
                         if (!subscribedClients.contains(client)) {

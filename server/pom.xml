@@ -11,6 +11,10 @@
 
     <artifactId>server</artifactId>
 
+    <properties>
+        <main.class>com.ghostofpq.kulkan.server.Server</main.class>
+    </properties>
+
     <build>
         <directory>target</directory>
         <outputDirectory>target/classes</outputDirectory>
@@ -35,6 +39,7 @@
                 <configuration>
                     <archive>
                         <manifest>
+                            <mainClass>${main.class}</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>

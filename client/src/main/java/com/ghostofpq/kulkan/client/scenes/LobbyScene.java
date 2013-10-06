@@ -192,26 +192,30 @@ public class LobbyScene implements Scene {
     }
 
     public void acceptMatch() {
-        MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(Client.getInstance().getTokenKey(), matchId);
-        try {
-            channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingAccept.getBytes());
-            log.debug(" [-] ACCEPT MATCH");
-            matchFound = false;
-            matchId = "";
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (null != matchId && !matchId.isEmpty()) {
+            MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(Client.getInstance().getTokenKey(), matchId);
+            try {
+                channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingAccept.getBytes());
+                log.debug(" [-] ACCEPT MATCH");
+                matchFound = false;
+                matchId = "";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void refuseMatch() {
-        MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(Client.getInstance().getTokenKey(), matchId);
-        try {
-            channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingRefuse.getBytes());
-            log.debug(" [-] REFUSE MATCH");
-            matchFound = false;
-            matchId = "";
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (null != matchId && !matchId.isEmpty()) {
+            MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(Client.getInstance().getTokenKey(), matchId);
+            try {
+                channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingRefuse.getBytes());
+                log.debug(" [-] REFUSE MATCH");
+                matchFound = false;
+                matchId = "";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

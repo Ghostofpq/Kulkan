@@ -28,5 +28,12 @@
                 <exclude>application.properties</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>.</outputDirectory>
+            <includes>
+                <include>debug.bat</include>
+            </includes>
+        </fileSet>
     </fileSets>
 </assembly>

@@ -34,6 +34,7 @@
                     <exclude>spritesheets/**</exclude>
                     <exclude>textures/**</exclude>
                     <exclude>assembly.xml</exclude>
+                    <exclude>debug.bat</exclude>
                 </excludes>
                 <filtering>false</filtering>
             </resource>

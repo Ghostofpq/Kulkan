@@ -65,9 +65,9 @@ public class Cube extends DrawableObject implements Serializable {
                 } else if (highlight.equals(HighlightColor.RED)) {
                     texture = TextureKey.HIGHLIGHT_RED;
                 }
-                facetZenith.setTexture(texture);
+                facetZenith.setTextureKey(texture);
             } else {
-                facetZenith.setTexture(textureTop);
+                facetZenith.setTextureKey(textureTop);
             }
 
             switch (pointOfView) {

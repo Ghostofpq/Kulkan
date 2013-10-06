@@ -6,17 +6,20 @@ import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.MessageDeploymentFinishedForPlayer;
 import com.ghostofpq.kulkan.entities.messages.MessageDeploymentStart;
 import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class Game {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
@@ -47,11 +50,14 @@ public class Game {
             String queueNameIn = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameID).toString();
             channelGameIn.queueDeclare(queueNameIn, false, false, false, null);
             gameConsumer = new QueueingConsumer(channelGameIn);
+            channelGameIn.basicConsume(queueNameIn, true, gameConsumer);
+            log.debug(" [-] OPENING QUEUE : {}", queueNameIn);
 
             channelGameOut = Server.getInstance().getConnection().createChannel();
             for (Player player : playerList) {
                 String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(player.getPseudo());
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(playerKey).toString();
+                log.debug(" [-] OPENING QUEUE : {}", queueName);
                 channelGameOut.queueDeclare(queueName, false, false, false, null);
                 playerChannelMap.put(player, queueName);
             }
@@ -72,6 +78,33 @@ public class Game {
         try {
             channelGameOut.basicPublish("", playerChannelMap.get(player), null, message.getBytes());
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void receiveMessage() {
+        try {
+            QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
+            if (null != delivery) {
+                Message message = Message.loadFromBytes(delivery.getBody());
+                if (null != message) {
+                    switch (message.getType()) {
+                        case FINISH_DEPLOYMENT:
+                            MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = (MessageDeploymentFinishedForPlayer) message;
+                            log.error(" [-] FINISH DEPLOYMENT MESSAGE FROM {}", messageDeploymentFinishedForPlayer.getKeyToken());
+                            for (GameCharacter gameCharacter : messageDeploymentFinishedForPlayer.getCharacterPositionMap().keySet()) {
+                                log.error("-> {} : {}", gameCharacter.getName(), messageDeploymentFinishedForPlayer.getCharacterPositionMap().get(gameCharacter));
+                            }
+                            characterPositionMap.putAll(messageDeploymentFinishedForPlayer.getCharacterPositionMap());
+                            break;
+                        default:
+                            log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
+                            break;
+                    }
+                }
+
+            }
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

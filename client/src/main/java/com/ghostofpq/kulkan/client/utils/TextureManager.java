@@ -26,6 +26,8 @@ public class TextureManager {
             Texture textfieldNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_not_selected.png"));
             Texture textfieldFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_selected.png"));
 
+            Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/login_background.jpg"));
+
             textureMap.put(TextureKey.GRASS, grass);
             textureMap.put(TextureKey.EARTH, earth);
 
@@ -36,6 +38,8 @@ public class TextureManager {
 
             textureMap.put(TextureKey.TEXT_FIELD_NO_FOCUS, textfieldNoFocus);
             textureMap.put(TextureKey.TEXT_FIELD_FOCUS, textfieldFocus);
+
+            textureMap.put(TextureKey.LOGIN_BACKGROUND, loginBackground);
 
         } catch (IOException e) {
             e.printStackTrace();

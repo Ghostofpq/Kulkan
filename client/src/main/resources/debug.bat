@@ -1,0 +1,1 @@
+java -jar client-0.0.2.jar

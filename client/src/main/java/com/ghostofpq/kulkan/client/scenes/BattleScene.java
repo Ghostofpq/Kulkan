@@ -18,16 +18,18 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageDeploymentFinishedForPlayer;
 import com.ghostofpq.kulkan.entities.messages.MessageDeploymentStart;
 import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 
 import java.io.IOException;
 import java.util.*;
 
+@Slf4j
 public class BattleScene implements Scene {
 
     private static volatile BattleScene instance = null;
-    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
+    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
     private String gameQueueName;
     private Channel channelGameOut;
     private BattleSceneState currentState;
@@ -95,7 +97,7 @@ public class BattleScene implements Scene {
     @Override
     public void update(long deltaTime) {
         boolean busy = false;
-
+        receiveMessage();
         for (DrawableObject drawableObject : drawableObjectList) {
             if (drawableObject.isMoving()) {
                 busy = true;
@@ -147,6 +149,8 @@ public class BattleScene implements Scene {
                                     cursorRight();
                                     break;
                             }
+                            GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            setEngineIsBusy(true);
                         }
                     } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.DOWN)) {
                         if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -164,6 +168,8 @@ public class BattleScene implements Scene {
                                     cursorLeft();
                                     break;
                             }
+                            GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            setEngineIsBusy(true);
                         }
                     } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.LEFT)) {
                         if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -181,6 +187,8 @@ public class BattleScene implements Scene {
                                     cursorUp();
                                     break;
                             }
+                            GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            setEngineIsBusy(true);
                         }
                     } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.RIGHT)) {
                         if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -198,6 +206,8 @@ public class BattleScene implements Scene {
                                     cursorDown();
                                     break;
                             }
+                            GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            setEngineIsBusy(true);
                         }
                     } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_LEFT)) {
                         if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -237,16 +247,9 @@ public class BattleScene implements Scene {
     public void closeConnections() {
     }
 
-    public boolean engineIsBusy() {
-        return engineIsBusy;
-    }
-
-    public void setEngineIsBusy(boolean engineIsBusy) {
-        this.engineIsBusy = engineIsBusy;
-    }
-
     public void postMessage(ClientMessage message) {
         try {
+            log.debug(" [-] POST MESSAGE {} ON {}", message.getType(), gameQueueName);
             channelGameOut.basicPublish("", gameQueueName, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -258,6 +261,7 @@ public class BattleScene implements Scene {
         if (null != message) {
             switch (message.getType()) {
                 case START_DEPLOYMENT:
+                    log.debug(" [-] START_DEPLOYMENT");
                     MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
                     characterListToDeploy = messageDeploymentStart.getCharacterList();
                     playerNumber = messageDeploymentStart.getPlayerNumber();
@@ -266,6 +270,7 @@ public class BattleScene implements Scene {
                     highlightDeploymentZone();
                     break;
                 default:
+                    log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
             }
         }
@@ -354,6 +359,8 @@ public class BattleScene implements Scene {
 
     public void placeCharacter() {
         if (battlefield.getDeploymentZones().get(playerNumber).contains(cursor)) {
+
+            log.debug(" [-] PLACE CHARACTER AT {}", cursor.toString());
             Position position = new Position(cursor);
             position.plusY(1);
             GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(currentGameCharacter, position);
@@ -362,6 +369,7 @@ public class BattleScene implements Scene {
             sortToDrawList();
             characterListToDeploy.remove(currentGameCharacter);
             if (characterListToDeploy.isEmpty()) {
+
                 characterRenderLeft = null;
                 sendDeploymentResult();
                 cleanHighlightDeploymentZone();
@@ -380,13 +388,11 @@ public class BattleScene implements Scene {
             gameCharacterPositionMap.put(gameCharacterRepresentation.getCharacter(), gameCharacterRepresentation.getPosition());
         }
 
-        MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(gameCharacterPositionMap, playerNumber);
+        MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(Client.getInstance().getTokenKey(), gameCharacterPositionMap, playerNumber);
 
-        try {
-            channelGameOut.basicPublish("", gameQueueName, null, messageDeploymentFinishedForPlayer.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        log.debug(" [-] DEPLOYMENT FINISHED FOR {}", messageDeploymentFinishedForPlayer.getKeyToken());
+        postMessage(messageDeploymentFinishedForPlayer);
+
     }
 
     private void highlightDeploymentZone() {
@@ -592,6 +598,10 @@ public class BattleScene implements Scene {
         }
     }
 
+    /*
+    * GETTERS AND SETTERS
+    */
+
     private List<Position> getPossiblePositions(int x, int z) {
         List<Position> possiblePositions = new ArrayList<Position>();
         for (Position position : positionsToSelect) {
@@ -642,4 +652,11 @@ public class BattleScene implements Scene {
         extractBattlefieldRepresentation(battlefield);
     }
 
+    public boolean engineIsBusy() {
+        return engineIsBusy;
+    }
+
+    public void setEngineIsBusy(boolean engineIsBusy) {
+        this.engineIsBusy = engineIsBusy;
+    }
 }
