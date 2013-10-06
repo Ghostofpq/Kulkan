@@ -26,6 +26,9 @@ public class TextureManager {
             Texture textfieldNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_not_selected.png"));
             Texture textfieldFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_selected.png"));
 
+            Texture buttonFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/homepage_800-600-button-rollover.png"));
+            Texture buttonNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/homepage_800-600-button-basic.png"));
+
             Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/login_background.jpg"));
 
             textureMap.put(TextureKey.GRASS, grass);
@@ -35,6 +38,9 @@ public class TextureManager {
             textureMap.put(TextureKey.HIGHLIGHT_GREEN, highlightG);
             textureMap.put(TextureKey.HIGHLIGHT_RED, highlightR);
 
+
+            textureMap.put(TextureKey.BUTTON_NO_FOCUS, buttonNoFocus);
+            textureMap.put(TextureKey.BUTTON_FOCUS, buttonFocus);
 
             textureMap.put(TextureKey.TEXT_FIELD_NO_FOCUS, textfieldNoFocus);
             textureMap.put(TextureKey.TEXT_FIELD_FOCUS, textfieldFocus);

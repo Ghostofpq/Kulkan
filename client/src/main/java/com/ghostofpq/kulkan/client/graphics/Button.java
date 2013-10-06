@@ -25,9 +25,9 @@ public abstract class Button extends HUDElement {
         GL11.glColor4f(1f, 1f, 1f, 1f);
         Texture texture;
         if (hasFocus()) {
-            texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_FOCUS);
-        } else {
             texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_NO_FOCUS);
+        } else {
+            texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_FOCUS);
         }
         texture.bind();
         GL11.glBegin(GL11.GL_QUADS);
