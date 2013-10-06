@@ -38,7 +38,13 @@ public class LobbyManager {
             lobbyConsumer = new QueueingConsumer(channelLobbyIn);
             channelLobbyIn.basicConsume(LOBBY_SERVER_QUEUE_NAME_BASE, true, lobbyConsumer);
             log.debug(" [-] OPENING QUEUE : {}", LOBBY_SERVER_QUEUE_NAME_BASE);
+            QueueingConsumer.Delivery delivery = lobbyConsumer.nextDelivery(1);
+            while (null != delivery) {
+                delivery = lobbyConsumer.nextDelivery(1);
+            }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

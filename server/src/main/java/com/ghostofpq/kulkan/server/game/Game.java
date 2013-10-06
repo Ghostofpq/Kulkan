@@ -52,7 +52,10 @@ public class Game {
             gameConsumer = new QueueingConsumer(channelGameIn);
             channelGameIn.basicConsume(queueNameIn, true, gameConsumer);
             log.debug(" [-] OPENING QUEUE : {}", queueNameIn);
-
+            QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
+            while (null != delivery) {
+                delivery = gameConsumer.nextDelivery(1);
+            }
             channelGameOut = Server.getInstance().getConnection().createChannel();
             for (Player player : playerList) {
                 String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(player.getPseudo());
@@ -62,6 +65,8 @@ public class Game {
                 playerChannelMap.put(player, queueName);
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

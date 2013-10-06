@@ -41,7 +41,13 @@ public class MatchmakingManager {
             matchmakingConsumer = new QueueingConsumer(channelMatchmakingIn);
             channelMatchmakingIn.basicConsume(MATCHMAKING_SERVER_QUEUE_NAME_BASE, true, matchmakingConsumer);
             log.debug(" [-] OPENING QUEUE : {}", MATCHMAKING_SERVER_QUEUE_NAME_BASE);
+            QueueingConsumer.Delivery delivery = matchmakingConsumer.nextDelivery(1);
+            while (null != delivery) {
+                delivery = matchmakingConsumer.nextDelivery(1);
+            }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

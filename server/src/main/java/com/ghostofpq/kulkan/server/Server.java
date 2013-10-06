@@ -53,12 +53,12 @@ public class Server {
         s.run();
     }
 
-    private void init() throws IOException {
+    private void init() throws IOException, InterruptedException {
         initConnection();
         initDatabase();
     }
 
-    private void initConnection() throws IOException {
+    private void initConnection() throws IOException, InterruptedException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
         connection = factory.newConnection();
@@ -67,7 +67,10 @@ public class Server {
         channelAuthenticating.basicQos(1);
         consumer = new QueueingConsumer(channelAuthenticating);
         channelAuthenticating.basicConsume(authenticationQueueName, false, consumer);
-
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery(1);
+        while (null != delivery) {
+            delivery = consumer.nextDelivery(1);
+        }
         log.debug(" [*] Waiting for messages. To exit press CTRL+C");
     }
 
