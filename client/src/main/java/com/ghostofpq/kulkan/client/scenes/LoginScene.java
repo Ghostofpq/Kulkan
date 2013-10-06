@@ -50,9 +50,9 @@ public class LoginScene implements Scene {
 
     @Override
     public void init() {
-        pseudo = new TextField(200, 200, 300, 50, 10);
-        password = new PasswordField(200, 300, 300, 50, 10);
-        button = new Button(200, 400, 300, 50, "CONNECT") {
+        pseudo = new TextField(250, 200, 300, 50, 10);
+        password = new PasswordField(250, 300, 300, 50, 10);
+        button = new Button(300, 400, 200, 50, "CONNECT") {
             @Override
             public void onClick() {
                 try {
@@ -83,8 +83,7 @@ public class LoginScene implements Scene {
             }
         };
         quitButton = new
-
-                Button(550, 50, 50, 50, "QUIT") {
+                Button(300, 500, 200, 50, "QUIT") {
                     @Override
                     public void onClick() {
                         log.debug("QUIT");
