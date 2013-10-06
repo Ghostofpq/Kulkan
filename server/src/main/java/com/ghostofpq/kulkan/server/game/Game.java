@@ -7,6 +7,7 @@ import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageDeploymentFinishedForPlayer;
+import com.ghostofpq.kulkan.entities.messages.MessageDeploymentPositionsOfPlayer;
 import com.ghostofpq.kulkan.entities.messages.MessageDeploymentStart;
 import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
@@ -26,7 +27,7 @@ public class Game {
     private BattleSceneState state;
     private Battlefield battlefield;
     private List<Player> playerList;
-    private Map<GameCharacter, Position> characterPositionMap;
+    private Map<Player, Map<GameCharacter, Position>> characterPositionMap;
     private Map<Player, String> playerChannelMap;
     private Channel channelGameIn;
     private Channel channelGameOut;
@@ -38,7 +39,7 @@ public class Game {
         this.playerList = playerList;
         this.gameID = gameID;
         state = BattleSceneState.DEPLOY;
-        characterPositionMap = new HashMap<GameCharacter, Position>();
+        characterPositionMap = new HashMap<Player, Map<GameCharacter, Position>>();
         playerChannelMap = new HashMap<Player, String>();
         initConnections();
         sendDeployMessage();
@@ -81,6 +82,7 @@ public class Game {
 
     private void sendMessageToPlayer(Player player, Message message) {
         try {
+            log.debug(" SENDING {} TO {}", message.getType(), playerChannelMap);
             channelGameOut.basicPublish("", playerChannelMap.get(player), null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -100,9 +102,25 @@ public class Game {
                             for (GameCharacter gameCharacter : messageDeploymentFinishedForPlayer.getCharacterPositionMap().keySet()) {
                                 log.debug("-> {} : {}", gameCharacter.getName(), messageDeploymentFinishedForPlayer.getCharacterPositionMap().get(gameCharacter));
                             }
-                            characterPositionMap.putAll(messageDeploymentFinishedForPlayer.getCharacterPositionMap());
+                            characterPositionMap.put(playerList.get(messageDeploymentFinishedForPlayer.getPlayerNumber()), messageDeploymentFinishedForPlayer.getCharacterPositionMap());
                             if (deployIsComplete()) {
                                 log.debug(" [-] DEPLOYMENT IS COMPLETE");
+                                for (Player player : playerList) {
+                                    log.debug("player {}", playerList.indexOf(player));
+                                    Map<GameCharacter, Position> characterPositionMapForPlayer = new HashMap<GameCharacter, Position>();
+                                    for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
+                                        log.debug("-> {} : {}", gameCharacter.getName(), characterPositionMap.get(player).get(gameCharacter));
+                                        characterPositionMapForPlayer.put(gameCharacter, characterPositionMap.get(player).get(gameCharacter));
+                                    }
+
+                                    MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer =
+                                            new MessageDeploymentPositionsOfPlayer(characterPositionMapForPlayer, playerList.indexOf(player));
+                                    for (Player playerToNotify : playerList) {
+                                        if (player != playerToNotify) {
+                                            sendMessageToPlayer(playerToNotify, messageDeploymentPositionsOfPlayer);
+                                        }
+                                    }
+                                }
                             }
                             break;
                         default:
@@ -122,7 +140,12 @@ public class Game {
 
         for (Player player : playerList) {
             for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
-                if (characterPositionMap.containsKey(gameCharacter)) {
+                if (null != characterPositionMap.get(player)) {
+                    if (characterPositionMap.get(player).containsKey(gameCharacter)) {
+                        result = false;
+                        break;
+                    }
+                } else {
                     result = false;
                     break;
                 }

@@ -13,10 +13,7 @@ import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
-import com.ghostofpq.kulkan.entities.messages.ClientMessage;
-import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.MessageDeploymentFinishedForPlayer;
-import com.ghostofpq.kulkan.entities.messages.MessageDeploymentStart;
+import com.ghostofpq.kulkan.entities.messages.*;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
@@ -269,6 +266,18 @@ public class BattleScene implements Scene {
                     characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
                     highlightDeploymentZone();
                     break;
+                case OTHER_PLAYER_DEPLOYMENT:
+                    MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer = (MessageDeploymentPositionsOfPlayer) message;
+                    log.debug(" [-] DEPLOYMENT OF PLAYER {}", messageDeploymentPositionsOfPlayer.getPlayerNumber());
+                    for (GameCharacter gameCharacter : messageDeploymentPositionsOfPlayer.getCharacterPositionMap().keySet()) {
+                        GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(gameCharacter,
+                                messageDeploymentPositionsOfPlayer.getCharacterPositionMap().get(gameCharacter),
+                                messageDeploymentPositionsOfPlayer.getPlayerNumber());
+                        characterRepresentationList.add(gameCharacterRepresentation);
+                        drawableObjectList.add(gameCharacterRepresentation);
+                        sortToDrawList();
+                    }
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
@@ -363,7 +372,7 @@ public class BattleScene implements Scene {
             log.debug(" [-] PLACE CHARACTER AT {}", cursor.toString());
             Position position = new Position(cursor);
             position.plusY(1);
-            GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(currentGameCharacter, position);
+            GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(currentGameCharacter, position, playerNumber);
             characterRepresentationList.add(gameCharacterRepresentation);
             drawableObjectList.add(gameCharacterRepresentation);
             sortToDrawList();

@@ -32,12 +32,12 @@ public class GameCharacterRepresentation extends DrawableObject {
     private boolean isJumping;
     private boolean hasMoved;
     private boolean hasActed;
+    private int playerNumber;
 
-
-    public GameCharacterRepresentation(GameCharacter character, Position position) {
+    public GameCharacterRepresentation(GameCharacter character, Position position, int playerNumber) {
         setCharacter(character);
         setMoving(false);
-
+        this.playerNumber = playerNumber;
         setHourglass(100);
         setJumping(false);
         setHasActed(false);
@@ -702,6 +702,10 @@ public class GameCharacterRepresentation extends DrawableObject {
 
     public void setHasActed(boolean hasActed) {
         this.hasActed = hasActed;
+    }
+
+    public int getPlayerNumber() {
+        return playerNumber;
     }
 
     public enum Facing {

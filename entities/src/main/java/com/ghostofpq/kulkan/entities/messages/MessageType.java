@@ -10,7 +10,7 @@ public enum MessageType implements Serializable {
     OTHER_PLAYER,
 
     START_DEPLOYMENT,
-    PLACE_CHARACTER,
+    OTHER_PLAYER_DEPLOYMENT,
     FINISH_DEPLOYMENT,
 
     ALL_POSITIONS,
