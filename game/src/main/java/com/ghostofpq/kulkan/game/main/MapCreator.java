@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.game.main;
 
+import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
@@ -26,6 +27,8 @@ public class MapCreator {
             Position position2 = new Position(i, 0, depth - 1);
             battlefield.addDeployementZone(1, position2);
         }
+        battlefield.setStartingPointsOfViewForPlayer(0, PointOfView.NORTH);
+        battlefield.setStartingPointsOfViewForPlayer(1, PointOfView.SOUTH);
 
         battlefield.addBattlefieldElement(0, 1, 0, BattlefieldElement.BattlefieldElementType.BLOC);
         battlefield.addBattlefieldElement(0, 2, 1, BattlefieldElement.BattlefieldElementType.BLOC);

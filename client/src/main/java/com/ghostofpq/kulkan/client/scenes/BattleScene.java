@@ -94,7 +94,7 @@ public class BattleScene implements Scene {
     @Override
     public void update(long deltaTime) {
         boolean busy = false;
-        receiveMessage();
+
         for (DrawableObject drawableObject : drawableObjectList) {
             if (drawableObject.isMoving()) {
                 busy = true;
@@ -107,16 +107,19 @@ public class BattleScene implements Scene {
         }
         if (GraphicsManager.getInstance().update3DMovement()) {
             busy = true;
+            if (!busy) {
+                log.debug("finished");
+            }
         }
 
         setEngineIsBusy(busy);
-
 
         for (DrawableObject drawableObject : drawableObjectList) {
             drawableObject.update(deltaTime);
         }
 
         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
+        receiveMessage();
     }
 
     @Override
@@ -127,112 +130,114 @@ public class BattleScene implements Scene {
 
     @Override
     public void manageInput() {
-        while (Keyboard.next()) {
-            if (Keyboard.getEventKeyState()) {
-                if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
-                    if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.UP)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
-                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
-                                case EAST:
-                                    cursorLeft();
-                                    break;
-                                case NORTH:
-                                    cursorDown();
-                                    break;
-                                case SOUTH:
-                                    cursorUp();
-                                    break;
-                                case WEST:
-                                    cursorRight();
-                                    break;
+        if (!engineIsBusy()) {
+            while (Keyboard.next()) {
+                if (Keyboard.getEventKeyState()) {
+                    if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
+                        if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.UP)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        cursorLeft();
+                                        break;
+                                    case NORTH:
+                                        cursorDown();
+                                        break;
+                                    case SOUTH:
+                                        cursorUp();
+                                        break;
+                                    case WEST:
+                                        cursorRight();
+                                        break;
+                                }
+                                GraphicsManager.getInstance().requestCenterPosition(cursor);
+                                setEngineIsBusy(true);
                             }
-                            GraphicsManager.getInstance().requestCenterPosition(cursor);
-                            setEngineIsBusy(true);
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.DOWN)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
-                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
-                                case EAST:
-                                    cursorRight();
-                                    break;
-                                case NORTH:
-                                    cursorUp();
-                                    break;
-                                case SOUTH:
-                                    cursorDown();
-                                    break;
-                                case WEST:
-                                    cursorLeft();
-                                    break;
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.DOWN)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        cursorRight();
+                                        break;
+                                    case NORTH:
+                                        cursorUp();
+                                        break;
+                                    case SOUTH:
+                                        cursorDown();
+                                        break;
+                                    case WEST:
+                                        cursorLeft();
+                                        break;
+                                }
+                                GraphicsManager.getInstance().requestCenterPosition(cursor);
+                                setEngineIsBusy(true);
                             }
-                            GraphicsManager.getInstance().requestCenterPosition(cursor);
-                            setEngineIsBusy(true);
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.LEFT)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
-                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
-                                case EAST:
-                                    cursorDown();
-                                    break;
-                                case NORTH:
-                                    cursorRight();
-                                    break;
-                                case SOUTH:
-                                    cursorLeft();
-                                    break;
-                                case WEST:
-                                    cursorUp();
-                                    break;
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.LEFT)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        cursorDown();
+                                        break;
+                                    case NORTH:
+                                        cursorRight();
+                                        break;
+                                    case SOUTH:
+                                        cursorLeft();
+                                        break;
+                                    case WEST:
+                                        cursorUp();
+                                        break;
+                                }
+                                GraphicsManager.getInstance().requestCenterPosition(cursor);
+                                setEngineIsBusy(true);
                             }
-                            GraphicsManager.getInstance().requestCenterPosition(cursor);
-                            setEngineIsBusy(true);
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.RIGHT)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
-                            switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
-                                case EAST:
-                                    cursorUp();
-                                    break;
-                                case NORTH:
-                                    cursorLeft();
-                                    break;
-                                case SOUTH:
-                                    cursorRight();
-                                    break;
-                                case WEST:
-                                    cursorDown();
-                                    break;
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.RIGHT)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        cursorUp();
+                                        break;
+                                    case NORTH:
+                                        cursorLeft();
+                                        break;
+                                    case SOUTH:
+                                        cursorRight();
+                                        break;
+                                    case WEST:
+                                        cursorDown();
+                                        break;
+                                }
+                                GraphicsManager.getInstance().requestCenterPosition(cursor);
+                                setEngineIsBusy(true);
                             }
-                            GraphicsManager.getInstance().requestCenterPosition(cursor);
-                            setEngineIsBusy(true);
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_LEFT)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_LEFT)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
 
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_RIGHT)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            }
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_RIGHT)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
 
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_IN)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            }
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_IN)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
 
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_OUT)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            }
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_OUT)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
 
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.VALIDATE)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
-                            placeCharacter();
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            }
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.VALIDATE)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                                placeCharacter();
+                            }
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
 
-                        }
-                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.SWITCH)) {
-                        if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            }
+                        } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.SWITCH)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY)) {
 
+                            }
                         }
                     }
                 }
@@ -254,33 +259,38 @@ public class BattleScene implements Scene {
     }
 
     public void receiveMessage() {
-        Message message = Client.getInstance().receiveMessage();
-        if (null != message) {
-            switch (message.getType()) {
-                case START_DEPLOYMENT:
-                    log.debug(" [-] START_DEPLOYMENT");
-                    MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
-                    characterListToDeploy = messageDeploymentStart.getCharacterList();
-                    playerNumber = messageDeploymentStart.getPlayerNumber();
-                    currentGameCharacter = characterListToDeploy.get(0);
-                    characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
-                    highlightDeploymentZone();
-                    break;
-                case OTHER_PLAYER_DEPLOYMENT:
-                    MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer = (MessageDeploymentPositionsOfPlayer) message;
-                    log.debug(" [-] DEPLOYMENT OF PLAYER {}", messageDeploymentPositionsOfPlayer.getPlayerNumber());
-                    for (GameCharacter gameCharacter : messageDeploymentPositionsOfPlayer.getCharacterPositionMap().keySet()) {
-                        GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(gameCharacter,
-                                messageDeploymentPositionsOfPlayer.getCharacterPositionMap().get(gameCharacter),
-                                messageDeploymentPositionsOfPlayer.getPlayerNumber());
-                        characterRepresentationList.add(gameCharacterRepresentation);
-                        drawableObjectList.add(gameCharacterRepresentation);
-                        sortToDrawList();
-                    }
-                    break;
-                default:
-                    log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
-                    break;
+        if (!engineIsBusy()) {
+            Message message = Client.getInstance().receiveMessage();
+            if (null != message) {
+                switch (message.getType()) {
+                    case START_DEPLOYMENT:
+                        log.debug(" [-] START_DEPLOYMENT");
+                        MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
+                        characterListToDeploy = messageDeploymentStart.getCharacterList();
+                        playerNumber = messageDeploymentStart.getPlayerNumber();
+                        GraphicsManager.getInstance().requestPointOfView(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
+                        log.debug(" [-] POV {} ", battlefield.getStartingPointsOfViewForPlayer(playerNumber));
+                        currentGameCharacter = characterListToDeploy.get(0);
+                        characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
+                        highlightDeploymentZone();
+                        setEngineIsBusy(true);
+                        break;
+                    case OTHER_PLAYER_DEPLOYMENT:
+                        MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer = (MessageDeploymentPositionsOfPlayer) message;
+                        log.debug(" [-] DEPLOYMENT OF PLAYER {}", messageDeploymentPositionsOfPlayer.getPlayerNumber());
+                        for (GameCharacter gameCharacter : messageDeploymentPositionsOfPlayer.getCharacterPositionMap().keySet()) {
+                            GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(gameCharacter,
+                                    messageDeploymentPositionsOfPlayer.getCharacterPositionMap().get(gameCharacter),
+                                    messageDeploymentPositionsOfPlayer.getPlayerNumber());
+                            characterRepresentationList.add(gameCharacterRepresentation);
+                            drawableObjectList.add(gameCharacterRepresentation);
+                            sortToDrawList();
+                        }
+                        break;
+                    default:
+                        log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
+                        break;
+                }
             }
         }
     }

@@ -70,6 +70,7 @@ public class BattleScene implements Scene {
         todraw = toDrawableList(battlefield);
         toDrawList = new ArrayList<DrawableObject>();
         toDrawList.addAll(todraw.values());
+        GraphicsManager.getInstance().requestPointOfView(PointOfView.NORTH);
 
         southPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), battlefield.getDepth());
         northPointOfView = new PositionAbsolute(0, battlefield.getHeight(), 0);

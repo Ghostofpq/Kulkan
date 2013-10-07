@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.battlefield;
 
 import com.ghostofpq.kulkan.commons.Node;
+import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
 
@@ -19,6 +20,7 @@ public class Battlefield implements Serializable {
     private Map<Position, BattlefieldElement> battlefieldElementMap;
     private int numberOfPlayers;
     private Map<Integer, List<Position>> deploymentZones;
+    private Map<Integer, PointOfView> startingPointsOfView;
 
     public Battlefield(int length, int height, int depth, int numberOfPlayers) {
         this.length = length;
@@ -27,6 +29,7 @@ public class Battlefield implements Serializable {
         this.numberOfPlayers = numberOfPlayers;
         battlefieldElementMap = new HashMap<Position, BattlefieldElement>();
         deploymentZones = new HashMap<Integer, List<Position>>();
+        startingPointsOfView = new HashMap<Integer, PointOfView>();
     }
 
     public void addDeployementZone(Integer playerNumber, Position position) {
@@ -37,7 +40,16 @@ public class Battlefield implements Serializable {
             }
             deploymentZone.add(position);
             deploymentZones.put(playerNumber, deploymentZone);
+            startingPointsOfView.put(playerNumber, PointOfView.SOUTH);
         }
+    }
+
+    public void setStartingPointsOfViewForPlayer(Integer playerNumber, PointOfView pointOfView) {
+        startingPointsOfView.put(playerNumber, pointOfView);
+    }
+
+    public PointOfView getStartingPointsOfViewForPlayer(Integer playerNumber) {
+        return startingPointsOfView.get(playerNumber);
     }
 
     public void addBattlefieldElement(int x, int y, int z, BattlefieldElement.BattlefieldElementType type) {
