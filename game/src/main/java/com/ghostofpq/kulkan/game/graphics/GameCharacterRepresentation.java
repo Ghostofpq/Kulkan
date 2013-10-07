@@ -25,10 +25,8 @@ public class GameCharacterRepresentation extends DrawableObject {
     private GameCharacter character;
     private Map<PointOfView, Animation> animationWalk;
     private Texture chara;
-    private PointOfView headingAngle;
     private PositionAbsolute positionToGo;
     private List<PositionAbsolute> positionsToGo;
-    private int hourglass;
     private boolean isJumping;
     private boolean hasMoved;
     private boolean hasActed;
@@ -51,7 +49,7 @@ public class GameCharacterRepresentation extends DrawableObject {
         positionsToGo = new ArrayList<PositionAbsolute>();
 
         SpriteSheet spriteSheet = SpritesheetManager.getInstance().getSpriteSheet("Arthur");
-        headingAngle = GraphicsManager.getInstance().getCurrentPointOfView();
+        setHeadingAngle(GraphicsManager.getInstance().getCurrentPointOfView());
 
         animationWalk = new HashMap<PointOfView, Animation>();
 
@@ -100,20 +98,10 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public boolean tickHourglass() {
-        boolean result = false;
-        if (getCharacter().isAlive()) {
-            hourglass -= getCharacter().getAgility();
-            // log.debug("{} : {}", getCharacter().getName(), hourglass);
-            if (hourglass <= 0) {
-                int delta = Math.abs(hourglass);
-                hourglass = 100 - delta;
-                result = true;
-                setHasMoved(false);
-                setHasActed(false);
-            }
-        } else {
-            hourglass = 100;
-            result = false;
+        boolean result = getCharacter().tickHourglass();
+        if (result) {
+            setHasMoved(false);
+            setHasActed(false);
         }
         return result;
     }
@@ -296,7 +284,7 @@ public class GameCharacterRepresentation extends DrawableObject {
                     (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
         }
 
-        Animation animation = animationWalk.get(getEquivalentPointOfView(pointOfView, headingAngle));
+        Animation animation = animationWalk.get(getEquivalentPointOfView(pointOfView, getHeadingAngle()));
         animation.getCurrentFrame().bind();
 
         GL11.glBegin(GL11.GL_QUADS);
@@ -611,14 +599,6 @@ public class GameCharacterRepresentation extends DrawableObject {
         }
     }
 
-    public PointOfView getHeadingAngle() {
-        return headingAngle;
-    }
-
-    public void setHeadingAngle(PointOfView headingAngle) {
-        this.headingAngle = headingAngle;
-    }
-
     public Position getFootPosition() {
         Position result = new Position(getPosition());
         result.plusY(-1);
@@ -676,14 +656,6 @@ public class GameCharacterRepresentation extends DrawableObject {
         isJumping = jumping;
     }
 
-    public int getHourglass() {
-        return hourglass;
-    }
-
-    public void setHourglass(int hourglass) {
-        this.hourglass = hourglass;
-    }
-
     public boolean hasMoved() {
         return hasMoved;
     }
@@ -698,6 +670,22 @@ public class GameCharacterRepresentation extends DrawableObject {
 
     public void setHasActed(boolean hasActed) {
         this.hasActed = hasActed;
+    }
+
+    public int getHourglass() {
+        return getCharacter().getHourglass();
+    }
+
+    public void setHourglass(int hourglass) {
+        this.getCharacter().setHourglass(hourglass);
+    }
+
+    public PointOfView getHeadingAngle() {
+        return getCharacter().getHeadingAngle();
+    }
+
+    public void setHeadingAngle(PointOfView headingAngle) {
+        this.getCharacter().setHeadingAngle(headingAngle);
     }
 
     public enum Facing {

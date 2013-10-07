@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.character;
 
 
+import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.Job;
@@ -86,6 +87,10 @@ public class GameCharacter implements Serializable {
      */
     private int currentManaPoint;
     private int maxManaPoint;
+
+    private int hourglass;
+    private PointOfView headingAngle;
+
 
     /**
      * Creates a new Character level 1 Warrior.
@@ -187,6 +192,23 @@ public class GameCharacter implements Serializable {
         if (currentManaPoint < 0) {
             currentManaPoint = 0;
         }
+    }
+
+    public boolean tickHourglass() {
+        boolean result = false;
+        if (isAlive()) {
+            hourglass -= getAgility();
+            // log.debug("{} : {}", getCharacter().getName(), hourglass);
+            if (hourglass <= 0) {
+                int delta = Math.abs(hourglass);
+                hourglass = 100 - delta;
+                result = true;
+            }
+        } else {
+            hourglass = 100;
+            result = false;
+        }
+        return result;
     }
 
     /*
@@ -346,5 +368,21 @@ public class GameCharacter implements Serializable {
 
     public BigDecimal getResilience() {
         return getAggregatedSecondaryCharacteristics().getResilience();
+    }
+
+    public int getHourglass() {
+        return hourglass;
+    }
+
+    public void setHourglass(int hourglass) {
+        this.hourglass = hourglass;
+    }
+
+    public PointOfView getHeadingAngle() {
+        return headingAngle;
+    }
+
+    public void setHeadingAngle(PointOfView headingAngle) {
+        this.headingAngle = headingAngle;
     }
 }

@@ -28,7 +28,6 @@ public class GameCharacterRepresentation extends DrawableObject {
     private PointOfView headingAngle;
     private PositionAbsolute positionToGo;
     private List<PositionAbsolute> positionsToGo;
-    private int hourglass;
     private boolean isJumping;
     private boolean hasMoved;
     private boolean hasActed;
@@ -97,25 +96,6 @@ public class GameCharacterRepresentation extends DrawableObject {
         animationWalk.put(PointOfView.NORTH, animation);
 
         chara = TextureManager.getInstance().getTexture(TextureKey.CHAR);
-    }
-
-    public boolean tickHourglass() {
-        boolean result = false;
-        if (getCharacter().isAlive()) {
-            hourglass -= getCharacter().getAgility();
-            // log.debug("{} : {}", getCharacter().getName(), hourglass);
-            if (hourglass <= 0) {
-                int delta = Math.abs(hourglass);
-                hourglass = 100 - delta;
-                result = true;
-                setHasMoved(false);
-                setHasActed(false);
-            }
-        } else {
-            hourglass = 100;
-            result = false;
-        }
-        return result;
     }
 
     public void update(long deltaTime) {
@@ -681,11 +661,11 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public int getHourglass() {
-        return hourglass;
+        return getCharacter().getHourglass();
     }
 
     public void setHourglass(int hourglass) {
-        this.hourglass = hourglass;
+        getCharacter().setHourglass(hourglass);
     }
 
     public boolean hasMoved() {
