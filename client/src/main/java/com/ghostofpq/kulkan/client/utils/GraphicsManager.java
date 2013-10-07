@@ -3,11 +3,13 @@ package com.ghostofpq.kulkan.client.utils;
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
 
+@Slf4j
 public class GraphicsManager {
     private static volatile GraphicsManager instance = null;
     private final float STEP_ROTATION = 2f;
@@ -209,7 +211,7 @@ public class GraphicsManager {
         focusYToGo = (float) Math.round(focusYToGo * 100) / 100;
         focusZToGo = (float) Math.round(focusZToGo * 100) / 100;
         rotationToGo = (float) Math.round(rotationToGo * 100) / 100;
-
+        boolean result = false;
         if (focusXToGo != 0) {
             if (focusXToGo < 0) {
                 originX -= STEP_TRANSLATION;
@@ -218,6 +220,7 @@ public class GraphicsManager {
                 originX += STEP_TRANSLATION;
                 focusXToGo -= STEP_TRANSLATION;
             }
+            result = true;
         }
         if (focusYToGo != 0) {
             if (focusYToGo < 0) {
@@ -227,6 +230,7 @@ public class GraphicsManager {
                 originY += STEP_TRANSLATION;
                 focusYToGo -= STEP_TRANSLATION;
             }
+            result = true;
         }
         if (focusZToGo != 0) {
             if (focusZToGo < 0) {
@@ -236,6 +240,7 @@ public class GraphicsManager {
                 originZ += STEP_TRANSLATION;
                 focusZToGo -= STEP_TRANSLATION;
             }
+            result = true;
         }
 
         if (rotationToGo != 0) {
@@ -295,11 +300,12 @@ public class GraphicsManager {
                     }
                 }
             }
+            result = true;
         }
-        if (focusXToGo == 0 && focusYToGo == 0 && focusZToGo == 0 && rotationToGo == 0) {
-            return false;
+        if (result) {
+            log.debug("[{}] [{}] [{}] / [{}]", focusXToGo, focusYToGo, focusZToGo, rotationToGo);
         }
-        return true;
+        return result;
     }
 
     /**

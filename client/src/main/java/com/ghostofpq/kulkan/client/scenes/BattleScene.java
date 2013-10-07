@@ -70,22 +70,15 @@ public class BattleScene implements Scene {
 
     @Override
     public void init() {
-        setEngineIsBusy(true);
-
-        currentState = BattleSceneState.DEPLOY;
+        currentState = BattleSceneState.PENDING;
         currentPointOfView = GraphicsManager.getInstance().getCurrentPointOfView();
 
         possiblePositionsToMove = new ArrayList<Position>();
         possiblePositionsToAttack = new ArrayList<Position>();
         characterRepresentationList = new ArrayList<GameCharacterRepresentation>();
 
-        List<String> options = new ArrayList<String>();
-        options.add("Move");
-        options.add("Attack");
-        options.add("End Turn");
-        menuSelectAction = new MenuSelectAction(300, 0, 200, 100, 2);
-
         cursor = new Position(4, 0, 4);
+        GraphicsManager.getInstance().requestPointOfView(PointOfView.EAST);
         GraphicsManager.getInstance().setupLights();
         GraphicsManager.getInstance().ready3D();
         GraphicsManager.getInstance().requestCenterPosition(cursor);
@@ -107,9 +100,6 @@ public class BattleScene implements Scene {
         }
         if (GraphicsManager.getInstance().update3DMovement()) {
             busy = true;
-            if (!busy) {
-                log.debug("finished");
-            }
         }
 
         setEngineIsBusy(busy);
@@ -120,12 +110,6 @@ public class BattleScene implements Scene {
 
         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
         receiveMessage();
-    }
-
-    @Override
-    public void render() {
-        render3D();
-        render2D();
     }
 
     @Override
@@ -151,7 +135,6 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                setEngineIsBusy(true);
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.DOWN)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -170,7 +153,6 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                setEngineIsBusy(true);
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.LEFT)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -189,7 +171,6 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                setEngineIsBusy(true);
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.RIGHT)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -208,15 +189,40 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                setEngineIsBusy(true);
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_LEFT)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
-
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.NORTH);
+                                        break;
+                                    case NORTH:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.WEST);
+                                        break;
+                                    case SOUTH:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.EAST);
+                                        break;
+                                    case WEST:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.SOUTH);
+                                        break;
+                                }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_RIGHT)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
-
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.SOUTH);
+                                        break;
+                                    case NORTH:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.EAST);
+                                        break;
+                                    case SOUTH:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.WEST);
+                                        break;
+                                    case WEST:
+                                        GraphicsManager.getInstance().requestPointOfView(PointOfView.NORTH);
+                                        break;
+                                }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_IN)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -232,7 +238,7 @@ public class BattleScene implements Scene {
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
-
+                                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.SWITCH)) {
                             if (currentState.equals(BattleSceneState.DEPLOY)) {
@@ -263,7 +269,7 @@ public class BattleScene implements Scene {
             Message message = Client.getInstance().receiveMessage();
             if (null != message) {
                 switch (message.getType()) {
-                    case START_DEPLOYMENT:
+                    case OTHER_PLAYER:
                         log.debug(" [-] START_DEPLOYMENT");
                         MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
                         characterListToDeploy = messageDeploymentStart.getCharacterList();
@@ -273,7 +279,7 @@ public class BattleScene implements Scene {
                         currentGameCharacter = characterListToDeploy.get(0);
                         characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
                         highlightDeploymentZone();
-                        setEngineIsBusy(true);
+                        currentState = BattleSceneState.DEPLOY;
                         break;
                     case OTHER_PLAYER_DEPLOYMENT:
                         MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer = (MessageDeploymentPositionsOfPlayer) message;
@@ -293,6 +299,12 @@ public class BattleScene implements Scene {
                 }
             }
         }
+    }
+
+    @Override
+    public void render() {
+        render3D();
+        render2D();
     }
 
     private void render3D() {
@@ -517,6 +529,7 @@ public class BattleScene implements Scene {
     private boolean pointOfViewHasChanged() {
         boolean result = false;
         if (!currentPointOfView.equals(GraphicsManager.getInstance().getCurrentPointOfView())) {
+            log.debug("POV={}", GraphicsManager.getInstance().getCurrentPointOfView());
             currentPointOfView = GraphicsManager.getInstance().getCurrentPointOfView();
             result = true;
         }
@@ -669,6 +682,7 @@ public class BattleScene implements Scene {
         westPointOfView = new PositionAbsolute(0, battlefield.getHeight(), battlefield.getDepth());
 
         extractBattlefieldRepresentation(battlefield);
+
     }
 
     public boolean engineIsBusy() {

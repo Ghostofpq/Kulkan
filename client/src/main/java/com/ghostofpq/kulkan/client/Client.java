@@ -116,12 +116,12 @@ public class Client {
 
     public void run() {
         while (!requestClose) {
-            manageInput();
             update(deltaTimeInMillis());
+            manageInput();
             render();
             lastTimeTick = Sys.getTime();
             while (deltaTimeInMillis() <= 4) {
-                // waiting for at least 4 millis
+                // waiting for at least 10 millis
             }
         }
         try {
