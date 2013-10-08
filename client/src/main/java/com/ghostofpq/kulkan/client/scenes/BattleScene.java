@@ -78,7 +78,6 @@ public class BattleScene implements Scene {
         characterRepresentationList = new ArrayList<GameCharacterRepresentation>();
 
         cursor = new Position(4, 0, 4);
-        GraphicsManager.getInstance().requestPointOfView(PointOfView.EAST);
         GraphicsManager.getInstance().setupLights();
         GraphicsManager.getInstance().ready3D();
         GraphicsManager.getInstance().requestCenterPosition(cursor);
@@ -87,7 +86,6 @@ public class BattleScene implements Scene {
     @Override
     public void update(long deltaTime) {
         boolean busy = false;
-
         for (DrawableObject drawableObject : drawableObjectList) {
             if (drawableObject.isMoving()) {
                 busy = true;
@@ -269,13 +267,11 @@ public class BattleScene implements Scene {
             Message message = Client.getInstance().receiveMessage();
             if (null != message) {
                 switch (message.getType()) {
-                    case OTHER_PLAYER:
+                    case START_DEPLOYMENT:
                         log.debug(" [-] START_DEPLOYMENT");
                         MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
                         characterListToDeploy = messageDeploymentStart.getCharacterList();
                         playerNumber = messageDeploymentStart.getPlayerNumber();
-                        GraphicsManager.getInstance().requestPointOfView(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
-                        log.debug(" [-] POV {} ", battlefield.getStartingPointsOfViewForPlayer(playerNumber));
                         currentGameCharacter = characterListToDeploy.get(0);
                         characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
                         highlightDeploymentZone();
