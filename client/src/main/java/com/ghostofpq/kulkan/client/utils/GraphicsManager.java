@@ -26,6 +26,7 @@ public class GraphicsManager {
     private float focusZToGo;
     private float rotationToGo;
     private float theta;
+    private boolean isBusy;
 
     private GraphicsManager() {
         originZ = 0;
@@ -36,6 +37,7 @@ public class GraphicsManager {
         scale = 0.2f;
         currentPointOfView = PointOfView.SOUTH;
         theta = 0;
+        isBusy = false;
     }
 
     public static GraphicsManager getInstance() {
@@ -305,6 +307,7 @@ public class GraphicsManager {
         if (result) {
             log.debug("[{}] [{}] [{}] / [{}]", focusXToGo, focusYToGo, focusZToGo, rotationToGo);
         }
+        isBusy = result;
         return result;
     }
 
@@ -330,6 +333,10 @@ public class GraphicsManager {
 
     public float getScale() {
         return scale;
+    }
+
+    public boolean isBusy() {
+        return isBusy;
     }
 }
 

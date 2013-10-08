@@ -93,21 +93,17 @@ public class BattleScene implements Scene {
                 break;
             }
         }
+        if (GraphicsManager.getInstance().isBusy()) {
+            busy = true;
+        }
         if (pointOfViewHasChanged()) {
             sortToDrawList();
         }
-        if (GraphicsManager.getInstance().update3DMovement()) {
-            busy = true;
-        }
-
         setEngineIsBusy(busy);
-
         for (DrawableObject drawableObject : drawableObjectList) {
             drawableObject.update(deltaTime);
         }
-
         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
-        receiveMessage();
     }
 
     @Override
@@ -262,6 +258,7 @@ public class BattleScene implements Scene {
         }
     }
 
+    @Override
     public void receiveMessage() {
         if (!engineIsBusy()) {
             Message message = Client.getInstance().receiveMessage();
@@ -272,6 +269,7 @@ public class BattleScene implements Scene {
                         MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
                         characterListToDeploy = messageDeploymentStart.getCharacterList();
                         playerNumber = messageDeploymentStart.getPlayerNumber();
+                        //GraphicsManager.getInstance().requestPointOfView(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
                         currentGameCharacter = characterListToDeploy.get(0);
                         characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
                         highlightDeploymentZone();
@@ -305,6 +303,7 @@ public class BattleScene implements Scene {
 
     private void render3D() {
         GraphicsManager.getInstance().make3D();
+        GraphicsManager.getInstance().update3DMovement();
         for (int i = 0; i < drawableObjectList.size(); i++) {
             drawableObjectList.get(i).draw();
         }

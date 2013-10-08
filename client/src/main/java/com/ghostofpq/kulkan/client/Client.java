@@ -108,8 +108,6 @@ public class Client {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else {
-            log.debug("Authenticate yourself");
         }
         return result;
     }
@@ -117,7 +115,8 @@ public class Client {
     public void run() {
         while (!requestClose) {
             update(deltaTimeInMillis());
-            manageInput();
+            currentScene.manageInput();
+            currentScene.receiveMessage();
             render();
             lastTimeTick = Sys.getTime();
             while (deltaTimeInMillis() <= 4) {
@@ -139,10 +138,6 @@ public class Client {
 
     private long deltaTimeInMillis() {
         return Sys.getTime() - lastTimeTick;
-    }
-
-    public void manageInput() {
-        currentScene.manageInput();
     }
 
     public void update(long deltaTime) {

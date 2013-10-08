@@ -83,6 +83,7 @@ public class LoginScene implements Scene {
             }
         };
         quitButton = new
+
                 Button(300, 500, 200, 50, "QUIT") {
                     @Override
                     public void onClick() {
@@ -145,6 +146,10 @@ public class LoginScene implements Scene {
 
     @Override
     public void update(long deltaTime) {
+    }
+
+    @Override
+    public void receiveMessage() {
     }
 
     @Override

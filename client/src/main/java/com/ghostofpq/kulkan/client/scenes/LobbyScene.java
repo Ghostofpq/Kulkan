@@ -149,6 +149,7 @@ public class LobbyScene implements Scene {
         }
     }
 
+    @Override
     public void receiveMessage() {
         Message message = Client.getInstance().receiveMessage();
         if (null != message) {
@@ -231,7 +232,6 @@ public class LobbyScene implements Scene {
 
     @Override
     public void update(long deltaTime) {
-        receiveMessage();
     }
 
     @Override

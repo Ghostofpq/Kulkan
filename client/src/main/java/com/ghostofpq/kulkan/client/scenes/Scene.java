@@ -11,4 +11,6 @@ public interface Scene {
     public void manageInput();
 
     public void closeConnections();
+
+    public void receiveMessage();
 }
