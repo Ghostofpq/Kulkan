@@ -27,8 +27,8 @@ public class MapCreator {
             Position position2 = new Position(i, 0, depth - 1);
             battlefield.addDeployementZone(1, position2);
         }
-        battlefield.setStartingPointsOfViewForPlayer(0, PointOfView.NORTH);
-        battlefield.setStartingPointsOfViewForPlayer(1, PointOfView.SOUTH);
+        battlefield.setStartingPointsOfViewForPlayer(0, PointOfView.SOUTH);
+        battlefield.setStartingPointsOfViewForPlayer(1, PointOfView.NORTH);
 
         battlefield.addBattlefieldElement(0, 1, 0, BattlefieldElement.BattlefieldElementType.BLOC);
         battlefield.addBattlefieldElement(0, 2, 1, BattlefieldElement.BattlefieldElementType.BLOC);

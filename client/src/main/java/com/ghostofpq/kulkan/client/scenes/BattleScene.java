@@ -113,7 +113,7 @@ public class BattleScene implements Scene {
                 if (Keyboard.getEventKeyState()) {
                     if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
                         if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.UP)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.PENDING)) {
                                 switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                     case EAST:
                                         cursorLeft();
@@ -129,9 +129,24 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.WEST);
+                                        break;
+                                    case NORTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.SOUTH);
+                                        break;
+                                    case SOUTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.NORTH);
+                                        break;
+                                    case WEST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.EAST);
+                                        break;
+                                }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.DOWN)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.PENDING)) {
                                 switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                     case EAST:
                                         cursorRight();
@@ -147,9 +162,24 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.EAST);
+                                        break;
+                                    case NORTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.NORTH);
+                                        break;
+                                    case SOUTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.SOUTH);
+                                        break;
+                                    case WEST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.WEST);
+                                        break;
+                                }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.LEFT)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.PENDING)) {
                                 switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                     case EAST:
                                         cursorDown();
@@ -165,9 +195,24 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.SOUTH);
+                                        break;
+                                    case NORTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.EAST);
+                                        break;
+                                    case SOUTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.WEST);
+                                        break;
+                                    case WEST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.NORTH);
+                                        break;
+                                }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.RIGHT)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.PENDING)) {
                                 switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                     case EAST:
                                         cursorUp();
@@ -183,9 +228,24 @@ public class BattleScene implements Scene {
                                         break;
                                 }
                                 GraphicsManager.getInstance().requestCenterPosition(cursor);
+                            } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
+                                    case EAST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.NORTH);
+                                        break;
+                                    case NORTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.WEST);
+                                        break;
+                                    case SOUTH:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.EAST);
+                                        break;
+                                    case WEST:
+                                        currentGameCharacterRepresentation.setHeadingAngle(PointOfView.SOUTH);
+                                        break;
+                                }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_LEFT)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE) || currentState.equals(BattleSceneState.PENDING)) {
                                 switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                     case EAST:
                                         GraphicsManager.getInstance().requestPointOfView(PointOfView.NORTH);
@@ -202,7 +262,7 @@ public class BattleScene implements Scene {
                                 }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ROTATE_RIGHT)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE) || currentState.equals(BattleSceneState.PENDING)) {
                                 switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                     case EAST:
                                         GraphicsManager.getInstance().requestPointOfView(PointOfView.SOUTH);
@@ -219,23 +279,25 @@ public class BattleScene implements Scene {
                                 }
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_IN)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
-
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE) || currentState.equals(BattleSceneState.PENDING)) {
+                                GraphicsManager.getInstance().zoomIn();
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.ZOOM_OUT)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
-
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION) || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE) || currentState.equals(BattleSceneState.PENDING)) {
+                                GraphicsManager.getInstance().zoomOut();
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.VALIDATE)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
-                                placeCharacter();
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION)) {
+                                deployCharacterPosition();
+                            } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                deployCharacterHeadingAngle();
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION)) {
                                 Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                             }
                         } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.SWITCH)) {
-                            if (currentState.equals(BattleSceneState.DEPLOY)) {
+                            if (currentState.equals(BattleSceneState.DEPLOY_POSITION)) {
 
                             }
                         }
@@ -269,11 +331,10 @@ public class BattleScene implements Scene {
                         MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
                         characterListToDeploy = messageDeploymentStart.getCharacterList();
                         playerNumber = messageDeploymentStart.getPlayerNumber();
-                        //GraphicsManager.getInstance().requestPointOfView(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
                         currentGameCharacter = characterListToDeploy.get(0);
                         characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
                         highlightDeploymentZone();
-                        currentState = BattleSceneState.DEPLOY;
+                        currentState = BattleSceneState.DEPLOY_POSITION;
                         break;
                     case OTHER_PLAYER_DEPLOYMENT:
                         MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer = (MessageDeploymentPositionsOfPlayer) message;
@@ -383,27 +444,33 @@ public class BattleScene implements Scene {
         Collections.sort(positionsToSelect);
     }
 
-    public void placeCharacter() {
+    public void deployCharacterPosition() {
         if (battlefield.getDeploymentZones().get(playerNumber).contains(cursor)) {
-
             log.debug(" [-] PLACE CHARACTER AT {}", cursor.toString());
             Position position = new Position(cursor);
             position.plusY(1);
+            currentGameCharacter.setHeadingAngle(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
             GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(currentGameCharacter, position, playerNumber);
+            currentGameCharacterRepresentation = gameCharacterRepresentation;
             characterRepresentationList.add(gameCharacterRepresentation);
             drawableObjectList.add(gameCharacterRepresentation);
             sortToDrawList();
-            characterListToDeploy.remove(currentGameCharacter);
-            if (characterListToDeploy.isEmpty()) {
+            currentState = BattleSceneState.DEPLOY_HEADING_ANGLE;
+        }
+    }
 
-                characterRenderLeft = null;
-                sendDeploymentResult();
-                cleanHighlightDeploymentZone();
-            } else {
-                currentGameCharacter = characterListToDeploy.get(0);
-                characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
-            }
-            battlefield.getDeploymentZones().get(playerNumber).remove(cursor);
+    public void deployCharacterHeadingAngle() {
+        characterListToDeploy.remove(currentGameCharacter);
+        battlefield.getDeploymentZones().get(playerNumber).remove(cursor);
+        if (characterListToDeploy.isEmpty()) {
+            characterRenderLeft = null;
+            sendDeploymentResult();
+            cleanHighlightDeploymentZone();
+            currentState = BattleSceneState.PENDING;
+        } else {
+            currentGameCharacter = characterListToDeploy.get(0);
+            currentState = BattleSceneState.DEPLOY_POSITION;
+            characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
         }
     }
 
@@ -544,7 +611,7 @@ public class BattleScene implements Scene {
 
     private void resetOldHighlight() {
         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.NONE);
-        if (currentState.equals(BattleSceneState.DEPLOY)) {
+        if (currentState.equals(BattleSceneState.DEPLOY_POSITION)) {
             if (battlefield.getDeploymentZones().get(playerNumber).contains(cursor)) {
                 battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.GREEN);
             }

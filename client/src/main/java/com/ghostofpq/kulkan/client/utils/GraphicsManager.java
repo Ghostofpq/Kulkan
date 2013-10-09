@@ -305,7 +305,7 @@ public class GraphicsManager {
             result = true;
         }
         if (result) {
-            log.debug("[{}] [{}] [{}] / [{}]", focusXToGo, focusYToGo, focusZToGo, rotationToGo);
+            //log.debug("[{}] [{}] [{}] / [{}]", focusXToGo, focusYToGo, focusZToGo, rotationToGo);
         }
         isBusy = result;
         return result;

@@ -25,7 +25,6 @@ public class GameCharacterRepresentation extends DrawableObject {
     private GameCharacter character;
     private Map<PointOfView, Animation> animationWalk;
     private Texture chara;
-    private PointOfView headingAngle;
     private PositionAbsolute positionToGo;
     private List<PositionAbsolute> positionsToGo;
     private boolean isJumping;
@@ -50,8 +49,6 @@ public class GameCharacterRepresentation extends DrawableObject {
         positionsToGo = new ArrayList<PositionAbsolute>();
 
         SpriteSheet spriteSheet = SpritesheetManager.getInstance().getSpriteSheet("Arthur");
-        headingAngle = GraphicsManager.getInstance().getCurrentPointOfView();
-
         animationWalk = new HashMap<PointOfView, Animation>();
 
 
@@ -280,7 +277,7 @@ public class GameCharacterRepresentation extends DrawableObject {
                     (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
         }
 
-        Animation animation = animationWalk.get(getEquivalentPointOfView(pointOfView, headingAngle));
+        Animation animation = animationWalk.get(getEquivalentPointOfView(pointOfView, getHeadingAngle()));
         animation.getCurrentFrame().bind();
 
         GL11.glBegin(GL11.GL_QUADS);
@@ -596,11 +593,11 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public PointOfView getHeadingAngle() {
-        return headingAngle;
+        return character.getHeadingAngle();
     }
 
     public void setHeadingAngle(PointOfView headingAngle) {
-        this.headingAngle = headingAngle;
+        character.setHeadingAngle(headingAngle);
     }
 
     public Position getFootPosition() {

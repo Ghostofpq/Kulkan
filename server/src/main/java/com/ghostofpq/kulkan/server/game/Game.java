@@ -38,7 +38,7 @@ public class Game {
         this.battlefield = battlefield;
         this.playerList = playerList;
         this.gameID = gameID;
-        state = BattleSceneState.DEPLOY;
+        state = BattleSceneState.DEPLOY_POSITION;
         characterPositionMap = new HashMap<Player, Map<GameCharacter, Position>>();
         playerChannelMap = new HashMap<Player, String>();
         initConnections();
