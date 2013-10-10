@@ -394,15 +394,12 @@ public class GameCharacter implements Serializable {
         GameCharacter that = (GameCharacter) o;
 
         if (!name.equals(that.name)) return false;
-        if (!race.equals(that.race)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + race.hashCode();
-        return result;
+        return name.hashCode();
     }
 }

@@ -8,7 +8,7 @@ import com.ghostofpq.kulkan.game.utils.SaveManager;
 
 public class PlayerCreator {
     public static void main(String[] argv) {
-        Player player1 = new Player("ghostofpq");
+        Player player1 = new Player("1");
 
         GameCharacter char1 = new GameCharacter("ghostofpq1Human", RaceType.HUMAN, Gender.MALE);
         GameCharacter char2 = new GameCharacter("ghostofpq2Elve", RaceType.ELVE, Gender.FEMALE);
@@ -21,7 +21,7 @@ public class PlayerCreator {
         SaveManager saveManager = SaveManager.getInstance();
         saveManager.savePlayer(player1);
 
-        Player player2 = new Player("azerty");
+        Player player2 = new Player("2");
 
         GameCharacter char4 = new GameCharacter("azerty1Human", RaceType.HUMAN, Gender.MALE);
         GameCharacter char5 = new GameCharacter("azerty2Elve", RaceType.ELVE, Gender.FEMALE);

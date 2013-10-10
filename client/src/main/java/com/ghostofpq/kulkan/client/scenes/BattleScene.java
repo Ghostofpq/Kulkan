@@ -93,7 +93,11 @@ public class BattleScene implements Scene {
         targetGameCharacterRepresentation = null;
         characterRenderLeft = null;
         characterRenderRight = null;
-        menuSelectAction = null;
+        List<String> options = new ArrayList<String>();
+        options.add("Move");
+        options.add("Attack");
+        options.add("End Turn");
+        menuSelectAction = new MenuSelectAction(300, 0, 200, 100, 2);
         // LOGIC
         currentState = BattleSceneState.PENDING;
         possiblePositionsToMove = new ArrayList<Position>();
@@ -401,8 +405,9 @@ public class BattleScene implements Scene {
                             for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
                                 if (gameCharacterRepresentation.getCharacter().equals(gameCharacter)) {
                                     gameCharacterRepresentation.updateCharacter(gameCharacter);
-                                    if (gameCharacterRepresentation.getPosition().equals(messageUpdateCharacters.getCharacterPositionMap().get(gameCharacter))) {
-                                        log.error("[X] CHAR {} IS MISPLACED !", gameCharacter.getName());
+                                    if (!gameCharacterRepresentation.getPosition().equals(messageUpdateCharacters.getCharacterPositionMap().get(gameCharacter))) {
+                                        log.error("[X] CHAR {} IS MISPLACED ! {}/{}", gameCharacter.getName(),
+                                                gameCharacterRepresentation.getPosition(), messageUpdateCharacters.getCharacterPositionMap().get(gameCharacter));
                                     }
                                 }
                             }
@@ -411,10 +416,20 @@ public class BattleScene implements Scene {
                     case CHARACTER_TO_PLAY:
                         MessageCharacterToPlay messageCharacterToPlay = (MessageCharacterToPlay) message;
                         log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharactertoPlay().getName());
+
+                        currentGameCharacter = messageCharacterToPlay.getCharactertoPlay();
+                        for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
+                            if (characterRepresentation.getCharacter().equals(currentGameCharacter)) {
+                                currentGameCharacterRepresentation = characterRepresentation;
+                                break;
+                            }
+                        }
+
                         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.NONE);
                         cursor = currentGameCharacterRepresentation.getFootPosition();
                         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
                         GraphicsManager.getInstance().requestCenterPosition(cursor);
+
                         currentState = BattleSceneState.ACTION;
                         break;
                     default:
@@ -441,7 +456,8 @@ public class BattleScene implements Scene {
 
     private void render2D() {
         GraphicsManager.getInstance().make2D();
-        if (null != characterRenderLeft) {
+        if (null != currentGameCharacter) {
+            characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
             characterRenderLeft.render(Color.white);
         }
         if (null != targetGameCharacterRepresentation && !targetGameCharacterRepresentation.equals(currentGameCharacterRepresentation)) {
@@ -535,9 +551,14 @@ public class BattleScene implements Scene {
             characterRenderLeft = null;
             sendDeploymentResult();
             cleanHighlightDeploymentZone();
+
+            currentGameCharacter = null;
+            currentGameCharacterRepresentation = null;
+
             currentState = BattleSceneState.PENDING;
         } else {
             currentGameCharacter = characterListToDeploy.get(0);
+            currentGameCharacterRepresentation = null;
             currentState = BattleSceneState.DEPLOY_POSITION;
             characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
         }
