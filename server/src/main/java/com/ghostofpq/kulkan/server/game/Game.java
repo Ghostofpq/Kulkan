@@ -5,10 +5,7 @@ import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
-import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.MessageDeploymentFinishedForPlayer;
-import com.ghostofpq.kulkan.entities.messages.MessageDeploymentPositionsOfPlayer;
-import com.ghostofpq.kulkan.entities.messages.MessageDeploymentStart;
+import com.ghostofpq.kulkan.entities.messages.*;
 import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
 import com.rabbitmq.client.Channel;
@@ -154,10 +151,7 @@ public class Game {
                                         }
                                     }
                                 }
-                                GameCharacter charToPlay = getNextCharToPlay();
-                                Player playerToPlay = getPlayerForCharacter(charToPlay);
-
-
+                                newTurn();
                             }
                             break;
                         default:
@@ -170,6 +164,22 @@ public class Game {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void newTurn() {
+        GameCharacter charToPlay = getNextCharToPlay();
+        Player playerToPlay = getPlayerForCharacter(charToPlay);
+        Map<GameCharacter, Position> actualCharacterPositionMap = new HashMap<GameCharacter, Position>();
+        for (Player player : characterPositionMap.keySet()) {
+            actualCharacterPositionMap.putAll(characterPositionMap.get(player));
+        }
+        MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(actualCharacterPositionMap);
+        for (Player player : playerList) {
+            sendMessageToPlayer(player, messageUpdateCharacters);
+        }
+
+        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay);
+        sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
     }
 
     private boolean deployIsComplete() {
