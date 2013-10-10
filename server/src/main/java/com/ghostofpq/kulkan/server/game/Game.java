@@ -82,7 +82,7 @@ public class Game {
 
     private void sendMessageToPlayer(Player player, Message message) {
         try {
-            log.debug(" SENDING {} TO {}", message.getType(), playerChannelMap);
+            log.debug(" SENDING {} TO {}", message.getType(), playerChannelMap.get(player));
             channelGameOut.basicPublish("", playerChannelMap.get(player), null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -135,22 +135,7 @@ public class Game {
                             characterPositionMap.put(playerList.get(messageDeploymentFinishedForPlayer.getPlayerNumber()), messageDeploymentFinishedForPlayer.getCharacterPositionMap());
                             if (deployIsComplete()) {
                                 log.debug(" [-] DEPLOYMENT IS COMPLETE");
-                                for (Player player : playerList) {
-                                    log.debug("player {}", playerList.indexOf(player));
-                                    Map<GameCharacter, Position> characterPositionMapForPlayer = new HashMap<GameCharacter, Position>();
-                                    for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
-                                        log.debug("-> {} : {}", gameCharacter.getName(), characterPositionMap.get(player).get(gameCharacter));
-                                        characterPositionMapForPlayer.put(gameCharacter, characterPositionMap.get(player).get(gameCharacter));
-                                    }
-
-                                    MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer =
-                                            new MessageDeploymentPositionsOfPlayer(characterPositionMapForPlayer, playerList.indexOf(player));
-                                    for (Player playerToNotify : playerList) {
-                                        if (player != playerToNotify) {
-                                            sendMessageToPlayer(playerToNotify, messageDeploymentPositionsOfPlayer);
-                                        }
-                                    }
-                                }
+                                completeDeployement();
                                 newTurn();
                             }
                             break;
@@ -163,6 +148,24 @@ public class Game {
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void completeDeployement() {
+        for (Player player : playerList) {
+            log.debug("player {}", playerList.indexOf(player));
+            Map<GameCharacter, Position> characterPositionMapForPlayer = new HashMap<GameCharacter, Position>();
+            for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
+                log.debug("-> {} : {}", gameCharacter.getName(), characterPositionMap.get(player).get(gameCharacter));
+                characterPositionMapForPlayer.put(gameCharacter, characterPositionMap.get(player).get(gameCharacter));
+            }
+            MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer =
+                    new MessageDeploymentPositionsOfPlayer(characterPositionMapForPlayer, playerList.indexOf(player));
+            for (Player playerToNotify : playerList) {
+                if (player != playerToNotify) {
+                    sendMessageToPlayer(playerToNotify, messageDeploymentPositionsOfPlayer);
+                }
+            }
         }
     }
 

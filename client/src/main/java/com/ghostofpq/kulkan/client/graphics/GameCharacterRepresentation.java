@@ -33,7 +33,7 @@ public class GameCharacterRepresentation extends DrawableObject {
     private int playerNumber;
 
     public GameCharacterRepresentation(GameCharacter character, Position position, int playerNumber) {
-        setCharacter(character);
+        this.character = character;
         setMoving(false);
         this.playerNumber = playerNumber;
         setHourglass(100);
@@ -645,8 +645,9 @@ public class GameCharacterRepresentation extends DrawableObject {
         return character;
     }
 
-    public void setCharacter(GameCharacter character) {
-        this.character = character;
+    public void updateCharacter(GameCharacter character) {
+        this.character.setHourglass(character.getHourglass());
+        this.character.setHeadingAngle(character.getHeadingAngle());
     }
 
     public boolean isJumping() {

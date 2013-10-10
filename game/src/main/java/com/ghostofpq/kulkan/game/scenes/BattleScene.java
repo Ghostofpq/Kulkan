@@ -197,7 +197,6 @@ public class BattleScene implements Scene {
                 characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacterRepresentation.getCharacter());
 
                 todraw.get(cursor).setHighlight(HighlightColor.NONE);
-
                 cursor = currentGameCharacterRepresentation.getPosition().plusYNew(-1);
                 todraw.get(cursor).setHighlight(HighlightColor.BLUE);
 

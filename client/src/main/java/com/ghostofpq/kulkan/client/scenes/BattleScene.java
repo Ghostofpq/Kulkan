@@ -27,30 +27,33 @@ public class BattleScene implements Scene {
 
     private static volatile BattleScene instance = null;
     private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
+    // COMMUNICATIONS
     private String gameQueueName;
     private Channel channelGameOut;
-    private BattleSceneState currentState;
     private String gameId;
-    private Battlefield battlefield;
+    private int playerNumber;
+    // GRAPHICS
     private PositionAbsolute southPointOfView;
     private PositionAbsolute northPointOfView;
     private PositionAbsolute eastPointOfView;
     private PositionAbsolute westPointOfView;
+    private PointOfView currentPointOfView;
     private boolean engineIsBusy;
     private Position cursor;
-    private List<Position> possiblePositionsToMove;
-    private List<Position> possiblePositionsToAttack;
-    private PointOfView currentPointOfView;
-    private CharacterRender characterRenderLeft;
-    private CharacterRender characterRenderRight;
+    private Battlefield battlefield;
     private Map<Position, Cube> battlefieldRepresentation;
     private List<DrawableObject> drawableObjectList;
-    private List<Position> positionsToSelect;
     private GameCharacter currentGameCharacter;
     private GameCharacterRepresentation currentGameCharacterRepresentation;
     private GameCharacterRepresentation targetGameCharacterRepresentation;
+    private CharacterRender characterRenderLeft;
+    private CharacterRender characterRenderRight;
     private MenuSelectAction menuSelectAction;
-    private int playerNumber;
+    // LOGIC
+    private BattleSceneState currentState;
+    private List<Position> possiblePositionsToMove;
+    private List<Position> possiblePositionsToAttack;
+    private List<Position> positionsToSelect;
     private List<GameCharacter> characterListToDeploy;
     private List<GameCharacterRepresentation> characterRepresentationList;
 
@@ -70,17 +73,60 @@ public class BattleScene implements Scene {
 
     @Override
     public void init() {
-        currentState = BattleSceneState.PENDING;
+        // COMMUNICATIONS
+        gameQueueName = null;
+        channelGameOut = null;
+        gameId = null;
+        playerNumber = 0;
+        // GRAPHICS
+        southPointOfView = null;
+        northPointOfView = null;
+        eastPointOfView = null;
+        westPointOfView = null;
         currentPointOfView = GraphicsManager.getInstance().getCurrentPointOfView();
-
+        cursor = new Position(4, 0, 4);
+        battlefield = null;
+        battlefieldRepresentation = new HashMap<Position, Cube>();
+        drawableObjectList = new ArrayList<DrawableObject>();
+        currentGameCharacter = null;
+        currentGameCharacterRepresentation = null;
+        targetGameCharacterRepresentation = null;
+        characterRenderLeft = null;
+        characterRenderRight = null;
+        menuSelectAction = null;
+        // LOGIC
+        currentState = BattleSceneState.PENDING;
         possiblePositionsToMove = new ArrayList<Position>();
         possiblePositionsToAttack = new ArrayList<Position>();
+        positionsToSelect = new ArrayList<Position>();
+        characterListToDeploy = new ArrayList<GameCharacter>();
         characterRepresentationList = new ArrayList<GameCharacterRepresentation>();
 
-        cursor = new Position(4, 0, 4);
         GraphicsManager.getInstance().setupLights();
         GraphicsManager.getInstance().ready3D();
         GraphicsManager.getInstance().requestCenterPosition(cursor);
+    }
+
+    public void setBattlefield(Battlefield battlefield) {
+        this.battlefield = battlefield;
+
+        southPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), battlefield.getDepth());
+        northPointOfView = new PositionAbsolute(0, battlefield.getHeight(), 0);
+        eastPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), 0);
+        westPointOfView = new PositionAbsolute(0, battlefield.getHeight(), battlefield.getDepth());
+
+        extractBattlefieldRepresentation(battlefield);
+    }
+
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+        gameQueueName = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameId).toString();
+        try {
+            channelGameOut = Client.getInstance().getConnection().createChannel();
+            channelGameOut.queueDeclare(gameQueueName, false, false, false, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -347,6 +393,29 @@ public class BattleScene implements Scene {
                             drawableObjectList.add(gameCharacterRepresentation);
                             sortToDrawList();
                         }
+                        break;
+                    case ALL_CHARACTERS:
+                        MessageUpdateCharacters messageUpdateCharacters = (MessageUpdateCharacters) message;
+                        log.debug(" [-] UPDATE ALL CHARACTERS");
+                        for (GameCharacter gameCharacter : messageUpdateCharacters.getCharacterPositionMap().keySet()) {
+                            for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
+                                if (gameCharacterRepresentation.getCharacter().equals(gameCharacter)) {
+                                    gameCharacterRepresentation.updateCharacter(gameCharacter);
+                                    if (gameCharacterRepresentation.getPosition().equals(messageUpdateCharacters.getCharacterPositionMap().get(gameCharacter))) {
+                                        log.error("[X] CHAR {} IS MISPLACED !", gameCharacter.getName());
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case CHARACTER_TO_PLAY:
+                        MessageCharacterToPlay messageCharacterToPlay = (MessageCharacterToPlay) message;
+                        log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharactertoPlay().getName());
+                        battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.NONE);
+                        cursor = currentGameCharacterRepresentation.getFootPosition();
+                        battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
+                        GraphicsManager.getInstance().requestCenterPosition(cursor);
+                        currentState = BattleSceneState.ACTION;
                         break;
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -722,29 +791,6 @@ public class BattleScene implements Scene {
             }
         }
         return cursor;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
-        gameQueueName = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameId).toString();
-        try {
-            channelGameOut = Client.getInstance().getConnection().createChannel();
-            channelGameOut.queueDeclare(gameQueueName, false, false, false, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setBattlefield(Battlefield battlefield) {
-        this.battlefield = battlefield;
-
-        southPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), battlefield.getDepth());
-        northPointOfView = new PositionAbsolute(0, battlefield.getHeight(), 0);
-        eastPointOfView = new PositionAbsolute(battlefield.getLength(), battlefield.getHeight(), 0);
-        westPointOfView = new PositionAbsolute(0, battlefield.getHeight(), battlefield.getDepth());
-
-        extractBattlefieldRepresentation(battlefield);
-
     }
 
     public boolean engineIsBusy() {
