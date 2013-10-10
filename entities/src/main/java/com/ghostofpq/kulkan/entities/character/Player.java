@@ -72,4 +72,21 @@ public class Player implements Serializable {
     public void setTeam(Team team) {
         this.team = team;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Player player = (Player) o;
+
+        if (!pseudo.equals(player.pseudo)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return pseudo.hashCode();
+    }
 }

@@ -16,6 +16,7 @@ import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class Game {
     private List<Player> playerList;
     private Map<Player, Map<GameCharacter, Position>> characterPositionMap;
     private Map<Player, String> playerChannelMap;
+    private List<GameCharacter> readyToPlay;
     private Channel channelGameIn;
     private Channel channelGameOut;
     private QueueingConsumer gameConsumer;
@@ -41,6 +43,7 @@ public class Game {
         state = BattleSceneState.DEPLOY_POSITION;
         characterPositionMap = new HashMap<Player, Map<GameCharacter, Position>>();
         playerChannelMap = new HashMap<Player, String>();
+        readyToPlay = new ArrayList<GameCharacter>();
         initConnections();
         sendDeployMessage();
     }
@@ -89,6 +92,36 @@ public class Game {
         }
     }
 
+    private GameCharacter getNextCharToPlay() {
+        GameCharacter result;
+        while (readyToPlay.isEmpty()) {
+            for (Player player : characterPositionMap.keySet()) {
+                for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
+                    if (gameCharacter.tickHourglass()) {
+                        readyToPlay.add(gameCharacter);
+                    }
+                }
+            }
+        }
+        result = readyToPlay.get(0);
+        readyToPlay.remove(result);
+
+        return result;
+    }
+
+    private Player getPlayerForCharacter(GameCharacter gameCharacter) {
+        Player result = null;
+
+        for (Player player : playerList) {
+            if (player.getTeam().getTeam().contains(gameCharacter)) {
+                result = player;
+                break;
+            }
+        }
+
+        return result;
+    }
+
     public void receiveMessage() {
         try {
             QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
@@ -121,6 +154,10 @@ public class Game {
                                         }
                                     }
                                 }
+                                GameCharacter charToPlay = getNextCharToPlay();
+                                Player playerToPlay = getPlayerForCharacter(charToPlay);
+
+
                             }
                             break;
                         default:
