@@ -98,12 +98,7 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public boolean tickHourglass() {
-        boolean result = getCharacter().tickHourglass();
-        if (result) {
-            setHasMoved(false);
-            setHasActed(false);
-        }
-        return result;
+        return getCharacter().tickHourglass();
     }
 
     public void update(long deltaTime) {
@@ -657,19 +652,19 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public boolean hasMoved() {
-        return hasMoved;
+        return character.hasMoved();
     }
 
     public void setHasMoved(boolean hadMoved) {
-        this.hasMoved = hadMoved;
+        character.setHasMoved(hadMoved);
     }
 
     public boolean hasActed() {
-        return hasActed;
+        return character.hasActed();
     }
 
     public void setHasActed(boolean hasActed) {
-        this.hasActed = hasActed;
+        character.setHasActed(hasActed);
     }
 
     public int getHourglass() {

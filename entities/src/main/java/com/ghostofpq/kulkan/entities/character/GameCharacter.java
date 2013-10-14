@@ -91,6 +91,8 @@ public class GameCharacter implements Serializable {
     private int hourglass;
     private PointOfView headingAngle;
 
+    private boolean hasMoved;
+    private boolean hasActed;
 
     /**
      * Creates a new Character level 1 Warrior.
@@ -202,12 +204,15 @@ public class GameCharacter implements Serializable {
             if (hourglass <= 0) {
                 int delta = Math.abs(hourglass);
                 hourglass = 100 - delta;
+                setHasMoved(false);
+                setHasActed(false);
                 result = true;
             }
         } else {
             hourglass = 100;
             result = false;
         }
+
         return result;
     }
 
@@ -401,5 +406,21 @@ public class GameCharacter implements Serializable {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this.hasMoved = hasMoved;
+    }
+
+    public boolean hasActed() {
+        return hasActed;
+    }
+
+    public void setHasActed(boolean hasActed) {
+        this.hasActed = hasActed;
     }
 }
