@@ -182,7 +182,8 @@ public class BattleScene implements Scene {
                                             break;
                                     }
                                     GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
+                                        || currentState.equals(BattleSceneState.END_TURN)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
                                             currentGameCharacterRepresentation.setHeadingAngle(PointOfView.WEST);
@@ -222,7 +223,8 @@ public class BattleScene implements Scene {
                                             break;
                                     }
                                     GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
+                                        || currentState.equals(BattleSceneState.END_TURN)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
                                             currentGameCharacterRepresentation.setHeadingAngle(PointOfView.EAST);
@@ -262,7 +264,8 @@ public class BattleScene implements Scene {
                                             break;
                                     }
                                     GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
+                                        || currentState.equals(BattleSceneState.END_TURN)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
                                             currentGameCharacterRepresentation.setHeadingAngle(PointOfView.SOUTH);
@@ -302,7 +305,8 @@ public class BattleScene implements Scene {
                                             break;
                                     }
                                     GraphicsManager.getInstance().requestCenterPosition(cursor);
-                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)) {
+                                } else if (currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
+                                        || currentState.equals(BattleSceneState.END_TURN)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
                                             currentGameCharacterRepresentation.setHeadingAngle(PointOfView.NORTH);
@@ -397,18 +401,19 @@ public class BattleScene implements Scene {
                                         }
                                         break;
                                     case MOVE:
-                                        currentState = BattleSceneState.ACTION;
                                         sendActionMove();
                                         cleanHighlightPossiblePositionsToMove();
                                         possiblePositionsToMove = new ArrayList<Position>();
+                                        currentState = BattleSceneState.PENDING;
                                         break;
                                     case ATTACK:
-                                        currentState = BattleSceneState.ACTION;
                                         sendActionAttack();
                                         cleanHighlightPossiblePositionsToAttack();
                                         possiblePositionsToAttack = new ArrayList<Position>();
+                                        currentState = BattleSceneState.PENDING;
                                         break;
                                     case END_TURN:
+                                        sendEndTurn();
                                         currentState = BattleSceneState.PENDING;
                                         break;
                                 }
@@ -496,11 +501,17 @@ public class BattleScene implements Scene {
                         }
 
                         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.NONE);
-                        cursor = currentGameCharacterRepresentation.getFootPosition();
+                        cursor = messageCharacterToPlay.getPositionOfChar();
                         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
                         GraphicsManager.getInstance().requestCenterPosition(cursor);
                         updateCursorTarget();
                         menuSelectAction.reinitMenu();
+                        if (currentGameCharacter.hasMoved()) {
+                            menuSelectAction.setHasMoved();
+                        }
+                        if (currentGameCharacter.hasActed()) {
+                            menuSelectAction.setHasActed();
+                        }
                         currentState = BattleSceneState.ACTION;
                         break;
                     case CHARACTER_POSITION_TO_MOVE_RESPONSE:
@@ -519,6 +530,7 @@ public class BattleScene implements Scene {
                         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
                             if (characterRepresentation.getCharacter().equals(messageCharacterMoves.getCharacter())) {
                                 characterRepresentation.setPositionsToGo(messageCharacterMoves.getPath());
+                                characterRepresentation.setHasMoved(messageCharacterMoves.getCharacter().hasMoved());
                                 break;
                             }
                         }

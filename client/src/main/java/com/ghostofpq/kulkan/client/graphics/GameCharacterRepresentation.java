@@ -480,6 +480,14 @@ public class GameCharacterRepresentation extends DrawableObject {
         this.positionToGo = positionToGo;
     }
 
+    public Position getDestination() {
+        Position result = null;
+        if (!positionsToGo.isEmpty()) {
+            result = positionsToGo.get(positionsToGo.size()).toPosition();
+        }
+        return result;
+    }
+
     public void setPositionsToGo(List<Position> positionsRaw) {
         // We add 1 in Y because we are computing ground positions.
         List<Position> positions = new ArrayList<Position>();

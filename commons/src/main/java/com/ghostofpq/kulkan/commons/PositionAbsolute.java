@@ -24,6 +24,10 @@ public class PositionAbsolute implements Serializable, Comparable<PositionAbsolu
         return new PositionAbsolute(this.getX() + x, this.getY() + y, this.getZ() + z);
     }
 
+    public Position toPosition() {
+        return new Position((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
+    }
+
     public void plusX(float x) {
         this.setX(this.getX() + x);
     }

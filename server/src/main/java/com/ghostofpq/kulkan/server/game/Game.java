@@ -194,19 +194,43 @@ public class Game {
                             break;
                         case CHARACTER_ACTION_MOVE:
                             MessageCharacterActionMove messageCharacterActionMove = (MessageCharacterActionMove) message;
-                            Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(messageCharacterActionMove.getCharacter());
-                            List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(messageCharacterActionMove.getPositionToMove());
+                            GameCharacter characterToMove = messageCharacterActionMove.getCharacter();
+                            Position positionToMove = messageCharacterActionMove.getPositionToMove();
+                            Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(characterToMove);
+                            List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(positionToMove);
                             if (!nodeList.isEmpty()) {
+                                characterToMove.setHasMoved(true);
+                                setCharacterPosition(characterToMove, positionToMove);
                                 List<Position> path = nodeList.get(0).getPathFromTop();
-                                MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(messageCharacterActionMove.getCharacter(), path);
+                                MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
                                 sendToAll(messageCharacterMoves);
+                                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                                sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
                             } else {
-                                log.error(" [X] NOT VALID POSITION TO MOVE : {}", messageCharacterActionMove.getPositionToMove().toString());
+                                log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
                             }
                             break;
+
+
                         case CHARACTER_POSITION_TO_ATTACK_REQUEST:
                             break;
+                        case CHARACTER_ACTION_ATTACK:
+                            break;
 
+                        case CHARACTER_ACTION_END_TURN:
+                            MessageCharacterEndTurn messageCharacterEndTurn = (MessageCharacterEndTurn) message;
+                            GameCharacter character = messageCharacterEndTurn.getCharacter();
+                            for (Player player : playerList) {
+                                if (characterPositionMap.get(player).keySet().contains(character)) {
+                                    for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
+                                        if (gameCharacter.equals(character)) {
+                                            gameCharacter.setHeadingAngle(character.getHeadingAngle());
+                                        }
+                                    }
+                                }
+                            }
+                            newTurn();
+                            break;
                         default:
                             log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                             break;
@@ -216,6 +240,15 @@ public class Game {
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setCharacterPosition(GameCharacter character, Position position) {
+        for (Player player : playerList) {
+            if (characterPositionMap.get(player).keySet().contains(character)) {
+                characterPositionMap.get(player).put(character, position);
+                break;
+            }
         }
     }
 
@@ -257,16 +290,19 @@ public class Game {
     private void newTurn() {
         GameCharacter charToPlay = getNextCharToPlay();
         Player playerToPlay = getPlayerForCharacter(charToPlay);
+
         Map<GameCharacter, Position> actualCharacterPositionMap = new HashMap<GameCharacter, Position>();
         for (Player player : characterPositionMap.keySet()) {
             actualCharacterPositionMap.putAll(characterPositionMap.get(player));
         }
         MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(actualCharacterPositionMap);
+
         for (Player player : playerList) {
             sendMessageToPlayer(player, messageUpdateCharacters);
         }
 
-        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay);
+        Position footPositionOfChar = actualCharacterPositionMap.get(charToPlay).plusYNew(-1);
+        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay, footPositionOfChar);
         sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
     }
 
