@@ -543,6 +543,26 @@ public class BattleScene implements Scene {
         }
     }
 
+    private void sendPositionToMoveRequest() {
+
+    }
+
+    private void sendActionMove() {
+
+    }
+
+    private void sendPositionToAttackRequest() {
+
+    }
+
+    private void sendActionAttack() {
+
+    }
+
+    private void sendEndTurn() {
+
+    }
+
     private void sendDeploymentResult() {
         Map<GameCharacter, Position> gameCharacterPositionMap = new HashMap<GameCharacter, Position>();
 
