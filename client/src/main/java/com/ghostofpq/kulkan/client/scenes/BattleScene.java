@@ -707,7 +707,12 @@ public class BattleScene implements Scene {
 
     private void highlightPossiblePositionsToMove() {
         for (Position possiblePositionToMove : possiblePositionsToMove) {
-            battlefieldRepresentation.get(possiblePositionToMove).setHighlight(HighlightColor.GREEN);
+            if (battlefieldRepresentation.containsKey(possiblePositionToMove)) {
+                log.debug("highlight green {}", possiblePositionToMove.toString());
+                battlefieldRepresentation.get(possiblePositionToMove).setHighlight(HighlightColor.GREEN);
+            } else {
+                log.error("{} can't be highlighted", possiblePositionToMove.toString());
+            }
         }
     }
 

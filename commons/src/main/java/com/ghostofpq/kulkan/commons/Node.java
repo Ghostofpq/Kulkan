@@ -1,10 +1,11 @@
 package com.ghostofpq.kulkan.commons;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Node<T> implements Comparable<Node<T>> {
+public class Node<T> implements Serializable, Comparable<Node<T>> {
     private Tree<T> tree;
     private T data;
     private Node<T> parent;

@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.server.game;
 
 import com.ghostofpq.kulkan.commons.Position;
+import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
@@ -89,6 +90,16 @@ public class Game {
         }
     }
 
+    private void sendMessageToChannel(String tokenKey, Message message) {
+        try {
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            log.debug(" SENDING {} TO {}", message.getType(), queueName);
+            channelGameOut.basicPublish("", queueName, null, message.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private GameCharacter getNextCharToPlay() {
         GameCharacter result;
         while (readyToPlay.isEmpty()) {
@@ -134,6 +145,17 @@ public class Game {
         return result;
     }
 
+    private Position getCharacterPosition(GameCharacter gameCharacter) {
+        Position result = null;
+        for (Map<GameCharacter, Position> gameCharacterPositionMap : characterPositionMap.values()) {
+            if (gameCharacterPositionMap.keySet().contains(gameCharacter)) {
+                result = gameCharacterPositionMap.get(gameCharacter);
+                break;
+            }
+        }
+        return result;
+    }
+
     public void receiveMessage() {
         try {
             QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
@@ -154,6 +176,34 @@ public class Game {
                                 newTurn();
                             }
                             break;
+                        case CHARACTER_POSITION_TO_MOVE_REQUEST:
+                            MessagePositionToMoveRequest messagePositionToMoveRequest = (MessagePositionToMoveRequest) message;
+                            Position characterPosition = getCharacterPosition(messagePositionToMoveRequest.getCharacter()).plusYNew(-1);
+                            if (null != characterPosition) {
+                                Tree<Position> possiblePositionsToMoveTree = battlefield.getPositionTree(characterPosition, 3, 2, 1);
+                                for (Player player : playerList) {
+                                    for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
+                                        if (!gameCharacter.equals(messagePositionToMoveRequest.getCharacter())) {
+                                            Position footPositionOfChar = characterPositionMap.get(player).get(gameCharacter).plusYNew(-1);
+                                            if (possiblePositionsToMoveTree.contains(footPositionOfChar)) {
+                                                log.debug("remove : {}", footPositionOfChar);
+                                                possiblePositionsToMoveTree.remove(footPositionOfChar);
+                                            }
+                                        }
+                                    }
+                                }
+                                List<Position> possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
+                                possiblePositionsToMove.remove(getCharacterPosition(messagePositionToMoveRequest.getCharacter()).plusYNew(-1));
+
+                                MessagePositionToMoveResponse messagePositionToMoveResponse = new MessagePositionToMoveResponse(possiblePositionsToMoveTree, possiblePositionsToMove);
+                                sendMessageToChannel(messagePositionToMoveRequest.getKeyToken(), messagePositionToMoveResponse);
+                            } else {
+                                log.error(" [X] CHARACTER NOT FOUND");
+                            }
+                            break;
+                        case CHARACTER_POSITION_TO_ATTACK_REQUEST:
+                            break;
+
                         default:
                             log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                             break;

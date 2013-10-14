@@ -1,9 +1,10 @@
 package com.ghostofpq.kulkan.commons;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
-public class Tree<T> {
+public class Tree<T> implements Serializable {
     private Node<T> root;
 
     public Tree(T rootData) {
