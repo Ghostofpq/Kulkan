@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.server.game;
 
+import com.ghostofpq.kulkan.commons.Node;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
@@ -78,6 +79,12 @@ public class Game {
             List<GameCharacter> characterList = player.getTeam().getTeam();
             MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
             sendMessageToPlayer(player, messageDeploymentStart);
+        }
+    }
+
+    private void sendToAll(Message message) {
+        for (Player player : playerList) {
+            sendMessageToPlayer(player, message);
         }
     }
 
@@ -178,27 +185,23 @@ public class Game {
                             break;
                         case CHARACTER_POSITION_TO_MOVE_REQUEST:
                             MessagePositionToMoveRequest messagePositionToMoveRequest = (MessagePositionToMoveRequest) message;
-                            Position characterPosition = getCharacterPosition(messagePositionToMoveRequest.getCharacter()).plusYNew(-1);
-                            if (null != characterPosition) {
-                                Tree<Position> possiblePositionsToMoveTree = battlefield.getPositionTree(characterPosition, 3, 2, 1);
-                                for (Player player : playerList) {
-                                    for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
-                                        if (!gameCharacter.equals(messagePositionToMoveRequest.getCharacter())) {
-                                            Position footPositionOfChar = characterPositionMap.get(player).get(gameCharacter).plusYNew(-1);
-                                            if (possiblePositionsToMoveTree.contains(footPositionOfChar)) {
-                                                log.debug("remove : {}", footPositionOfChar);
-                                                possiblePositionsToMoveTree.remove(footPositionOfChar);
-                                            }
-                                        }
-                                    }
-                                }
-                                List<Position> possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
-                                possiblePositionsToMove.remove(getCharacterPosition(messagePositionToMoveRequest.getCharacter()).plusYNew(-1));
+                            Tree<Position> possiblePositionsToMoveTree = getPossiblePositionsToMoveTree(messagePositionToMoveRequest.getCharacter());
+                            List<Position> possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
+                            possiblePositionsToMove.remove(getCharacterPosition(messagePositionToMoveRequest.getCharacter()).plusYNew(-1));
 
-                                MessagePositionToMoveResponse messagePositionToMoveResponse = new MessagePositionToMoveResponse(possiblePositionsToMoveTree, possiblePositionsToMove);
-                                sendMessageToChannel(messagePositionToMoveRequest.getKeyToken(), messagePositionToMoveResponse);
+                            MessagePositionToMoveResponse messagePositionToMoveResponse = new MessagePositionToMoveResponse(possiblePositionsToMove);
+                            sendMessageToChannel(messagePositionToMoveRequest.getKeyToken(), messagePositionToMoveResponse);
+                            break;
+                        case CHARACTER_ACTION_MOVE:
+                            MessageCharacterActionMove messageCharacterActionMove = (MessageCharacterActionMove) message;
+                            Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(messageCharacterActionMove.getCharacter());
+                            List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(messageCharacterActionMove.getPositionToMove());
+                            if (!nodeList.isEmpty()) {
+                                List<Position> path = nodeList.get(0).getPathFromTop();
+                                MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(messageCharacterActionMove.getCharacter(), path);
+                                sendToAll(messageCharacterMoves);
                             } else {
-                                log.error(" [X] CHARACTER NOT FOUND");
+                                log.error(" [X] NOT VALID POSITION TO MOVE : {}", messageCharacterActionMove.getPositionToMove().toString());
                             }
                             break;
                         case CHARACTER_POSITION_TO_ATTACK_REQUEST:
@@ -214,6 +217,23 @@ public class Game {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private Tree<Position> getPossiblePositionsToMoveTree(GameCharacter gameCharacter) {
+        Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
+        Tree<Position> result = battlefield.getPositionTree(characterPosition, 3, 2, 1);
+        for (Player player : playerList) {
+            for (GameCharacter character : characterPositionMap.get(player).keySet()) {
+                if (!character.equals(gameCharacter)) {
+                    Position footPositionOfChar = characterPositionMap.get(player).get(character).plusYNew(-1);
+                    if (result.contains(footPositionOfChar)) {
+                        log.debug("remove : {}", footPositionOfChar);
+                        result.remove(footPositionOfChar);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private void completeDeployement() {

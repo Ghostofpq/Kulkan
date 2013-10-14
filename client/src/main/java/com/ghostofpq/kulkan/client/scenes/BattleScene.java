@@ -8,7 +8,6 @@ import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.PositionAbsolute;
-import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
@@ -51,7 +50,6 @@ public class BattleScene implements Scene {
     private MenuSelectAction menuSelectAction;
     // LOGIC
     private BattleSceneState currentState;
-    private Tree<Position> possiblePositionsToMoveTree;
     private List<Position> possiblePositionsToMove;
     private List<Position> possiblePositionsToAttack;
     private List<Position> positionsToSelect;
@@ -101,7 +99,6 @@ public class BattleScene implements Scene {
         menuSelectAction = new MenuSelectAction(300, 0, 200, 100, 2);
         // LOGIC
         currentState = BattleSceneState.PENDING;
-        possiblePositionsToMoveTree = null;
         possiblePositionsToMove = new ArrayList<Position>();
         possiblePositionsToAttack = new ArrayList<Position>();
         positionsToSelect = new ArrayList<Position>();
@@ -167,6 +164,8 @@ public class BattleScene implements Scene {
                         switch (InputManager.getInstance().getInput(Keyboard.getEventKey())) {
                             case UP:
                                 if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
+                                        || currentState.equals(BattleSceneState.MOVE)
+                                        || currentState.equals(BattleSceneState.ATTACK)
                                         || currentState.equals(BattleSceneState.PENDING)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
@@ -205,6 +204,8 @@ public class BattleScene implements Scene {
 
                             case DOWN:
                                 if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
+                                        || currentState.equals(BattleSceneState.MOVE)
+                                        || currentState.equals(BattleSceneState.ATTACK)
                                         || currentState.equals(BattleSceneState.PENDING)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
@@ -243,6 +244,8 @@ public class BattleScene implements Scene {
 
                             case LEFT:
                                 if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
+                                        || currentState.equals(BattleSceneState.MOVE)
+                                        || currentState.equals(BattleSceneState.ATTACK)
                                         || currentState.equals(BattleSceneState.PENDING)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
@@ -281,6 +284,8 @@ public class BattleScene implements Scene {
 
                             case RIGHT:
                                 if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
+                                        || currentState.equals(BattleSceneState.MOVE)
+                                        || currentState.equals(BattleSceneState.ATTACK)
                                         || currentState.equals(BattleSceneState.PENDING)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
@@ -320,6 +325,8 @@ public class BattleScene implements Scene {
                             case ROTATE_LEFT:
                                 if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
                                         || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
+                                        || currentState.equals(BattleSceneState.MOVE)
+                                        || currentState.equals(BattleSceneState.ATTACK)
                                         || currentState.equals(BattleSceneState.PENDING)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
@@ -341,6 +348,8 @@ public class BattleScene implements Scene {
                             case ROTATE_RIGHT:
                                 if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
                                         || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
+                                        || currentState.equals(BattleSceneState.MOVE)
+                                        || currentState.equals(BattleSceneState.ATTACK)
                                         || currentState.equals(BattleSceneState.PENDING)) {
                                     switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                                         case EAST:
@@ -391,7 +400,6 @@ public class BattleScene implements Scene {
                                         currentState = BattleSceneState.ACTION;
                                         sendActionMove();
                                         cleanHighlightPossiblePositionsToMove();
-                                        possiblePositionsToMoveTree = null;
                                         possiblePositionsToMove = new ArrayList<Position>();
                                         break;
                                     case ATTACK:
@@ -499,12 +507,20 @@ public class BattleScene implements Scene {
                         MessagePositionToMoveResponse messagePositionToMoveResponse = (MessagePositionToMoveResponse) message;
                         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_MOVE)) {
                             log.debug(" [-] RECEIVED POSITIONS TO MOVE");
-                            possiblePositionsToMoveTree = messagePositionToMoveResponse.getPossiblePositionsToMoveTree();
                             possiblePositionsToMove = messagePositionToMoveResponse.getPossiblePositionsToMove();
                             highlightPossiblePositionsToMove();
                             currentState = BattleSceneState.MOVE;
                         } else {
                             log.error(" [-] RECEIVED POSITIONS TO MOVE");
+                        }
+                        break;
+                    case CHARACTER_MOVES:
+                        MessageCharacterMoves messageCharacterMoves = (MessageCharacterMoves) message;
+                        for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
+                            if (characterRepresentation.getCharacter().equals(messageCharacterMoves.getCharacter())) {
+                                characterRepresentation.setPositionsToGo(messageCharacterMoves.getPath());
+                                break;
+                            }
                         }
                         break;
                     case CHARACTER_POSITION_TO_ATTACK_RESPONSE:
@@ -656,8 +672,17 @@ public class BattleScene implements Scene {
     }
 
     private void sendActionMove() {
-        MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
-        postMessage(messageCharacterActionMove);
+        if (possiblePositionsToMove.contains(cursor)) {
+            MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+            postMessage(messageCharacterActionMove);
+            menuSelectAction.setHasMoved();
+        } else {
+            resetOldHighlight();
+            cursor = new Position(currentGameCharacterRepresentation.getFootPosition());
+            GraphicsManager.getInstance().requestCenterPosition(cursor);
+            currentState = BattleSceneState.ACTION;
+        }
+        cleanHighlightPossiblePositionsToMove();
     }
 
     private void sendPositionToAttackRequest() {
