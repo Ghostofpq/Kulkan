@@ -8,6 +8,7 @@ import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.PositionAbsolute;
+import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
@@ -50,6 +51,7 @@ public class BattleScene implements Scene {
     private MenuSelectAction menuSelectAction;
     // LOGIC
     private BattleSceneState currentState;
+    private Tree<Position> possiblePositionsToMoveTree;
     private List<Position> possiblePositionsToMove;
     private List<Position> possiblePositionsToAttack;
     private List<Position> positionsToSelect;
@@ -99,6 +101,7 @@ public class BattleScene implements Scene {
         menuSelectAction = new MenuSelectAction(300, 0, 200, 100, 2);
         // LOGIC
         currentState = BattleSceneState.PENDING;
+        possiblePositionsToMoveTree = null;
         possiblePositionsToMove = new ArrayList<Position>();
         possiblePositionsToAttack = new ArrayList<Position>();
         positionsToSelect = new ArrayList<Position>();
@@ -374,18 +377,28 @@ public class BattleScene implements Scene {
                                         break;
                                     case ACTION:
                                         if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.MOVE)) {
-                                            currentState = BattleSceneState.MOVE;
+                                            sendPositionToMoveRequest();
+                                            currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
                                         } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.ATTACK)) {
-                                            currentState = BattleSceneState.ATTACK;
+                                            sendPositionToAttackRequest();
+                                            currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
                                         } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.END_TURN)) {
+                                            sendEndTurn();
                                             currentState = BattleSceneState.END_TURN;
                                         }
                                         break;
                                     case MOVE:
                                         currentState = BattleSceneState.ACTION;
+                                        sendActionMove();
+                                        cleanHighlightPossiblePositionsToMove();
+                                        possiblePositionsToMoveTree = null;
+                                        possiblePositionsToMove = new ArrayList<Position>();
                                         break;
                                     case ATTACK:
                                         currentState = BattleSceneState.ACTION;
+                                        sendActionAttack();
+                                        cleanHighlightPossiblePositionsToAttack();
+                                        possiblePositionsToAttack = new ArrayList<Position>();
                                         break;
                                     case END_TURN:
                                         currentState = BattleSceneState.PENDING;
@@ -481,6 +494,29 @@ public class BattleScene implements Scene {
                         updateCursorTarget();
                         menuSelectAction.reinitMenu();
                         currentState = BattleSceneState.ACTION;
+                        break;
+                    case CHARACTER_POSITION_TO_MOVE_RESPONSE:
+                        MessagePositionToMoveResponse messagePositionToMoveResponse = (MessagePositionToMoveResponse) message;
+                        if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_MOVE)) {
+                            log.debug(" [-] RECEIVED POSITIONS TO MOVE");
+                            possiblePositionsToMoveTree = messagePositionToMoveResponse.getPossiblePositionsToMoveTree();
+                            possiblePositionsToMove = messagePositionToMoveResponse.getPossiblePositionsToMove();
+                            highlightPossiblePositionsToMove();
+                            currentState = BattleSceneState.MOVE;
+                        } else {
+                            log.error(" [-] RECEIVED POSITIONS TO MOVE");
+                        }
+                        break;
+                    case CHARACTER_POSITION_TO_ATTACK_RESPONSE:
+                        MessagePositionToAttackResponse messagePositionToAttackResponse = (MessagePositionToAttackResponse) message;
+                        if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK)) {
+                            log.debug(" [-] RECEIVED POSITIONS TO ATTACK");
+                            possiblePositionsToAttack = messagePositionToAttackResponse.getPossiblePositionsToAttack();
+                            highlightPossiblePositionsToAttack();
+                            currentState = BattleSceneState.ATTACK;
+                        } else {
+                            log.error(" [-] RECEIVED POSITIONS TO ATTACK");
+                        }
                         break;
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -615,23 +651,28 @@ public class BattleScene implements Scene {
     }
 
     private void sendPositionToMoveRequest() {
-
+        MessagePositionToMoveRequest messagePositionToMoveRequest = new MessagePositionToMoveRequest(Client.getInstance().getTokenKey(), currentGameCharacter);
+        postMessage(messagePositionToMoveRequest);
     }
 
     private void sendActionMove() {
-
+        MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+        postMessage(messageCharacterActionMove);
     }
 
     private void sendPositionToAttackRequest() {
-
+        MessagePositionToAttackRequest messagePositionToAttackRequest = new MessagePositionToAttackRequest(Client.getInstance().getTokenKey(), currentGameCharacter);
+        postMessage(messagePositionToAttackRequest);
     }
 
     private void sendActionAttack() {
-
+        MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+        postMessage(messageCharacterActionMove);
     }
 
     private void sendEndTurn() {
-
+        MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(Client.getInstance().getTokenKey(), currentGameCharacter);
+        postMessage(messageCharacterEndturn);
     }
 
     private void sendDeploymentResult() {
@@ -660,6 +701,34 @@ public class BattleScene implements Scene {
         for (Position deploymentPosition : deploymentZonePlayer) {
             if (battlefieldRepresentation.get(deploymentPosition).getHighlight().equals(HighlightColor.GREEN)) {
                 battlefieldRepresentation.get(deploymentPosition).setHighlight(HighlightColor.NONE);
+            }
+        }
+    }
+
+    private void highlightPossiblePositionsToMove() {
+        for (Position possiblePositionToMove : possiblePositionsToMove) {
+            battlefieldRepresentation.get(possiblePositionToMove).setHighlight(HighlightColor.GREEN);
+        }
+    }
+
+    private void cleanHighlightPossiblePositionsToMove() {
+        for (Position possiblePositionToMove : possiblePositionsToMove) {
+            if (battlefieldRepresentation.get(possiblePositionToMove).getHighlight().equals(HighlightColor.GREEN)) {
+                battlefieldRepresentation.get(possiblePositionToMove).setHighlight(HighlightColor.NONE);
+            }
+        }
+    }
+
+    private void highlightPossiblePositionsToAttack() {
+        for (Position possiblePositionToAttack : possiblePositionsToAttack) {
+            battlefieldRepresentation.get(possiblePositionToAttack).setHighlight(HighlightColor.RED);
+        }
+    }
+
+    private void cleanHighlightPossiblePositionsToAttack() {
+        for (Position possiblePositionToAttack : possiblePositionsToAttack) {
+            if (battlefieldRepresentation.get(possiblePositionToAttack).getHighlight().equals(HighlightColor.RED)) {
+                battlefieldRepresentation.get(possiblePositionToAttack).setHighlight(HighlightColor.NONE);
             }
         }
     }

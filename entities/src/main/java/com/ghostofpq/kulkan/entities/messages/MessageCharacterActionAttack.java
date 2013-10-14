@@ -7,20 +7,20 @@ import java.io.Serializable;
 
 public class MessageCharacterActionAttack extends ClientMessage implements Serializable {
     private GameCharacter character;
-    private Position positionToMove;
+    private Position positionToAttack;
 
-    public MessageCharacterActionAttack(String keyToken, GameCharacter character, Position positionToMove) {
+    public MessageCharacterActionAttack(String keyToken, GameCharacter character, Position positionToAttack) {
         type = MessageType.CHARACTER_ACTION_ATTACK;
         this.keyToken = keyToken;
         this.character = character;
-        this.positionToMove = positionToMove;
+        this.positionToAttack = positionToAttack;
     }
 
     public GameCharacter getCharacter() {
         return character;
     }
 
-    public Position getPositionToMove() {
-        return positionToMove;
+    public Position getPositionToAttack() {
+        return positionToAttack;
     }
 }
