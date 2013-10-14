@@ -102,7 +102,11 @@ public class Game {
         }
         result = readyToPlay.get(0);
         readyToPlay.remove(result);
-
+        if (null == result) {
+            log.error("[X] CHAR TO PLAY = NULL");
+        } else {
+            log.debug("[-] CHAR TO PLAY : {}", result.getName());
+        }
         return result;
     }
 
@@ -110,12 +114,23 @@ public class Game {
         Player result = null;
 
         for (Player player : playerList) {
-            if (player.getTeam().getTeam().contains(gameCharacter)) {
-                result = player;
+            for (GameCharacter gameCharacterOfPlayer : player.getTeam().getTeam()) {
+                log.debug("[-] CHAR : {}", gameCharacterOfPlayer.getName());
+                if (gameCharacterOfPlayer.equals(gameCharacter)) {
+                    result = player;
+                    log.debug("= {}", gameCharacter.getName());
+                    break;
+                } else {
+                    log.debug("/= {}", gameCharacter.getName());
+                }
+            }
+            if (null != result) {
                 break;
             }
         }
-
+        if (null == result) {
+            log.error("[X] CHAR TO PLAY BELONGS TO NO ONE");
+        }
         return result;
     }
 
@@ -189,18 +204,9 @@ public class Game {
         boolean result = true;
 
         for (Player player : playerList) {
-            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
-                if (null != characterPositionMap.get(player)) {
-                    if (characterPositionMap.get(player).containsKey(gameCharacter)) {
-                        result = false;
-                        break;
-                    }
-                } else {
-                    result = false;
-                    break;
-                }
-            }
-            if (!result) {
+            if (!characterPositionMap.keySet().contains(player)) {
+                result = false;
+                log.debug("[x] DEPLOYMENT NOT FINISHED FOR {}", player.getPseudo());
                 break;
             }
         }

@@ -231,7 +231,6 @@ public class BattleScene implements Scene {
             possiblePositionsToMoveTree.remove(gameCharacterRepresentation.getFootPosition());
         }
 
-
         possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
         possiblePositionsToMove.remove(currentGameCharacterRepresentation.getFootPosition());
 
