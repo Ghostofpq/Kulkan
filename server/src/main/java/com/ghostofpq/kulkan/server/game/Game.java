@@ -29,11 +29,16 @@ public class Game {
     private List<Player> playerList;
     private Map<Player, Map<GameCharacter, Position>> characterPositionMap;
     private Map<Player, String> playerChannelMap;
+    private Map<String, Player> keyTokenPlayerMap;
+    private Map<String, Integer> keyTokenPlayerNumberMap;
     private List<GameCharacter> readyToPlay;
     private Channel channelGameIn;
     private Channel channelGameOut;
     private QueueingConsumer gameConsumer;
     private String gameID;
+    private Player playerToPlay;
+    private GameCharacter currentCharToPlay;
+
 
     public Game(Battlefield battlefield, List<Player> playerList, String gameID) {
         this.battlefield = battlefield;
@@ -41,6 +46,8 @@ public class Game {
         this.gameID = gameID;
         state = BattleSceneState.DEPLOY_POSITION;
         characterPositionMap = new HashMap<Player, Map<GameCharacter, Position>>();
+        keyTokenPlayerMap = new HashMap<String, Player>();
+        keyTokenPlayerNumberMap = new HashMap<String, Integer>();
         playerChannelMap = new HashMap<Player, String>();
         readyToPlay = new ArrayList<GameCharacter>();
         initConnections();
@@ -62,6 +69,7 @@ public class Game {
             channelGameOut = Server.getInstance().getConnection().createChannel();
             for (Player player : playerList) {
                 String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(player.getPseudo());
+                keyTokenPlayerMap.put(playerKey, player);
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(playerKey).toString();
                 log.debug(" [-] OPENING QUEUE : {}", queueName);
                 channelGameOut.queueDeclare(queueName, false, false, false, null);
@@ -78,6 +86,8 @@ public class Game {
         for (Player player : playerList) {
             List<GameCharacter> characterList = player.getTeam().getTeam();
             MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
+            String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(player.getPseudo());
+            keyTokenPlayerNumberMap.put(playerKey, playerList.indexOf(player));
             sendMessageToPlayer(player, messageDeploymentStart);
         }
     }
@@ -167,7 +177,8 @@ public class Game {
         try {
             QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
             if (null != delivery) {
-                Message message = Message.loadFromBytes(delivery.getBody());
+                Message rawMessage = Message.loadFromBytes(delivery.getBody());
+                ClientMessage message = (ClientMessage) rawMessage;
                 if (null != message) {
                     switch (message.getType()) {
                         case FINISH_DEPLOYMENT:
@@ -184,52 +195,83 @@ public class Game {
                             }
                             break;
                         case CHARACTER_POSITION_TO_MOVE_REQUEST:
-                            MessagePositionToMoveRequest messagePositionToMoveRequest = (MessagePositionToMoveRequest) message;
-                            Tree<Position> possiblePositionsToMoveTree = getPossiblePositionsToMoveTree(messagePositionToMoveRequest.getCharacter());
-                            List<Position> possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
-                            possiblePositionsToMove.remove(getCharacterPosition(messagePositionToMoveRequest.getCharacter()).plusYNew(-1));
+                            if (messageIsExpected(message)) {
+                                MessagePositionToMoveRequest messagePositionToMoveRequest = (MessagePositionToMoveRequest) message;
+                                GameCharacter characterToMove = messagePositionToMoveRequest.getCharacter();
+                                if (characterToMove.equals(currentCharToPlay)) {
+                                    Tree<Position> possiblePositionsToMoveTree = getPossiblePositionsToMoveTree(characterToMove);
+                                    List<Position> possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
+                                    possiblePositionsToMove.remove(getCharacterPosition(characterToMove).plusYNew(-1));
 
-                            MessagePositionToMoveResponse messagePositionToMoveResponse = new MessagePositionToMoveResponse(possiblePositionsToMove);
-                            sendMessageToChannel(messagePositionToMoveRequest.getKeyToken(), messagePositionToMoveResponse);
+                                    MessagePositionToMoveResponse messagePositionToMoveResponse = new MessagePositionToMoveResponse(possiblePositionsToMove);
+                                    sendMessageToChannel(messagePositionToMoveRequest.getKeyToken(), messagePositionToMoveResponse);
+                                } else {
+                                    log.error(" [X] UNEXPECTED CHAR TO PLAY");
+                                }
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
+                            }
                             break;
                         case CHARACTER_ACTION_MOVE:
-                            MessageCharacterActionMove messageCharacterActionMove = (MessageCharacterActionMove) message;
-                            GameCharacter characterToMove = messageCharacterActionMove.getCharacter();
-                            Position positionToMove = messageCharacterActionMove.getPositionToMove();
-                            Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(characterToMove);
-                            List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(positionToMove);
-                            if (!nodeList.isEmpty()) {
-                                characterToMove.setHasMoved(true);
-                                setCharacterPosition(characterToMove, positionToMove);
-                                List<Position> path = nodeList.get(0).getPathFromTop();
-                                MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
-                                sendToAll(messageCharacterMoves);
-                                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
-                                sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+                            if (messageIsExpected(message)) {
+                                MessageCharacterActionMove messageCharacterActionMove = (MessageCharacterActionMove) message;
+                                GameCharacter characterToMove = messageCharacterActionMove.getCharacter();
+                                if (characterToMove.equals(currentCharToPlay)) {
+                                    Position positionToMove = messageCharacterActionMove.getPositionToMove();
+                                    Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(characterToMove);
+                                    List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(positionToMove);
+                                    if (!nodeList.isEmpty()) {
+                                        characterToMove.setHasMoved(true);
+                                        // the position is on the floor, set the char position to position +Y1
+                                        setCharacterPosition(characterToMove, positionToMove.plusYNew(1));
+                                        List<Position> path = nodeList.get(0).getPathFromTop();
+                                        MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
+                                        sendToAll(messageCharacterMoves);
+                                        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                                        sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+                                    } else {
+                                        log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
+                                    }
+                                } else {
+                                    log.error(" [X] UNEXPECTED CHAR TO PLAY");
+                                }
                             } else {
-                                log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }
                             break;
-
-
                         case CHARACTER_POSITION_TO_ATTACK_REQUEST:
+                            if (messageIsExpected(message)) {
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
+                            }
                             break;
                         case CHARACTER_ACTION_ATTACK:
+                            if (messageIsExpected(message)) {
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
+                            }
                             break;
-
                         case CHARACTER_ACTION_END_TURN:
-                            MessageCharacterEndTurn messageCharacterEndTurn = (MessageCharacterEndTurn) message;
-                            GameCharacter character = messageCharacterEndTurn.getCharacter();
-                            for (Player player : playerList) {
-                                if (characterPositionMap.get(player).keySet().contains(character)) {
-                                    for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
-                                        if (gameCharacter.equals(character)) {
-                                            gameCharacter.setHeadingAngle(character.getHeadingAngle());
+                            if (messageIsExpected(message)) {
+                                MessageCharacterEndTurn messageCharacterEndTurn = (MessageCharacterEndTurn) message;
+                                GameCharacter character = messageCharacterEndTurn.getCharacter();
+                                if (character.equals(currentCharToPlay)) {
+                                    for (Player player : playerList) {
+                                        if (characterPositionMap.get(player).keySet().contains(character)) {
+                                            for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
+                                                if (gameCharacter.equals(character)) {
+                                                    gameCharacter.setHeadingAngle(character.getHeadingAngle());
+                                                }
+                                            }
                                         }
                                     }
+                                    newTurn();
+                                } else {
+                                    log.error(" [X] UNEXPECTED CHAR TO PLAY");
                                 }
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }
-                            newTurn();
                             break;
                         default:
                             log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -241,6 +283,20 @@ public class Game {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean messageIsExpected(ClientMessage message) {
+        boolean result;
+        int receivedPlayerNumber = keyTokenPlayerNumberMap.get(message.getKeyToken());
+        String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(playerToPlay.getPseudo());
+        int expectedPlayerNumber = keyTokenPlayerNumberMap.get(playerKey);
+        log.debug("message from player n°{} , expecting from player n°{}", receivedPlayerNumber, expectedPlayerNumber);
+        if (receivedPlayerNumber == expectedPlayerNumber) {
+            result = true;
+        } else {
+            result = false;
+        }
+        return result;
     }
 
     private void setCharacterPosition(GameCharacter character, Position position) {
@@ -300,10 +356,12 @@ public class Game {
         for (Player player : playerList) {
             sendMessageToPlayer(player, messageUpdateCharacters);
         }
-
         Position footPositionOfChar = actualCharacterPositionMap.get(charToPlay).plusYNew(-1);
         MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay, footPositionOfChar);
         sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
+
+        this.playerToPlay = playerToPlay;
+        this.currentCharToPlay = charToPlay;
     }
 
     private boolean deployIsComplete() {
