@@ -292,76 +292,6 @@ public class GameCharacterRepresentation extends DrawableObject {
         GL11.glEnd();
     }
 
-    public Facing getFacing(GameCharacterRepresentation other) {
-        Facing result = null;
-        switch (getHeadingAngleFor(other.getPositionAbsolute())) {
-            case NORTH:
-                switch (other.getHeadingAngle()) {
-                    case NORTH:
-                        result = Facing.BACK;
-                        break;
-                    case EAST:
-                        result = Facing.FLANK;
-                        break;
-                    case SOUTH:
-                        result = Facing.FACE;
-                        break;
-                    case WEST:
-                        result = Facing.FLANK;
-                        break;
-                }
-                break;
-            case EAST:
-                switch (other.getHeadingAngle()) {
-                    case NORTH:
-                        result = Facing.FLANK;
-                        break;
-                    case EAST:
-                        result = Facing.BACK;
-                        break;
-                    case SOUTH:
-                        result = Facing.FLANK;
-                        break;
-                    case WEST:
-                        result = Facing.FACE;
-                        break;
-                }
-                break;
-            case SOUTH:
-                switch (other.getHeadingAngle()) {
-                    case NORTH:
-                        result = Facing.FACE;
-                        break;
-                    case EAST:
-                        result = Facing.FLANK;
-                        break;
-                    case SOUTH:
-                        result = Facing.BACK;
-                        break;
-                    case WEST:
-                        result = Facing.FLANK;
-                        break;
-                }
-                break;
-            case WEST:
-                switch (other.getHeadingAngle()) {
-                    case NORTH:
-                        result = Facing.FLANK;
-                        break;
-                    case EAST:
-                        result = Facing.FACE;
-                        break;
-                    case SOUTH:
-                        result = Facing.FLANK;
-                        break;
-                    case WEST:
-                        result = Facing.BACK;
-                        break;
-                }
-                break;
-        }
-        return result;
-    }
 
     public String toString() {
         return character.getName();
@@ -694,7 +624,5 @@ public class GameCharacterRepresentation extends DrawableObject {
         return playerNumber;
     }
 
-    public enum Facing {
-        FACE, FLANK, BACK
-    }
+
 }

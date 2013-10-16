@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
+import com.ghostofpq.kulkan.entities.character.CombatCalculator;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.*;
@@ -212,6 +213,19 @@ public class Game {
                                 log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }
                             break;
+                        case CHARACTER_POSITION_TO_ATTACK_REQUEST:
+                            if (messageIsExpected(message)) {
+                                MessagePositionToAttackRequest messagePositionToAttackRequest = (MessagePositionToAttackRequest) message;
+                                GameCharacter character = messagePositionToAttackRequest.getCharacter();
+                                if (character.equals(currentCharToPlay)) {
+                                    List<Position> possiblePositionsToAttack = getPossiblePositionsToAttack(character);
+                                    MessagePositionToAttackResponse messagePositionToAttackResponse = new MessagePositionToAttackResponse(possiblePositionsToAttack);
+                                    sendMessageToChannel(messagePositionToAttackRequest.getKeyToken(), messagePositionToAttackResponse);
+                                }
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
+                            }
+                            break;
                         case CHARACTER_ACTION_MOVE:
                             if (messageIsExpected(message)) {
                                 MessageCharacterActionMove messageCharacterActionMove = (MessageCharacterActionMove) message;
@@ -239,14 +253,45 @@ public class Game {
                                 log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }
                             break;
-                        case CHARACTER_POSITION_TO_ATTACK_REQUEST:
-                            if (messageIsExpected(message)) {
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
                         case CHARACTER_ACTION_ATTACK:
                             if (messageIsExpected(message)) {
+                                MessageCharacterActionAttack messageCharacterActionAttack = (MessageCharacterActionAttack) message;
+                                GameCharacter characterWhoAttacks = messageCharacterActionAttack.getCharacter();
+                                Position characterWhoAttacksPosition = getCharacterPosition(characterWhoAttacks);
+                                if (characterWhoAttacks.equals(currentCharToPlay)) {
+                                    Position positionToAttack = messageCharacterActionAttack.getPositionToAttack();
+                                    List<Position> possiblePositionsToAttack = getPossiblePositionsToAttack(characterWhoAttacks);
+                                    if (possiblePositionsToAttack.contains(positionToAttack)) {
+                                        GameCharacter characterAttacked = getGameCharacterAtPosition(positionToAttack);
+                                        if (null != characterAttacked) {
+                                            CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
+                                            double hitRoll = Math.random();
+                                            log.debug("rolled a {} to hit", hitRoll);
+                                            if (Math.floor(hitRoll * 100) <= combatCalculator.getChanceToHit()) {
+                                                double critRoll = Math.random();
+                                                log.debug("rolled a {} to crit", critRoll);
+                                                int damages;
+                                                if (Math.floor(critRoll * 100) <= combatCalculator.getChanceToCriticalHit()) {
+                                                    damages = combatCalculator.getEstimatedDamage() * 2;
+                                                } else {
+                                                    damages = combatCalculator.getEstimatedDamage();
+                                                }
+                                                log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
+
+                                            } else {
+                                                log.debug("missed");
+                                            }
+
+
+                                        } else {
+                                            log.error(" [X] INVALID TARGET");
+                                        }
+                                    } else {
+                                        log.error(" [X] INVALID POSITION TO ATTACK : {}", positionToAttack.toString());
+                                    }
+                                } else {
+                                    log.error(" [X] UNEXPECTED CHAR TO PLAY");
+                                }
                             } else {
                                 log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }
@@ -308,6 +353,20 @@ public class Game {
         }
     }
 
+    private GameCharacter getGameCharacterAtPosition(Position position) {
+        GameCharacter result = null;
+        for (Player player : playerList) {
+            for (GameCharacter character : characterPositionMap.get(player).keySet()) {
+                Position footPositionOfChar = characterPositionMap.get(player).get(character).plusYNew(-1);
+                if (footPositionOfChar.equals(position)) {
+                    result = character;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     private Tree<Position> getPossiblePositionsToMoveTree(GameCharacter gameCharacter) {
         Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
         Tree<Position> result = battlefield.getPositionTree(characterPosition, 3, 2, 1);
@@ -322,6 +381,14 @@ public class Game {
                 }
             }
         }
+        return result;
+    }
+
+    private List<Position> getPossiblePositionsToAttack(GameCharacter gameCharacter) {
+        Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
+        Tree<Position> possiblePositionsToAttackTree = battlefield.getPositionTree(characterPosition, 0, 0, 1);
+        List<Position> result = possiblePositionsToAttackTree.getAllElements();
+        result.remove(characterPosition);
         return result;
     }
 
