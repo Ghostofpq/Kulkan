@@ -455,7 +455,6 @@ public class BattleScene implements Scene {
         }
     }
 
-
     public void postMessage(ClientMessage message) {
         try {
             log.debug(" [-] POST MESSAGE {} ON {}", message.getType(), gameQueueName);
