@@ -738,7 +738,6 @@ public class BattleScene implements Scene {
         if (possiblePositionsToMove.contains(cursor)) {
             MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
             postMessage(messageCharacterActionMove);
-            menuSelectAction.setHasMoved();
         } else {
             resetOldHighlight();
             cursor = new Position(currentGameCharacterRepresentation.getFootPosition());
@@ -754,8 +753,16 @@ public class BattleScene implements Scene {
     }
 
     private void sendActionAttack() {
-        MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
-        postMessage(messageCharacterActionMove);
+        if (possiblePositionsToAttack.contains(cursor)) {
+            MessageCharacterActionAttack messageCharacterActionAttack = new MessageCharacterActionAttack(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+            postMessage(messageCharacterActionAttack);
+        } else {
+            resetOldHighlight();
+            cursor = new Position(currentGameCharacterRepresentation.getFootPosition());
+            GraphicsManager.getInstance().requestCenterPosition(cursor);
+            currentState = BattleSceneState.ACTION;
+        }
+        cleanHighlightPossiblePositionsToAttack();
     }
 
     private void sendEndTurn() {

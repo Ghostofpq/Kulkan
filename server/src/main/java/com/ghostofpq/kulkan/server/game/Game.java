@@ -212,6 +212,8 @@ public class Game {
             List<Position> possiblePositionsToAttack = getPossiblePositionsToAttack(character);
             MessagePositionToAttackResponse messagePositionToAttackResponse = new MessagePositionToAttackResponse(possiblePositionsToAttack);
             sendMessageToChannel(messagePositionToAttackRequest.getKeyToken(), messagePositionToAttackResponse);
+        } else {
+            log.error(" [X] UNEXPECTED CHAR TO PLAY");
         }
     }
 
@@ -234,6 +236,8 @@ public class Game {
                 sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
             } else {
                 log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
+                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
             }
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
@@ -268,11 +272,19 @@ public class Game {
                     } else {
                         log.debug("missed");
                     }
+
+                    characterWhoAttacks.setHasActed(true);
+                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                    sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                 } else {
                     log.error(" [X] INVALID TARGET");
+                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                    sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                 }
             } else {
                 log.error(" [X] INVALID POSITION TO ATTACK : {}", positionToAttack.toString());
+                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
             }
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
@@ -412,7 +424,7 @@ public class Game {
 
     private List<Position> getPossiblePositionsToAttack(GameCharacter gameCharacter) {
         Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
-        Tree<Position> possiblePositionsToAttackTree = battlefield.getPositionTree(characterPosition, 0, 0, 1);
+        Tree<Position> possiblePositionsToAttackTree = battlefield.getPositionTree(characterPosition, 1, 0, 0);
         List<Position> result = possiblePositionsToAttackTree.getAllElements();
         result.remove(characterPosition);
         return result;
