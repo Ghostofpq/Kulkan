@@ -247,14 +247,14 @@ public class Game {
     private void manageMessageCharAttacks(ClientMessage message) {
         MessageCharacterActionAttack messageCharacterActionAttack = (MessageCharacterActionAttack) message;
         GameCharacter characterWhoAttacks = messageCharacterActionAttack.getCharacter();
-        Position characterWhoAttacksPosition = getCharacterPosition(characterWhoAttacks);
+        Position characterWhoAttacksPosition = getCharacterPosition(characterWhoAttacks).plusYNew(-1);
         if (characterWhoAttacks.equals(currentCharToPlay)) {
             Position positionToAttack = messageCharacterActionAttack.getPositionToAttack();
             List<Position> possiblePositionsToAttack = getPossiblePositionsToAttack(characterWhoAttacks);
             if (possiblePositionsToAttack.contains(positionToAttack)) {
                 GameCharacter characterAttacked = getGameCharacterAtPosition(positionToAttack);
                 if (null != characterAttacked) {
-                    log.debug(" [C] {} ATTACKS {}", characterWhoAttacks.getName(), characterAttacked.getName());
+                    log.debug(" [C] {} at {} ATTACKS {} at {}", characterWhoAttacks.getName(), characterWhoAttacksPosition.toString(), characterAttacked.getName(), positionToAttack.toString());
                     CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
                     double hitRoll = Math.random();
                     log.debug("rolled a {} to hit", hitRoll);

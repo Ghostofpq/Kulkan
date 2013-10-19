@@ -381,7 +381,6 @@ public class BattleScene implements Scene {
                     sendPositionToAttackRequest();
                     currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
                 } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.END_TURN)) {
-                    sendEndTurn();
                     currentState = BattleSceneState.END_TURN;
                 }
                 break;
