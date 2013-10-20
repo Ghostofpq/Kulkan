@@ -37,7 +37,7 @@ public class MessageCharacterAttacks extends Message implements Serializable {
         return hits;
     }
 
-    public boolean cits() {
+    public boolean crits() {
         return crits;
     }
 }

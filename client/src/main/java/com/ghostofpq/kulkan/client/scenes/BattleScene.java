@@ -565,6 +565,27 @@ public class BattleScene implements Scene {
         }
     }
 
+    private void manageMessageCharacterAttacks(Message message) {
+        MessageCharacterAttacks messageCharacterAttacks = (MessageCharacterAttacks) message;
+        GameCharacterRepresentation attackingCharRepresentation = null;
+        GameCharacterRepresentation attackedCharRepresentation = null;
+        for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
+            if (characterRepresentation.getCharacter().equals(messageCharacterAttacks.getAttackingChar())) {
+                attackingCharRepresentation = characterRepresentation;
+            }
+            if (characterRepresentation.getCharacter().equals(messageCharacterAttacks.getAttackingChar())) {
+                attackedCharRepresentation = characterRepresentation;
+            }
+        }
+        if (null != attackingCharRepresentation && null != attackedCharRepresentation) {
+            int damages = messageCharacterAttacks.getDamages();
+            boolean crit = messageCharacterAttacks.crits();
+            boolean hit = messageCharacterAttacks.hits();
+            log.debug("{} takes {} damage from {}", attackedCharRepresentation.getCharacter().getName(), damages, attackingCharRepresentation.getCharacter().getName());
+            attackedCharRepresentation.getCharacter().addHealthPoint(-damages);
+        }
+    }
+
     @Override
     public void receiveMessage() {
         if (!engineIsBusy()) {
@@ -591,6 +612,9 @@ public class BattleScene implements Scene {
                         break;
                     case CHARACTER_POSITION_TO_ATTACK_RESPONSE:
                         manageMessageCharacterPositionToAttackResponse(message);
+                        break;
+                    case CHARACTER_ATTACKS:
+                        manageMessageCharacterAttacks(message);
                         break;
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
