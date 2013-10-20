@@ -573,7 +573,7 @@ public class BattleScene implements Scene {
             if (characterRepresentation.getCharacter().equals(messageCharacterAttacks.getAttackingChar())) {
                 attackingCharRepresentation = characterRepresentation;
             }
-            if (characterRepresentation.getCharacter().equals(messageCharacterAttacks.getAttackingChar())) {
+            if (characterRepresentation.getCharacter().equals(messageCharacterAttacks.getTargetedChar())) {
                 attackedCharRepresentation = characterRepresentation;
             }
         }
@@ -583,6 +583,20 @@ public class BattleScene implements Scene {
             boolean hit = messageCharacterAttacks.hits();
             log.debug("{} takes {} damage from {}", attackedCharRepresentation.getCharacter().getName(), damages, attackingCharRepresentation.getCharacter().getName());
             attackedCharRepresentation.getCharacter().addHealthPoint(-damages);
+        }
+    }
+
+    private void manageMessageCharacterGainsXP(Message message) {
+        MessageCharacterGainsXP messageCharacterGainsXP = (MessageCharacterGainsXP) message;
+
+        for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
+            if (characterRepresentation.getCharacter().equals(messageCharacterGainsXP.getCharacter())) {
+                characterRepresentation.getCharacter().gainXp(messageCharacterGainsXP.getExperiencePoints());
+                characterRepresentation.getCharacter().gainJobpoints(messageCharacterGainsXP.getJobPoints());
+                log.debug("{} gains {} exp and {} job points", messageCharacterGainsXP.getCharacter().getName(),
+                        messageCharacterGainsXP.getExperiencePoints(), messageCharacterGainsXP.getJobPoints());
+                break;
+            }
         }
     }
 
@@ -615,6 +629,9 @@ public class BattleScene implements Scene {
                         break;
                     case CHARACTER_ATTACKS:
                         manageMessageCharacterAttacks(message);
+                        break;
+                    case CHARACTER_GAINS_XP:
+                        manageMessageCharacterGainsXP(message);
                         break;
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -789,7 +806,7 @@ public class BattleScene implements Scene {
     }
 
     private void sendEndTurn() {
-        MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(Client.getInstance().getTokenKey(), currentGameCharacter);
+        MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(Client.getInstance().getTokenKey(), currentGameCharacterRepresentation.getCharacter());
         postMessage(messageCharacterEndturn);
     }
 

@@ -222,20 +222,27 @@ public class Game {
         GameCharacter characterToMove = messageCharacterActionMove.getCharacter();
         if (characterToMove.equals(currentCharToPlay)) {
             Position positionToMove = messageCharacterActionMove.getPositionToMove();
-            log.debug(" [C] {} MOVES TO {}", characterToMove.getName(), positionToMove.toString());
-            Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(characterToMove);
-            List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(positionToMove);
-            if (!nodeList.isEmpty()) {
-                characterToMove.setHasMoved(true);
-                // the position is on the floor, set the char position to position +Y1
-                setCharacterPosition(characterToMove, positionToMove.plusYNew(1));
-                List<Position> path = nodeList.get(0).getPathFromTop();
-                MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
-                sendToAll(messageCharacterMoves);
-                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
-                sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+            Position currentPosition = getCharacterPosition(characterToMove).plusYNew(-1);
+            if (!currentPosition.equals(positionToMove)) {
+                log.debug(" [C] {} MOVES TO {}", characterToMove.getName(), positionToMove.toString());
+                Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(characterToMove);
+                List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(positionToMove);
+                if (!nodeList.isEmpty()) {
+                    characterToMove.setHasMoved(true);
+                    // the position is on the floor, set the char position to position +Y1
+                    setCharacterPosition(characterToMove, positionToMove.plusYNew(1));
+                    List<Position> path = nodeList.get(0).getPathFromTop();
+                    MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
+                    sendToAll(messageCharacterMoves);
+                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                    sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+                } else {
+                    log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
+                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                    sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+                }
             } else {
-                log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
+                log.error(" [X] NOT MOVING : {}", positionToMove.toString());
                 MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
                 sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
             }
@@ -250,34 +257,55 @@ public class Game {
         Position characterWhoAttacksPosition = getCharacterPosition(characterWhoAttacks).plusYNew(-1);
         if (characterWhoAttacks.equals(currentCharToPlay)) {
             Position positionToAttack = messageCharacterActionAttack.getPositionToAttack();
-            List<Position> possiblePositionsToAttack = getPossiblePositionsToAttack(characterWhoAttacks);
-            if (possiblePositionsToAttack.contains(positionToAttack)) {
-                GameCharacter characterAttacked = getGameCharacterAtPosition(positionToAttack);
-                if (null != characterAttacked) {
-                    log.debug(" [C] {} at {} ATTACKS {} at {}", characterWhoAttacks.getName(), characterWhoAttacksPosition.toString(), characterAttacked.getName(), positionToAttack.toString());
-                    CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
-                    double hitRoll = Math.random();
-                    log.debug("rolled a {} to hit", hitRoll);
-                    if (Math.floor(hitRoll * 100) <= combatCalculator.getChanceToHit()) {
-                        double critRoll = Math.random();
-                        log.debug("rolled a {} to crit", critRoll);
-                        int damages;
-                        if (Math.floor(critRoll * 100) <= combatCalculator.getChanceToCriticalHit()) {
-                            damages = combatCalculator.getEstimatedDamage() * 2;
+            if (!positionToAttack.equals(characterWhoAttacksPosition)) {
+                List<Position> possiblePositionsToAttack = getPossiblePositionsToAttack(characterWhoAttacks);
+                if (possiblePositionsToAttack.contains(positionToAttack)) {
+                    GameCharacter characterAttacked = getGameCharacterAtPosition(positionToAttack);
+                    if (null != characterAttacked) {
+                        log.debug(" [C] {} at {} ATTACKS {} at {}", characterWhoAttacks.getName(), characterWhoAttacksPosition.toString(), characterAttacked.getName(), positionToAttack.toString());
+                        CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
+                        double hitRoll = Math.random();
+                        log.debug("rolled a {} to hit", hitRoll);
+                        boolean hit = false;
+                        boolean crit = false;
+                        int damages = 0;
+
+                        if (Math.floor(hitRoll * 100) <= combatCalculator.getChanceToHit()) {
+                            double critRoll = Math.random();
+                            log.debug("rolled a {} to crit", critRoll);
+
+                            if (Math.floor(critRoll * 100) <= combatCalculator.getChanceToCriticalHit()) {
+                                damages = combatCalculator.getEstimatedDamage() * 2;
+                                crit = true;
+                            } else {
+                                damages = combatCalculator.getEstimatedDamage();
+
+                            }
+
+                            log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
+                            characterAttacked.addHealthPoint(-damages);
+                            hit = true;
                         } else {
-                            damages = combatCalculator.getEstimatedDamage();
+                            log.debug("missed");
                         }
-                        log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
+                        MessageCharacterAttacks messageCharacterAttacks = new MessageCharacterAttacks(characterWhoAttacks, characterAttacked, hit, damages, crit);
+                        sendToAll(messageCharacterAttacks);
 
+                        characterWhoAttacks.gainXp(damages);
+                        characterWhoAttacks.gainJobpoints(5);
+                        MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(characterWhoAttacks, damages, 5);
+                        sendToAll(messageCharacterGainsXP);
+
+                        characterWhoAttacks.setHasActed(true);
+                        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                        sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                     } else {
-                        log.debug("missed");
+                        log.error(" [X] INVALID TARGET (EMPTY)");
+                        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                        sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                     }
-
-                    characterWhoAttacks.setHasActed(true);
-                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
-                    sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                 } else {
-                    log.error(" [X] INVALID TARGET");
+                    log.error(" [X] INVALID TARGET (SELF)");
                     MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
                     sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                 }
