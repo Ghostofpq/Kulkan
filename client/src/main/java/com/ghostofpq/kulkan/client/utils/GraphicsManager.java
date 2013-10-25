@@ -27,6 +27,7 @@ public class GraphicsManager {
     private float rotationToGo;
     private float theta;
     private boolean isBusy;
+    private int zoomLevel;
 
     private GraphicsManager() {
         originZ = 0;
@@ -38,6 +39,7 @@ public class GraphicsManager {
         currentPointOfView = PointOfView.SOUTH;
         theta = 0;
         isBusy = false;
+        zoomLevel = 2;
     }
 
     public static GraphicsManager getInstance() {
@@ -134,11 +136,17 @@ public class GraphicsManager {
     }
 
     public void zoomIn() {
-        scale += 0.1 * scale;
+        if (zoomLevel > 0) {
+            scale += 0.1 * scale;
+            zoomLevel--;
+        }
     }
 
     public void zoomOut() {
-        scale -= 0.1 * scale;
+        if (zoomLevel < 5) {
+            scale -= 0.1 * scale;
+            zoomLevel++;
+        }
     }
 
     public void requestCenterPosition(Position position) {

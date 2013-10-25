@@ -8,8 +8,8 @@ import java.io.Serializable;
 public class MessageGameEnd extends Message implements Serializable {
     private boolean isWinner;
 
-    public MessageGameEnd(String gameID, boolean isWinner) {
-        type = MessageType.GAME_START;
+    public MessageGameEnd(boolean isWinner) {
+        type = MessageType.GAME_END;
         this.isWinner = isWinner;
     }
 

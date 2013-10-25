@@ -25,8 +25,8 @@ import java.util.Map;
 
 @Slf4j
 public class Game {
-    private final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
+    private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
+    private static final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
     private BattleSceneState state;
     private Battlefield battlefield;
     private List<Player> playerList;
@@ -81,6 +81,15 @@ public class Game {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeConnections() {
+        try {
+            channelGameIn.close();
+            channelGameOut.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -185,7 +194,7 @@ public class Game {
         characterPositionMap.put(playerList.get(messageDeploymentFinishedForPlayer.getPlayerNumber()), messageDeploymentFinishedForPlayer.getCharacterPositionMap());
         if (deployIsComplete()) {
             log.debug(" [S] DEPLOYMENT IS COMPLETE");
-            completeDeployement();
+            completeDeployment();
             newTurn();
         }
     }
@@ -460,7 +469,7 @@ public class Game {
         return result;
     }
 
-    private void completeDeployement() {
+    private void completeDeployment() {
         for (Player player : playerList) {
             log.debug("player {}", playerList.indexOf(player));
             Map<GameCharacter, Position> characterPositionMapForPlayer = new HashMap<GameCharacter, Position>();
@@ -479,29 +488,74 @@ public class Game {
     }
 
     private void newTurn() {
-        GameCharacter charToPlay = getNextCharToPlay();
-        Player playerToPlay = getPlayerForCharacter(charToPlay);
+        Player winnerPlayer = getWinnerPlayer();
+        if (null != winnerPlayer) {
+            for (Player playerToNotify : playerList) {
+                if (winnerPlayer == playerToNotify) {
+                    MessageGameEnd messageGameEnd = new MessageGameEnd(true);
+                    sendMessageToPlayer(playerToNotify, messageGameEnd);
+                } else {
+                    MessageGameEnd messageGameEnd = new MessageGameEnd(false);
+                    sendMessageToPlayer(playerToNotify, messageGameEnd);
+                }
+            }
+            closeGame();
+        } else {
+            GameCharacter charToPlay = getNextCharToPlay();
+            Player playerToPlay = getPlayerForCharacter(charToPlay);
 
-        Map<GameCharacter, Position> actualCharacterPositionMap = new HashMap<GameCharacter, Position>();
-        for (Player player : characterPositionMap.keySet()) {
-            actualCharacterPositionMap.putAll(characterPositionMap.get(player));
+            Map<GameCharacter, Position> actualCharacterPositionMap = new HashMap<GameCharacter, Position>();
+            for (Player player : characterPositionMap.keySet()) {
+                actualCharacterPositionMap.putAll(characterPositionMap.get(player));
+            }
+            MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(actualCharacterPositionMap);
+
+            for (Player player : playerList) {
+                sendMessageToPlayer(player, messageUpdateCharacters);
+            }
+            Position footPositionOfChar = actualCharacterPositionMap.get(charToPlay).plusYNew(-1);
+            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay, footPositionOfChar);
+            sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
+
+            this.playerToPlay = playerToPlay;
+            this.currentCharToPlay = charToPlay;
         }
-        MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(actualCharacterPositionMap);
 
+    }
+
+    private void closeGame() {
+        log.debug("[S] GAME IS OVER");
+        closeConnections();
+        GameManager.getInstance().closeGame(this.gameID);
+        this.battlefield = null;
+        this.playerList = null;
+        this.gameID = null;
+        state = null;
+        characterPositionMap = null;
+        keyTokenPlayerMap = null;
+        keyTokenPlayerNumberMap = null;
+        playerChannelMap = null;
+        readyToPlay = null;
+    }
+
+    private Player getWinnerPlayer() {
+        int numberOfPlayerAlive = 0;
+        Player result = null;
+        Player playerAlive = null;
         for (Player player : playerList) {
-            sendMessageToPlayer(player, messageUpdateCharacters);
+            if (player.getTeam().isAlive()) {
+                numberOfPlayerAlive++;
+                playerAlive = player;
+            }
         }
-        Position footPositionOfChar = actualCharacterPositionMap.get(charToPlay).plusYNew(-1);
-        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay, footPositionOfChar);
-        sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
-
-        this.playerToPlay = playerToPlay;
-        this.currentCharToPlay = charToPlay;
+        if (numberOfPlayerAlive == 1) {
+            result = playerAlive;
+        }
+        return result;
     }
 
     private boolean deployIsComplete() {
         boolean result = true;
-
         for (Player player : playerList) {
             if (!characterPositionMap.keySet().contains(player)) {
                 result = false;
@@ -509,7 +563,6 @@ public class Game {
                 break;
             }
         }
-
         return result;
     }
 }
