@@ -18,6 +18,7 @@ import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class BattleScene implements Scene {
     private CharacterRender characterRenderLeft;
     private CharacterRender characterRenderRight;
     private MenuSelectAction menuSelectAction;
+    private Button gameOverButton;
     // LOGIC
     private BattleSceneState currentState;
     private List<Position> possiblePositionsToMove;
@@ -453,6 +455,15 @@ public class BattleScene implements Scene {
                     }
                 }
             }
+            while (Mouse.next()) {
+                if (Mouse.isButtonDown(0)) {
+                    if (currentState.equals(BattleSceneState.GAME_OVER)) {
+                        if (gameOverButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                            gameOverButton.onClick();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -602,6 +613,24 @@ public class BattleScene implements Scene {
         }
     }
 
+    private void manageMessageGameOver(Message message) {
+        MessageGameEnd messageGameEnd = (MessageGameEnd) message;
+        String buttonText;
+        if (messageGameEnd.isWinner()) {
+            buttonText = "YOU WIN";
+        } else {
+            buttonText = "YOU LOSE";
+        }
+        gameOverButton = new Button(300, 400, 50, 50, buttonText) {
+            @Override
+            public void onClick() {
+                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+            }
+        };
+        currentState = BattleSceneState.GAME_OVER;
+        closeConnections();
+    }
+
     @Override
     public void receiveMessage() {
         if (!engineIsBusy()) {
@@ -635,6 +664,8 @@ public class BattleScene implements Scene {
                     case CHARACTER_GAINS_XP:
                         manageMessageCharacterGainsXP(message);
                         break;
+                    case GAME_END:
+                        manageMessageGameOver(message);
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                         break;
@@ -672,6 +703,9 @@ public class BattleScene implements Scene {
         }
         if (currentState.equals(BattleSceneState.ACTION)) {
             menuSelectAction.render(Color.white);
+        }
+        if (currentState.equals(BattleSceneState.GAME_OVER)) {
+            gameOverButton.draw();
         }
     }
 
