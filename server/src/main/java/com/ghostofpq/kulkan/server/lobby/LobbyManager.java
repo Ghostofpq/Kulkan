@@ -1,7 +1,11 @@
 package com.ghostofpq.kulkan.server.lobby;
 
 
-import com.ghostofpq.kulkan.entities.messages.*;
+import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyClient;
+import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPing;
+import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPong;
+import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyServer;
 import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;

@@ -1,4 +1,7 @@
-package com.ghostofpq.kulkan.entities.messages;
+package com.ghostofpq.kulkan.entities.messages.lobby;
+
+import com.ghostofpq.kulkan.entities.messages.ClientMessage;
+import com.ghostofpq.kulkan.entities.messages.MessageType;
 
 import java.io.Serializable;
 
