@@ -2,6 +2,7 @@ package com.ghostofpq.kulkan.entities.character;
 
 
 import com.ghostofpq.kulkan.commons.PointOfView;
+import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.Job;
@@ -18,6 +19,7 @@ public class GameCharacter implements Serializable {
     private final int DEFAULT_START_LEVEL = 1;
     private final int DEFAULT_START_XP = 0;
     private final int DEFAULT_START_NEXT_LEVEL = 100;
+    private Player player;
     /**
      * Name
      */
@@ -78,19 +80,24 @@ public class GameCharacter implements Serializable {
      */
     private SecondaryCharacteristics aggregatedSecondaryCharacteristics;
     /**
-     * Health point of the character
+     * Current Health point of the character
      */
     private int currentHealthPoint;
+    /**
+     * Max Health point of the character
+     */
     private int maxHealthPoint;
     /**
-     * Mana point of the character
+     * Current Mana point of the character
      */
     private int currentManaPoint;
+    /**
+     * Max Mana point of the character
+     */
     private int maxManaPoint;
-
     private int hourglass;
     private PointOfView headingAngle;
-
+    private Position position;
     private boolean hasMoved;
     private boolean hasActed;
 
@@ -101,11 +108,12 @@ public class GameCharacter implements Serializable {
      * @param race   {@link com.ghostofpq.kulkan.entities.race.RaceType} of the character
      * @param gender {@link Gender} of the character
      */
-    public GameCharacter(String name, RaceType race, Gender gender) {
+    public GameCharacter(Player player, String name, RaceType race, Gender gender) {
         // Identity
         this.name = name;
         this.race = Race.Race(race);
         this.gender = gender;
+        this.player = player;
 
         // XP
         level = DEFAULT_START_LEVEL;
@@ -124,6 +132,7 @@ public class GameCharacter implements Serializable {
 
         currentHealthPoint = maxHealthPoint;
         currentManaPoint = maxManaPoint;
+        position = null;
     }
 
     public void gainXp(double experience) {
@@ -295,6 +304,19 @@ public class GameCharacter implements Serializable {
     public boolean isAlive() {
         return (currentHealthPoint > 0);
     }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
     /*
     * CHARACTERISTICS GETTERS
     */

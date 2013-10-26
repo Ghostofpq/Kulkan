@@ -542,10 +542,13 @@ public class Game {
         int numberOfPlayerAlive = 0;
         Player result = null;
         Player playerAlive = null;
-        for (Player player : playerList) {
-            if (player.getTeam().isAlive()) {
-                numberOfPlayerAlive++;
-                playerAlive = player;
+        for (Player player : characterPositionMap.keySet()) {
+            for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
+                if (gameCharacter.isAlive()) {
+                    numberOfPlayerAlive++;
+                    playerAlive = player;
+                    break;
+                }
             }
         }
         if (numberOfPlayerAlive == 1) {

@@ -58,15 +58,14 @@ public class Client {
         Client g = ((Client) context.getBean("Client"));
         g.init();
         g.setCurrentScene(LoginScene.getInstance());
-
         g.run();
     }
 
     public void init() {
         log.debug("HOST : {}", hostIp);
 
-        setHeight(600);
-        setWidth(800);
+        setHeight(900);
+        setWidth(1350);
         if (instance == null) {
             instance = this;
         }
