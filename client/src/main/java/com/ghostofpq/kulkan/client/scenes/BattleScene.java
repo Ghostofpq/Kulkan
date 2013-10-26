@@ -403,6 +403,7 @@ public class BattleScene implements Scene {
             case END_TURN:
                 sendEndTurn();
                 currentState = BattleSceneState.PENDING;
+                currentGameCharacter = null;
                 break;
         }
     }
@@ -520,10 +521,11 @@ public class BattleScene implements Scene {
         MessageCharacterToPlay messageCharacterToPlay = (MessageCharacterToPlay) message;
         log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharacterToPlay().getName());
 
-        currentGameCharacter = messageCharacterToPlay.getCharacterToPlay();
+
         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
-            if (characterRepresentation.getCharacter().equals(currentGameCharacter)) {
+            if (characterRepresentation.getCharacter().equals(messageCharacterToPlay.getCharacterToPlay())) {
                 currentGameCharacterRepresentation = characterRepresentation;
+                currentGameCharacter = currentGameCharacterRepresentation.getCharacter();
                 break;
             }
         }
