@@ -100,6 +100,7 @@ public class GameCharacter implements Serializable {
     private Position position;
     private boolean hasMoved;
     private boolean hasActed;
+    private boolean isReadyToPlay;
 
     /**
      * Creates a new Character level 1 Warrior.
@@ -130,9 +131,14 @@ public class GameCharacter implements Serializable {
 
         updateLifeAndManaPoint();
 
+        initChar();
+    }
+
+    public void initChar() {
         currentHealthPoint = maxHealthPoint;
         currentManaPoint = maxManaPoint;
         position = null;
+        isReadyToPlay = false;
     }
 
     public void gainXp(double experience) {
@@ -205,8 +211,15 @@ public class GameCharacter implements Serializable {
         }
     }
 
-    public boolean tickHourglass() {
-        boolean result = false;
+    public boolean isReadyToPlay() {
+        return (isAlive() && isReadyToPlay);
+    }
+
+    public void setReadyToPlay(boolean readyToPlay) {
+        this.isReadyToPlay = readyToPlay;
+    }
+
+    public void tickHourglass() {
         if (isAlive()) {
             hourglass -= getAgility();
             // log.debug("{} : {}", getCharacter().getName(), hourglass);
@@ -215,14 +228,12 @@ public class GameCharacter implements Serializable {
                 hourglass = 100 - delta;
                 setHasMoved(false);
                 setHasActed(false);
-                result = true;
+                isReadyToPlay = true;
             }
         } else {
             hourglass = 100;
-            result = false;
+            isReadyToPlay = false;
         }
-
-        return result;
     }
 
     /*

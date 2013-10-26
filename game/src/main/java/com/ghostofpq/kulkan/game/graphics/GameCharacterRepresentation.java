@@ -98,7 +98,8 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public boolean tickHourglass() {
-        return getCharacter().tickHourglass();
+        getCharacter().tickHourglass();
+        return getCharacter().isReadyToPlay();
     }
 
     public void update(long deltaTime) {

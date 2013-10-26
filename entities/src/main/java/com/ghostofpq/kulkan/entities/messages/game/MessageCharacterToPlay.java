@@ -8,20 +8,20 @@ import com.ghostofpq.kulkan.entities.messages.MessageType;
 import java.io.Serializable;
 
 public class MessageCharacterToPlay extends Message implements Serializable {
-    private GameCharacter charactertoPlay;
-    private Position positionOfChar;
+    private GameCharacter characterToPlay;
+    private Position positionOfCursor;
 
-    public MessageCharacterToPlay(GameCharacter charactertoPlay, Position positionOfChar) {
+    public MessageCharacterToPlay(GameCharacter characterToPlay, Position positionOfCursor) {
         type = MessageType.CHARACTER_TO_PLAY;
-        this.charactertoPlay = charactertoPlay;
-        this.positionOfChar = positionOfChar;
+        this.characterToPlay = characterToPlay;
+        this.positionOfCursor = positionOfCursor;
     }
 
-    public GameCharacter getCharactertoPlay() {
-        return charactertoPlay;
+    public GameCharacter getCharacterToPlay() {
+        return characterToPlay;
     }
 
-    public Position getPositionOfChar() {
-        return positionOfChar;
+    public Position getPositionOfCursor() {
+        return positionOfCursor;
     }
 }

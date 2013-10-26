@@ -30,11 +30,9 @@ public class Game {
     private BattleSceneState state;
     private Battlefield battlefield;
     private List<Player> playerList;
-    private Map<Player, Map<GameCharacter, Position>> characterPositionMap;
     private Map<Player, String> playerChannelMap;
     private Map<String, Player> keyTokenPlayerMap;
     private Map<String, Integer> keyTokenPlayerNumberMap;
-    private List<GameCharacter> readyToPlay;
     private Channel channelGameIn;
     private Channel channelGameOut;
     private QueueingConsumer gameConsumer;
@@ -46,13 +44,16 @@ public class Game {
     public Game(Battlefield battlefield, List<Player> playerList, String gameID) {
         this.battlefield = battlefield;
         this.playerList = playerList;
+        for (Player player : playerList) {
+            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                gameCharacter.initChar();
+            }
+        }
         this.gameID = gameID;
         state = BattleSceneState.DEPLOY_POSITION;
-        characterPositionMap = new HashMap<Player, Map<GameCharacter, Position>>();
         keyTokenPlayerMap = new HashMap<String, Player>();
         keyTokenPlayerNumberMap = new HashMap<String, Integer>();
         playerChannelMap = new HashMap<Player, String>();
-        readyToPlay = new ArrayList<GameCharacter>();
         initConnections();
         sendDeployMessage();
     }
@@ -130,23 +131,37 @@ public class Game {
     }
 
     private GameCharacter getNextCharToPlay() {
-        GameCharacter result;
-        while (readyToPlay.isEmpty()) {
-            for (Player player : characterPositionMap.keySet()) {
-                for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
-                    if (gameCharacter.tickHourglass()) {
-                        readyToPlay.add(gameCharacter);
+        GameCharacter result = null;
+        while (null == result) {
+            List<GameCharacter> readyGameCharactersList = new ArrayList<GameCharacter>();
+            for (Player player : playerList) {
+                for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                    if (gameCharacter.isReadyToPlay()) {
+                        readyGameCharactersList.add(gameCharacter);
                     }
                 }
             }
+            if (readyGameCharactersList.isEmpty()) {
+                log.error(" [X] NO CHAR READY, TICK HOURGLASS");
+                for (Player player : playerList) {
+                    for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                        gameCharacter.tickHourglass();
+                    }
+                }
+            } else {
+                log.debug(" [-] {} CHAR ARE TO PLAY : ", readyGameCharactersList.size());
+                result = readyGameCharactersList.get(0);
+                for (GameCharacter gameCharacter : readyGameCharactersList) {
+                    if (result.getHourglass() > gameCharacter.getHourglass()) {
+                        result = gameCharacter;
+                    }
+                }
+                readyGameCharactersList.remove(result);
+                result.setReadyToPlay(false);
+            }
+
         }
-        result = readyToPlay.get(0);
-        readyToPlay.remove(result);
-        if (null == result) {
-            log.error(" [X] CHAR TO PLAY = NULL");
-        } else {
-            log.debug(" [-] CHAR TO PLAY : {}", result.getName());
-        }
+        log.debug(" [-] CHAR TO PLAY : {}", result.getName());
         return result;
     }
 
@@ -176,10 +191,9 @@ public class Game {
 
     private Position getCharacterPosition(GameCharacter gameCharacter) {
         Position result = null;
-        for (Map<GameCharacter, Position> gameCharacterPositionMap : characterPositionMap.values()) {
-            if (gameCharacterPositionMap.keySet().contains(gameCharacter)) {
-                result = gameCharacterPositionMap.get(gameCharacter);
-                break;
+        for (Player player : playerList) {
+            if (player.getTeam().getTeam().contains(gameCharacter)) {
+                result = player.getGameCharacter(gameCharacter).getPosition();
             }
         }
         return result;
@@ -188,10 +202,14 @@ public class Game {
     private void manageMessageFinishDeployment(ClientMessage message) {
         MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = (MessageDeploymentFinishedForPlayer) message;
         log.debug(" [P] FINISH DEPLOYMENT MESSAGE FROM {}", messageDeploymentFinishedForPlayer.getKeyToken());
-        for (GameCharacter gameCharacter : messageDeploymentFinishedForPlayer.getCharacterPositionMap().keySet()) {
-            log.debug("-> {} : {}", gameCharacter.getName(), messageDeploymentFinishedForPlayer.getCharacterPositionMap().get(gameCharacter));
+
+        for (GameCharacter gameCharacter : messageDeploymentFinishedForPlayer.getCharactersList()) {
+            log.debug("PLACING -> {} : {}", gameCharacter.getName(), gameCharacter.getPosition().toString());
+            Player player = playerList.get(messageDeploymentFinishedForPlayer.getPlayerNumber());
+            player.getGameCharacter(gameCharacter).setPosition(gameCharacter.getPosition());
+            player.getGameCharacter(gameCharacter).setHeadingAngle(gameCharacter.getHeadingAngle());
         }
-        characterPositionMap.put(playerList.get(messageDeploymentFinishedForPlayer.getPlayerNumber()), messageDeploymentFinishedForPlayer.getCharacterPositionMap());
+
         if (deployIsComplete()) {
             log.debug(" [S] DEPLOYMENT IS COMPLETE");
             completeDeployment();
@@ -241,7 +259,8 @@ public class Game {
                 if (!nodeList.isEmpty()) {
                     characterToMove.setHasMoved(true);
                     // the position is on the floor, set the char position to position +Y1
-                    setCharacterPosition(characterToMove, positionToMove.plusYNew(1));
+                    Player player = playerList.get(messageCharacterActionMove.getPlayerNumber());
+                    player.getGameCharacter(characterToMove).setPosition(positionToMove.plusYNew(1));
                     List<Position> path = nodeList.get(0).getPathFromTop();
                     MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
                     sendToAll(messageCharacterMoves);
@@ -335,15 +354,8 @@ public class Game {
         GameCharacter character = messageCharacterEndTurn.getCharacter();
         if (character.equals(currentCharToPlay)) {
             log.debug(" [C] END TURN FOR {}", character.getName());
-            for (Player player : playerList) {
-                if (characterPositionMap.get(player).keySet().contains(character)) {
-                    for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
-                        if (gameCharacter.equals(character)) {
-                            gameCharacter.setHeadingAngle(character.getHeadingAngle());
-                        }
-                    }
-                }
-            }
+            Player player = playerList.get(messageCharacterEndTurn.getPlayerNumber());
+            player.getGameCharacter(character).setHeadingAngle(character.getHeadingAngle());
             newTurn();
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
@@ -422,20 +434,11 @@ public class Game {
         return result;
     }
 
-    private void setCharacterPosition(GameCharacter character, Position position) {
-        for (Player player : playerList) {
-            if (characterPositionMap.get(player).keySet().contains(character)) {
-                characterPositionMap.get(player).put(character, position);
-                break;
-            }
-        }
-    }
-
     private GameCharacter getGameCharacterAtPosition(Position position) {
         GameCharacter result = null;
         for (Player player : playerList) {
-            for (GameCharacter character : characterPositionMap.get(player).keySet()) {
-                Position footPositionOfChar = characterPositionMap.get(player).get(character).plusYNew(-1);
+            for (GameCharacter character : player.getTeam().getTeam()) {
+                Position footPositionOfChar = character.getPosition().plusYNew(-1);
                 if (footPositionOfChar.equals(position)) {
                     result = character;
                     break;
@@ -449,9 +452,9 @@ public class Game {
         Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
         Tree<Position> result = battlefield.getPositionTree(characterPosition, 3, 2, 1);
         for (Player player : playerList) {
-            for (GameCharacter character : characterPositionMap.get(player).keySet()) {
+            for (GameCharacter character : player.getTeam().getTeam()) {
                 if (!character.equals(gameCharacter)) {
-                    Position footPositionOfChar = characterPositionMap.get(player).get(character).plusYNew(-1);
+                    Position footPositionOfChar = character.getPosition().plusYNew(-1);
                     if (result.contains(footPositionOfChar)) {
                         result.remove(footPositionOfChar);
                     }
@@ -472,13 +475,11 @@ public class Game {
     private void completeDeployment() {
         for (Player player : playerList) {
             log.debug("player {}", playerList.indexOf(player));
-            Map<GameCharacter, Position> characterPositionMapForPlayer = new HashMap<GameCharacter, Position>();
-            for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
-                log.debug("-> {} : {}", gameCharacter.getName(), characterPositionMap.get(player).get(gameCharacter));
-                characterPositionMapForPlayer.put(gameCharacter, characterPositionMap.get(player).get(gameCharacter));
+            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                log.debug("-> {} : {}", gameCharacter.getName(), gameCharacter.getPosition().toString());
             }
             MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer =
-                    new MessageDeploymentPositionsOfPlayer(characterPositionMapForPlayer, playerList.indexOf(player));
+                    new MessageDeploymentPositionsOfPlayer(player.getTeam().getTeam(), playerList.indexOf(player));
             for (Player playerToNotify : playerList) {
                 if (player != playerToNotify) {
                     sendMessageToPlayer(playerToNotify, messageDeploymentPositionsOfPlayer);
@@ -504,16 +505,16 @@ public class Game {
             GameCharacter charToPlay = getNextCharToPlay();
             Player playerToPlay = getPlayerForCharacter(charToPlay);
 
-            Map<GameCharacter, Position> actualCharacterPositionMap = new HashMap<GameCharacter, Position>();
-            for (Player player : characterPositionMap.keySet()) {
-                actualCharacterPositionMap.putAll(characterPositionMap.get(player));
+            List<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
+            for (Player player : playerList) {
+                allGameCharacters.addAll(player.getTeam().getTeam());
             }
-            MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(actualCharacterPositionMap);
+            MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(allGameCharacters);
 
             for (Player player : playerList) {
                 sendMessageToPlayer(player, messageUpdateCharacters);
             }
-            Position footPositionOfChar = actualCharacterPositionMap.get(charToPlay).plusYNew(-1);
+            Position footPositionOfChar = charToPlay.getPosition().plusYNew(-1);
             MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay, footPositionOfChar);
             sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
 
@@ -531,24 +532,19 @@ public class Game {
         this.playerList = null;
         this.gameID = null;
         state = null;
-        characterPositionMap = null;
         keyTokenPlayerMap = null;
         keyTokenPlayerNumberMap = null;
         playerChannelMap = null;
-        readyToPlay = null;
     }
 
     private Player getWinnerPlayer() {
         int numberOfPlayerAlive = 0;
         Player result = null;
         Player playerAlive = null;
-        for (Player player : characterPositionMap.keySet()) {
-            for (GameCharacter gameCharacter : characterPositionMap.get(player).keySet()) {
-                if (gameCharacter.isAlive()) {
-                    numberOfPlayerAlive++;
-                    playerAlive = player;
-                    break;
-                }
+        for (Player player : playerList) {
+            if (player.getTeam().isAlive()) {
+                numberOfPlayerAlive++;
+                playerAlive = player;
             }
         }
         if (numberOfPlayerAlive == 1) {
@@ -560,10 +556,12 @@ public class Game {
     private boolean deployIsComplete() {
         boolean result = true;
         for (Player player : playerList) {
-            if (!characterPositionMap.keySet().contains(player)) {
-                result = false;
-                log.debug("[x] DEPLOYMENT NOT FINISHED FOR {}", player.getPseudo());
-                break;
+            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                if (null == gameCharacter.getPosition()) {
+                    result = false;
+                    log.debug("[x] DEPLOYMENT NOT FINISHED FOR {}", player.getPseudo());
+                    break;
+                }
             }
         }
         return result;

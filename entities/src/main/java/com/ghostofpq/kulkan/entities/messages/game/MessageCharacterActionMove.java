@@ -10,12 +10,14 @@ import java.io.Serializable;
 public class MessageCharacterActionMove extends ClientMessage implements Serializable {
     private GameCharacter character;
     private Position positionToMove;
+    private int playerNumber;
 
-    public MessageCharacterActionMove(String keyToken, GameCharacter character, Position positionToMove) {
+    public MessageCharacterActionMove(String keyToken, int playerNumber, GameCharacter character, Position positionToMove) {
         type = MessageType.CHARACTER_ACTION_MOVE;
         this.keyToken = keyToken;
         this.character = character;
         this.positionToMove = positionToMove;
+        this.playerNumber = playerNumber;
     }
 
     public GameCharacter getCharacter() {
@@ -24,5 +26,9 @@ public class MessageCharacterActionMove extends ClientMessage implements Seriali
 
     public Position getPositionToMove() {
         return positionToMove;
+    }
+
+    public int getPlayerNumber() {
+        return playerNumber;
     }
 }

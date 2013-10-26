@@ -292,7 +292,6 @@ public class GameCharacterRepresentation extends DrawableObject {
         GL11.glEnd();
     }
 
-
     public String toString() {
         return character.getName();
     }
@@ -624,5 +623,11 @@ public class GameCharacterRepresentation extends DrawableObject {
         return playerNumber;
     }
 
+    public Position getPosition() {
+        return character.getPosition();
+    }
 
+    public void setPosition(Position position) {
+        this.character.setPosition(position);
+    }
 }

@@ -490,9 +490,9 @@ public class BattleScene implements Scene {
     private void manageMessageOtherPlayerDeployment(Message message) {
         MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer = (MessageDeploymentPositionsOfPlayer) message;
         log.debug(" [-] DEPLOYMENT OF PLAYER {}", messageDeploymentPositionsOfPlayer.getPlayerNumber());
-        for (GameCharacter gameCharacter : messageDeploymentPositionsOfPlayer.getCharacterPositionMap().keySet()) {
+        for (GameCharacter gameCharacter : messageDeploymentPositionsOfPlayer.getCharacterList()) {
             GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(gameCharacter,
-                    messageDeploymentPositionsOfPlayer.getCharacterPositionMap().get(gameCharacter),
+                    gameCharacter.getPosition(),
                     messageDeploymentPositionsOfPlayer.getPlayerNumber());
             characterRepresentationList.add(gameCharacterRepresentation);
             drawableObjectList.add(gameCharacterRepresentation);
@@ -503,13 +503,13 @@ public class BattleScene implements Scene {
     private void manageMessageAllCharacter(Message message) {
         MessageUpdateCharacters messageUpdateCharacters = (MessageUpdateCharacters) message;
         log.debug(" [-] UPDATE ALL CHARACTERS");
-        for (GameCharacter gameCharacter : messageUpdateCharacters.getCharacterPositionMap().keySet()) {
+        for (GameCharacter gameCharacter : messageUpdateCharacters.getCharacterList()) {
             for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
                 if (gameCharacterRepresentation.getCharacter().equals(gameCharacter)) {
                     gameCharacterRepresentation.updateCharacter(gameCharacter);
-                    if (!gameCharacterRepresentation.getPosition().equals(messageUpdateCharacters.getCharacterPositionMap().get(gameCharacter))) {
+                    if (!gameCharacterRepresentation.getPosition().equals(gameCharacter.getPosition())) {
                         log.error("[X] CHAR {} IS MISPLACED ! {}/{}", gameCharacter.getName(),
-                                gameCharacterRepresentation.getPosition(), messageUpdateCharacters.getCharacterPositionMap().get(gameCharacter));
+                                gameCharacterRepresentation.getPosition(), gameCharacter.getPosition());
                     }
                 }
             }
@@ -518,9 +518,9 @@ public class BattleScene implements Scene {
 
     private void manageMessageCharacterToPlay(Message message) {
         MessageCharacterToPlay messageCharacterToPlay = (MessageCharacterToPlay) message;
-        log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharactertoPlay().getName());
+        log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharacterToPlay().getName());
 
-        currentGameCharacter = messageCharacterToPlay.getCharactertoPlay();
+        currentGameCharacter = messageCharacterToPlay.getCharacterToPlay();
         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
             if (characterRepresentation.getCharacter().equals(currentGameCharacter)) {
                 currentGameCharacterRepresentation = characterRepresentation;
@@ -529,7 +529,7 @@ public class BattleScene implements Scene {
         }
 
         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.NONE);
-        cursor = messageCharacterToPlay.getPositionOfChar();
+        cursor = messageCharacterToPlay.getPositionOfCursor();
         battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
         GraphicsManager.getInstance().requestCenterPosition(cursor);
         updateCursorTarget();
@@ -812,7 +812,7 @@ public class BattleScene implements Scene {
 
     private void sendActionMove() {
         if (possiblePositionsToMove.contains(cursor)) {
-            MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+            MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), playerNumber, currentGameCharacter, cursor);
             postMessage(messageCharacterActionMove);
         } else {
             resetOldHighlight();
@@ -842,18 +842,18 @@ public class BattleScene implements Scene {
     }
 
     private void sendEndTurn() {
-        MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(Client.getInstance().getTokenKey(), currentGameCharacterRepresentation.getCharacter());
+        MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(Client.getInstance().getTokenKey(), playerNumber, currentGameCharacterRepresentation.getCharacter());
         postMessage(messageCharacterEndturn);
     }
 
     private void sendDeploymentResult() {
-        Map<GameCharacter, Position> gameCharacterPositionMap = new HashMap<GameCharacter, Position>();
+        List<GameCharacter> gameCharacterList = new ArrayList<GameCharacter>();
 
         for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
-            gameCharacterPositionMap.put(gameCharacterRepresentation.getCharacter(), gameCharacterRepresentation.getPosition());
+            gameCharacterList.add(gameCharacterRepresentation.getCharacter());
         }
 
-        MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(Client.getInstance().getTokenKey(), gameCharacterPositionMap, playerNumber);
+        MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(Client.getInstance().getTokenKey(), playerNumber, gameCharacterList);
 
         log.debug(" [-] DEPLOYMENT FINISHED FOR {}", messageDeploymentFinishedForPlayer.getKeyToken());
         postMessage(messageDeploymentFinishedForPlayer);

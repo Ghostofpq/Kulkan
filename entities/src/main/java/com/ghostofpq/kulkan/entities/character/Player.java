@@ -73,6 +73,10 @@ public class Player implements Serializable {
         this.team = team;
     }
 
+    public GameCharacter getGameCharacter(GameCharacter gameCharacter) {
+        return team.getTeam().get(team.getTeam().indexOf(gameCharacter));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

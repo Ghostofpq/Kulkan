@@ -1,26 +1,25 @@
 package com.ghostofpq.kulkan.entities.messages.game;
 
-import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 public class MessageDeploymentFinishedForPlayer extends ClientMessage implements Serializable {
-    private Map<GameCharacter, Position> characterPositionMap;
+    private List<GameCharacter> charactersList;
     private int playerNumber;
 
-    public MessageDeploymentFinishedForPlayer(String keyToken, Map<GameCharacter, Position> characterPositionMap, int playerNumber) {
+    public MessageDeploymentFinishedForPlayer(String keyToken, int playerNumber, List<GameCharacter> charactersList) {
         type = MessageType.FINISH_DEPLOYMENT;
         this.keyToken = keyToken;
-        this.characterPositionMap = characterPositionMap;
+        this.charactersList = charactersList;
         this.playerNumber = playerNumber;
     }
 
-    public Map<GameCharacter, Position> getCharacterPositionMap() {
-        return characterPositionMap;
+    public List<GameCharacter> getCharactersList() {
+        return charactersList;
     }
 
     public int getPlayerNumber() {
