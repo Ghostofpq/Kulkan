@@ -169,17 +169,8 @@ public class Game {
         Player result = null;
 
         for (Player player : playerList) {
-            for (GameCharacter gameCharacterOfPlayer : player.getTeam().getTeam()) {
-                log.debug("[-] CHAR : {}", gameCharacterOfPlayer.getName());
-                if (gameCharacterOfPlayer.equals(gameCharacter)) {
-                    result = player;
-                    log.debug("= {}", gameCharacter.getName());
-                    break;
-                } else {
-                    log.debug("/= {}", gameCharacter.getName());
-                }
-            }
-            if (null != result) {
+            if (player.getTeam().getTeam().contains(gameCharacter)) {
+                result = player;
                 break;
             }
         }
