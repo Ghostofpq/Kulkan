@@ -9,16 +9,24 @@ import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.Warrior;
 import com.ghostofpq.kulkan.entities.race.Race;
 import com.ghostofpq.kulkan.entities.race.RaceType;
+import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class GameCharacter implements Serializable {
     private static final long serialVersionUID = 1519266158170332774L;
+
+    @Id
+    private String id;
+
     // Evolution
     private final int DEFAULT_START_LEVEL = 1;
     private final int DEFAULT_START_XP = 0;
     private final int DEFAULT_START_NEXT_LEVEL = 100;
+    /**
+     * Owner
+     */
     private Player player;
     /**
      * Name
@@ -455,5 +463,13 @@ public class GameCharacter implements Serializable {
 
     public void setHasActed(boolean hasActed) {
         this.hasActed = hasActed;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

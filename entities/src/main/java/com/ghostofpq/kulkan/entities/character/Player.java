@@ -1,10 +1,16 @@
 package com.ghostofpq.kulkan.entities.character;
 
+import org.springframework.data.annotation.Id;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class Player implements Serializable {
     private static final long serialVersionUID = 3105715593359746378L;
+
+    @Id
+    private String id;
+
     private String pseudo;
     private String firstName;
     private String lastName;
@@ -92,5 +98,13 @@ public class Player implements Serializable {
     @Override
     public int hashCode() {
         return pseudo.hashCode();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
