@@ -1,10 +1,9 @@
-package com.ghostofpq.kulkan.game.main;
+package com.ghostofpq.kulkan.server.utils;
 
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
-import com.ghostofpq.kulkan.game.utils.SaveManager;
 
 public class MapCreator {
     public static void main(String[] argv) {

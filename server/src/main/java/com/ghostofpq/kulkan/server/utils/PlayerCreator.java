@@ -1,10 +1,9 @@
-package com.ghostofpq.kulkan.game.main;
+package com.ghostofpq.kulkan.server.utils;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.race.RaceType;
-import com.ghostofpq.kulkan.game.utils.SaveManager;
 
 public class PlayerCreator {
     public static void main(String[] argv) {
