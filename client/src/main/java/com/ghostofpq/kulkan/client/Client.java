@@ -28,6 +28,7 @@ public class Client {
     private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
     //SPRING
     private String hostIp;
+    private int hostPort;
     private int height;
     private int width;
     private String clientQueueName;
@@ -93,6 +94,7 @@ public class Client {
     private void initConnection() throws IOException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(hostIp);
+        factory.setPort(hostPort);
         connection = factory.newConnection();
     }
 
@@ -219,5 +221,9 @@ public class Client {
 
     public void setHostIp(String hostIp) {
         this.hostIp = hostIp;
+    }
+
+    public void setHostPort(int hostPort) {
+        this.hostPort = hostPort;
     }
 }

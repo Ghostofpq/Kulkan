@@ -67,6 +67,7 @@ public class Server {
     private void initConnection() throws IOException, InterruptedException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
+        factory.setPort(13370);
         connection = factory.newConnection();
         channelAuthenticating = connection.createChannel();
         channelAuthenticating.queueDeclare(authenticationQueueName, false, false, false, null);
