@@ -28,8 +28,6 @@ public class GameCharacterRepresentation extends DrawableObject {
     private PositionAbsolute positionToGo;
     private List<PositionAbsolute> positionsToGo;
     private boolean isJumping;
-    private boolean hasMoved;
-    private boolean hasActed;
     private int playerNumber;
 
     public GameCharacterRepresentation(GameCharacter character, Position position, int playerNumber) {
@@ -604,19 +602,19 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public boolean hasMoved() {
-        return hasMoved;
+        return character.hasMoved();
     }
 
     public void setHasMoved(boolean hadMoved) {
-        this.hasMoved = hadMoved;
+        character.setHasMoved(hadMoved);
     }
 
     public boolean hasActed() {
-        return hasActed;
+        return character.hasActed();
     }
 
     public void setHasActed(boolean hasActed) {
-        this.hasActed = hasActed;
+        character.setHasActed(hasActed);
     }
 
     public int getPlayerNumber() {

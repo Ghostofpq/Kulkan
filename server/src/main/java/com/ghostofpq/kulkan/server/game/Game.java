@@ -180,6 +180,20 @@ public class Game {
         return result;
     }
 
+    private GameCharacter getEquivalentCharacter(GameCharacter gameCharacter) {
+        GameCharacter result = null;
+        for (Player player : playerList) {
+            if (player.getTeam().getTeam().contains(gameCharacter)) {
+                for (GameCharacter character : player.getTeam().getTeam()) {
+                    if (character.equals(gameCharacter)) {
+                        result = character;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     private Position getCharacterPosition(GameCharacter gameCharacter) {
         Position result = null;
         for (Player player : playerList) {
@@ -239,7 +253,7 @@ public class Game {
 
     private void manageMessageCharMoves(ClientMessage message) {
         MessageCharacterActionMove messageCharacterActionMove = (MessageCharacterActionMove) message;
-        GameCharacter characterToMove = messageCharacterActionMove.getCharacter();
+        GameCharacter characterToMove = getEquivalentCharacter(messageCharacterActionMove.getCharacter());
         if (characterToMove.equals(currentCharToPlay)) {
             Position positionToMove = messageCharacterActionMove.getPositionToMove();
             Position currentPosition = getCharacterPosition(characterToMove).plusYNew(-1);
@@ -274,8 +288,8 @@ public class Game {
 
     private void manageMessageCharAttacks(ClientMessage message) {
         MessageCharacterActionAttack messageCharacterActionAttack = (MessageCharacterActionAttack) message;
-        GameCharacter characterWhoAttacks = messageCharacterActionAttack.getCharacter();
-        Position characterWhoAttacksPosition = getCharacterPosition(characterWhoAttacks).plusYNew(-1);
+        GameCharacter characterWhoAttacks = getEquivalentCharacter(messageCharacterActionAttack.getCharacter());
+        Position characterWhoAttacksPosition = characterWhoAttacks.getPosition().plusYNew(-1);
         if (characterWhoAttacks.equals(currentCharToPlay)) {
             Position positionToAttack = messageCharacterActionAttack.getPositionToAttack();
             if (!positionToAttack.equals(characterWhoAttacksPosition)) {
@@ -342,7 +356,7 @@ public class Game {
 
     private void manageMessageCharEndTurn(ClientMessage message) {
         MessageCharacterEndTurn messageCharacterEndTurn = (MessageCharacterEndTurn) message;
-        GameCharacter character = messageCharacterEndTurn.getCharacter();
+        GameCharacter character = getEquivalentCharacter(messageCharacterEndTurn.getCharacter());
         if (character.equals(currentCharToPlay)) {
             log.debug(" [C] END TURN FOR {}", character.getName());
             Player player = playerList.get(messageCharacterEndTurn.getPlayerNumber());

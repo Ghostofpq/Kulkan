@@ -100,7 +100,6 @@ public class Server {
 
             switch (message.getType()) {
                 case AUTHENTICATION_REQUEST:
-                    //TODO do stuff;
                     MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
                     boolean authenticationResult = AuthenticationManager.getInstance().authenticate(authenticationRequest.getPseudo(),
                             authenticationRequest.getPassword());
