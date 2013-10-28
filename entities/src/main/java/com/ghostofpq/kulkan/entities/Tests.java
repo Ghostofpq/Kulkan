@@ -4,10 +4,10 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.character.PlayerRepository;
 import com.mongodb.Mongo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.net.UnknownHostException;
@@ -24,13 +24,10 @@ public class Tests {
         return new Mongo("localhost");
     }
 
-    public static void main(String[] args) {
-        AbstractApplicationContext context = new AnnotationConfigApplicationContext(Tests.class);
-        PlayerRepository repository = context.getBean(PlayerRepository.class);
-
-        repository.deleteAll();
-
-        repository.save(new Player("Bob"));
+    public static void main(String[] args) throws Exception {
+        MongoOperations mongoOps = new MongoTemplate(new Mongo(), "kulkan");
+        Player p1 = new Player("Bob");
+        mongoOps.insert(p1);
 
 
     }
