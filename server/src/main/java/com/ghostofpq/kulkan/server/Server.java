@@ -8,7 +8,7 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationRequest;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationResponse;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
-import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
+import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
@@ -21,14 +21,21 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 
 @Slf4j
 public class Server {
+    private static final java.lang.String CONTEXT_URI = "META-INF/spring/server-context.xml";
     private static volatile Server instance = null;
     private final String HOST = "localhost";
+    private AuthenticationManager authenticationManager;
+    private LobbyManager lobbyManager;
+    private GameManager gameManager;
+    private MatchmakingManager matchmakingManager;
     private String authenticationQueueName = "authentication";
     private boolean requestClose;
     private QueueingConsumer consumer;
@@ -42,19 +49,11 @@ public class Server {
         requestClose = false;
     }
 
-    public static Server getInstance() {
-        if (instance == null) {
-            synchronized (Server.class) {
-                if (instance == null) {
-                    instance = new Server();
-                }
-            }
-        }
-        return instance;
-    }
-
     public static void main(String[] argv) throws IOException, InterruptedException {
-        Server s = Server.getInstance();
+
+        ApplicationContext context = new ClassPathXmlApplicationContext(CONTEXT_URI);
+        Server s = ((Server) context.getBean("server"));
+
         s.init();
         s.run();
     }
@@ -62,12 +61,14 @@ public class Server {
     private void init() throws IOException, InterruptedException {
         initConnection();
         initDatabase();
+        lobbyManager.initConnections();
+        matchmakingManager.initConnections();
     }
 
     private void initConnection() throws IOException, InterruptedException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
-        factory.setPort(13370);
+        factory.setPort(5672);
         connection = factory.newConnection();
         channelAuthenticating = connection.createChannel();
         channelAuthenticating.queueDeclare(authenticationQueueName, false, false, false, null);
@@ -101,14 +102,14 @@ public class Server {
             switch (message.getType()) {
                 case AUTHENTICATION_REQUEST:
                     MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
-                    boolean authenticationResult = AuthenticationManager.getInstance().authenticate(authenticationRequest.getPseudo(),
+                    boolean authenticationResult = authenticationManager.authenticate(authenticationRequest.getPseudo(),
                             authenticationRequest.getPassword());
-                    String tokenKey = AuthenticationManager.getInstance().getTokenKeyFor(authenticationRequest.getPseudo());
+                    String tokenKey = authenticationManager.getTokenKeyFor(authenticationRequest.getPseudo());
 
                     MessageErrorCode code;
                     if (authenticationResult) {
                         code = MessageErrorCode.OK;
-                        LobbyManager.getInstance().addClient(tokenKey);
+                        lobbyManager.addClient(tokenKey);
                     } else {
                         code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
                     }
@@ -132,9 +133,9 @@ public class Server {
     public void run() throws IOException, InterruptedException {
         while (!requestClose) {
             receiveMessage();
-            LobbyManager.getInstance().run();
-            MatchmakingManager.getInstance().run();
-            GameManager.getInstance().run();
+            lobbyManager.run();
+            matchmakingManager.run();
+            gameManager.run();
         }
         channelAuthenticating.close();
         connection.close();
@@ -182,5 +183,21 @@ public class Server {
         SaveManager saveManager = SaveManager.getInstance();
         saveManager.saveMap(battlefield, "mapTest1");
 
+    }
+
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
+
+    public void setLobbyManager(LobbyManager lobbyManager) {
+        this.lobbyManager = lobbyManager;
+    }
+
+    public void setGameManager(GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
+
+    public void setMatchmakingManager(MatchmakingManager matchmakingManager) {
+        this.matchmakingManager = matchmakingManager;
     }
 }

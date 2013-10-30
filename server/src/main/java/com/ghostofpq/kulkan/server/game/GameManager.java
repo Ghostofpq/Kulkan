@@ -2,6 +2,7 @@ package com.ghostofpq.kulkan.server.game;
 
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.server.Server;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -11,30 +12,18 @@ import java.util.Map;
 
 @Slf4j
 public class GameManager {
-    private static volatile GameManager instance = new GameManager();
     private Map<String, Game> gameMap;
     private List<String> toRemoveGames;
-
+    private Server server;
 
     private GameManager() {
         gameMap = new HashMap<String, Game>();
         toRemoveGames = new ArrayList<String>();
     }
 
-    public static GameManager getInstance() {
-        if (instance == null) {
-            synchronized (GameManager.class) {
-                if (instance == null) {
-                    instance = new GameManager();
-                }
-            }
-        }
-        return instance;
-    }
-
     public void addGame(String gameId, Battlefield battlefield, List<Player> playerList) {
         log.debug(" [-] ADDING GAME {} IN THE GAME MANAGER", gameId);
-        gameMap.put(gameId, new Game(battlefield, playerList, gameId));
+        gameMap.put(gameId, new Game(server, battlefield, playerList, gameId));
     }
 
     public void closeGame(String gameId) {
@@ -55,5 +44,9 @@ public class GameManager {
         for (Game game : gameMap.values()) {
             game.receiveMessage();
         }
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

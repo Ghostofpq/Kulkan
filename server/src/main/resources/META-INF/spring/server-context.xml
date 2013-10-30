@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="server"
+          class="com.ghostofpq.kulkan.server.Server">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="gameManager" ref="gameManager"/>
+        <property name="lobbyManager" ref="lobbyManager"/>
+        <property name="matchmakingManager" ref="matchmakingManager"/>
+    </bean>
+
+    <bean id="gameManager"
+          class="com.ghostofpq.kulkan.server.game.GameManager">
+        <property name="server" ref="server"/>
+    </bean>
+
+    <bean id="authenticationManager"
+          class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager">
+        <property name="server" ref="server"/>
+    </bean>
+
+
+    <bean id="lobbyManager"
+          class="com.ghostofpq.kulkan.server.lobby.LobbyManager">
+        <property name="server" ref="server"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="matchmakingManager" ref="matchmakingManager"/>
+    </bean>
+
+    <bean id="matchmakingManager"
+          class="com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager">
+        <property name="server" ref="server"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="gameManager" ref="gameManager"/>
+        <property name="lobbyManager" ref="lobbyManager"/>
+    </bean>
+</beans>

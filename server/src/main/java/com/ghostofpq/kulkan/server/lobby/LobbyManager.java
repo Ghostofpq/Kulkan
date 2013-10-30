@@ -7,7 +7,7 @@ import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPing;
 import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPong;
 import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyServer;
 import com.ghostofpq.kulkan.server.Server;
-import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
+import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
@@ -19,10 +19,11 @@ import java.util.List;
 
 @Slf4j
 public class LobbyManager {
-
-    private static volatile LobbyManager instance = new LobbyManager();
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
+    private AuthenticationManager authenticationManager;
+    private MatchmakingManager matchmakingManager;
+    private Server server;
     private List<String> connectedClients;
     private List<String> pongClients;
     private Channel channelOut;
@@ -35,9 +36,12 @@ public class LobbyManager {
         connectedClients = new ArrayList<String>();
         pongClients = new ArrayList<String>();
         lastTimePing = System.currentTimeMillis();
+    }
+
+    public void initConnections() {
         try {
-            channelOut = Server.getInstance().getConnection().createChannel();
-            channelLobbyIn = Server.getInstance().getConnection().createChannel();
+            channelOut = server.getConnection().createChannel();
+            channelLobbyIn = server.getConnection().createChannel();
             channelLobbyIn.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
             lobbyConsumer = new QueueingConsumer(channelLobbyIn);
             channelLobbyIn.basicConsume(LOBBY_SERVER_QUEUE_NAME_BASE, true, lobbyConsumer);
@@ -51,17 +55,6 @@ public class LobbyManager {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static LobbyManager getInstance() {
-        if (instance == null) {
-            synchronized (LobbyManager.class) {
-                if (instance == null) {
-                    instance = new LobbyManager();
-                }
-            }
-        }
-        return instance;
     }
 
     public void run() throws IOException, InterruptedException {
@@ -116,11 +109,11 @@ public class LobbyManager {
     public void removeClient(String clientKey) {
         log.debug(" [-] REMOVING CLIENT KEY : {}", clientKey);
         connectedClients.remove(clientKey);
-        MatchmakingManager.getInstance().removeClient(clientKey);
+        matchmakingManager.removeClient(clientKey);
     }
 
     public void postMessage(MessageLobbyClient messageLobbyClient) throws IOException {
-        String clientPseudo = AuthenticationManager.getInstance().getNameForKey(messageLobbyClient.getKeyToken());
+        String clientPseudo = authenticationManager.getNameForKey(messageLobbyClient.getKeyToken());
         if (clientPseudo != "") {
             String message = new StringBuilder().append("[").append(clientPseudo).append("]  :  ").append(messageLobbyClient.getLobbyMessage()).toString();
             MessageLobbyServer messageLobbyServer = new MessageLobbyServer(message);
@@ -163,5 +156,17 @@ public class LobbyManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
+
+    public void setMatchmakingManager(MatchmakingManager matchmakingManager) {
+        this.matchmakingManager = matchmakingManager;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

@@ -6,7 +6,7 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
 import com.ghostofpq.kulkan.server.Server;
-import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
+import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.utils.SaveManager;
@@ -22,9 +22,12 @@ import java.util.Map;
 
 @Slf4j
 public class MatchmakingManager {
-    private static volatile MatchmakingManager instance = new MatchmakingManager();
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
+    private Server server;
+    private AuthenticationManager authenticationManager;
+    private LobbyManager lobbyManager;
+    private GameManager gameManager;
     private List<String> subscribedClients;
     private Map<String, Match> matchMap;
     private Channel channelOut;
@@ -36,9 +39,12 @@ public class MatchmakingManager {
         matchmapIncrementor = 0;
         subscribedClients = new ArrayList<String>();
         matchMap = new HashMap<String, Match>();
+    }
+
+    public void initConnections() {
         try {
-            channelOut = Server.getInstance().getConnection().createChannel();
-            channelMatchmakingIn = Server.getInstance().getConnection().createChannel();
+            channelOut = server.getConnection().createChannel();
+            channelMatchmakingIn = server.getConnection().createChannel();
             channelMatchmakingIn.queueDeclare(MATCHMAKING_SERVER_QUEUE_NAME_BASE, false, false, false, null);
             matchmakingConsumer = new QueueingConsumer(channelMatchmakingIn);
             channelMatchmakingIn.basicConsume(MATCHMAKING_SERVER_QUEUE_NAME_BASE, true, matchmakingConsumer);
@@ -52,17 +58,6 @@ public class MatchmakingManager {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static MatchmakingManager getInstance() {
-        if (instance == null) {
-            synchronized (MatchmakingManager.class) {
-                if (instance == null) {
-                    instance = new MatchmakingManager();
-                }
-            }
-        }
-        return instance;
     }
 
     public void run() throws IOException, InterruptedException {
@@ -139,7 +134,7 @@ public class MatchmakingManager {
                     Battlefield battlefield = SaveManager.getInstance().loadMap("mapTest1");
                     List<Player> playerList = new ArrayList<Player>();
                     for (String client : match.getAllClients()) {
-                        playerList.add(SaveManager.getInstance().loadPlayer(AuthenticationManager.getInstance().getNameForKey(client)));
+                        playerList.add(SaveManager.getInstance().loadPlayer(authenticationManager.getNameForKey(client)));
                     }
                     MessageGameStart messageGameStart = new MessageGameStart(matchKey, battlefield, playerList);
                     for (String client : match.getAllClients()) {
@@ -150,9 +145,9 @@ public class MatchmakingManager {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        LobbyManager.getInstance().removeClient(client);
+                        lobbyManager.removeClient(client);
                     }
-                    GameManager.getInstance().addGame(matchKey, battlefield, playerList);
+                    gameManager.addGame(matchKey, battlefield, playerList);
                     matchesToRemove.add(matchKey);
                     break;
                 case REFUSE:
@@ -215,5 +210,21 @@ public class MatchmakingManager {
         matchMap.put(matchKey, match);
         matchmapIncrementor++;
         return matchKey;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
+
+    public void setLobbyManager(LobbyManager lobbyManager) {
+        this.lobbyManager = lobbyManager;
+    }
+
+    public void setGameManager(GameManager gameManager) {
+        this.gameManager = gameManager;
     }
 }

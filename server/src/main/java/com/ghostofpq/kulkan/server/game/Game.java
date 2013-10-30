@@ -12,7 +12,7 @@ import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.ghostofpq.kulkan.server.Server;
-import com.ghostofpq.kulkan.server.authentification.AuthenticationManager;
+import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +25,12 @@ import java.util.Map;
 
 @Slf4j
 public class Game {
+
     private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private static final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
+    private AuthenticationManager authenticationManager;
+    private GameManager gameManager;
+    private Server server;
     private BattleSceneState state;
     private Battlefield battlefield;
     private List<Player> playerList;
@@ -41,7 +45,8 @@ public class Game {
     private GameCharacter currentCharToPlay;
 
 
-    public Game(Battlefield battlefield, List<Player> playerList, String gameID) {
+    public Game(Server server, Battlefield battlefield, List<Player> playerList, String gameID) {
+        this.server = server;
         this.battlefield = battlefield;
         this.playerList = playerList;
         for (Player player : playerList) {
@@ -60,7 +65,7 @@ public class Game {
 
     private void initConnections() {
         try {
-            channelGameIn = Server.getInstance().getConnection().createChannel();
+            channelGameIn = server.getConnection().createChannel();
             String queueNameIn = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameID).toString();
             channelGameIn.queueDeclare(queueNameIn, false, false, false, null);
             gameConsumer = new QueueingConsumer(channelGameIn);
@@ -70,9 +75,9 @@ public class Game {
             while (null != delivery) {
                 delivery = gameConsumer.nextDelivery(1);
             }
-            channelGameOut = Server.getInstance().getConnection().createChannel();
+            channelGameOut = server.getConnection().createChannel();
             for (Player player : playerList) {
-                String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(player.getPseudo());
+                String playerKey = authenticationManager.getTokenKeyFor(player.getPseudo());
                 keyTokenPlayerMap.put(playerKey, player);
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(playerKey).toString();
                 log.debug(" [-] OPENING QUEUE : {}", queueName);
@@ -99,7 +104,7 @@ public class Game {
         for (Player player : playerList) {
             List<GameCharacter> characterList = player.getTeam().getTeam();
             MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
-            String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(player.getPseudo());
+            String playerKey = authenticationManager.getTokenKeyFor(player.getPseudo());
             keyTokenPlayerNumberMap.put(playerKey, playerList.indexOf(player));
             sendMessageToPlayer(player, messageDeploymentStart);
         }
@@ -428,7 +433,7 @@ public class Game {
     private boolean messageIsExpected(ClientMessage message) {
         boolean result;
         int receivedPlayerNumber = keyTokenPlayerNumberMap.get(message.getKeyToken());
-        String playerKey = AuthenticationManager.getInstance().getTokenKeyFor(playerToPlay.getPseudo());
+        String playerKey = authenticationManager.getTokenKeyFor(playerToPlay.getPseudo());
         int expectedPlayerNumber = keyTokenPlayerNumberMap.get(playerKey);
         if (receivedPlayerNumber == expectedPlayerNumber) {
             result = true;
@@ -532,7 +537,7 @@ public class Game {
     private void closeGame() {
         log.debug("[S] GAME IS OVER");
         closeConnections();
-        GameManager.getInstance().closeGame(this.gameID);
+        gameManager.closeGame(this.gameID);
         this.battlefield = null;
         this.playerList = null;
         this.gameID = null;
