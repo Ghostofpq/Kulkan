@@ -33,6 +33,7 @@
                     <exclude>HUD/**</exclude>
                     <exclude>spritesheets/**</exclude>
                     <exclude>textures/**</exclude>
+                    <exclude>conf/**</exclude>
                     <exclude>assembly.xml</exclude>
                     <exclude>debug.bat</exclude>
                 </excludes>
@@ -50,6 +51,9 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
+                        <manifestEntries>
+                            <Class-Path>conf/</Class-Path>
+                        </manifestEntries>
                         <manifest>
                             <mainClass>${main.class}</mainClass>
                             <addClasspath>true</addClasspath>

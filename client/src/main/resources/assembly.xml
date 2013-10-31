@@ -23,9 +23,10 @@
             <directory>src/main/resources</directory>
             <outputDirectory>resources</outputDirectory>
             <excludes>
-                <exclude>Client.xml</exclude>
+                <exclude>client.xml</exclude>
                 <exclude>assembly.xml</exclude>
-                <exclude>application.properties</exclude>
+                <exclude>conf/**</exclude>
+                <exclude>debug.bat</exclude>
             </excludes>
         </fileSet>
         <fileSet>
@@ -33,6 +34,13 @@
             <outputDirectory>.</outputDirectory>
             <includes>
                 <include>debug.bat</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <includes>
+                <include>application.properties</include>
             </includes>
         </fileSet>
     </fileSets>
