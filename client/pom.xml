@@ -29,14 +29,9 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>HUD/**</exclude>
-                    <exclude>spritesheets/**</exclude>
-                    <exclude>textures/**</exclude>
-                    <exclude>conf/**</exclude>
-                    <exclude>assembly.xml</exclude>
-                    <exclude>debug.bat</exclude>
-                </excludes>
+                <includes>
+                    <include>client.xml</include>
+                </includes>
                 <filtering>false</filtering>
             </resource>
         </resources>

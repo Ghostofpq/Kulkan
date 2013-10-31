@@ -13,6 +13,10 @@
             <outputDirectory>lib</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>src/main/resources/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>target</directory>
             <outputDirectory>.</outputDirectory>
             <includes>
@@ -36,12 +40,6 @@
                 <include>debug.bat</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>src/main/resources/conf</directory>
-            <outputDirectory>conf</outputDirectory>
-            <includes>
-                <include>application.properties</include>
-            </includes>
-        </fileSet>
+
     </fileSets>
 </assembly>
