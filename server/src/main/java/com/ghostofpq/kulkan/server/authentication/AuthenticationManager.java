@@ -1,31 +1,45 @@
 package com.ghostofpq.kulkan.server.authentication;
 
-
 import com.ghostofpq.kulkan.server.Server;
+import com.ghostofpq.kulkan.server.database.model.User;
+import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
+@Slf4j
 public class AuthenticationManager {
     private Server server;
+    @Autowired
+    private UserRepository userRepositoryRepository;
 
     private AuthenticationManager() {
     }
 
-    public boolean authenticate(String pseudo, String password) {
-        boolean result = false;
-        DBCollection coll = server.getDb().getCollection("users");
-        BasicDBObject query = new BasicDBObject("pseudo", pseudo);
-        DBCursor cursor = coll.find(query);
-        if (cursor.hasNext()) {
-            DBObject obj = cursor.next();
-            if (obj.get("password").equals(password)) ;
-            {
-                obj.put("key", generateKey());
-                coll.update(new BasicDBObject("_id", obj.get("_id")), obj);
+    public boolean authenticate(String username, String password) {
+        log.debug("authenticate [{}]/[{}]", username, password);
+        boolean result;
+        List<User> userList = userRepositoryRepository.findByUsername(username);
+        if (userList.size() == 1) {
+            User user = userList.get(0);
+            if (user.getPassword().equals(password)) {
+
                 result = true;
+            } else {
+                log.warn("bad password");
+                result = false;
             }
+        } else if (userList.size() > 1) {
+            log.error("multiple results for username : [{}]", username);
+            result = false;
+        } else {
+            log.error("no result for username : [{}]", username);
+            result = false;
         }
         return result;
     }

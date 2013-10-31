@@ -50,7 +50,6 @@ public class Server {
     }
 
     public static void main(String[] argv) throws IOException, InterruptedException {
-
         ApplicationContext context = new ClassPathXmlApplicationContext(CONTEXT_URI);
         Server s = ((Server) context.getBean("server"));
 
@@ -79,7 +78,7 @@ public class Server {
         while (null != delivery) {
             delivery = consumer.nextDelivery(1);
         }
-        log.debug(" [*] Waiting for messages. To exit press CTRL+C");
+        log.debug(" [*] init connection finished");
     }
 
     private void initDatabase() throws UnknownHostException {
@@ -132,6 +131,7 @@ public class Server {
 
     public void run() throws IOException, InterruptedException {
         while (!requestClose) {
+            System.out.print(".");
             receiveMessage();
             lobbyManager.run();
             matchmakingManager.run();
