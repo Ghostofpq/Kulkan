@@ -1,5 +1,7 @@
 package com.ghostofpq.kulkan.server.database.model;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,6 +12,8 @@ public class User {
     private ObjectId id;
     private String username;
     private String password;
+    private String authKey;
+    private String passwordSalt;
 
     public User() {
     }
@@ -17,7 +21,8 @@ public class User {
     public User(String username, String password) {
         this.id = new ObjectId();
         this.username = username;
-        this.password = password;
+        this.passwordSalt = RandomStringUtils.randomAscii(20);
+        this.password = DigestUtils.shaHex(password + passwordSalt);
     }
 
     public ObjectId getId() {
@@ -42,6 +47,18 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAuthKey() {
+        return authKey;
+    }
+
+    public void setAuthKey(String authKey) {
+        this.authKey = authKey;
+    }
+
+    public String getPasswordSalt() {
+        return passwordSalt;
     }
 
     @Override

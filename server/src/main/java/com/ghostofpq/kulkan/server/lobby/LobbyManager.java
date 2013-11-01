@@ -6,10 +6,11 @@ import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyClient;
 import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPing;
 import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPong;
 import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyServer;
-import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,8 +23,10 @@ public class LobbyManager {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
     private AuthenticationManager authenticationManager;
+    private final String HOST = "localhost";
+    private final Integer PORT = 5672;
+    private Connection connection;
     private MatchmakingManager matchmakingManager;
-    private Server server;
     private List<String> connectedClients;
     private List<String> pongClients;
     private Channel channelOut;
@@ -40,8 +43,12 @@ public class LobbyManager {
 
     public void initConnections() {
         try {
-            channelOut = server.getConnection().createChannel();
-            channelLobbyIn = server.getConnection().createChannel();
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost(HOST);
+            factory.setPort(PORT);
+            connection = factory.newConnection();
+            channelOut = connection.createChannel();
+            channelLobbyIn = connection.createChannel();
             channelLobbyIn.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
             lobbyConsumer = new QueueingConsumer(channelLobbyIn);
             channelLobbyIn.basicConsume(LOBBY_SERVER_QUEUE_NAME_BASE, true, lobbyConsumer);
@@ -166,7 +173,4 @@ public class LobbyManager {
         this.matchmakingManager = matchmakingManager;
     }
 
-    public void setServer(Server server) {
-        this.server = server;
-    }
 }

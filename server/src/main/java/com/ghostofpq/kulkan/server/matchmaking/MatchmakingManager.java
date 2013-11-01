@@ -5,12 +5,13 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
-import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.utils.SaveManager;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +25,9 @@ import java.util.Map;
 public class MatchmakingManager {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
-    private Server server;
+    private final String HOST = "localhost";
+    private final Integer PORT = 5672;
+    private Connection connection;
     private AuthenticationManager authenticationManager;
     private LobbyManager lobbyManager;
     private GameManager gameManager;
@@ -43,8 +46,12 @@ public class MatchmakingManager {
 
     public void initConnections() {
         try {
-            channelOut = server.getConnection().createChannel();
-            channelMatchmakingIn = server.getConnection().createChannel();
+            ConnectionFactory factory = new ConnectionFactory();
+            factory.setHost(HOST);
+            factory.setPort(PORT);
+            connection = factory.newConnection();
+            channelOut = connection.createChannel();
+            channelMatchmakingIn = connection.createChannel();
             channelMatchmakingIn.queueDeclare(MATCHMAKING_SERVER_QUEUE_NAME_BASE, false, false, false, null);
             matchmakingConsumer = new QueueingConsumer(channelMatchmakingIn);
             channelMatchmakingIn.basicConsume(MATCHMAKING_SERVER_QUEUE_NAME_BASE, true, matchmakingConsumer);
@@ -210,10 +217,6 @@ public class MatchmakingManager {
         matchMap.put(matchKey, match);
         matchmapIncrementor++;
         return matchKey;
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
     }
 
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {

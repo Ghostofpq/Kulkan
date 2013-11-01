@@ -4,10 +4,6 @@ import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
-import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationRequest;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationResponse;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
@@ -15,7 +11,6 @@ import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
 import com.ghostofpq.kulkan.server.utils.SaveManager;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
-import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -52,101 +47,29 @@ public class Server {
     public static void main(String[] argv) throws IOException, InterruptedException {
         ApplicationContext context = new ClassPathXmlApplicationContext(CONTEXT_URI);
         Server s = ((Server) context.getBean("server"));
-
         s.init();
         s.run();
     }
 
     private void init() throws IOException, InterruptedException {
-        initConnection();
-        initDatabase();
+        authenticationManager.initConnection();
         lobbyManager.initConnections();
         matchmakingManager.initConnections();
     }
 
-    private void initConnection() throws IOException, InterruptedException {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(HOST);
-        factory.setPort(5672);
-        connection = factory.newConnection();
-        channelAuthenticating = connection.createChannel();
-        channelAuthenticating.queueDeclare(authenticationQueueName, false, false, false, null);
-        channelAuthenticating.basicQos(1);
-        consumer = new QueueingConsumer(channelAuthenticating);
-        channelAuthenticating.basicConsume(authenticationQueueName, false, consumer);
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery(1);
-        while (null != delivery) {
-            delivery = consumer.nextDelivery(1);
-        }
-        log.debug(" [*] init connection finished");
-    }
-
-    private void initDatabase() throws UnknownHostException {
-        mongoClient = new MongoClient("localhost", 27017);
-        db = mongoClient.getDB("kulkan");
-    }
-
-    private void receiveMessage() throws InterruptedException, IOException {
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
-        if (null != delivery) {
-            log.debug(" [-] RECEIVED MESSAGE ON : {}", authenticationQueueName);
-            BasicProperties props = delivery.getProperties();
-            BasicProperties replyProps = new BasicProperties.Builder()
-                    .correlationId(props.getCorrelationId())
-                    .build();
-
-            Message message = Message.loadFromBytes(delivery.getBody());
-            log.debug(" [x] Received '{}'", message.getType());
-
-            switch (message.getType()) {
-                case AUTHENTICATION_REQUEST:
-                    MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
-                    boolean authenticationResult = authenticationManager.authenticate(authenticationRequest.getPseudo(),
-                            authenticationRequest.getPassword());
-                    String tokenKey = authenticationManager.getTokenKeyFor(authenticationRequest.getPseudo());
-
-                    MessageErrorCode code;
-                    if (authenticationResult) {
-                        code = MessageErrorCode.OK;
-                        lobbyManager.addClient(tokenKey);
-                    } else {
-                        code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
-                    }
-
-
-                    MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
-                            authenticationRequest.getPseudo(),
-                            authenticationRequest.getPassword(),
-                            tokenKey,
-                            code);
-
-                    channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
-                    channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-
-
-                    log.debug(" [x] Sent '{}'", authenticationResponse.getType());
-            }
-        }
-    }
-
     public void run() throws IOException, InterruptedException {
+        Thread authThread=new Thread(authenticationManager);
+        authThread.start();
         while (!requestClose) {
-            System.out.print(".");
-            receiveMessage();
             lobbyManager.run();
             matchmakingManager.run();
             gameManager.run();
         }
-        channelAuthenticating.close();
-        connection.close();
+        authenticationManager.setRequestClose(true);
     }
 
     public void shutDown() {
         requestClose = true;
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
     public DB getDb() {

@@ -30,26 +30,20 @@
     </bean>
 
     <bean id="gameManager"
-          class="com.ghostofpq.kulkan.server.game.GameManager">
-        <property name="server" ref="server"/>
-    </bean>
+          class="com.ghostofpq.kulkan.server.game.GameManager"/>
 
     <bean id="authenticationManager"
-          class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager">
-        <property name="server" ref="server"/>
-    </bean>
+          class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager"/>
 
 
     <bean id="lobbyManager"
           class="com.ghostofpq.kulkan.server.lobby.LobbyManager">
-        <property name="server" ref="server"/>
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="matchmakingManager" ref="matchmakingManager"/>
     </bean>
 
     <bean id="matchmakingManager"
           class="com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager">
-        <property name="server" ref="server"/>
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="gameManager" ref="gameManager"/>
         <property name="lobbyManager" ref="lobbyManager"/>
