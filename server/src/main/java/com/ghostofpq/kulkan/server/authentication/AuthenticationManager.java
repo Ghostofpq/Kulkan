@@ -18,10 +18,10 @@ import java.util.List;
 
 @Slf4j
 public class AuthenticationManager implements Runnable {
-    private final String HOST = "localhost";
-    private final Integer PORT = 5672;
-    private final Integer KEY_SIZE = 10;
     private final String authenticationQueueName = "authentication";
+    private String hostIp;
+    private Integer hostPort;
+    private Integer authKeySize;
     @Autowired
     private LobbyManager lobbyManager;
     private QueueingConsumer consumer;
@@ -36,8 +36,8 @@ public class AuthenticationManager implements Runnable {
 
     public void initConnection() throws IOException, InterruptedException {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(HOST);
-        factory.setPort(PORT);
+        factory.setHost(hostIp);
+        factory.setPort(hostPort);
         connection = factory.newConnection();
         channelAuthenticating = connection.createChannel();
         channelAuthenticating.queueDeclare(authenticationQueueName, false, false, false, null);
@@ -102,10 +102,10 @@ public class AuthenticationManager implements Runnable {
     }
 
     private String generateKey() {
-        String result = RandomStringUtils.randomNumeric(KEY_SIZE);
+        String result = RandomStringUtils.randomNumeric(authKeySize);
         while (!getNameForKey(result).equals("")) {
             log.error("Key [{}] is already in use", result);
-            result = RandomStringUtils.randomNumeric(KEY_SIZE);
+            result = RandomStringUtils.randomNumeric(authKeySize);
         }
         return result;
     }
@@ -176,5 +176,17 @@ public class AuthenticationManager implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
+
+    public void setHostPort(Integer hostPort) {
+        this.hostPort = hostPort;
+    }
+
+    public void setAuthKeySize(Integer authKeySize) {
+        this.authKeySize = authKeySize;
     }
 }

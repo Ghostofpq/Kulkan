@@ -33,7 +33,11 @@
           class="com.ghostofpq.kulkan.server.game.GameManager"/>
 
     <bean id="authenticationManager"
-          class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager"/>
+          class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager">
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
+        <property name="authKeySize" value="${authentication.key.size}"/>
+    </bean>
 
 
     <bean id="lobbyManager"
