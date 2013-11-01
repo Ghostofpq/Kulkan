@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.server.authentication;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationRequest;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationResponse;
+import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateAccount;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
@@ -146,9 +147,14 @@ public class AuthenticationManager implements Runnable {
                     channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
                     channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 
-
                     log.debug(" [x] Sent '{}'", authenticationResponse.getType());
-
+                    break;
+                case CREATE_ACCOUT:
+                    MessageCreateAccount messageCreateAccount = (MessageCreateAccount) message;
+                    User user = new User(messageCreateAccount.getUserName(), messageCreateAccount.getPassword());
+                    userRepositoryRepository.save(user);
+                    log.debug("user [{}] is created", user.getUsername());
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;

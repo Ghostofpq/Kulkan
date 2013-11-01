@@ -10,6 +10,7 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationRequest;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationResponse;
+import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateAccount;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -36,6 +37,7 @@ public class LoginScene implements Scene {
     private int indexOnFocus;
     private QueueingConsumer consumer;
     private Button quitButton;
+    private Button createAccountButton;
     private Background background;
 
     private LoginScene() {
@@ -88,19 +90,33 @@ public class LoginScene implements Scene {
         };
         quitButton = new
 
-                Button(300, 500, 200, 50, "QUIT") {
+                Button(300, 450, 200, 50, "QUIT") {
                     @Override
                     public void onClick() {
                         log.debug("QUIT");
                         Client.getInstance().quit();
                     }
                 };
-
+        createAccountButton = new
+                Button(300, 500, 200, 50, "CREATE ACCOUNT") {
+                    @Override
+                    public void onClick() {
+                        try {
+                            MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudo.getContent(), password.getContent());
+                            channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, null, messageCreateAccount.getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
         hudElementList = new ArrayList<HUDElement>();
         hudElementList.add(pseudo);
         hudElementList.add(password);
         hudElementList.add(button);
         hudElementList.add(quitButton);
+        hudElementList.add(createAccountButton);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
         background = new Background(TextureKey.LOGIN_BACKGROUND);
@@ -110,6 +126,7 @@ public class LoginScene implements Scene {
             e.printStackTrace();
             System.exit(0);
         }
+
     }
 
     private void initConnection() throws IOException {
@@ -182,6 +199,10 @@ public class LoginScene implements Scene {
                 if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
                     setFocusOn(hudElementList.indexOf(quitButton));
                     quitButton.onClick();
+                }
+                if (createAccountButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    setFocusOn(hudElementList.indexOf(createAccountButton));
+                    createAccountButton.onClick();
                 }
             }
         }

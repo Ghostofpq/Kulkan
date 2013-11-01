@@ -65,8 +65,8 @@ public class Client {
     public void init() {
         log.debug("HOST : {}", hostIp);
 
-        setHeight(900);
-        setWidth(1350);
+        setHeight(600);
+        setWidth(800);
         if (instance == null) {
             instance = this;
         }
