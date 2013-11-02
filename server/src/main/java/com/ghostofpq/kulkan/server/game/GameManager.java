@@ -12,15 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class GameManager {
+public class GameManager implements Runnable {
     @Autowired
     private AuthenticationManager authenticationManager;
     private Map<String, Game> gameMap;
     private List<String> toRemoveGames;
+    private boolean requestClose;
 
     private GameManager() {
         gameMap = new HashMap<String, Game>();
         toRemoveGames = new ArrayList<String>();
+        requestClose = false;
     }
 
     public void addGame(String gameId, Battlefield battlefield, List<Player> playerList) {
@@ -37,15 +39,21 @@ public class GameManager {
         gameMap.get(gameId);
     }
 
-    public void run() {
-        while (!toRemoveGames.isEmpty()) {
-            String gameId = toRemoveGames.get(0);
-            gameMap.remove(gameId);
-            toRemoveGames.remove(gameId);
-        }
+    public void setRequestClose(boolean requestClose) {
+        this.requestClose = requestClose;
+    }
 
-        for (Game game : gameMap.values()) {
-            game.receiveMessage();
+    public void run() {
+        while (!requestClose) {
+            while (!toRemoveGames.isEmpty()) {
+                String gameId = toRemoveGames.get(0);
+                gameMap.remove(gameId);
+                toRemoveGames.remove(gameId);
+            }
+
+            for (Game game : gameMap.values()) {
+                game.receiveMessage();
+            }
         }
     }
 }

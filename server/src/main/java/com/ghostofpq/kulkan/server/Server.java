@@ -13,14 +13,12 @@ import com.mongodb.DB;
 import com.mongodb.MongoClient;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 @Slf4j
 public class Server {
@@ -58,14 +56,16 @@ public class Server {
     }
 
     public void run() throws IOException, InterruptedException {
-        Thread authThread=new Thread(authenticationManager);
+        Thread authThread = new Thread(authenticationManager);
         authThread.start();
+        Thread gameManagerThread = new Thread(gameManager);
+        gameManagerThread.start();
         while (!requestClose) {
             lobbyManager.run();
             matchmakingManager.run();
-            gameManager.run();
         }
         authenticationManager.setRequestClose(true);
+        gameManager.setRequestClose(true);
     }
 
     public void shutDown() {

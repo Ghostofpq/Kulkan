@@ -30,6 +30,7 @@ public class AuthenticationManager implements Runnable {
     private UserRepository userRepositoryRepository;
 
     private AuthenticationManager() {
+        requestClose = false;
     }
 
     public void initConnection() throws IOException, InterruptedException {
@@ -109,7 +110,7 @@ public class AuthenticationManager implements Runnable {
     }
 
     private void receiveMessage() throws InterruptedException, IOException {
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
         if (null != delivery) {
             AMQP.BasicProperties props = delivery.getProperties();
             AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()
