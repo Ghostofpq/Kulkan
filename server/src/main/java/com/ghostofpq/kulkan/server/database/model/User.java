@@ -64,9 +64,9 @@ public class User {
     @Override
     public String toString() {
         return new StringBuilder().append("User{")
-                .append("id='").append(id).append("', ")
                 .append("username='").append(username).append("', ")
                 .append("password='").append(password).append("'} ")
                 .toString();
     }
+
 }

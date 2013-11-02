@@ -8,10 +8,7 @@ import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationRequest;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationResponse;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateAccount;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
+import com.ghostofpq.kulkan.entities.messages.auth.*;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
@@ -63,7 +60,7 @@ public class LoginScene implements Scene {
             public void onClick() {
                 try {
                     MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudo.getContent(), password.getContent());
-                    Message result = authenticate(authenticationRequest);
+                    Message result = requestServer(authenticationRequest);
                     if (null != result) {
                         if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
                             MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
@@ -103,7 +100,19 @@ public class LoginScene implements Scene {
                     public void onClick() {
                         try {
                             MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudo.getContent(), password.getContent());
-                            channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, null, messageCreateAccount.getBytes());
+                            Message result = requestServer(messageCreateAccount);
+                            if (null != result) {
+                                if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
+                                    MessageCreateAccountResponse response = (MessageCreateAccountResponse) result;
+                                    if (response.getErrorCode().equals(MessageErrorCode.OK)) {
+                                        log.debug("CREATE ACCOUT OK");
+                                    } else {
+                                        log.debug("CREATE ACCOUT KO : USER ALREADY USED");
+                                    }
+                                }
+                            } else {
+                                log.debug("SERVER DOWN");
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (Exception e) {
@@ -136,8 +145,8 @@ public class LoginScene implements Scene {
         channelAuthenticating.basicConsume(authenticationReplyQueueName, true, consumer);
     }
 
-    public Message authenticate(Message message) throws Exception {
-        log.debug("authenticate");
+    public Message requestServer(Message message) throws Exception {
+        log.debug("create account");
         Message response = null;
         String corrId = java.util.UUID.randomUUID().toString();
 

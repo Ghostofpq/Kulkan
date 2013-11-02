@@ -32,6 +32,7 @@ public enum MessageType implements Serializable {
     AUTHENTICATION_REQUEST,
     AUTHENTICATION_RESPONSE,
     CREATE_ACCOUT,
+    CREATE_ACCOUT_RESPONSE,
 
     LOBBY_CLIENT,
     LOBBY_SERVER,

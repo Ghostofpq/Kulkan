@@ -1,10 +1,7 @@
 package com.ghostofpq.kulkan.server.authentication;
 
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationRequest;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageAuthenticationResponse;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateAccount;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
+import com.ghostofpq.kulkan.entities.messages.auth.*;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
@@ -112,7 +109,7 @@ public class AuthenticationManager implements Runnable {
     }
 
     private void receiveMessage() throws InterruptedException, IOException {
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
         if (null != delivery) {
             log.debug(" [-] RECEIVED MESSAGE ON : {}", authenticationQueueName);
             AMQP.BasicProperties props = delivery.getProperties();
@@ -151,9 +148,21 @@ public class AuthenticationManager implements Runnable {
                     break;
                 case CREATE_ACCOUT:
                     MessageCreateAccount messageCreateAccount = (MessageCreateAccount) message;
-                    User user = new User(messageCreateAccount.getUserName(), messageCreateAccount.getPassword());
-                    userRepositoryRepository.save(user);
-                    log.debug("user [{}] is created", user.getUsername());
+                    if (userRepositoryRepository.findByUsername(messageCreateAccount.getUserName()).isEmpty()) {
+                        User user = new User(messageCreateAccount.getUserName(), messageCreateAccount.getPassword());
+                        userRepositoryRepository.save(user);
+                        code = MessageErrorCode.OK;
+                        log.debug("user [{}] is created", user.getUsername());
+                    } else {
+                        code = MessageErrorCode.USER_NAME_ALREADY_USED;
+                        log.error("user [{}] is already in base", messageCreateAccount.getUserName());
+                    }
+                    MessageCreateAccountResponse createAccountResponse = new MessageCreateAccountResponse(
+                            code);
+                    channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, createAccountResponse.getBytes());
+                    channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+
+                    log.debug(" [x] Sent '{}'", createAccountResponse.getType());
                     break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
