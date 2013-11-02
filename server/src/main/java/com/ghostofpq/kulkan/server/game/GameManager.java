@@ -2,7 +2,9 @@ package com.ghostofpq.kulkan.server.game;
 
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +13,8 @@ import java.util.Map;
 
 @Slf4j
 public class GameManager {
+    @Autowired
+    private AuthenticationManager authenticationManager;
     private Map<String, Game> gameMap;
     private List<String> toRemoveGames;
 
@@ -21,7 +25,8 @@ public class GameManager {
 
     public void addGame(String gameId, Battlefield battlefield, List<Player> playerList) {
         log.debug(" [-] ADDING GAME {} IN THE GAME MANAGER", gameId);
-        gameMap.put(gameId, new Game(battlefield, playerList, gameId));
+        Game game = new Game(battlefield, playerList, gameId, authenticationManager);
+        gameMap.put(gameId, game);
     }
 
     public void closeGame(String gameId) {

@@ -111,14 +111,13 @@ public class AuthenticationManager implements Runnable {
     private void receiveMessage() throws InterruptedException, IOException {
         QueueingConsumer.Delivery delivery = consumer.nextDelivery();
         if (null != delivery) {
-            log.debug(" [-] RECEIVED MESSAGE ON : {}", authenticationQueueName);
             AMQP.BasicProperties props = delivery.getProperties();
             AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()
                     .correlationId(props.getCorrelationId())
                     .build();
 
             Message message = Message.loadFromBytes(delivery.getBody());
-            log.debug(" [x] Received '{}'", message.getType());
+            log.debug(" [x] RECEIVED '{}' ON {}", message.getType(), authenticationQueueName);
 
             switch (message.getType()) {
                 case AUTHENTICATION_REQUEST:
@@ -144,10 +143,11 @@ public class AuthenticationManager implements Runnable {
                     channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
                     channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 
-                    log.debug(" [x] Sent '{}'", authenticationResponse.getType());
+                    log.debug("sent '{}'", authenticationResponse.getType());
                     break;
                 case CREATE_ACCOUT:
                     MessageCreateAccount messageCreateAccount = (MessageCreateAccount) message;
+
                     if (userRepositoryRepository.findByUsername(messageCreateAccount.getUserName()).isEmpty()) {
                         User user = new User(messageCreateAccount.getUserName(), messageCreateAccount.getPassword());
                         userRepositoryRepository.save(user);
@@ -157,12 +157,13 @@ public class AuthenticationManager implements Runnable {
                         code = MessageErrorCode.USER_NAME_ALREADY_USED;
                         log.error("user [{}] is already in base", messageCreateAccount.getUserName());
                     }
+
                     MessageCreateAccountResponse createAccountResponse = new MessageCreateAccountResponse(
                             code);
                     channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, createAccountResponse.getBytes());
                     channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 
-                    log.debug(" [x] Sent '{}'", createAccountResponse.getType());
+                    log.debug("sent '{}'", createAccountResponse.getType());
                     break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());

@@ -30,8 +30,8 @@
     </bean>
 
     <bean id="gameManager"
-          class="com.ghostofpq.kulkan.server.game.GameManager"/>
-
+          class="com.ghostofpq.kulkan.server.game.GameManager">
+    </bean>
     <bean id="authenticationManager"
           class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager">
         <property name="hostIp" value="${host.ip}"/>

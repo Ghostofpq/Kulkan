@@ -11,13 +11,13 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
-import com.ghostofpq.kulkan.server.Server;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +30,10 @@ public class Game {
 
     private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private static final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
+    private final String HOST = "localhost";
+    private final Integer PORT = 5672;
     private AuthenticationManager authenticationManager;
+    @Autowired
     private GameManager gameManager;
     private BattleSceneState state;
     private Battlefield battlefield;
@@ -44,13 +47,12 @@ public class Game {
     private String gameID;
     private Player playerToPlay;
     private GameCharacter currentCharToPlay;
-    private final String HOST = "localhost";
-    private final Integer PORT = 5672;
     private Connection connection;
 
-    public Game(Battlefield battlefield, List<Player> playerList, String gameID) {
+    public Game(Battlefield battlefield, List<Player> playerList, String gameID, AuthenticationManager authenticationManager) {
         this.battlefield = battlefield;
         this.playerList = playerList;
+        this.authenticationManager = authenticationManager;
         for (Player player : playerList) {
             for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
                 gameCharacter.initChar();
