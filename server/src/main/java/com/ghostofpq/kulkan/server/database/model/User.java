@@ -1,11 +1,16 @@
 package com.ghostofpq.kulkan.server.database.model;
 
+import com.ghostofpq.kulkan.entities.character.GameCharacter;
+import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.character.Team;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Date;
 
 @Document
 public class User {
@@ -17,6 +22,11 @@ public class User {
     @Indexed
     private String authKey;
     private String passwordSalt;
+    private String firstName;
+    private String lastName;
+    private Date dateOfBirth;
+    private TeamDB team;
+    private Integer grade;
 
     public User() {
         this.id = new ObjectId();
@@ -63,6 +73,63 @@ public class User {
 
     public String getPasswordSalt() {
         return passwordSalt;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public TeamDB getTeam() {
+        return team;
+    }
+
+    public Integer getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Integer grade) {
+        this.grade = grade;
+    }
+
+    public Player toPlayer() {
+        Player result = new Player();
+        result.setPseudo(username);
+        result.setGrade(grade);
+        Team team = new Team();
+        team.setName(this.team.getName());
+        for (GameCharacterDB gameCharacterDB : this.team.getGameCharacterList()) {
+            GameCharacter gameCharacter = new GameCharacter(
+                    result,
+                    gameCharacterDB.getName(),
+                    gameCharacterDB.getRaceType(),
+                    gameCharacterDB.getGender(),
+                    gameCharacterDB.getLvl(),
+                    gameCharacterDB.getCurrentXp()
+            );
+            team.getTeam().add(gameCharacter);
+        }
+        result.setTeam(team);
+        return result;
     }
 
     @Override

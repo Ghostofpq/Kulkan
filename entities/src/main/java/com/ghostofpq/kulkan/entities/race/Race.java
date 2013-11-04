@@ -30,7 +30,7 @@ public abstract class Race implements Serializable {
      * Getters and Setters
      */
 
-    public RaceType getRace() {
+    public RaceType getRaceType() {
         return race;
     }
 
