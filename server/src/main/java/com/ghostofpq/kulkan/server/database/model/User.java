@@ -10,7 +10,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Document
 public class User {
@@ -25,7 +27,8 @@ public class User {
     private String firstName;
     private String lastName;
     private Date dateOfBirth;
-    private TeamDB team;
+    private List<GameCharacterDB> team;
+    private List<GameCharacterDB> stock;
     private Integer grade;
 
     public User() {
@@ -37,6 +40,8 @@ public class User {
         this.username = username;
         this.passwordSalt = RandomStringUtils.randomAscii(20);
         this.password = DigestUtils.shaHex(password + passwordSalt);
+        team = new ArrayList<GameCharacterDB>();
+        stock = new ArrayList<GameCharacterDB>();
     }
 
     public ObjectId getId() {
@@ -99,8 +104,12 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public TeamDB getTeam() {
+    public List<GameCharacterDB> getTeam() {
         return team;
+    }
+
+    public List<GameCharacterDB> getStock() {
+        return stock;
     }
 
     public Integer getGrade() {
@@ -115,9 +124,8 @@ public class User {
         Player result = new Player();
         result.setPseudo(username);
         result.setGrade(grade);
-        Team team = new Team();
-        team.setName(this.team.getName());
-        for (GameCharacterDB gameCharacterDB : this.team.getGameCharacterList()) {
+        Team pTeam = new Team();
+        for (GameCharacterDB gameCharacterDB : this.team) {
             GameCharacter gameCharacter = new GameCharacter(
                     result,
                     gameCharacterDB.getName(),
@@ -126,9 +134,9 @@ public class User {
                     gameCharacterDB.getLvl(),
                     gameCharacterDB.getCurrentXp()
             );
-            team.getTeam().add(gameCharacter);
+            pTeam.getTeam().add(gameCharacter);
         }
-        result.setTeam(team);
+        result.setTeam(pTeam);
         return result;
     }
 

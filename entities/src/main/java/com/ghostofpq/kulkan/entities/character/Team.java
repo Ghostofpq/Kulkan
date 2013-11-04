@@ -7,11 +7,9 @@ import java.util.List;
 
 public class Team implements Serializable {
 
-    private String name;
     private List<GameCharacter> team;
 
     public Team(String name) {
-        this.name = name;
         team = new ArrayList<GameCharacter>();
     }
 
@@ -39,13 +37,5 @@ public class Team implements Serializable {
 
     public void setTeam(List<GameCharacter> team) {
         this.team = team;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }
