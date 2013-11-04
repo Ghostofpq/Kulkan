@@ -16,14 +16,12 @@ import java.math.BigDecimal;
 
 public class GameCharacter implements Serializable {
     private static final long serialVersionUID = 1519266158170332774L;
-
-    @Id
-    private String id;
-
     // Evolution
     private final int DEFAULT_START_LEVEL = 1;
     private final int DEFAULT_START_XP = 0;
     private final int DEFAULT_START_NEXT_LEVEL = 100;
+    @Id
+    private String id;
     /**
      * Owner
      */
@@ -135,6 +133,37 @@ public class GameCharacter implements Serializable {
 
         // Caracteristics
         characteristics = getRace().getBaseCaracteristics();
+        for (int i = 1; i < level; i++) {
+            characteristics.plus(getRace().getLevelUpCaracteristics());
+        }
+        secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
+
+        updateLifeAndManaPoint();
+
+        initChar();
+    }
+
+    public GameCharacter(Player player, String name, RaceType race, Gender gender, int level, int experience) {
+        // Identity
+        this.name = name;
+        this.race = Race.Race(race);
+        this.gender = gender;
+        this.player = player;
+
+        // XP
+        this.level = level;
+        this.experience = experience;
+        calculateNextLevel();
+
+        // Jobs
+        jobWarrior = new Warrior();
+        currentJob = jobWarrior;
+
+        // Caracteristics
+        characteristics = getRace().getBaseCaracteristics();
+        for (int i = 1; i < level; i++) {
+            characteristics.plus(getRace().getLevelUpCaracteristics());
+        }
         secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
 
         updateLifeAndManaPoint();
@@ -174,8 +203,13 @@ public class GameCharacter implements Serializable {
     }
 
     private void calculateNextLevel() {
-        double coef = (Math.sqrt(level));
-        this.nextLevel = (int) Math.floor(coef * nextLevel) + nextLevel;
+        nextLevel = DEFAULT_START_NEXT_LEVEL;
+        if (level != DEFAULT_START_LEVEL) {
+            for (int i = DEFAULT_START_LEVEL; i < level; i++) {
+                double coef = (Math.sqrt(level));
+                nextLevel = (int) Math.floor(coef * nextLevel) + nextLevel;
+            }
+        }
     }
 
     private void updateLifeAndManaPoint() {

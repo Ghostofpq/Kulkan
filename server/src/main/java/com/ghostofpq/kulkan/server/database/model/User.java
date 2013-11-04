@@ -4,18 +4,22 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class User {
     @Id
     private ObjectId id;
+    @Indexed
     private String username;
     private String password;
+    @Indexed
     private String authKey;
     private String passwordSalt;
 
     public User() {
+        this.id = new ObjectId();
     }
 
     public User(String username, String password) {
@@ -65,7 +69,9 @@ public class User {
     public String toString() {
         return new StringBuilder().append("User{")
                 .append("username='").append(username).append("', ")
-                .append("password='").append(password).append("'} ")
+                .append("authKey='").append(authKey).append("'} ")
+                .append("password='").append(authKey).append("'} ")
+                .append("passwordSalt='").append(authKey).append("'} ")
                 .toString();
     }
 
