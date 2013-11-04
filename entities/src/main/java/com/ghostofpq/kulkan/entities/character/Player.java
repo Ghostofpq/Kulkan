@@ -1,20 +1,21 @@
 package com.ghostofpq.kulkan.entities.character;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Player implements Serializable {
     private static final long serialVersionUID = 3105715593359746378L;
     private String pseudo;
     private int grade;
-    private Team team;
+    private List<GameCharacter> team;
+    private List<GameCharacter> stock;
 
     public Player(String pseudo) {
         this.pseudo = pseudo;
 
-        StringBuilder teamNameBuilder = new StringBuilder();
-        teamNameBuilder.append(pseudo);
-        teamNameBuilder.append("'s Team");
-        team = new Team(teamNameBuilder.toString());
+        team = new ArrayList<GameCharacter>();
+        stock = new ArrayList<GameCharacter>();
     }
 
     public Player() {
@@ -40,16 +41,34 @@ public class Player implements Serializable {
         this.grade = grade;
     }
 
-    public Team getTeam() {
+    public List<GameCharacter> getTeam() {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void setTeam(List<GameCharacter> team) {
         this.team = team;
     }
 
+    public List<GameCharacter> getStock() {
+        return stock;
+    }
+
+    public void setStock(List<GameCharacter> stock) {
+        this.stock = stock;
+    }
+
     public GameCharacter getGameCharacter(GameCharacter gameCharacter) {
-        return team.getTeam().get(team.getTeam().indexOf(gameCharacter));
+        return team.get(team.indexOf(gameCharacter));
+    }
+
+    public boolean isAlive() {
+        boolean result = false;
+        for (GameCharacter gameCharacter : team) {
+            if (gameCharacter.isAlive()) {
+                result = true;
+            }
+        }
+        return result;
     }
 
     @Override

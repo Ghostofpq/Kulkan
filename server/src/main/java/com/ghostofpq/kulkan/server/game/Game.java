@@ -31,7 +31,7 @@ public class Game {
     private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private static final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
     private final String HOST = "localhost";
-    private final Integer PORT = 5672;
+    private final Integer PORT = 13370;
     private AuthenticationManager authenticationManager;
     @Autowired
     private GameManager gameManager;
@@ -54,7 +54,7 @@ public class Game {
         this.playerList = playerList;
         this.authenticationManager = authenticationManager;
         for (Player player : playerList) {
-            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+            for (GameCharacter gameCharacter : player.getTeam()) {
                 gameCharacter.initChar();
             }
         }
@@ -110,7 +110,7 @@ public class Game {
 
     private void sendDeployMessage() {
         for (Player player : playerList) {
-            List<GameCharacter> characterList = player.getTeam().getTeam();
+            List<GameCharacter> characterList = player.getTeam();
             MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
             String playerKey = authenticationManager.getTokenKeyFor(player.getPseudo());
             keyTokenPlayerNumberMap.put(playerKey, playerList.indexOf(player));
@@ -148,7 +148,7 @@ public class Game {
         while (null == result) {
             List<GameCharacter> readyGameCharactersList = new ArrayList<GameCharacter>();
             for (Player player : playerList) {
-                for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                for (GameCharacter gameCharacter : player.getTeam()) {
                     if (gameCharacter.isReadyToPlay()) {
                         readyGameCharactersList.add(gameCharacter);
                     }
@@ -157,7 +157,7 @@ public class Game {
             if (readyGameCharactersList.isEmpty()) {
                 log.error(" [X] NO CHAR READY, TICK HOURGLASS");
                 for (Player player : playerList) {
-                    for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+                    for (GameCharacter gameCharacter : player.getTeam()) {
                         gameCharacter.tickHourglass();
                     }
                 }
@@ -182,7 +182,7 @@ public class Game {
         Player result = null;
 
         for (Player player : playerList) {
-            if (player.getTeam().getTeam().contains(gameCharacter)) {
+            if (player.getTeam().contains(gameCharacter)) {
                 result = player;
                 break;
             }
@@ -196,8 +196,8 @@ public class Game {
     private GameCharacter getEquivalentCharacter(GameCharacter gameCharacter) {
         GameCharacter result = null;
         for (Player player : playerList) {
-            if (player.getTeam().getTeam().contains(gameCharacter)) {
-                for (GameCharacter character : player.getTeam().getTeam()) {
+            if (player.getTeam().contains(gameCharacter)) {
+                for (GameCharacter character : player.getTeam()) {
                     if (character.equals(gameCharacter)) {
                         result = character;
                     }
@@ -210,7 +210,7 @@ public class Game {
     private Position getCharacterPosition(GameCharacter gameCharacter) {
         Position result = null;
         for (Player player : playerList) {
-            if (player.getTeam().getTeam().contains(gameCharacter)) {
+            if (player.getTeam().contains(gameCharacter)) {
                 result = player.getGameCharacter(gameCharacter).getPosition();
             }
         }
@@ -455,7 +455,7 @@ public class Game {
     private GameCharacter getGameCharacterAtPosition(Position position) {
         GameCharacter result = null;
         for (Player player : playerList) {
-            for (GameCharacter character : player.getTeam().getTeam()) {
+            for (GameCharacter character : player.getTeam()) {
                 Position footPositionOfChar = character.getPosition().plusYNew(-1);
                 if (footPositionOfChar.equals(position)) {
                     result = character;
@@ -470,7 +470,7 @@ public class Game {
         Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
         Tree<Position> result = battlefield.getPositionTree(characterPosition, 3, 2, 1);
         for (Player player : playerList) {
-            for (GameCharacter character : player.getTeam().getTeam()) {
+            for (GameCharacter character : player.getTeam()) {
                 if (!character.equals(gameCharacter)) {
                     Position footPositionOfChar = character.getPosition().plusYNew(-1);
                     if (result.contains(footPositionOfChar)) {
@@ -493,11 +493,11 @@ public class Game {
     private void completeDeployment() {
         for (Player player : playerList) {
             log.debug("player {}", playerList.indexOf(player));
-            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+            for (GameCharacter gameCharacter : player.getTeam()) {
                 log.debug("-> {} : {}", gameCharacter.getName(), gameCharacter.getPosition().toString());
             }
             MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer =
-                    new MessageDeploymentPositionsOfPlayer(player.getTeam().getTeam(), playerList.indexOf(player));
+                    new MessageDeploymentPositionsOfPlayer(player.getTeam(), playerList.indexOf(player));
             for (Player playerToNotify : playerList) {
                 if (player != playerToNotify) {
                     sendMessageToPlayer(playerToNotify, messageDeploymentPositionsOfPlayer);
@@ -525,7 +525,7 @@ public class Game {
 
             List<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
             for (Player player : playerList) {
-                allGameCharacters.addAll(player.getTeam().getTeam());
+                allGameCharacters.addAll(player.getTeam());
             }
             MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(allGameCharacters);
 
@@ -560,7 +560,7 @@ public class Game {
         Player result = null;
         Player playerAlive = null;
         for (Player player : playerList) {
-            if (player.getTeam().isAlive()) {
+            if (player.isAlive()) {
                 numberOfPlayerAlive++;
                 playerAlive = player;
             }
@@ -574,7 +574,7 @@ public class Game {
     private boolean deployIsComplete() {
         boolean result = true;
         for (Player player : playerList) {
-            for (GameCharacter gameCharacter : player.getTeam().getTeam()) {
+            for (GameCharacter gameCharacter : player.getTeam()) {
                 if (null == gameCharacter.getPosition()) {
                     result = false;
                     log.debug("[x] DEPLOYMENT NOT FINISHED FOR {}", player.getPseudo());

@@ -24,7 +24,7 @@ public class LobbyManager {
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
     private AuthenticationManager authenticationManager;
     private final String HOST = "localhost";
-    private final Integer PORT = 5672;
+    private final Integer PORT = 13370;
     private Connection connection;
     private MatchmakingManager matchmakingManager;
     private List<String> connectedClients;

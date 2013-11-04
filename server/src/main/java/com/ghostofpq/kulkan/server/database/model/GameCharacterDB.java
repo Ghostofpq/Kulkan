@@ -15,6 +15,9 @@ public class GameCharacterDB {
     private Integer lvl;
     private Integer currentXp;
 
+    public GameCharacterDB() {
+    }
+
     public GameCharacterDB(String name, Gender gender, RaceType raceType, Integer lvl, Integer currentXp) {
         this.id = new ObjectId();
         this.name = name;

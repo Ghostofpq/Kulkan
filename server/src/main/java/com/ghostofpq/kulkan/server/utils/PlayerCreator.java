@@ -13,9 +13,9 @@ public class PlayerCreator {
         GameCharacter char2 = new GameCharacter(player1, "ghostofpq2Elve", RaceType.ELVE, Gender.FEMALE);
         GameCharacter char3 = new GameCharacter(player1, "ghostofpq3Dwarf", RaceType.DWARF, Gender.MALE);
 
-        player1.getTeam().getTeam().add(char1);
-        player1.getTeam().getTeam().add(char2);
-        player1.getTeam().getTeam().add(char3);
+        player1.getTeam().add(char1);
+        player1.getTeam().add(char2);
+        player1.getTeam().add(char3);
 
         SaveManager saveManager = SaveManager.getInstance();
         saveManager.savePlayer(player1);
@@ -26,9 +26,9 @@ public class PlayerCreator {
         GameCharacter char5 = new GameCharacter(player2, "azerty2Elve", RaceType.ELVE, Gender.FEMALE);
         GameCharacter char6 = new GameCharacter(player2, "azerty3Dwarf", RaceType.DWARF, Gender.MALE);
 
-        player2.getTeam().getTeam().add(char4);
-        player2.getTeam().getTeam().add(char5);
-        player2.getTeam().getTeam().add(char6);
+        player2.getTeam().add(char4);
+        player2.getTeam().add(char5);
+        player2.getTeam().add(char6);
 
 
         saveManager.savePlayer(player2);

@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
+import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.utils.SaveManager;
@@ -26,7 +27,7 @@ public class MatchmakingManager {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
     private final String HOST = "localhost";
-    private final Integer PORT = 5672;
+    private final Integer PORT = 13370;
     private Connection connection;
     private AuthenticationManager authenticationManager;
     private LobbyManager lobbyManager;
@@ -141,7 +142,9 @@ public class MatchmakingManager {
                     Battlefield battlefield = SaveManager.getInstance().loadMap("mapTest1");
                     List<Player> playerList = new ArrayList<Player>();
                     for (String client : match.getAllClients()) {
-                        playerList.add(SaveManager.getInstance().loadPlayer(authenticationManager.getNameForKey(client)));
+                        User user = authenticationManager.getUserForKey(client);
+                        Player player = user.toPlayer();
+                        playerList.add(player);
                     }
                     MessageGameStart messageGameStart = new MessageGameStart(matchKey, battlefield, playerList);
                     for (String client : match.getAllClients()) {

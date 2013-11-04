@@ -2,7 +2,6 @@ package com.ghostofpq.kulkan.server.database.model;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
-import com.ghostofpq.kulkan.entities.character.Team;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bson.types.ObjectId;
@@ -32,7 +31,6 @@ public class User {
     private Integer grade;
 
     public User() {
-        this.id = new ObjectId();
     }
 
     public User(String username, String password) {
@@ -120,11 +118,28 @@ public class User {
         this.grade = grade;
     }
 
+    public void addGameCharToStock(GameCharacterDB gameCharacterDB) {
+        stock.add(gameCharacterDB);
+    }
+
+    public void addGameCharToStock(GameCharacter gameCharacter) {
+        stock.add(new GameCharacterDB(gameCharacter));
+    }
+
+    public void addGameCharToTeam(GameCharacterDB gameCharacterDB) {
+        team.add(gameCharacterDB);
+    }
+
+    public void addGameCharToTeam(GameCharacter gameCharacter) {
+        team.add(new GameCharacterDB(gameCharacter));
+    }
+
     public Player toPlayer() {
         Player result = new Player();
         result.setPseudo(username);
-        result.setGrade(grade);
-        Team pTeam = new Team();
+        result.setTeam(new ArrayList<GameCharacter>());
+        result.setStock(new ArrayList<GameCharacter>());
+
         for (GameCharacterDB gameCharacterDB : this.team) {
             GameCharacter gameCharacter = new GameCharacter(
                     result,
@@ -134,9 +149,19 @@ public class User {
                     gameCharacterDB.getLvl(),
                     gameCharacterDB.getCurrentXp()
             );
-            pTeam.getTeam().add(gameCharacter);
+            result.getTeam().add(gameCharacter);
         }
-        result.setTeam(pTeam);
+        for (GameCharacterDB gameCharacterDB : this.stock) {
+            GameCharacter gameCharacter = new GameCharacter(
+                    result,
+                    gameCharacterDB.getName(),
+                    gameCharacterDB.getRaceType(),
+                    gameCharacterDB.getGender(),
+                    gameCharacterDB.getLvl(),
+                    gameCharacterDB.getCurrentXp()
+            );
+            result.getStock().add(gameCharacter);
+        }
         return result;
     }
 

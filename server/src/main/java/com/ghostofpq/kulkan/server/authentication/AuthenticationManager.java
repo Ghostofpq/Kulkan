@@ -1,7 +1,10 @@
 package com.ghostofpq.kulkan.server.authentication;
 
+import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.*;
+import com.ghostofpq.kulkan.entities.race.RaceType;
+import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
@@ -43,6 +46,7 @@ public class AuthenticationManager implements Runnable {
         channelAuthenticating.basicQos(1);
         consumer = new QueueingConsumer(channelAuthenticating);
         channelAuthenticating.basicConsume(authenticationQueueName, false, consumer);
+        //addusers();
     }
 
     public boolean authenticate(String username, String password) {
@@ -92,6 +96,20 @@ public class AuthenticationManager implements Runnable {
         if (userList.size() == 1) {
             User user = userList.get(0);
             result = user.getUsername();
+        } else if (userList.size() > 1) {
+            log.error("multiple results for authKey : [{}]", authKey);
+        } else {
+            log.error("no result for authKey : [{}]", authKey);
+        }
+        return result;
+    }
+
+    public User getUserForKey(String authKey) {
+        User result = null;
+        List<User> userList = userRepositoryRepository.findByAuthKey(authKey);
+        if (userList.size() == 1) {
+            User user = userList.get(0);
+            result = user;
         } else if (userList.size() > 1) {
             log.error("multiple results for authKey : [{}]", authKey);
         } else {
@@ -205,5 +223,34 @@ public class AuthenticationManager implements Runnable {
 
     public void setAuthKeySize(Integer authKeySize) {
         this.authKeySize = authKeySize;
+    }
+
+    private void addusers() {
+        User user1 = new User("azerty", "123456");
+
+        GameCharacterDB char1 = new GameCharacterDB("azerty1Human", Gender.MALE, RaceType.HUMAN, 1, 0);
+        GameCharacterDB char2 = new GameCharacterDB("azerty2Elve", Gender.FEMALE, RaceType.ELVE, 1, 0);
+        GameCharacterDB char3 = new GameCharacterDB("azerty3Dwarf", Gender.MALE, RaceType.DWARF, 1, 0);
+
+        user1.addGameCharToTeam(char1);
+        user1.addGameCharToTeam(char2);
+        user1.addGameCharToTeam(char3);
+
+        if (userRepositoryRepository.findByUsername("azerty").isEmpty()) {
+            userRepositoryRepository.save(user1);
+        }
+        User user2 = new User("ghostofpq", "123456");
+
+        GameCharacterDB char4 = new GameCharacterDB("ghostofpq1Human", Gender.MALE, RaceType.HUMAN, 1, 0);
+        GameCharacterDB char5 = new GameCharacterDB("ghostofpq2Elve", Gender.FEMALE, RaceType.ELVE, 1, 0);
+        GameCharacterDB char6 = new GameCharacterDB("ghostofpq3Dwarf", Gender.MALE, RaceType.DWARF, 1, 0);
+
+        user2.addGameCharToTeam(char4);
+        user2.addGameCharToTeam(char5);
+        user2.addGameCharToTeam(char6);
+
+        if (userRepositoryRepository.findByUsername("ghostofpq").isEmpty()) {
+            userRepositoryRepository.save(user2);
+        }
     }
 }
