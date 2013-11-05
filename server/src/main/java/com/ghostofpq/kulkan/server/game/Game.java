@@ -310,43 +310,49 @@ public class Game {
                 if (possiblePositionsToAttack.contains(positionToAttack)) {
                     GameCharacter characterAttacked = getGameCharacterAtPosition(positionToAttack);
                     if (null != characterAttacked) {
-                        log.debug(" [C] {} at {} ATTACKS {} at {}", characterWhoAttacks.getName(), characterWhoAttacksPosition.toString(), characterAttacked.getName(), positionToAttack.toString());
-                        CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
-                        double hitRoll = Math.random();
-                        log.debug("rolled a {} to hit", hitRoll);
-                        boolean hit = false;
-                        boolean crit = false;
-                        int damages = 0;
+                        if (characterAttacked.isAlive()) {
+                            log.debug(" [C] {} at {} ATTACKS {} at {}", characterWhoAttacks.getName(), characterWhoAttacksPosition.toString(), characterAttacked.getName(), positionToAttack.toString());
+                            CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
+                            double hitRoll = Math.random();
+                            log.debug("rolled a {} to hit", hitRoll);
+                            boolean hit = false;
+                            boolean crit = false;
+                            int damages = 0;
 
-                        if (Math.floor(hitRoll * 100) <= combatCalculator.getChanceToHit()) {
-                            double critRoll = Math.random();
-                            log.debug("rolled a {} to crit", critRoll);
+                            if (Math.floor(hitRoll * 100) <= combatCalculator.getChanceToHit()) {
+                                double critRoll = Math.random();
+                                log.debug("rolled a {} to crit", critRoll);
 
-                            if (Math.floor(critRoll * 100) <= combatCalculator.getChanceToCriticalHit()) {
-                                damages = combatCalculator.getEstimatedDamage() * 2;
-                                crit = true;
+                                if (Math.floor(critRoll * 100) <= combatCalculator.getChanceToCriticalHit()) {
+                                    damages = combatCalculator.getEstimatedDamage() * 2;
+                                    crit = true;
+                                } else {
+                                    damages = combatCalculator.getEstimatedDamage();
+
+                                }
+
+                                log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
+                                characterAttacked.addHealthPoint(-damages);
+                                hit = true;
                             } else {
-                                damages = combatCalculator.getEstimatedDamage();
-
+                                log.debug("missed");
                             }
+                            MessageCharacterAttacks messageCharacterAttacks = new MessageCharacterAttacks(characterWhoAttacks, characterAttacked, hit, damages, crit);
+                            sendToAll(messageCharacterAttacks);
 
-                            log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
-                            characterAttacked.addHealthPoint(-damages);
-                            hit = true;
+                            characterWhoAttacks.gainXp(damages);
+                            characterWhoAttacks.gainJobpoints(5);
+                            MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(characterWhoAttacks, damages, 5);
+                            sendToAll(messageCharacterGainsXP);
+
+                            characterWhoAttacks.setHasActed(true);
+                            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                            sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                         } else {
-                            log.debug("missed");
+                            log.error(" [X] INVALID TARGET (ALREADY DEAD)");
+                            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                            sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                         }
-                        MessageCharacterAttacks messageCharacterAttacks = new MessageCharacterAttacks(characterWhoAttacks, characterAttacked, hit, damages, crit);
-                        sendToAll(messageCharacterAttacks);
-
-                        characterWhoAttacks.gainXp(damages);
-                        characterWhoAttacks.gainJobpoints(5);
-                        MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(characterWhoAttacks, damages, 5);
-                        sendToAll(messageCharacterGainsXP);
-
-                        characterWhoAttacks.setHasActed(true);
-                        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
-                        sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                     } else {
                         log.error(" [X] INVALID TARGET (EMPTY)");
                         MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
