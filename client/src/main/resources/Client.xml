@@ -14,7 +14,7 @@
 
 
     <bean id="Client" class="com.ghostofpq.kulkan.client.Client">
-        <property name="hostIp" value="${host.ip}"/>
-        <property name="hostPort" value="${host.port}"/>
+        <property name="hostIp" value="${hostIp.ip}"/>
+        <property name="hostPort" value="${hostIp.hostPort}"/>
     </bean>
 </beans>
