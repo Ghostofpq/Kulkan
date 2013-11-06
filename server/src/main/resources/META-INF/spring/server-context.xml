@@ -32,12 +32,12 @@
     <bean id="gameManager"
           class="com.ghostofpq.kulkan.server.game.GameManager">
         <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.hostPort}"/>
+        <property name="hostPort" value="${hostIp.port}"/>
     </bean>
     <bean id="authenticationManager"
           class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager">
         <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.hostPort}"/>
+        <property name="hostPort" value="${hostIp.port}"/>
         <property name="authKeySize" value="${authentication.key.size}"/>
     </bean>
 
@@ -47,7 +47,7 @@
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="matchmakingManager" ref="matchmakingManager"/>
         <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.hostPort}"/>
+        <property name="hostPort" value="${hostIp.port}"/>
     </bean>
 
     <bean id="matchmakingManager"
@@ -56,6 +56,6 @@
         <property name="gameManager" ref="gameManager"/>
         <property name="lobbyManager" ref="lobbyManager"/>
         <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.hostPort}"/>
+        <property name="hostPort" value="${hostIp.port}"/>
     </bean>
 </beans>
