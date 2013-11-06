@@ -30,8 +30,8 @@ public class Game {
 
     private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private static final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
-    private final String HOST = "localhost";
-    private final Integer PORT = 13370;
+    private String hostIp;
+    private Integer hostPort;
     private AuthenticationManager authenticationManager;
     @Autowired
     private GameManager gameManager;
@@ -49,7 +49,7 @@ public class Game {
     private GameCharacter currentCharToPlay;
     private Connection connection;
 
-    public Game(Battlefield battlefield, List<Player> playerList, String gameID, AuthenticationManager authenticationManager) {
+    public Game(Battlefield battlefield, List<Player> playerList, String gameID, AuthenticationManager authenticationManager, String hostIp, int hostPort) {
         this.battlefield = battlefield;
         this.playerList = playerList;
         this.authenticationManager = authenticationManager;
@@ -63,6 +63,8 @@ public class Game {
         keyTokenPlayerMap = new HashMap<String, Player>();
         keyTokenPlayerNumberMap = new HashMap<String, Integer>();
         playerChannelMap = new HashMap<Player, String>();
+        this.hostIp = hostIp;
+        this.hostPort = hostPort;
         initConnections();
         sendDeployMessage();
     }
@@ -70,8 +72,8 @@ public class Game {
     private void initConnections() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(HOST);
-            factory.setPort(PORT);
+            factory.setHost(hostIp);
+            factory.setPort(hostPort);
             connection = factory.newConnection();
             channelGameIn = connection.createChannel();
             String queueNameIn = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameID).toString();

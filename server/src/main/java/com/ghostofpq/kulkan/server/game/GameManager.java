@@ -18,6 +18,8 @@ public class GameManager implements Runnable {
     private Map<String, Game> gameMap;
     private List<String> toRemoveGames;
     private boolean requestClose;
+    private String hostIp;
+    private Integer hostPort;
 
     private GameManager() {
         gameMap = new HashMap<String, Game>();
@@ -27,7 +29,7 @@ public class GameManager implements Runnable {
 
     public void addGame(String gameId, Battlefield battlefield, List<Player> playerList) {
         log.debug(" [-] ADDING GAME {} IN THE GAME MANAGER", gameId);
-        Game game = new Game(battlefield, playerList, gameId, authenticationManager);
+        Game game = new Game(battlefield, playerList, gameId, authenticationManager, hostIp, hostPort);
         gameMap.put(gameId, game);
     }
 
@@ -55,5 +57,13 @@ public class GameManager implements Runnable {
                 game.receiveMessage();
             }
         }
+    }
+
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
+
+    public void setHostPort(Integer hostPort) {
+        this.hostPort = hostPort;
     }
 }

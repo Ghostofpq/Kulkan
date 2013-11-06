@@ -23,8 +23,8 @@ public class LobbyManager {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
     private AuthenticationManager authenticationManager;
-    private final String HOST = "localhost";
-    private final Integer PORT = 13370;
+    private String hostIp;
+    private Integer hostPort;
     private Connection connection;
     private MatchmakingManager matchmakingManager;
     private List<String> connectedClients;
@@ -44,8 +44,8 @@ public class LobbyManager {
     public void initConnections() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(HOST);
-            factory.setPort(PORT);
+            factory.setHost(hostIp);
+            factory.setPort(hostPort);
             connection = factory.newConnection();
             channelOut = connection.createChannel();
             channelLobbyIn = connection.createChannel();
@@ -173,4 +173,11 @@ public class LobbyManager {
         this.matchmakingManager = matchmakingManager;
     }
 
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
+
+    public void setHostPort(Integer hostPort) {
+        this.hostPort = hostPort;
+    }
 }

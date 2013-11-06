@@ -26,8 +26,8 @@ import java.util.Map;
 public class MatchmakingManager {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
-    private final String HOST = "localhost";
-    private final Integer PORT = 13370;
+    private String hostIp;
+    private Integer hostPort;
     private Connection connection;
     private AuthenticationManager authenticationManager;
     private LobbyManager lobbyManager;
@@ -48,8 +48,8 @@ public class MatchmakingManager {
     public void initConnections() {
         try {
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(HOST);
-            factory.setPort(PORT);
+            factory.setHost(hostIp);
+            factory.setPort(hostPort);
             connection = factory.newConnection();
             channelOut = connection.createChannel();
             channelMatchmakingIn = connection.createChannel();
@@ -222,6 +222,7 @@ public class MatchmakingManager {
         return matchKey;
     }
 
+
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
@@ -232,5 +233,13 @@ public class MatchmakingManager {
 
     public void setGameManager(GameManager gameManager) {
         this.gameManager = gameManager;
+    }
+
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
+
+    public void setHostPort(Integer hostPort) {
+        this.hostPort = hostPort;
     }
 }
