@@ -288,12 +288,12 @@ public class Game {
                     sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
                 } else {
                     log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
-                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, currentPosition);
                     sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
                 }
             } else {
                 log.error(" [X] NOT MOVING : {}", positionToMove.toString());
-                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, currentPosition);
                 sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
             }
         } else {
