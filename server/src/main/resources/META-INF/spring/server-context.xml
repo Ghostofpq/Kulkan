@@ -12,7 +12,7 @@
 
     <context:property-placeholder location="classpath:application.properties"/>
     <context:annotation-config/>
-    <mongo:mongo id="mongo" hostIp="localhost" hostPort="27017"/>
+    <mongo:mongo id="mongo" host="localhost" port="27017"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg ref="mongo"/>
