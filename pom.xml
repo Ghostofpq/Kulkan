@@ -29,8 +29,18 @@
     </properties>
     <repositories>
         <repository>
-            <id>nifty-maven-repo.sourceforge.net</id>
-            <url>http://nifty-gui.sourceforge.net/nifty-maven-repo</url>
+            <id>mavenNatives</id>
+            <name>Maven Natives Repository</name>
+            <url>http://mavennatives.googlecode.com/svn/repo</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>slick</id>
+            <name>slick</name>
+            <url>http://slick.cokeandcode.com/mavenrepo</url>
         </repository>
     </repositories>
     <dependencyManagement>
@@ -68,6 +78,12 @@
                 <artifactId>lwjgl</artifactId>
                 <version>${lwjgl.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.lwjgl.lwjgl</groupId>
+                <artifactId>lwjgl_util</artifactId>
+                <version>${lwjgl.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>slick</groupId>
                 <artifactId>slick</artifactId>

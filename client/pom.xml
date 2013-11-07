@@ -133,10 +133,16 @@
             <scope>compile</scope>
         </dependency>
 
+
         <dependency>
             <groupId>org.lwjgl.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.lwjgl.lwjgl</groupId>
+            <artifactId>lwjgl_util</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>slick</groupId>
             <artifactId>slick</artifactId>
