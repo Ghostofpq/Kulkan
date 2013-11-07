@@ -29,10 +29,14 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources/conf</directory>
+                <excludes>
+                    <exclude>assembly.xml</exclude>
+                    <exclude>conf/**</exclude>
+                    <exclude>debug.bat</exclude>
+                    <exclude>HUD/**</exclude>
+                    <exclude>spritesheets/**</exclude>
+                    <exclude>textures/**</exclude>
+                </excludes>
                 <filtering>false</filtering>
             </resource>
         </resources>
