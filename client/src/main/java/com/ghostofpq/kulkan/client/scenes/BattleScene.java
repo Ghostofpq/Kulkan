@@ -390,13 +390,11 @@ public class BattleScene implements Scene {
                 break;
             case MOVE:
                 sendActionMove();
-                cleanHighlightPossiblePositionsToMove();
                 possiblePositionsToMove = new ArrayList<Position>();
                 currentState = BattleSceneState.PENDING;
                 break;
             case ATTACK:
                 sendActionAttack();
-                cleanHighlightPossiblePositionsToAttack();
                 possiblePositionsToAttack = new ArrayList<Position>();
                 currentState = BattleSceneState.PENDING;
                 break;
@@ -813,15 +811,8 @@ public class BattleScene implements Scene {
     }
 
     private void sendActionMove() {
-        if (possiblePositionsToMove.contains(cursor)) {
-            MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), playerNumber, currentGameCharacter, cursor);
-            postMessage(messageCharacterActionMove);
-        } else {
-            resetOldHighlight();
-            cursor = new Position(currentGameCharacterRepresentation.getFootPosition());
-            GraphicsManager.getInstance().requestCenterPosition(cursor);
-            currentState = BattleSceneState.ACTION;
-        }
+        MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), playerNumber, currentGameCharacter, cursor);
+        postMessage(messageCharacterActionMove);
         cleanHighlightPossiblePositionsToMove();
     }
 
@@ -831,15 +822,8 @@ public class BattleScene implements Scene {
     }
 
     private void sendActionAttack() {
-        if (possiblePositionsToAttack.contains(cursor)) {
-            MessageCharacterActionAttack messageCharacterActionAttack = new MessageCharacterActionAttack(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
-            postMessage(messageCharacterActionAttack);
-        } else {
-            resetOldHighlight();
-            cursor = new Position(currentGameCharacterRepresentation.getFootPosition());
-            GraphicsManager.getInstance().requestCenterPosition(cursor);
-            currentState = BattleSceneState.ACTION;
-        }
+        MessageCharacterActionAttack messageCharacterActionAttack = new MessageCharacterActionAttack(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+        postMessage(messageCharacterActionAttack);
         cleanHighlightPossiblePositionsToAttack();
     }
 
