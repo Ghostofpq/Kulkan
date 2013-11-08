@@ -21,6 +21,11 @@
 
     <mongo:repositories base-package="com.ghostofpq.kulkan.server.database.repository"/>
 
+    <bean id="userController"
+          class="com.ghostofpq.kulkan.server.database.controller.UserController">
+        <property name="tokenKeySize" value="${token.key.size}"/>
+    </bean>
+
     <bean id="server"
           class="com.ghostofpq.kulkan.server.Server">
         <property name="authenticationManager" ref="authenticationManager"/>
@@ -31,13 +36,13 @@
 
     <bean id="gameManager"
           class="com.ghostofpq.kulkan.server.game.GameManager">
-        <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.port}"/>
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
     </bean>
     <bean id="authenticationManager"
           class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager">
-        <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.port}"/>
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
         <property name="authKeySize" value="${authentication.key.size}"/>
     </bean>
 
@@ -46,8 +51,8 @@
           class="com.ghostofpq.kulkan.server.lobby.LobbyManager">
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="matchmakingManager" ref="matchmakingManager"/>
-        <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.port}"/>
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
     </bean>
 
     <bean id="matchmakingManager"
@@ -55,7 +60,7 @@
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="gameManager" ref="gameManager"/>
         <property name="lobbyManager" ref="lobbyManager"/>
-        <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.port}"/>
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
     </bean>
 </beans>

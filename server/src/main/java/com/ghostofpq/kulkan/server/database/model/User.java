@@ -21,7 +21,7 @@ public class User {
     private String username;
     private String password;
     @Indexed
-    private String authKey;
+    private String tokenKey;
     private String passwordSalt;
     private String firstName;
     private String lastName;
@@ -66,12 +66,12 @@ public class User {
         this.password = password;
     }
 
-    public String getAuthKey() {
-        return authKey;
+    public String getTokenKey() {
+        return tokenKey;
     }
 
-    public void setAuthKey(String authKey) {
-        this.authKey = authKey;
+    public void setTokenKey(String tokenKey) {
+        this.tokenKey = tokenKey;
     }
 
     public String getPasswordSalt() {
@@ -169,9 +169,9 @@ public class User {
     public String toString() {
         return new StringBuilder().append("User{")
                 .append("username='").append(username).append("', ")
-                .append("authKey='").append(authKey).append("'} ")
-                .append("password='").append(authKey).append("'} ")
-                .append("passwordSalt='").append(authKey).append("'} ")
+                .append("tokenKey='").append(tokenKey).append("'} ")
+                .append("password='").append(tokenKey).append("'} ")
+                .append("passwordSalt='").append(tokenKey).append("'} ")
                 .toString();
     }
 

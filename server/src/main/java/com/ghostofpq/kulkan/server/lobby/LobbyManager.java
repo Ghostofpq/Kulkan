@@ -7,12 +7,14 @@ import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPing;
 import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPong;
 import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyServer;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
+import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +35,8 @@ public class LobbyManager {
     private Channel channelLobbyIn;
     private QueueingConsumer lobbyConsumer;
     private long lastTimePing;
-
+    @Autowired
+    private UserController userController;
 
     private LobbyManager() {
         connectedClients = new ArrayList<String>();
@@ -120,7 +123,7 @@ public class LobbyManager {
     }
 
     public void postMessage(MessageLobbyClient messageLobbyClient) throws IOException {
-        String clientPseudo = authenticationManager.getNameForKey(messageLobbyClient.getKeyToken());
+        String clientPseudo = userController.getNameForTokenKey(messageLobbyClient.getKeyToken());
         if (clientPseudo != "") {
             String message = new StringBuilder().append("[").append(clientPseudo).append("]  :  ").append(messageLobbyClient.getLobbyMessage()).toString();
             MessageLobbyServer messageLobbyServer = new MessageLobbyServer(message);

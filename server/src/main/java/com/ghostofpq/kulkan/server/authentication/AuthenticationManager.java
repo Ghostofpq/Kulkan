@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.*;
 import com.ghostofpq.kulkan.entities.race.RaceType;
+import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
@@ -15,22 +16,27 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 public class AuthenticationManager implements Runnable {
     private final String authenticationQueueName = "authentication";
+    // PARAMETERS - SPRING
     private String hostIp;
     private Integer hostPort;
     private Integer authKeySize;
+    // OTHER BEANS - SPRING
     @Autowired
     private LobbyManager lobbyManager;
+    @Autowired
+    private UserRepository userRepositoryRepository;
+    @Autowired
+    private UserController userController;
+    // MESSAGING
     private QueueingConsumer consumer;
     private Connection connection;
     private Channel channelAuthenticating;
+    // THREAD ROUTINE
     private boolean requestClose;
-    @Autowired
-    private UserRepository userRepositoryRepository;
 
     private AuthenticationManager() {
         requestClose = false;
@@ -49,78 +55,28 @@ public class AuthenticationManager implements Runnable {
         //addusers();
     }
 
-    public boolean authenticate(String username, String password) {
+    public String authenticate(String username, String password) {
         log.debug("Authenticate [{}]/[{}]", username, password);
-        boolean result;
-        List<User> userList = userRepositoryRepository.findByUsername(username);
-        if (userList.size() == 1) {
-            User user = userList.get(0);
+        String newTokenKey;
+        User user = userController.getUserForUsername(username);
+        if (null != user) {
             String hashedPassword = DigestUtils.shaHex(password + user.getPasswordSalt());
             if (user.getPassword().equals(hashedPassword)) {
-                String authKey = generateKey();
-                user.setAuthKey(authKey);
-                userRepositoryRepository.save(user);
-                log.debug("user [{}] is authenticated with key [{}]", username, authKey);
-                result = true;
+                newTokenKey = userController.generateTokenKeyForUser(user);
             } else {
-                log.warn("bad password");
-                result = false;
+                log.warn("Invalid Password");
+                newTokenKey = null;
             }
-        } else if (userList.size() > 1) {
-            log.error("multiple results for username : [{}]", username);
-            result = false;
         } else {
-            log.error("no result for username : [{}]", username);
-            result = false;
+            log.warn("Invalid Username");
+            newTokenKey = null;
         }
-        return result;
-    }
-
-    public String getTokenKeyFor(String username) {
-        String result = "";
-        List<User> userList = userRepositoryRepository.findByUsername(username);
-        if (userList.size() == 1) {
-            User user = userList.get(0);
-            result = user.getAuthKey();
-        } else if (userList.size() > 1) {
-            log.error("multiple results for username : [{}]", username);
-        } else {
-            log.error("no result for username : [{}]", username);
-        }
-        return result;
-    }
-
-    public String getNameForKey(String authKey) {
-        String result = "";
-        List<User> userList = userRepositoryRepository.findByAuthKey(authKey);
-        if (userList.size() == 1) {
-            User user = userList.get(0);
-            result = user.getUsername();
-        } else if (userList.size() > 1) {
-            log.error("multiple results for authKey : [{}]", authKey);
-        } else {
-            log.error("no result for authKey : [{}]", authKey);
-        }
-        return result;
-    }
-
-    public User getUserForKey(String authKey) {
-        User result = null;
-        List<User> userList = userRepositoryRepository.findByAuthKey(authKey);
-        if (userList.size() == 1) {
-            User user = userList.get(0);
-            result = user;
-        } else if (userList.size() > 1) {
-            log.error("multiple results for authKey : [{}]", authKey);
-        } else {
-            log.error("no result for authKey : [{}]", authKey);
-        }
-        return result;
+        return newTokenKey;
     }
 
     private String generateKey() {
         String result = RandomStringUtils.randomNumeric(authKeySize);
-        while (!getNameForKey(result).equals("")) {
+        while (!userController.getNameForTokenKey(result).equals("")) {
             log.error("Key [{}] is already in use", result);
             result = RandomStringUtils.randomNumeric(authKeySize);
         }
@@ -140,50 +96,10 @@ public class AuthenticationManager implements Runnable {
 
             switch (message.getType()) {
                 case AUTHENTICATION_REQUEST:
-                    MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
-                    boolean authenticationResult = authenticate(authenticationRequest.getPseudo(),
-                            authenticationRequest.getPassword());
-                    String tokenKey = getTokenKeyFor(authenticationRequest.getPseudo());
-
-                    MessageErrorCode code;
-                    if (authenticationResult) {
-                        code = MessageErrorCode.OK;
-                        lobbyManager.addClient(tokenKey);
-                    } else {
-                        code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
-                    }
-
-                    MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
-                            authenticationRequest.getPseudo(),
-                            authenticationRequest.getPassword(),
-                            tokenKey,
-                            code);
-
-                    channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
-                    channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-
-                    log.debug("sent '{}'", authenticationResponse.getType());
+                    manageAuthenticationRequestMessage(message, props, replyProps, delivery.getEnvelope().getDeliveryTag());
                     break;
                 case CREATE_ACCOUT:
-                    MessageCreateAccount messageCreateAccount = (MessageCreateAccount) message;
-
-                    if (userRepositoryRepository.findByUsername(messageCreateAccount.getUserName()).isEmpty()) {
-                        User user = new User(messageCreateAccount.getUserName(), messageCreateAccount.getPassword());
-                        userRepositoryRepository.save(user);
-                        code = MessageErrorCode.OK;
-                        log.debug("user [{}] is created", user.getUsername());
-                    } else {
-                        code = MessageErrorCode.USER_NAME_ALREADY_USED;
-                        log.error("user [{}] is already in base", messageCreateAccount.getUserName());
-                    }
-
-                    MessageCreateAccountResponse createAccountResponse = new MessageCreateAccountResponse(
-                            code);
-                    channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, createAccountResponse.getBytes());
-                    channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-
-                    log.debug("sent '{}'", createAccountResponse.getType());
-                    break;
+                    manageCreateAccountMessage(message, props, replyProps, delivery.getEnvelope().getDeliveryTag());
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
@@ -191,10 +107,54 @@ public class AuthenticationManager implements Runnable {
         }
     }
 
-    public void setRequestClose(boolean requestClose) {
-        this.requestClose = requestClose;
+    private void manageAuthenticationRequestMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps, long deliveryTag) throws IOException {
+        MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
+
+        String tokenKey = authenticate(authenticationRequest.getPseudo(),
+                authenticationRequest.getPassword());
+
+        MessageErrorCode code;
+        if (null != tokenKey) {
+            code = MessageErrorCode.OK;
+            lobbyManager.addClient(tokenKey);
+        } else {
+            code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
+        }
+
+        MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
+                authenticationRequest.getPseudo(),
+                authenticationRequest.getPassword(),
+                tokenKey,
+                code);
+
+        channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
+        channelAuthenticating.basicAck(deliveryTag, false);
+
+        log.debug("sent '{}'", authenticationResponse.getType());
     }
 
+    private void manageCreateAccountMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps, long deliveryTag) throws IOException {
+        MessageCreateAccount messageCreateAccount = (MessageCreateAccount) message;
+        MessageErrorCode code;
+        if (userRepositoryRepository.findByUsername(messageCreateAccount.getUserName()).isEmpty()) {
+            User user = new User(messageCreateAccount.getUserName(), messageCreateAccount.getPassword());
+            userRepositoryRepository.save(user);
+            code = MessageErrorCode.OK;
+            log.debug("user [{}] is created", user.getUsername());
+        } else {
+            code = MessageErrorCode.USER_NAME_ALREADY_USED;
+            log.error("user [{}] is already in base", messageCreateAccount.getUserName());
+        }
+
+        MessageCreateAccountResponse createAccountResponse = new MessageCreateAccountResponse(
+                code);
+        channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, createAccountResponse.getBytes());
+        channelAuthenticating.basicAck(deliveryTag, false);
+
+        log.debug("sent '{}'", createAccountResponse.getType());
+    }
+
+    // THREAD ROUTINE
     public void run() {
         while (!requestClose) {
             try {
@@ -213,6 +173,11 @@ public class AuthenticationManager implements Runnable {
         }
     }
 
+    public void setRequestClose(boolean requestClose) {
+        this.requestClose = requestClose;
+    }
+
+    // SPRING
     public void setHostIp(String hostIp) {
         this.hostIp = hostIp;
     }
@@ -225,6 +190,7 @@ public class AuthenticationManager implements Runnable {
         this.authKeySize = authKeySize;
     }
 
+    // POPULATE
     private void addusers() {
         User user1 = new User("azerty", "123456");
 

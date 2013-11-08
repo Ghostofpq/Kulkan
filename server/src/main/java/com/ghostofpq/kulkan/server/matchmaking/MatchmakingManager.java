@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
+import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
@@ -15,6 +16,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +40,8 @@ public class MatchmakingManager {
     private Channel channelMatchmakingIn;
     private QueueingConsumer matchmakingConsumer;
     private int matchmapIncrementor;
+    @Autowired
+    private UserController userController;
 
     private MatchmakingManager() {
         matchmapIncrementor = 0;
@@ -142,7 +146,7 @@ public class MatchmakingManager {
                     Battlefield battlefield = SaveManager.getInstance().loadMap("mapTest1");
                     List<Player> playerList = new ArrayList<Player>();
                     for (String client : match.getAllClients()) {
-                        User user = authenticationManager.getUserForKey(client);
+                        User user = userController.getUserForTokenKey(client);
                         Player player = user.toPlayer();
                         playerList.add(player);
                     }
@@ -221,7 +225,6 @@ public class MatchmakingManager {
         matchmapIncrementor++;
         return matchKey;
     }
-
 
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;

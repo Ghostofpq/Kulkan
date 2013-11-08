@@ -12,6 +12,7 @@ import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
+import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -35,6 +36,8 @@ public class Game {
     private AuthenticationManager authenticationManager;
     @Autowired
     private GameManager gameManager;
+    @Autowired
+    private UserController userController;
     private BattleSceneState state;
     private Battlefield battlefield;
     private List<Player> playerList;
@@ -87,7 +90,7 @@ public class Game {
             }
             channelGameOut = connection.createChannel();
             for (Player player : playerList) {
-                String playerKey = authenticationManager.getTokenKeyFor(player.getPseudo());
+                String playerKey = userController.getTokenKeyForUsername(player.getPseudo());
                 keyTokenPlayerMap.put(playerKey, player);
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(playerKey).toString();
                 log.debug(" [-] OPENING QUEUE : {}", queueName);
@@ -114,7 +117,7 @@ public class Game {
         for (Player player : playerList) {
             List<GameCharacter> characterList = player.getTeam();
             MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
-            String playerKey = authenticationManager.getTokenKeyFor(player.getPseudo());
+            String playerKey = userController.getTokenKeyForUsername(player.getPseudo());
             keyTokenPlayerNumberMap.put(playerKey, playerList.indexOf(player));
             sendMessageToPlayer(player, messageDeploymentStart);
         }
@@ -449,7 +452,7 @@ public class Game {
     private boolean messageIsExpected(ClientMessage message) {
         boolean result;
         int receivedPlayerNumber = keyTokenPlayerNumberMap.get(message.getKeyToken());
-        String playerKey = authenticationManager.getTokenKeyFor(playerToPlay.getPseudo());
+        String playerKey = userController.getTokenKeyForUsername(playerToPlay.getPseudo());
         int expectedPlayerNumber = keyTokenPlayerNumberMap.get(playerKey);
         if (receivedPlayerNumber == expectedPlayerNumber) {
             result = true;
