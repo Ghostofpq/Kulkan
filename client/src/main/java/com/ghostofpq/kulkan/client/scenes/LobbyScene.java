@@ -1,13 +1,11 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
-import com.ghostofpq.kulkan.client.graphics.Button;
-import com.ghostofpq.kulkan.client.graphics.HUDElement;
-import com.ghostofpq.kulkan.client.graphics.TextArea;
-import com.ghostofpq.kulkan.client.graphics.TextField;
+import com.ghostofpq.kulkan.client.graphics.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
+import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
@@ -40,6 +38,7 @@ public class LobbyScene implements Scene {
     private String matchId;
     private List<HUDElement> hudElementList;
     private int indexOnFocus;
+    private Background background;
 
     private LobbyScene() {
     }
@@ -117,6 +116,7 @@ public class LobbyScene implements Scene {
         setFocusOn(indexOnFocus);
         matchFound = false;
         matchId = "";
+        background = new Background(TextureKey.BACKGROUND_BASIC);
         try {
             initConnection();
         } catch (IOException e) {
@@ -250,6 +250,7 @@ public class LobbyScene implements Scene {
     @Override
     public void render() {
         GraphicsManager.getInstance().make2D();
+        background.draw();
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
         }
@@ -270,6 +271,12 @@ public class LobbyScene implements Scene {
                             ((Button) hudElement).onClick();
                         }
                     }
+                }
+                if (acceptButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    acceptButton.onClick();
+                }
+                if (refuseButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    refuseButton.onClick();
                 }
             }
         }

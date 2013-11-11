@@ -65,15 +65,21 @@ public class Client {
     public void init() {
         log.debug("HOST : {}", hostIp);
 
-        setHeight(600);
-        setWidth(800);
+        setHeight(1020);
+        setWidth(1360);
         if (instance == null) {
             instance = this;
         }
         this.requestClose = false;
         this.lastTimeTick = Sys.getTime();
         try {
-            Display.setDisplayMode(new DisplayMode(this.width, this.height));
+            // DisplayMode[] displayModes = Display.getAvailableDisplayModes();
+            // for (int i = 0; i < displayModes.length; i++) {
+            //     log.debug("[{}]: {}x{} bbp:{} freq:{}  {}",i, displayModes[i].getHeight(), displayModes[i].getWidth()
+            //             , displayModes[i].getBitsPerPixel(), displayModes[i].getFrequency(), displayModes[i].isFullscreenCapable());
+            // }
+
+            Display.setDisplayMode(new DisplayMode(1360, 1020));
             Display.setSwapInterval(1);
             Display.sync(60);
             Display.create();

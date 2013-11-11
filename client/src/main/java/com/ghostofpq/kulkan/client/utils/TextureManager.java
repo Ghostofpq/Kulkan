@@ -31,6 +31,9 @@ public class TextureManager {
 
             Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/login_background.jpg"));
 
+            Texture backgroundBasic = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/background_basic.jpg"));
+
+
             textureMap.put(TextureKey.GRASS, grass);
             textureMap.put(TextureKey.EARTH, earth);
 
@@ -46,7 +49,7 @@ public class TextureManager {
             textureMap.put(TextureKey.TEXT_FIELD_FOCUS, textfieldFocus);
 
             textureMap.put(TextureKey.LOGIN_BACKGROUND, loginBackground);
-
+            textureMap.put(TextureKey.BACKGROUND_BASIC, backgroundBasic);
         } catch (IOException e) {
             e.printStackTrace();
         }

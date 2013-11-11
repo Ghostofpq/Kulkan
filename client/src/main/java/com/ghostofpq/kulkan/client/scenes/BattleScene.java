@@ -534,10 +534,10 @@ public class BattleScene implements Scene {
         GraphicsManager.getInstance().requestCenterPosition(cursor);
         updateCursorTarget();
         menuSelectAction.reinitMenu();
-        if (currentGameCharacter.hasMoved()) {
+        if (messageCharacterToPlay.getCharacterToPlay().hasMoved()) {
             menuSelectAction.setHasMoved();
         }
-        if (currentGameCharacter.hasActed()) {
+        if (messageCharacterToPlay.getCharacterToPlay().hasActed()) {
             menuSelectAction.setHasActed();
         }
         currentState = BattleSceneState.ACTION;

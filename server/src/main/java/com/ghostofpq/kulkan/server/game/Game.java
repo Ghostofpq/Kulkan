@@ -18,7 +18,6 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,9 +33,7 @@ public class Game {
     private String hostIp;
     private Integer hostPort;
     private AuthenticationManager authenticationManager;
-    @Autowired
     private GameManager gameManager;
-    @Autowired
     private UserController userController;
     private BattleSceneState state;
     private Battlefield battlefield;
@@ -52,10 +49,14 @@ public class Game {
     private GameCharacter currentCharToPlay;
     private Connection connection;
 
-    public Game(Battlefield battlefield, List<Player> playerList, String gameID, AuthenticationManager authenticationManager, String hostIp, int hostPort) {
+    public Game(Battlefield battlefield, List<Player> playerList, String gameID, AuthenticationManager authenticationManager, UserController userController, GameManager gameManager, String hostIp, int hostPort) {
         this.battlefield = battlefield;
         this.playerList = playerList;
+
         this.authenticationManager = authenticationManager;
+        this.gameManager = gameManager;
+        this.userController = userController;
+
         for (Player player : playerList) {
             for (GameCharacter gameCharacter : player.getTeam()) {
                 gameCharacter.initChar();
@@ -170,6 +171,7 @@ public class Game {
                 log.debug(" [-] {} CHAR ARE TO PLAY : ", readyGameCharactersList.size());
                 result = readyGameCharactersList.get(0);
                 for (GameCharacter gameCharacter : readyGameCharactersList) {
+                    log.debug("{} M:{} A:{}", gameCharacter.getName(), gameCharacter.hasMoved(), gameCharacter.hasActed());
                     if (result.getHourglass() > gameCharacter.getHourglass()) {
                         result = gameCharacter;
                     }
@@ -316,43 +318,49 @@ public class Game {
                     GameCharacter characterAttacked = getGameCharacterAtPosition(positionToAttack);
                     if (null != characterAttacked) {
                         if (characterAttacked.isAlive()) {
-                            log.debug(" [C] {} at {} ATTACKS {} at {}", characterWhoAttacks.getName(), characterWhoAttacksPosition.toString(), characterAttacked.getName(), positionToAttack.toString());
-                            CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
-                            double hitRoll = Math.random();
-                            log.debug("rolled a {} to hit", hitRoll);
-                            boolean hit = false;
-                            boolean crit = false;
-                            int damages = 0;
+                            if (!characterWhoAttacks.hasActed()) {
 
-                            if (Math.floor(hitRoll * 100) <= combatCalculator.getChanceToHit()) {
-                                double critRoll = Math.random();
-                                log.debug("rolled a {} to crit", critRoll);
+                                log.debug(" [C] {} at {} ATTACKS {} at {}", characterWhoAttacks.getName(), characterWhoAttacksPosition.toString(), characterAttacked.getName(), positionToAttack.toString());
+                                CombatCalculator combatCalculator = new CombatCalculator(characterWhoAttacks, characterWhoAttacksPosition, characterAttacked, positionToAttack);
+                                double hitRoll = Math.random();
+                                log.debug("rolled a {} to hit", hitRoll);
+                                boolean hit = false;
+                                boolean crit = false;
+                                int damages = 0;
 
-                                if (Math.floor(critRoll * 100) <= combatCalculator.getChanceToCriticalHit()) {
-                                    damages = combatCalculator.getEstimatedDamage() * 2;
-                                    crit = true;
+                                if (Math.floor(hitRoll * 100) <= combatCalculator.getChanceToHit()) {
+                                    double critRoll = Math.random();
+                                    log.debug("rolled a {} to crit", critRoll);
+
+                                    if (Math.floor(critRoll * 100) <= combatCalculator.getChanceToCriticalHit()) {
+                                        damages = combatCalculator.getEstimatedDamage() * 2;
+                                        crit = true;
+                                    } else {
+                                        damages = combatCalculator.getEstimatedDamage();
+
+                                    }
+
+                                    log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
+                                    characterAttacked.addHealthPoint(-damages);
+                                    hit = true;
                                 } else {
-                                    damages = combatCalculator.getEstimatedDamage();
-
+                                    log.debug("missed");
                                 }
+                                MessageCharacterAttacks messageCharacterAttacks = new MessageCharacterAttacks(characterWhoAttacks, characterAttacked, hit, damages, crit);
+                                sendToAll(messageCharacterAttacks);
+                                characterWhoAttacks.setHasActed(true);
+                                characterWhoAttacks.gainXp(damages);
+                                characterWhoAttacks.gainJobpoints(5);
+                                MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(characterWhoAttacks, damages, 5);
+                                sendToAll(messageCharacterGainsXP);
 
-                                log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
-                                characterAttacked.addHealthPoint(-damages);
-                                hit = true;
+                                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                                sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                             } else {
-                                log.debug("missed");
+                                log.error(" [X] CHARACTER HAS ALREADY ACTED THIS TURN");
+                                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
+                                sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                             }
-                            MessageCharacterAttacks messageCharacterAttacks = new MessageCharacterAttacks(characterWhoAttacks, characterAttacked, hit, damages, crit);
-                            sendToAll(messageCharacterAttacks);
-
-                            characterWhoAttacks.gainXp(damages);
-                            characterWhoAttacks.gainJobpoints(5);
-                            MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(characterWhoAttacks, damages, 5);
-                            sendToAll(messageCharacterGainsXP);
-
-                            characterWhoAttacks.setHasActed(true);
-                            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
-                            sendMessageToChannel(messageCharacterActionAttack.getKeyToken(), messageCharacterToPlay);
                         } else {
                             log.error(" [X] INVALID TARGET (ALREADY DEAD)");
                             MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterWhoAttacks, characterWhoAttacksPosition);
@@ -383,8 +391,7 @@ public class Game {
         GameCharacter character = getEquivalentCharacter(messageCharacterEndTurn.getCharacter());
         if (character.equals(currentCharToPlay)) {
             log.debug(" [C] END TURN FOR {}", character.getName());
-            Player player = playerList.get(messageCharacterEndTurn.getPlayerNumber());
-            player.getGameCharacter(character).setHeadingAngle(character.getHeadingAngle());
+            character.setHeadingAngle(messageCharacterEndTurn.getCharacter().getHeadingAngle());
             newTurn();
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
