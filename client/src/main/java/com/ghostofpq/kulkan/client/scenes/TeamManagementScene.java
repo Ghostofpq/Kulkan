@@ -13,6 +13,7 @@ public class TeamManagementScene implements Scene {
     private static volatile TeamManagementScene instance = null;
     private List<TeamManagementCharacterRender> teamManagementCharacterRenderList;
     private List<Button> buttonsNewGameCharacter;
+    private Button backButton;
 
     private TeamManagementScene() {
         teamManagementCharacterRenderList = new ArrayList<TeamManagementCharacterRender>();
@@ -32,18 +33,19 @@ public class TeamManagementScene implements Scene {
 
     @Override
     public void init() {
-
-        int[] posXs = {0, Client.getInstance().getWidth() / 2, 0, Client.getInstance().getWidth() / 2};
-        int[] posYs = {0, 0, Client.getInstance().getHeight() / 2, Client.getInstance().getHeight() / 2};
+        int width = 5 * Client.getInstance().getWidth() / 6;
+        int height = 3 * Client.getInstance().getHeight() / 4;
+        int[] posXs = {0, width / 2, 0, width / 2};
+        int[] posYs = {0, 0, height / 2, height / 2};
 
         for (int i = 0; i < 4; i++) {
             if (Client.getInstance().getPlayer().getTeam().size() > i) {
                 teamManagementCharacterRenderList.add(
                         new TeamManagementCharacterRender(posXs[i], posYs[i],
-                                Client.getInstance().getWidth() / 2, Client.getInstance().getHeight(),
+                                width / 2, height / 2,
                                 2, Client.getInstance().getPlayer().getTeam().get(i)));
             } else {
-                buttonsNewGameCharacter.add(new Button(posXs[i], posYs[i], Client.getInstance().getWidth() / 2, Client.getInstance().getHeight() / 2, "HIRE NEW WARRIOR") {
+                buttonsNewGameCharacter.add(new Button(posXs[i], posYs[i], width / 2, height / 2, "HIRE NEW WARRIOR") {
                     @Override
                     public void onClick() {
                         Client.getInstance().setCurrentScene(NewGameCharacterScene.getInstance());
@@ -51,6 +53,13 @@ public class TeamManagementScene implements Scene {
                 });
             }
         }
+        backButton = new Button(width, 0, Client.getInstance().getWidth() / 6, 50, "BACK") {
+            @Override
+            public void onClick() {
+                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+            }
+        };
+
     }
 
     @Override
@@ -67,6 +76,7 @@ public class TeamManagementScene implements Scene {
         for (Button button : buttonsNewGameCharacter) {
             button.draw();
         }
+        backButton.draw();
     }
 
     @Override
@@ -83,6 +93,9 @@ public class TeamManagementScene implements Scene {
                         Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
                         GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
                     }
+                }
+                if (backButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    backButton.onClick();
                 }
             }
         }
