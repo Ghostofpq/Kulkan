@@ -14,25 +14,20 @@ public class UserController {
     private UserRepository userRepositoryRepository;
     private Integer tokenKeySize;
 
-    public String getTokenKeyForUsername(String username) {
-        String user = getUserForUsername(username).getTokenKey();
-        return user;
-    }
-
-    public String getNameForTokenKey(String tokenKey) {
-        String user = getUserForTokenKey(tokenKey).getUsername();
-        return user;
-    }
-
-    public String generateTokenKeyForUser(User user) {
+    public User generateTokenKeyForUser(User user) {
         String newTokenKey = RandomStringUtils.randomNumeric(tokenKeySize);
-        while (!getNameForTokenKey(newTokenKey).equals("")) {
-            log.error("Key [{}] is already in use", newTokenKey);
+        while (getUserForTokenKey(newTokenKey) != null) {
+            log.error("key [{}] is already in use", newTokenKey);
             newTokenKey = RandomStringUtils.randomNumeric(tokenKeySize);
         }
         user.setTokenKey(newTokenKey);
-        userRepositoryRepository.save(user);
-        return newTokenKey;
+        user = userRepositoryRepository.save(user);
+        return user;
+    }
+
+    public String getTokenKeyForUsername(String username) {
+        String user = getUserForUsername(username).getTokenKey();
+        return user;
     }
 
     public User getUserForUsername(String username) {
@@ -48,9 +43,14 @@ public class UserController {
         return user;
     }
 
+    public String getNameForTokenKey(String tokenKey) {
+        String user = getUserForTokenKey(tokenKey).getUsername();
+        return user;
+    }
+
     public User getUserForTokenKey(String tokenKey) {
         User user = null;
-        List<User> userList = userRepositoryRepository.findByAuthKey(tokenKey);
+        List<User> userList = userRepositoryRepository.findByTokenKey(tokenKey);
         if (userList.size() == 1) {
             user = userList.get(0);
         } else if (userList.size() > 1) {

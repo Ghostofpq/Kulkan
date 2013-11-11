@@ -36,15 +36,19 @@ public class FontManager {
     }
 
     public void drawString(String font, int x, int y, String str, Color color) {
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         fontMap.get(font).drawString(x, y, str, color);
         GL11.glDisable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 
     public void drawString(String font, int size, int x, int y, String str, Color color) {
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         fontMap.get(font + "_" + size).drawString(x, y, str, color);
         GL11.glDisable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 
     /**

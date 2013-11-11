@@ -46,6 +46,7 @@ public class AuthenticationManager implements Runnable {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(hostIp);
         factory.setPort(hostPort);
+        log.debug("{}:{}", hostIp, hostPort);
         connection = factory.newConnection();
         channelAuthenticating = connection.createChannel();
         channelAuthenticating.queueDeclare(authenticationQueueName, false, false, false, null);
@@ -55,23 +56,22 @@ public class AuthenticationManager implements Runnable {
         //addusers();
     }
 
-    public String authenticate(String username, String password) {
+    public User authenticate(String username, String password) {
         log.debug("Authenticate [{}]/[{}]", username, password);
-        String newTokenKey;
         User user = userController.getUserForUsername(username);
         if (null != user) {
             String hashedPassword = DigestUtils.shaHex(password + user.getPasswordSalt());
             if (user.getPassword().equals(hashedPassword)) {
-                newTokenKey = userController.generateTokenKeyForUser(user);
+                user = userController.generateTokenKeyForUser(user);
             } else {
                 log.warn("Invalid Password");
-                newTokenKey = null;
+                user = null;
             }
         } else {
             log.warn("Invalid Username");
-            newTokenKey = null;
+            user = null;
         }
-        return newTokenKey;
+        return user;
     }
 
     private String generateKey() {
@@ -110,13 +110,13 @@ public class AuthenticationManager implements Runnable {
     private void manageAuthenticationRequestMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps, long deliveryTag) throws IOException {
         MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
 
-        String tokenKey = authenticate(authenticationRequest.getPseudo(),
+        User user = authenticate(authenticationRequest.getPseudo(),
                 authenticationRequest.getPassword());
 
         MessageErrorCode code;
-        if (null != tokenKey) {
+        if (null != user) {
             code = MessageErrorCode.OK;
-            lobbyManager.addClient(tokenKey);
+            lobbyManager.addClient(user.getTokenKey());
         } else {
             code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
         }
@@ -124,7 +124,8 @@ public class AuthenticationManager implements Runnable {
         MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
                 authenticationRequest.getPseudo(),
                 authenticationRequest.getPassword(),
-                tokenKey,
+                user.getTokenKey(),
+                user.toPlayer(),
                 code);
 
         channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());

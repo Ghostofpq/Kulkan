@@ -21,10 +21,6 @@
 
     <mongo:repositories base-package="com.ghostofpq.kulkan.server.database.repository"/>
 
-    <bean id="userController"
-          class="com.ghostofpq.kulkan.server.database.controller.UserController">
-        <property name="tokenKeySize" value="${token.key.size}"/>
-    </bean>
 
     <bean id="server"
           class="com.ghostofpq.kulkan.server.Server">
@@ -62,5 +58,10 @@
         <property name="lobbyManager" ref="lobbyManager"/>
         <property name="hostIp" value="${host.ip}"/>
         <property name="hostPort" value="${host.port}"/>
+    </bean>
+
+    <bean id="userController"
+          class="com.ghostofpq.kulkan.server.database.controller.UserController">
+        <property name="tokenKeySize" value="${token.key.size}"/>
     </bean>
 </beans>

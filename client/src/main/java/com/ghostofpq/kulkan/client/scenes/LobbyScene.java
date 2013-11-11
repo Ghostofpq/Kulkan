@@ -35,6 +35,7 @@ public class LobbyScene implements Scene {
     private Button quitButton;
     private Button acceptButton;
     private Button refuseButton;
+    private Button manageTeamButton;
     private boolean matchFound;
     private String matchId;
     private List<HUDElement> hudElementList;
@@ -97,11 +98,21 @@ public class LobbyScene implements Scene {
                 refuseMatch();
             }
         };
+
+        manageTeamButton = new Button(550, 200, 50, 50, "MANAGE TEAM") {
+            @Override
+            public void onClick() {
+                log.debug("MANAGE TEAM");
+                Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+            }
+        };
+
         hudElementList.add(inputText);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
         hudElementList.add(lobbyMessages);
         hudElementList.add(quitButton);
+        hudElementList.add(manageTeamButton);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
         matchFound = false;
@@ -252,28 +263,14 @@ public class LobbyScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (inputText.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    setFocusOn(hudElementList.indexOf(inputText));
+                for (HUDElement hudElement : hudElementList) {
+                    if (hudElement.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        setFocusOn(hudElementList.indexOf(hudElement));
+                        if (hudElement instanceof Button) {
+                            ((Button) hudElement).onClick();
+                        }
+                    }
                 }
-                if (postButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    setFocusOn(hudElementList.indexOf(postButton));
-                    postButton.onClick();
-                }
-                if (matchmakingButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    setFocusOn(hudElementList.indexOf(matchmakingButton));
-                    matchmakingButton.onClick();
-                }
-                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    setFocusOn(hudElementList.indexOf(quitButton));
-                    quitButton.onClick();
-                }
-                if (acceptButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    acceptButton.onClick();
-                }
-                if (refuseButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    refuseButton.onClick();
-                }
-
             }
         }
         while (Keyboard.next()) {

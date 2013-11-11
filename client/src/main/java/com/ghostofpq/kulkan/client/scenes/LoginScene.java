@@ -67,6 +67,7 @@ public class LoginScene implements Scene {
                             if (response.getErrorCode().equals(MessageErrorCode.OK)) {
                                 closeConnections();
                                 log.debug("AUTH OK : key={}", response.getTokenKey());
+                                Client.getInstance().setPlayer(response.getPlayer());
                                 Client.getInstance().setTokenKey(response.getTokenKey());
                                 Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                             } else {
