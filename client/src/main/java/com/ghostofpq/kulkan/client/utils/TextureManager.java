@@ -30,7 +30,6 @@ public class TextureManager {
             Texture buttonNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/homepage_800-600-button-basic.png"));
 
             Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/login_background.jpg"));
-
             Texture backgroundBasic = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/background_basic.jpg"));
 
 

@@ -10,6 +10,8 @@ import org.newdawn.slick.opengl.Texture;
 public abstract class Button extends HUDElement {
     private final String FONT = "optimus_princeps_16";
     protected String label;
+    private TextureKey customTexture;
+    private TextureKey customTextureFocus;
 
     public Button(int posX, int posY, int length, int height, String label) {
         this.posX = posX;
@@ -20,14 +22,30 @@ public abstract class Button extends HUDElement {
         this.hasFocus = false;
     }
 
+    public void setCustomTexture(TextureKey customTexture) {
+        this.customTexture = customTexture;
+    }
+
+    public void setCustomTextureFocus(TextureKey customTextureFocus) {
+        this.customTextureFocus = customTextureFocus;
+    }
+
     public void draw() {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glColor4f(1f, 1f, 1f, 1f);
         Texture texture;
-        if (hasFocus()) {
-            texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_NO_FOCUS);
+        if (customTexture == null || customTextureFocus == null) {
+            if (hasFocus()) {
+                texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_FOCUS);
+            } else {
+                texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_NO_FOCUS);
+            }
         } else {
-            texture = TextureManager.getInstance().getTexture(TextureKey.TEXT_FIELD_FOCUS);
+            if (hasFocus()) {
+                texture = TextureManager.getInstance().getTexture(customTextureFocus);
+            } else {
+                texture = TextureManager.getInstance().getTexture(customTexture);
+            }
         }
         texture.bind();
         GL11.glBegin(GL11.GL_QUADS);
