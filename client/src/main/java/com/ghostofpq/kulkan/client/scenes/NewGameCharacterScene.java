@@ -11,7 +11,7 @@ import org.lwjgl.input.Mouse;
 
 public class NewGameCharacterScene implements Scene {
     private static volatile NewGameCharacterScene instance = null;
-    private TextField pseudo;
+    private TextField name;
     private Button male;
     private Button female;
     private Button gorilla;
@@ -22,6 +22,8 @@ public class NewGameCharacterScene implements Scene {
     private Button lizard;
     private Button ara;
     private Button eagle;
+    private Button validate;
+    private Button quit;
     private int widthSeparator = 50;
     private int widthStep;
     private int widthStepClan;
@@ -72,6 +74,10 @@ public class NewGameCharacterScene implements Scene {
                         femaleHasFocus();
                     }
                 };
+        int namePosX = 2 * widthSeparator + widthStep;
+        int namePosY = heightSeparator;
+
+        name = new TextField(namePosX, namePosY, 3 * widthStep, heightStep, 15);
 
         int gorillaPosX = widthSeparator;
         int gorillaPosY = 2 * heightSeparator + heightStep;
@@ -97,26 +103,32 @@ public class NewGameCharacterScene implements Scene {
         int eaglePosX = araPosX + widthStepClan;
         int eaglePosY = gorillaPosY;
 
-        gorilla = new Button(gorillaPosX, gorillaPosY, widthStepClan, heightStep, "gorilla") {
-            @Override
-            public void onClick() {
-                gorillaHasFocus();
-            }
-        };
+        gorilla = new
 
-        jaguar = new Button(jaguarPosX, jaguarPosY, widthStepClan, heightStep, "jaguar") {
-            @Override
-            public void onClick() {
-                jaguarHasFocus();
-            }
-        };
+                Button(gorillaPosX, gorillaPosY, widthStepClan, heightStep, "gorilla") {
+                    @Override
+                    public void onClick() {
+                        gorillaHasFocus();
+                    }
+                };
 
-        turtle = new Button(turtlePosX, turtlePosY, widthStepClan, heightStep, "turtle") {
-            @Override
-            public void onClick() {
-                turtleHasFocus();
-            }
-        };
+        jaguar = new
+
+                Button(jaguarPosX, jaguarPosY, widthStepClan, heightStep, "jaguar") {
+                    @Override
+                    public void onClick() {
+                        jaguarHasFocus();
+                    }
+                };
+
+        turtle = new
+
+                Button(turtlePosX, turtlePosY, widthStepClan, heightStep, "turtle") {
+                    @Override
+                    public void onClick() {
+                        turtleHasFocus();
+                    }
+                };
         monkey = new
 
                 Button(monkeyPosX, monkeyPosY, widthStepClan, heightStep, "monkey") {
@@ -126,34 +138,67 @@ public class NewGameCharacterScene implements Scene {
                     }
                 };
 
-        panther = new Button(pantherPosX, pantherPosY, widthStepClan, heightStep, "panther") {
-            @Override
-            public void onClick() {
-                pantherHasFocus();
-            }
-        };
+        panther = new
 
-        lizard = new Button(lizardPosX, lizardPosY, widthStepClan, heightStep, "lizard") {
-            @Override
-            public void onClick() {
-                lizardHasFocus();
-            }
-        };
+                Button(pantherPosX, pantherPosY, widthStepClan, heightStep, "panther") {
+                    @Override
+                    public void onClick() {
+                        pantherHasFocus();
+                    }
+                };
 
-        ara = new Button(araPosX, araPosY, widthStepClan, heightStep, "ara") {
-            @Override
-            public void onClick() {
-                araHasFocus();
-            }
-        };
+        lizard = new
 
-        eagle = new Button(eaglePosX, eaglePosY, widthStepClan, heightStep, "eagle") {
-            @Override
-            public void onClick() {
-                eagleHasFocus();
-            }
-        };
+                Button(lizardPosX, lizardPosY, widthStepClan, heightStep, "lizard") {
+                    @Override
+                    public void onClick() {
+                        lizardHasFocus();
+                    }
+                };
 
+        ara = new
+
+                Button(araPosX, araPosY, widthStepClan, heightStep, "ara") {
+                    @Override
+                    public void onClick() {
+                        araHasFocus();
+                    }
+                };
+
+        eagle = new
+
+                Button(eaglePosX, eaglePosY, widthStepClan, heightStep, "eagle") {
+                    @Override
+                    public void onClick() {
+                        eagleHasFocus();
+                    }
+                };
+
+        int widthDesc = (Client.getInstance().getWidth() - 4 * widthSeparator) / 7;
+
+        int validatePosX = 6 * widthDesc + 3 * widthSeparator;
+        int validatePosY = 3 * heightSeparator + 2 * heightStep;
+
+        int quitPosX = validatePosX;
+        int quitPosY = 3 * heightSeparator + 4 * heightStep;
+
+        validate = new
+
+                Button(validatePosX, validatePosY, widthDesc, heightStep, "validate") {
+                    @Override
+                    public void onClick() {
+                        //TODO
+                    }
+                };
+
+        quit = new
+
+                Button(quitPosX, quitPosY, widthDesc, heightStep, "back") {
+                    @Override
+                    public void onClick() {
+                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    }
+                };
 
         maleHasFocus();
         gorillaHasFocus();
@@ -274,6 +319,9 @@ public class NewGameCharacterScene implements Scene {
         lizard.draw();
         ara.draw();
         eagle.draw();
+        name.draw();
+        validate.draw();
+        quit.draw();
     }
 
     @Override
@@ -310,18 +358,24 @@ public class NewGameCharacterScene implements Scene {
                 if (eagle.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
                     eagle.onClick();
                 }
+                if (validate.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    validate.onClick();
+                }
+                if (quit.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    quit.onClick();
+                }
             }
         }
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
                     if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
-                        pseudo.deleteLastChar();
+                        name.deleteLastChar();
                     } else {
-                        pseudo.writeChar(Keyboard.getEventCharacter());
+                        name.writeChar(Keyboard.getEventCharacter());
                     }
                 } else {
-                    pseudo.writeChar(Keyboard.getEventCharacter());
+                    name.writeChar(Keyboard.getEventCharacter());
                 }
             }
         }
