@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.server.database.controller;
 
+import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import java.util.List;
 @Slf4j
 public class UserController {
     @Autowired
-    private UserRepository userRepositoryRepository;
+    private UserRepository userRepository;
     private Integer tokenKeySize;
 
     public User generateTokenKeyForUser(User user) {
@@ -21,7 +22,7 @@ public class UserController {
             newTokenKey = RandomStringUtils.randomNumeric(tokenKeySize);
         }
         user.setTokenKey(newTokenKey);
-        user = userRepositoryRepository.save(user);
+        user = userRepository.save(user);
         return user;
     }
 
@@ -32,7 +33,7 @@ public class UserController {
 
     public User getUserForUsername(String username) {
         User user = null;
-        List<User> userList = userRepositoryRepository.findByUsername(username);
+        List<User> userList = userRepository.findByUsername(username);
         if (userList.size() == 1) {
             user = userList.get(0);
         } else if (userList.size() > 1) {
@@ -50,7 +51,7 @@ public class UserController {
 
     public User getUserForTokenKey(String tokenKey) {
         User user = null;
-        List<User> userList = userRepositoryRepository.findByTokenKey(tokenKey);
+        List<User> userList = userRepository.findByTokenKey(tokenKey);
         if (userList.size() == 1) {
             user = userList.get(0);
         } else if (userList.size() > 1) {
@@ -59,6 +60,20 @@ public class UserController {
             log.error("no result for authKey : [{}]", tokenKey);
         }
         return user;
+    }
+
+    public boolean addGameCharToUser(String username, String tokenKey, GameCharacterDB gameCharacterDB) {
+        User user = getUserForUsername(username);
+        User verification = getUserForTokenKey(tokenKey);
+        boolean result;
+        if (user.equals(verification)) {
+            user.addGameCharToStock(gameCharacterDB);
+            userRepository.save(user);
+            result = true;
+        } else {
+            result = false;
+        }
+        return result;
     }
 
     public void setTokenKeySize(Integer tokenKeySize) {
