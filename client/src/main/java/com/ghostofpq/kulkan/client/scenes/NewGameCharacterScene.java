@@ -247,7 +247,6 @@ public class NewGameCharacterScene implements Scene {
 
         maleHasFocus();
         gorillaHasFocus();
-        clanType = ClanType.ELVE;
     }
 
     public void maleHasFocus() {
@@ -263,6 +262,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void gorillaHasFocus() {
+        clanType = ClanType.GORILLA;
         gorilla.setHasFocus(true);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -274,6 +274,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void jaguarHasFocus() {
+        clanType = ClanType.JAGUAR;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(true);
         turtle.setHasFocus(false);
@@ -285,6 +286,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void turtleHasFocus() {
+        clanType = ClanType.TURTLE;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(true);
@@ -296,6 +298,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void monkeyHasFocus() {
+        clanType = ClanType.MONKEY;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -307,6 +310,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void pantherHasFocus() {
+        clanType = ClanType.PANTHER;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -318,6 +322,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void lizardHasFocus() {
+        clanType = ClanType.LIZARD;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -329,6 +334,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void araHasFocus() {
+        clanType = ClanType.ARA;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -340,6 +346,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void eagleHasFocus() {
+        clanType = ClanType.EAGLE;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -460,11 +467,15 @@ public class NewGameCharacterScene implements Scene {
 
     @Override
     public void closeConnections() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            channelAuthenticating.close();
+            log.debug("channelAuthenticating closed");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void receiveMessage() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }
