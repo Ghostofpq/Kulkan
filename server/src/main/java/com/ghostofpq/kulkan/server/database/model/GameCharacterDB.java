@@ -2,7 +2,7 @@ package com.ghostofpq.kulkan.server.database.model;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Gender;
-import com.ghostofpq.kulkan.entities.race.RaceType;
+import com.ghostofpq.kulkan.entities.clan.ClanType;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
@@ -11,18 +11,18 @@ public class GameCharacterDB {
     private ObjectId id;
     private String name;
     private Gender gender;
-    private RaceType raceType;
+    private ClanType clanType;
     private Integer lvl;
     private Integer currentXp;
 
     public GameCharacterDB() {
     }
 
-    public GameCharacterDB(String name, Gender gender, RaceType raceType, Integer lvl, Integer currentXp) {
+    public GameCharacterDB(String name, Gender gender, ClanType clanType, Integer lvl, Integer currentXp) {
         this.id = new ObjectId();
         this.name = name;
         this.gender = gender;
-        this.raceType = raceType;
+        this.clanType = clanType;
         this.lvl = lvl;
         this.currentXp = currentXp;
     }
@@ -30,7 +30,7 @@ public class GameCharacterDB {
     public GameCharacterDB(GameCharacter gameCharacter) {
         this.name = gameCharacter.getName();
         this.gender = gameCharacter.getGender();
-        this.raceType = gameCharacter.getRace().getRaceType();
+        this.clanType = gameCharacter.getClan().getRaceType();
         this.lvl = gameCharacter.getLevel();
         this.currentXp = gameCharacter.getExperience();
     }
@@ -71,11 +71,11 @@ public class GameCharacterDB {
         this.currentXp = currentXp;
     }
 
-    public RaceType getRaceType() {
-        return raceType;
+    public ClanType getClanType() {
+        return clanType;
     }
 
-    public void setRaceType(RaceType raceType) {
-        this.raceType = raceType;
+    public void setClanType(ClanType clanType) {
+        this.clanType = clanType;
     }
 }

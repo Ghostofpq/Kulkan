@@ -19,7 +19,7 @@ public class TeamManagementCharacterRender extends HUDElement {
     // Lvl
     private int lvlPosX;
     private int lvlPosY;
-    // Race
+    // Clan
     private int racePosX;
     private int racePosY;
     // xp
@@ -55,7 +55,7 @@ public class TeamManagementCharacterRender extends HUDElement {
         Toolbox.drawFrame(posX, posY, frameLength, frameHeight, frameWidth, Color.white);
         FontManager.getInstance().drawString(FONT, namePosX, namePosY, character.getName(), Color.white);
         FontManager.getInstance().drawString(FONT, lvlPosX, lvlPosY, "LvL : " + character.getLevel(), Color.white);
-        FontManager.getInstance().drawString(FONT, racePosX, racePosY, character.getRace().getName(), Color.white);
+        FontManager.getInstance().drawString(FONT, racePosX, racePosY, character.getClan().getName(), Color.white);
         FontManager.getInstance().drawString(FONT, xpPosX, xpPosY, String.valueOf(character.getExperience()), Color.white);
     }
 
