@@ -247,7 +247,11 @@ public class NewGameCharacterScene implements Scene {
 
         maleHasFocus();
         gorillaHasFocus();
-        raceType = RaceType.ELVE;
+        try {
+            initConnection();
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 
     public void maleHasFocus() {
@@ -460,7 +464,12 @@ public class NewGameCharacterScene implements Scene {
 
     @Override
     public void closeConnections() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            channelAuthenticating.close();
+            log.debug("channelAuthenticating closed");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

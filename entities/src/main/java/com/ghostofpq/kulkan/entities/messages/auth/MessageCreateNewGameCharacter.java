@@ -12,7 +12,7 @@ public class MessageCreateNewGameCharacter extends ClientMessage {
     private String username;
 
     public MessageCreateNewGameCharacter(String keyToken, String username, RaceType raceType, Gender gender, String name) {
-        type = MessageType.CHARACTER_ACTION_ATTACK;
+        type = MessageType.CREATE_NEW_GAME_CHARACTER_REQUEST;
         this.keyToken = keyToken;
         this.username = username;
         this.raceType = raceType;

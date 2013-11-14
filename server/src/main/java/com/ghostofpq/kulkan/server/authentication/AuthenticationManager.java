@@ -91,26 +91,28 @@ public class AuthenticationManager implements Runnable {
             AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()
                     .correlationId(props.getCorrelationId())
                     .build();
-
             Message message = Message.loadFromBytes(delivery.getBody());
             log.debug(" [x] RECEIVED '{}' ON {}", message.getType(), authenticationQueueName);
 
             switch (message.getType()) {
                 case AUTHENTICATION_REQUEST:
-                    manageAuthenticationRequestMessage(message, props, replyProps, delivery.getEnvelope().getDeliveryTag());
+                    manageAuthenticationRequestMessage(message, props, replyProps);
                     break;
                 case CREATE_ACCOUT:
-                    manageCreateAccountMessage(message, props, replyProps, delivery.getEnvelope().getDeliveryTag());
+                    manageCreateAccountMessage(message, props, replyProps);
+                    break;
                 case CREATE_NEW_GAME_CHARACTER_REQUEST:
-                    manageCreateGameCharacterRequest(message, props, replyProps, delivery.getEnvelope().getDeliveryTag());
+                    manageCreateGameCharacterRequest(message, props, replyProps);
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
             }
+            channelAuthenticating.basicAck(delivery.getEnvelope().getDeliveryTag(), true);
         }
     }
 
-    private void manageCreateGameCharacterRequest(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps, long deliveryTag) throws IOException {
+    private void manageCreateGameCharacterRequest(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps) throws IOException {
         MessageCreateNewGameCharacter messageCreateNewGameCharacter = (MessageCreateNewGameCharacter) message;
 
         MessageErrorCode code;
@@ -122,41 +124,34 @@ public class AuthenticationManager implements Runnable {
         } else {
             code = MessageErrorCode.KO;
         }
+
         Player player = userController.getUserForTokenKey(messageCreateNewGameCharacter.getKeyToken()).toPlayer();
 
         MessageCreateNewGameCharacterResponse messageCreateNewGameCharacterResponse = new MessageCreateNewGameCharacterResponse(player, code);
         channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, messageCreateNewGameCharacterResponse.getBytes());
-        channelAuthenticating.basicAck(deliveryTag, false);
     }
 
-    private void manageAuthenticationRequestMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps, long deliveryTag) throws IOException {
+    private void manageAuthenticationRequestMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps) throws IOException {
         MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
 
         User user = authenticate(authenticationRequest.getPseudo(),
                 authenticationRequest.getPassword());
 
-        MessageErrorCode code;
         if (null != user) {
-            code = MessageErrorCode.OK;
+            MessageErrorCode code = MessageErrorCode.OK;
             lobbyManager.addClient(user.getTokenKey());
-        } else {
-            code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
+            MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
+                    authenticationRequest.getPseudo(),
+                    authenticationRequest.getPassword(),
+                    user.getTokenKey(),
+                    user.toPlayer(),
+                    code);
+
+            channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
         }
-
-        MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
-                authenticationRequest.getPseudo(),
-                authenticationRequest.getPassword(),
-                user.getTokenKey(),
-                user.toPlayer(),
-                code);
-
-        channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
-        channelAuthenticating.basicAck(deliveryTag, false);
-
-        log.debug("sent '{}'", authenticationResponse.getType());
     }
 
-    private void manageCreateAccountMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps, long deliveryTag) throws IOException {
+    private void manageCreateAccountMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps) throws IOException {
         MessageCreateAccount messageCreateAccount = (MessageCreateAccount) message;
         MessageErrorCode code;
         if (userRepositoryRepository.findByUsername(messageCreateAccount.getUserName()).isEmpty()) {
@@ -172,9 +167,6 @@ public class AuthenticationManager implements Runnable {
         MessageCreateAccountResponse createAccountResponse = new MessageCreateAccountResponse(
                 code);
         channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, createAccountResponse.getBytes());
-        channelAuthenticating.basicAck(deliveryTag, false);
-
-        log.debug("sent '{}'", createAccountResponse.getType());
     }
 
     // THREAD ROUTINE

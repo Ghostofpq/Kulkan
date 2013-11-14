@@ -9,7 +9,7 @@ public class MessageCreateNewGameCharacterResponse extends Message {
     private MessageErrorCode messageErrorCode;
 
     public MessageCreateNewGameCharacterResponse(Player player, MessageErrorCode messageErrorCode) {
-        type = MessageType.CHARACTER_ACTION_ATTACK;
+        type = MessageType.CREATE_NEW_GAME_CHARACTER_RESPONSE;
         this.player = player;
     }
 
