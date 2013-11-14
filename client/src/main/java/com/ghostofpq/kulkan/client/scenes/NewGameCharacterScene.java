@@ -8,12 +8,12 @@ import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.clan.Clan;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacterResponse;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
-import com.ghostofpq.kulkan.entities.race.RaceType;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
@@ -30,7 +30,7 @@ public class NewGameCharacterScene implements Scene {
     private String authenticationReplyQueueName;
     private Channel channelAuthenticating;
     private QueueingConsumer consumer;
-    private RaceType raceType;
+    private Clan clan;
     private Gender gender;
     private TextField name;
     private Button male;
@@ -210,7 +210,7 @@ public class NewGameCharacterScene implements Scene {
                     public void onClick() {
                         try {
                             Player player = Client.getInstance().getPlayer();
-                            MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), raceType, gender, name.getContent());
+                            MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clan, gender, name.getContent());
                             Message result = requestServer(messageCreateNewGameCharacter);
                             if (null != result) {
                                 if (result.getType().equals(MessageType.CREATE_NEW_GAME_CHARACTER_RESPONSE)) {
