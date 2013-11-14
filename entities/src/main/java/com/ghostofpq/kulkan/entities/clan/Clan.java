@@ -1,19 +1,25 @@
-package com.ghostofpq.kulkan.entities.race;
+package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 
 import java.io.Serializable;
 
-public abstract class Race implements Serializable {
+public abstract class Clan implements Serializable {
 
     private static final long serialVersionUID = -3933914420338387526L;
-    private RaceType race;
+    protected final int BASE_STRENGTH = 10;
+    protected final int BASE_ENDURANCE = 10;
+    protected final int BASE_INTELLIGENCE = 10;
+    protected final int BASE_WILL = 10;
+    protected final int BASE_AGILITY = 10;
+    protected final int BASE_MOVEMENT = 2;
+    private ClanType race;
     private PrimaryCharacteristics baseCaracteristics;
     private PrimaryCharacteristics levelUpCaracteristics;
     private String description;
     private String name;
 
-    public static Race Race(RaceType race) {
+    public static Clan Race(ClanType race) {
         switch (race) {
             case ELVE:
                 return new Elve();
@@ -30,11 +36,11 @@ public abstract class Race implements Serializable {
      * Getters and Setters
      */
 
-    public RaceType getRaceType() {
+    public ClanType getRaceType() {
         return race;
     }
 
-    public void setRace(RaceType race) {
+    public void setRace(ClanType race) {
         this.race = race;
     }
 

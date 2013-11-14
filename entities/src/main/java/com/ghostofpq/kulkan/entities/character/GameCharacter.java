@@ -5,10 +5,10 @@ import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
+import com.ghostofpq.kulkan.entities.clan.Clan;
+import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.Warrior;
-import com.ghostofpq.kulkan.entities.race.Race;
-import com.ghostofpq.kulkan.entities.race.RaceType;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -31,9 +31,9 @@ public class GameCharacter implements Serializable {
      */
     private String name;
     /**
-     * {@link com.ghostofpq.kulkan.entities.race.RaceType}
+     * {@link com.ghostofpq.kulkan.entities.clan.ClanType}
      */
-    private Race race;
+    private Clan clan;
     /**
      * {@link Gender}
      */
@@ -112,13 +112,13 @@ public class GameCharacter implements Serializable {
      * Creates a new Character level 1 Warrior.
      *
      * @param name   name of the character
-     * @param race   {@link com.ghostofpq.kulkan.entities.race.RaceType} of the character
+     * @param race   {@link com.ghostofpq.kulkan.entities.clan.ClanType} of the character
      * @param gender {@link Gender} of the character
      */
-    public GameCharacter(Player player, String name, RaceType race, Gender gender) {
+    public GameCharacter(Player player, String name, ClanType race, Gender gender) {
         // Identity
         this.name = name;
-        this.race = Race.Race(race);
+        this.clan = Clan.Race(race);
         this.gender = gender;
         this.player = player;
 
@@ -132,9 +132,9 @@ public class GameCharacter implements Serializable {
         currentJob = jobWarrior;
 
         // Caracteristics
-        characteristics = getRace().getBaseCaracteristics();
-        for (int i = 1; i < level; i++) {
-            characteristics.plus(getRace().getLevelUpCaracteristics());
+        characteristics = getClan().getBaseCaracteristics();
+        for (int i = 0; i < level; i++) {
+            characteristics.plus(getClan().getLevelUpCaracteristics());
         }
         secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
 
@@ -143,10 +143,10 @@ public class GameCharacter implements Serializable {
         initChar();
     }
 
-    public GameCharacter(Player player, String name, RaceType race, Gender gender, int level, int experience) {
+    public GameCharacter(Player player, String name, ClanType race, Gender gender, int level, int experience) {
         // Identity
         this.name = name;
-        this.race = Race.Race(race);
+        this.clan = Clan.Race(race);
         this.gender = gender;
         this.player = player;
 
@@ -160,9 +160,9 @@ public class GameCharacter implements Serializable {
         currentJob = jobWarrior;
 
         // Caracteristics
-        characteristics = getRace().getBaseCaracteristics();
+        characteristics = getClan().getBaseCaracteristics();
         for (int i = 1; i < level; i++) {
-            characteristics.plus(getRace().getLevelUpCaracteristics());
+            characteristics.plus(getClan().getLevelUpCaracteristics());
         }
         secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
 
@@ -197,7 +197,7 @@ public class GameCharacter implements Serializable {
     public void levelUp() {
         level++;
         calculateNextLevel();
-        characteristics.plus(getRace().getLevelUpCaracteristics());
+        characteristics.plus(getClan().getLevelUpCaracteristics());
 
         updateLifeAndManaPoint();
     }
@@ -286,8 +286,8 @@ public class GameCharacter implements Serializable {
         return name;
     }
 
-    public Race getRace() {
-        return race;
+    public Clan getClan() {
+        return clan;
     }
 
     public Gender getGender() {

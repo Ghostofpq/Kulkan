@@ -27,9 +27,9 @@ public class CharacterRender {
     // Name Position
     private int posXName;
     private int posYName;
-    // Race Position
-    private int posXRace;
-    private int posYRace;
+    // Clan Position
+    private int posXClan;
+    private int posYClan;
     // Level Position
     private int posXLevel;
     private int posYLevel;
@@ -127,8 +127,8 @@ public class CharacterRender {
 
         posXName = posX + ((frameLength / 2) - FontManager.getInstance().getFontMap().get(FONT).getWidth(character.getName())) / 2;
         posYName = posY + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight(character.getName())) / 2;
-        posXRace = posX + (frameLength / 2) + (((3 * frameLength) / 10) - FontManager.getInstance().getFontMap().get(FONT).getWidth(character.getRace().getName())) / 2;
-        posYRace = posY + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight(character.getRace().getName())) / 2;
+        posXClan = posX + (frameLength / 2) + (((3 * frameLength) / 10) - FontManager.getInstance().getFontMap().get(FONT).getWidth(character.getClan().getName())) / 2;
+        posYClan = posY + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight(character.getClan().getName())) / 2;
         posXLevel = posX + (frameLength / 2) + ((3 * frameLength) / 10) + (((2 * frameLength) / 10) - FontManager.getInstance().getFontMap().get(FONT).getWidth("LvL : " + character.getLevel())) / 2;
         posYLevel = posY + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight("LvL : " + character.getLevel())) / 2;
         //Bars Frame
@@ -236,7 +236,7 @@ public class CharacterRender {
 
         Toolbox.drawFrame(posX, posY, nameFrameLength, nameFrameHeight, frameWidth, color);
         FontManager.getInstance().drawString(FONT, posXName, posYName, character.getName(), Color.white);
-        FontManager.getInstance().drawString(FONT, posXRace, posYRace, character.getRace().getName(), Color.white);
+        FontManager.getInstance().drawString(FONT, posXClan, posYClan, character.getClan().getName(), Color.white);
         FontManager.getInstance().drawString(FONT, posXLevel, posYLevel, "LvL : " + character.getLevel(), Color.white);
 
         Toolbox.drawFrame(posXBarsFrame, posYBarsFrame, barsFrameLength, barsFrameHeight, frameWidth, color);

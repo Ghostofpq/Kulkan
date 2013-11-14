@@ -144,7 +144,7 @@ public class User {
             GameCharacter gameCharacter = new GameCharacter(
                     result,
                     gameCharacterDB.getName(),
-                    gameCharacterDB.getRaceType(),
+                    gameCharacterDB.getClanType(),
                     gameCharacterDB.getGender(),
                     gameCharacterDB.getLvl(),
                     gameCharacterDB.getCurrentXp()
@@ -155,7 +155,7 @@ public class User {
             GameCharacter gameCharacter = new GameCharacter(
                     result,
                     gameCharacterDB.getName(),
-                    gameCharacterDB.getRaceType(),
+                    gameCharacterDB.getClanType(),
                     gameCharacterDB.getGender(),
                     gameCharacterDB.getLvl(),
                     gameCharacterDB.getCurrentXp()
