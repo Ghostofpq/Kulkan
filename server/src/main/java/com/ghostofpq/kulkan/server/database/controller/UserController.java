@@ -64,13 +64,14 @@ public class UserController {
 
     public boolean addGameCharToUser(String username, String tokenKey, GameCharacterDB gameCharacterDB) {
         User user = getUserForUsername(username);
-        User verification = getUserForTokenKey(tokenKey);
         boolean result;
-        if (user.equals(verification)) {
-            user.addGameCharToStock(gameCharacterDB);
+        if (tokenKey.equals(user.getTokenKey())) {
+            log.debug("addGameCharToUser : {}", username);
+            user.addGameCharToTeam(gameCharacterDB);
             userRepository.save(user);
             result = true;
         } else {
+            log.error("verification failed");
             result = false;
         }
         return result;

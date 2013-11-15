@@ -72,34 +72,41 @@ public class UserService implements Runnable {
 
     private void manageCreateGameCharacterRequest(Message message) throws IOException {
         MessageCreateNewGameCharacter messageCreateNewGameCharacter = (MessageCreateNewGameCharacter) message;
+
+        String tokenKey = messageCreateNewGameCharacter.getKeyToken();
         String name = messageCreateNewGameCharacter.getName();
         Gender gender = messageCreateNewGameCharacter.getGender();
         ClanType clanType = messageCreateNewGameCharacter.getClanType();
 
         if (null != name && null != gender && null != clanType && !name.isEmpty()) {
+            log.debug("Received a CreateGameCharacterRequest from [{}]", tokenKey);
+            log.debug("Name : '{}'", name);
+            log.debug("Gender : '{}'", gender);
+            log.debug("ClanType : '{}'", clanType);
+            MessageErrorCode code;
 
-        }
+            GameCharacterDB gameCharacterDB = new GameCharacterDB(name, gender, clanType, 1, 0);
+            boolean result = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), tokenKey, gameCharacterDB);
+            if (result) {
+                code = MessageErrorCode.OK;
+            } else {
+                code = MessageErrorCode.KO;
+            }
 
-        MessageErrorCode code;
+            Player player = userController.getUserForTokenKey(messageCreateNewGameCharacter.getKeyToken()).toPlayer();
 
+            MessageCreateNewGameCharacterResponse messageCreateNewGameCharacterResponse = new MessageCreateNewGameCharacterResponse(player, code);
 
-        GameCharacterDB gameCharacterDB = new GameCharacterDB(name, gender, clanType, 1, 0);
-        boolean result = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), messageCreateNewGameCharacter.getKeyToken(), gameCharacterDB);
-        if (result) {
-            code = MessageErrorCode.OK;
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            log.debug(" [-] OPENING QUEUE : {}", queueName);
+            channelServiceOut.queueDeclare(queueName, false, false, false, null);
+            channelServiceOut.basicPublish("", queueName, null, messageCreateNewGameCharacterResponse.getBytes());
         } else {
-            code = MessageErrorCode.KO;
+            log.error("Received a bugged CreateGameCharacterRequest from [{}]", tokenKey);
+            log.error("Name : '{}'", name);
+            log.error("Gender : '{}'", gender);
+            log.error("ClanType : '{}'", clanType);
         }
-
-        Player player = userController.getUserForTokenKey(messageCreateNewGameCharacter.getKeyToken()).toPlayer();
-
-        MessageCreateNewGameCharacterResponse messageCreateNewGameCharacterResponse = new MessageCreateNewGameCharacterResponse(player, code);
-
-        String tokenKey = messageCreateNewGameCharacter.getKeyToken();
-        String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-        log.debug(" [-] OPENING QUEUE : {}", queueName);
-        channelServiceOut.queueDeclare(queueName, false, false, false, null);
-        channelServiceOut.basicPublish("", queueName, null, messageCreateNewGameCharacterResponse.getBytes());
     }
 
     // THREAD ROUTINE
@@ -132,5 +139,9 @@ public class UserService implements Runnable {
 
     public void setAuthKeySize(Integer authKeySize) {
         this.authKeySize = authKeySize;
+    }
+
+    public void setRequestClose(boolean requestClose) {
+        this.requestClose = requestClose;
     }
 }

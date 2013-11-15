@@ -42,6 +42,13 @@
         <property name="authKeySize" value="${authentication.key.size}"/>
     </bean>
 
+    <bean id="userService"
+          class="com.ghostofpq.kulkan.server.database.UserService">
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
+        <property name="authKeySize" value="${authentication.key.size}"/>
+    </bean>
+
 
     <bean id="lobbyManager"
           class="com.ghostofpq.kulkan.server.lobby.LobbyManager">

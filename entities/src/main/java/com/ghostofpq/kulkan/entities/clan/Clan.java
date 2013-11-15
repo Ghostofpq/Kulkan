@@ -19,7 +19,7 @@ public abstract class Clan implements Serializable {
     private String description;
     private String name;
 
-    public static Clan Race(ClanType race) {
+    public static Clan Clan(ClanType race) {
         switch (race) {
             case ELVE:
                 return new Elve();
@@ -27,6 +27,22 @@ public abstract class Clan implements Serializable {
                 return new Human();
             case DWARF:
                 return new Dwarf();
+            case GORILLA:
+                return new Gorilla();
+            case TURTLE:
+                return new Turtle();
+            case JAGUAR:
+                return new Jaguar();
+            case MONKEY:
+                return new Monkey();
+            case PANTHER:
+                return new Panther();
+            case LIZARD:
+                return new Lizard();
+            case ARA:
+                return new Ara();
+            case EAGLE:
+                return new Eagle();
             default:
                 return null;
         }

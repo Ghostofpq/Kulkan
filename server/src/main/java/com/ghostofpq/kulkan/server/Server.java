@@ -5,16 +5,13 @@ import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
+import com.ghostofpq.kulkan.server.database.UserService;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
 import com.ghostofpq.kulkan.server.utils.SaveManager;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -23,19 +20,13 @@ import java.io.IOException;
 @Slf4j
 public class Server {
     private static final java.lang.String CONTEXT_URI = "META-INF/spring/server-context.xml";
-    private static volatile Server instance = null;
-    private final String HOST = "localhost";
     private AuthenticationManager authenticationManager;
     private LobbyManager lobbyManager;
     private GameManager gameManager;
     private MatchmakingManager matchmakingManager;
-    private String authenticationQueueName = "authentication";
     private boolean requestClose;
-    private QueueingConsumer consumer;
-    private Connection connection;
-    private Channel channelAuthenticating;
-    private MongoClient mongoClient;
-    private DB db;
+    @Autowired
+    private UserService userService;
 
     private Server() {
         //createMAp();
@@ -53,6 +44,7 @@ public class Server {
         authenticationManager.initConnection();
         lobbyManager.initConnections();
         matchmakingManager.initConnections();
+        userService.initConnection();
     }
 
     public void run() throws IOException, InterruptedException {
@@ -60,20 +52,22 @@ public class Server {
         authThread.start();
         Thread gameManagerThread = new Thread(gameManager);
         gameManagerThread.start();
+        Thread userServiceThread = new Thread(userService);
+        userServiceThread.start();
+
+
         while (!requestClose) {
             lobbyManager.run();
             matchmakingManager.run();
         }
+
         authenticationManager.setRequestClose(true);
         gameManager.setRequestClose(true);
+        userService.setRequestClose(true);
     }
 
     public void shutDown() {
         requestClose = true;
-    }
-
-    public DB getDb() {
-        return db;
     }
 
     public void createMAp() {

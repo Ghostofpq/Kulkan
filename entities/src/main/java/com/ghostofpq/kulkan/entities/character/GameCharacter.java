@@ -118,7 +118,7 @@ public class GameCharacter implements Serializable {
     public GameCharacter(Player player, String name, ClanType race, Gender gender) {
         // Identity
         this.name = name;
-        this.clan = Clan.Race(race);
+        this.clan = Clan.Clan(race);
         this.gender = gender;
         this.player = player;
 
@@ -146,7 +146,7 @@ public class GameCharacter implements Serializable {
     public GameCharacter(Player player, String name, ClanType race, Gender gender, int level, int experience) {
         // Identity
         this.name = name;
-        this.clan = Clan.Race(race);
+        this.clan = Clan.Clan(race);
         this.gender = gender;
         this.player = player;
 

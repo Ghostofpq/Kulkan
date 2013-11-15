@@ -175,4 +175,7 @@ public class User {
                 .toString();
     }
 
+    public boolean equals(User obj) {
+        return this.getId().equals(obj.getId());
+    }
 }

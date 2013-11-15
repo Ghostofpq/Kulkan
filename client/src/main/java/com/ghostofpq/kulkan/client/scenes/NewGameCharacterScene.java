@@ -10,13 +10,10 @@ import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.MessageType;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacterResponse;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -26,10 +23,9 @@ import java.io.IOException;
 @Slf4j
 public class NewGameCharacterScene implements Scene {
     private static volatile NewGameCharacterScene instance = null;
-    private final String AUTHENTICATION_QUEUE_NAME = "authentication";
-    private String authenticationReplyQueueName;
-    private Channel channelAuthenticating;
-    private QueueingConsumer consumer;
+    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private String userReplyQueueName;
+    private Channel channelOut;
     private ClanType clanType;
     private Gender gender;
     private TextField name;
@@ -208,26 +204,11 @@ public class NewGameCharacterScene implements Scene {
                 Button(validatePosX, validatePosY, widthDesc, heightStep, "validate") {
                     @Override
                     public void onClick() {
+                        log.debug("TEST");
                         try {
                             Player player = Client.getInstance().getPlayer();
                             MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getContent());
-                            Message result = requestServer(messageCreateNewGameCharacter);
-                            if (null != result) {
-                                if (result.getType().equals(MessageType.CREATE_NEW_GAME_CHARACTER_RESPONSE)) {
-                                    MessageCreateNewGameCharacterResponse response = (MessageCreateNewGameCharacterResponse) result;
-                                    if (response.getMessageErrorCode().equals(MessageErrorCode.OK)) {
-                                        closeConnections();
-                                        Client.getInstance().setPlayer(response.getPlayer());
-                                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-                                    } else {
-                                        log.debug("CREATE OK");
-                                    }
-                                }
-                            } else {
-                                log.debug("SERVER DOWN");
-                            }
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageCreateNewGameCharacter.getBytes());
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (Exception e) {
@@ -247,6 +228,7 @@ public class NewGameCharacterScene implements Scene {
 
         maleHasFocus();
         gorillaHasFocus();
+        initConnection();
     }
 
     public void maleHasFocus() {
@@ -359,7 +341,7 @@ public class NewGameCharacterScene implements Scene {
 
     @Override
     public void update(long deltaTime) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
@@ -436,40 +418,20 @@ public class NewGameCharacterScene implements Scene {
         }
     }
 
-    public Message requestServer(Message message) throws Exception {
-        log.debug("create account");
-        Message response = null;
-        String corrId = java.util.UUID.randomUUID().toString();
-
-        AMQP.BasicProperties props = new AMQP.BasicProperties
-                .Builder()
-                .correlationId(corrId)
-                .replyTo(authenticationReplyQueueName)
-                .build();
-        channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, props, message.getBytes());
-        log.debug(" [x] Sent '{}'", message.getType());
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery(1000);
-        if (null != delivery) {
-            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
-                response = Message.loadFromBytes(delivery.getBody());
-                log.debug(" [x] Received '{}'", response.getType());
-            }
+    private void initConnection() {
+        try {
+            channelOut = Client.getInstance().getConnection().createChannel();
+            channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return response;
-    }
-
-    private void initConnection() throws IOException {
-        channelAuthenticating = Client.getInstance().getConnection().createChannel();
-        authenticationReplyQueueName = channelAuthenticating.queueDeclare().getQueue();
-        consumer = new QueueingConsumer(channelAuthenticating);
-        channelAuthenticating.basicConsume(authenticationReplyQueueName, true, consumer);
     }
 
     @Override
     public void closeConnections() {
         try {
-            channelAuthenticating.close();
-            log.debug("channelAuthenticating closed");
+            channelOut.close();
+            log.debug("channelOut closed");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -477,5 +439,21 @@ public class NewGameCharacterScene implements Scene {
 
     @Override
     public void receiveMessage() {
+        Message message = Client.getInstance().receiveMessage();
+        if (null != message) {
+            switch (message.getType()) {
+                case CREATE_NEW_GAME_CHARACTER_RESPONSE:
+                    log.debug("CREATE_NEW_GAME_CHARACTER_RESPONSE");
+                    MessageCreateNewGameCharacterResponse response = (MessageCreateNewGameCharacterResponse) message;
+                    if (response.getMessageErrorCode().equals(MessageErrorCode.OK)) {
+                        closeConnections();
+                        Client.getInstance().setPlayer(response.getPlayer());
+                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    } else {
+                        log.debug("CREATE OK");
+                    }
+                    break;
+            }
+        }
     }
 }

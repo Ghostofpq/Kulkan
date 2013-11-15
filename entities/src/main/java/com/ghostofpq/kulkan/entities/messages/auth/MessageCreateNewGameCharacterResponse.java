@@ -11,6 +11,7 @@ public class MessageCreateNewGameCharacterResponse extends Message {
     public MessageCreateNewGameCharacterResponse(Player player, MessageErrorCode messageErrorCode) {
         type = MessageType.CREATE_NEW_GAME_CHARACTER_RESPONSE;
         this.player = player;
+        this.messageErrorCode = messageErrorCode;
     }
 
     public Player getPlayer() {
@@ -21,3 +22,4 @@ public class MessageCreateNewGameCharacterResponse extends Message {
         return messageErrorCode;
     }
 }
+
