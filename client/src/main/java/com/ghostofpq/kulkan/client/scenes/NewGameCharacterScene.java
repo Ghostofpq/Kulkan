@@ -8,7 +8,7 @@ import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
-import com.ghostofpq.kulkan.entities.clan.Clan;
+import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
@@ -30,7 +30,7 @@ public class NewGameCharacterScene implements Scene {
     private String authenticationReplyQueueName;
     private Channel channelAuthenticating;
     private QueueingConsumer consumer;
-    private Clan clan;
+    private ClanType clanType;
     private Gender gender;
     private TextField name;
     private Button male;
@@ -210,7 +210,7 @@ public class NewGameCharacterScene implements Scene {
                     public void onClick() {
                         try {
                             Player player = Client.getInstance().getPlayer();
-                            MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clan, gender, name.getContent());
+                            MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getContent());
                             Message result = requestServer(messageCreateNewGameCharacter);
                             if (null != result) {
                                 if (result.getType().equals(MessageType.CREATE_NEW_GAME_CHARACTER_RESPONSE)) {
@@ -247,11 +247,6 @@ public class NewGameCharacterScene implements Scene {
 
         maleHasFocus();
         gorillaHasFocus();
-        try {
-            initConnection();
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
     }
 
     public void maleHasFocus() {
@@ -267,6 +262,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void gorillaHasFocus() {
+        clanType = ClanType.GORILLA;
         gorilla.setHasFocus(true);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -278,6 +274,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void jaguarHasFocus() {
+        clanType = ClanType.JAGUAR;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(true);
         turtle.setHasFocus(false);
@@ -289,6 +286,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void turtleHasFocus() {
+        clanType = ClanType.TURTLE;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(true);
@@ -300,6 +298,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void monkeyHasFocus() {
+        clanType = ClanType.MONKEY;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -311,6 +310,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void pantherHasFocus() {
+        clanType = ClanType.PANTHER;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -322,6 +322,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void lizardHasFocus() {
+        clanType = ClanType.LIZARD;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -333,6 +334,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void araHasFocus() {
+        clanType = ClanType.ARA;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -344,6 +346,7 @@ public class NewGameCharacterScene implements Scene {
     }
 
     public void eagleHasFocus() {
+        clanType = ClanType.EAGLE;
         gorilla.setHasFocus(false);
         jaguar.setHasFocus(false);
         turtle.setHasFocus(false);
@@ -474,6 +477,5 @@ public class NewGameCharacterScene implements Scene {
 
     @Override
     public void receiveMessage() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

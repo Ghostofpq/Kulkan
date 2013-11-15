@@ -1,7 +1,6 @@
 package com.ghostofpq.kulkan.server.authentication;
 
 import com.ghostofpq.kulkan.entities.character.Gender;
-import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.*;
@@ -101,9 +100,6 @@ public class AuthenticationManager implements Runnable {
                 case CREATE_ACCOUT:
                     manageCreateAccountMessage(message, props, replyProps);
                     break;
-                case CREATE_NEW_GAME_CHARACTER_REQUEST:
-                    manageCreateGameCharacterRequest(message, props, replyProps);
-                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
@@ -112,24 +108,6 @@ public class AuthenticationManager implements Runnable {
         }
     }
 
-    private void manageCreateGameCharacterRequest(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps) throws IOException {
-        MessageCreateNewGameCharacter messageCreateNewGameCharacter = (MessageCreateNewGameCharacter) message;
-
-        MessageErrorCode code;
-
-        GameCharacterDB gameCharacterDB = new GameCharacterDB(messageCreateNewGameCharacter.getName(), messageCreateNewGameCharacter.getGender(), messageCreateNewGameCharacter.getClanType(), 1, 0);
-        boolean result = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), messageCreateNewGameCharacter.getKeyToken(), gameCharacterDB);
-        if (result) {
-            code = MessageErrorCode.OK;
-        } else {
-            code = MessageErrorCode.KO;
-        }
-
-        Player player = userController.getUserForTokenKey(messageCreateNewGameCharacter.getKeyToken()).toPlayer();
-
-        MessageCreateNewGameCharacterResponse messageCreateNewGameCharacterResponse = new MessageCreateNewGameCharacterResponse(player, code);
-        channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, messageCreateNewGameCharacterResponse.getBytes());
-    }
 
     private void manageAuthenticationRequestMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps) throws IOException {
         MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
