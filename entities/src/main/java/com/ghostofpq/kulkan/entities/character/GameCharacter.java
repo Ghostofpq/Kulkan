@@ -161,7 +161,7 @@ public class GameCharacter implements Serializable {
 
         // Caracteristics
         characteristics = getClan().getBaseCaracteristics();
-        for (int i = 1; i < level; i++) {
+        for (int i = 0; i < level; i++) {
             characteristics.plus(getClan().getLevelUpCaracteristics());
         }
         secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
