@@ -25,20 +25,16 @@ import java.io.IOException;
 public class Client {
     private static volatile Client instance = null;
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game";
     //SPRING
     private String hostIp;
     private int hostPort;
     private int height;
     private int width;
     private String clientQueueName;
-    private Channel channelGameOut;
     private Channel channelIn;
     private Scene currentScene;
     private Player player;
     private String tokenKey;
-    private int lobbyNumber = 0;
-    private int gameNumber;
     private long lastTimeTick;
     private boolean requestClose;
     private QueueingConsumer consumer;

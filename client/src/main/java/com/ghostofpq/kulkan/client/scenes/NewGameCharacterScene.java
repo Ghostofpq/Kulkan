@@ -1,6 +1,5 @@
 package com.ghostofpq.kulkan.client.scenes;
 
-
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.TextField;
@@ -12,7 +11,6 @@ import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacterResponse;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
@@ -24,7 +22,6 @@ import java.io.IOException;
 public class NewGameCharacterScene implements Scene {
     private static volatile NewGameCharacterScene instance = null;
     private final String USER_SERVICE_QUEUE_NAME = "users";
-    private String userReplyQueueName;
     private Channel channelOut;
     private ClanType clanType;
     private Gender gender;
@@ -204,8 +201,12 @@ public class NewGameCharacterScene implements Scene {
                 Button(validatePosX, validatePosY, widthDesc, heightStep, "validate") {
                     @Override
                     public void onClick() {
-                        log.debug("TEST");
+                        log.debug("Sending a CreateGameCharacterRequest");
+                        log.debug("Name : '{}'", name);
+                        log.debug("Gender : '{}'", gender);
+                        log.debug("ClanType : '{}'", clanType);
                         try {
+                            log.debug("Sending ");
                             Player player = Client.getInstance().getPlayer();
                             MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getContent());
                             channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageCreateNewGameCharacter.getBytes());
@@ -445,13 +446,10 @@ public class NewGameCharacterScene implements Scene {
                 case CREATE_NEW_GAME_CHARACTER_RESPONSE:
                     log.debug("CREATE_NEW_GAME_CHARACTER_RESPONSE");
                     MessageCreateNewGameCharacterResponse response = (MessageCreateNewGameCharacterResponse) message;
-                    if (response.getMessageErrorCode().equals(MessageErrorCode.OK)) {
-                        closeConnections();
-                        Client.getInstance().setPlayer(response.getPlayer());
-                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-                    } else {
-                        log.debug("CREATE OK");
-                    }
+                    log.debug("CREATE OK");
+                    Client.getInstance().setPlayer(response.getPlayer());
+                    Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    closeConnections();
                     break;
             }
         }

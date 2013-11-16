@@ -33,6 +33,8 @@ public class TeamManagementScene implements Scene {
 
     @Override
     public void init() {
+        teamManagementCharacterRenderList = new ArrayList<TeamManagementCharacterRender>();
+        buttonsNewGameCharacter = new ArrayList<Button>();
         int width = 5 * Client.getInstance().getWidth() / 6;
         int height = 3 * Client.getInstance().getHeight() / 4;
         int[] posXs = {0, width / 2, 0, width / 2};

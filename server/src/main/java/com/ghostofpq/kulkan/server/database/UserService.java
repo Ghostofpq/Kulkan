@@ -6,9 +6,9 @@ import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacterResponse;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageErrorCode;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
+import com.ghostofpq.kulkan.server.database.model.User;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -83,19 +83,12 @@ public class UserService implements Runnable {
             log.debug("Name : '{}'", name);
             log.debug("Gender : '{}'", gender);
             log.debug("ClanType : '{}'", clanType);
-            MessageErrorCode code;
 
             GameCharacterDB gameCharacterDB = new GameCharacterDB(name, gender, clanType, 1, 0);
-            boolean result = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), tokenKey, gameCharacterDB);
-            if (result) {
-                code = MessageErrorCode.OK;
-            } else {
-                code = MessageErrorCode.KO;
-            }
+            User user = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), tokenKey, gameCharacterDB);
+            Player player = user.toPlayer();
 
-            Player player = userController.getUserForTokenKey(messageCreateNewGameCharacter.getKeyToken()).toPlayer();
-
-            MessageCreateNewGameCharacterResponse messageCreateNewGameCharacterResponse = new MessageCreateNewGameCharacterResponse(player, code);
+            MessageCreateNewGameCharacterResponse messageCreateNewGameCharacterResponse = new MessageCreateNewGameCharacterResponse(player);
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
             log.debug(" [-] OPENING QUEUE : {}", queueName);

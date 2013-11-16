@@ -62,19 +62,16 @@ public class UserController {
         return user;
     }
 
-    public boolean addGameCharToUser(String username, String tokenKey, GameCharacterDB gameCharacterDB) {
+    public User addGameCharToUser(String username, String tokenKey, GameCharacterDB gameCharacterDB) {
         User user = getUserForUsername(username);
-        boolean result;
         if (tokenKey.equals(user.getTokenKey())) {
             log.debug("addGameCharToUser : {}", username);
             user.addGameCharToTeam(gameCharacterDB);
-            userRepository.save(user);
-            result = true;
+            user = userRepository.save(user);
         } else {
             log.error("verification failed");
-            result = false;
         }
-        return result;
+        return user;
     }
 
     public void setTokenKeySize(Integer tokenKeySize) {
