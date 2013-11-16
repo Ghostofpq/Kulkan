@@ -5,7 +5,7 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacterResponse;
+import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.User;
@@ -88,12 +88,12 @@ public class UserService implements Runnable {
             User user = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), tokenKey, gameCharacterDB);
             Player player = user.toPlayer();
 
-            MessageCreateNewGameCharacterResponse messageCreateNewGameCharacterResponse = new MessageCreateNewGameCharacterResponse(player);
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
             log.debug(" [-] OPENING QUEUE : {}", queueName);
             channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, messageCreateNewGameCharacterResponse.getBytes());
+            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
         } else {
             log.error("Received a bugged CreateGameCharacterRequest from [{}]", tokenKey);
             log.error("Name : '{}'", name);

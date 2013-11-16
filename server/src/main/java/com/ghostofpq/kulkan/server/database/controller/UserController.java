@@ -74,6 +74,58 @@ public class UserController {
         return user;
     }
 
+    public User putGameCharFromTeamToStock(String username, String tokenKey, String gameCharacterName) {
+        User user = getUserForUsername(username);
+        if (user.getStock().size() == 10) {
+            log.error("TEAM IS COMPLETE");
+        } else {
+            if (tokenKey.equals(user.getTokenKey())) {
+                log.debug("addGameCharToUser : {}", username);
+                GameCharacterDB gameCharacterDB = null;
+                for (GameCharacterDB teamMember : user.getTeam()) {
+                    if (teamMember.getName().equals(gameCharacterName)) {
+                        gameCharacterDB = teamMember;
+                        break;
+                    }
+                }
+                if (null != gameCharacterDB) {
+                    user.getTeam().remove(gameCharacterDB);
+                    user.getStock().add(gameCharacterDB);
+                }
+                user = userRepository.save(user);
+            } else {
+                log.error("verification failed");
+            }
+        }
+        return user;
+    }
+
+    public User putGameCharFromStockToTeam(String username, String tokenKey, String gameCharacterName) {
+        User user = getUserForUsername(username);
+        if (user.getTeam().size() == 4) {
+            log.error("TEAM IS COMPLETE");
+        } else {
+            if (tokenKey.equals(user.getTokenKey())) {
+                log.debug("addGameCharToUser : {}", username);
+                GameCharacterDB gameCharacterDB = null;
+                for (GameCharacterDB teamMember : user.getStock()) {
+                    if (teamMember.getName().equals(gameCharacterName)) {
+                        gameCharacterDB = teamMember;
+                        break;
+                    }
+                }
+                if (null != gameCharacterDB) {
+                    user.getStock().remove(gameCharacterDB);
+                    user.getTeam().add(gameCharacterDB);
+                }
+                user = userRepository.save(user);
+            } else {
+                log.error("verification failed");
+            }
+        }
+        return user;
+    }
+
     public void setTokenKeySize(Integer tokenKeySize) {
         this.tokenKeySize = tokenKeySize;
     }

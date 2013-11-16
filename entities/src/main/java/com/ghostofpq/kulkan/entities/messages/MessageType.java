@@ -47,6 +47,6 @@ public enum MessageType implements Serializable {
     MATCHMAKING_REFUSE,
 
     CREATE_NEW_GAME_CHARACTER_REQUEST,
-    CREATE_NEW_GAME_CHARACTER_RESPONSE;
+    PLAYER_UPDATE;
 
 }

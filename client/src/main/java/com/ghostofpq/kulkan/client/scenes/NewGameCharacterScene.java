@@ -10,7 +10,7 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacterResponse;
+import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
@@ -443,9 +443,9 @@ public class NewGameCharacterScene implements Scene {
         Message message = Client.getInstance().receiveMessage();
         if (null != message) {
             switch (message.getType()) {
-                case CREATE_NEW_GAME_CHARACTER_RESPONSE:
-                    log.debug("CREATE_NEW_GAME_CHARACTER_RESPONSE");
-                    MessageCreateNewGameCharacterResponse response = (MessageCreateNewGameCharacterResponse) message;
+                case PLAYER_UPDATE:
+                    log.debug("PLAYER_UPDATE");
+                    MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     log.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
                     Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());

@@ -4,11 +4,11 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 
-public class MessageCreateNewGameCharacterResponse extends Message {
+public class MessagePlayerUpdate extends Message {
     private Player player;
 
-    public MessageCreateNewGameCharacterResponse(Player player) {
-        type = MessageType.CREATE_NEW_GAME_CHARACTER_RESPONSE;
+    public MessagePlayerUpdate(Player player) {
+        type = MessageType.PLAYER_UPDATE;
         this.player = player;
     }
 
