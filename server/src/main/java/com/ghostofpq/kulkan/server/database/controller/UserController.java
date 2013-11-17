@@ -66,8 +66,18 @@ public class UserController {
         User user = getUserForUsername(username);
         if (tokenKey.equals(user.getTokenKey())) {
             log.debug("addGameCharToUser : {}", username);
-            user.addGameCharToTeam(gameCharacterDB);
-            user = userRepository.save(user);
+            if (user.getTeam().size() >= 4) {
+                log.warn("TEAM IS COMPLETE");
+                if (user.getStock().size() >= 12) {
+                    log.error("STOCK IS COMPLETE");
+                } else {
+                    user.addGameCharToStock(gameCharacterDB);
+                    user = userRepository.save(user);
+                }
+            } else {
+                user.addGameCharToTeam(gameCharacterDB);
+                user = userRepository.save(user);
+            }
         } else {
             log.error("verification failed");
         }
@@ -118,7 +128,7 @@ public class UserController {
 
     public User putGameCharFromTeamToStock(String username, String tokenKey, String gameCharacterName) {
         User user = getUserForUsername(username);
-        if (user.getStock().size() == 10) {
+        if (user.getStock().size() >= 12) {
             log.error("STOCK IS COMPLETE");
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
@@ -144,7 +154,7 @@ public class UserController {
 
     public User putGameCharFromStockToTeam(String username, String tokenKey, String gameCharacterName) {
         User user = getUserForUsername(username);
-        if (user.getTeam().size() == 4) {
+        if (user.getTeam().size() >= 4) {
             log.error("TEAM IS COMPLETE");
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
