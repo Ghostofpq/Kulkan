@@ -4,11 +4,13 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.TeamManagementCharacterRender;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class TeamManagementScene implements Scene {
     private static volatile TeamManagementScene instance = null;
     private List<TeamManagementCharacterRender> teamManagementCharacterRenderList;
@@ -223,8 +225,9 @@ public class TeamManagementScene implements Scene {
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : teamManagementCharacterRenderList) {
                         if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            log.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
                         }
                     }
                 }
@@ -236,8 +239,9 @@ public class TeamManagementScene implements Scene {
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage1) {
                         if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            log.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
                         }
                     }
                 }
@@ -249,8 +253,9 @@ public class TeamManagementScene implements Scene {
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage2) {
                         if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            log.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
                         }
                     }
                 }
@@ -262,8 +267,9 @@ public class TeamManagementScene implements Scene {
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage3) {
                         if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            log.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
                         }
                     }
                 }

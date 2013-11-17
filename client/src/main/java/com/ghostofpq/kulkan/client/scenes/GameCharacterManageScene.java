@@ -1,11 +1,24 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 
+import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.graphics.Button;
+import com.ghostofpq.kulkan.client.graphics.PrimaryCharacteristicsRender;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 
 public class GameCharacterManageScene implements Scene {
     private static volatile GameCharacterManageScene instance = null;
     private GameCharacter gameCharacter;
+    private Button manageJobButton;
+    private Button manageEquipementButton;
+    private Button quitButton;
+    private Button deleteGameCharButton;
+    private int widthSeparator = 50;
+    private int widthStep;
+    private int widthStepClan;
+    private int heightSeparator = 50;
+    private int heightStep;
+    private PrimaryCharacteristicsRender primaryCharacteristicsRender;
 
     private GameCharacterManageScene() {
     }
@@ -23,7 +36,13 @@ public class GameCharacterManageScene implements Scene {
 
     @Override
     public void init() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        widthSeparator = Client.getInstance().getWidth() / 20;
+        heightSeparator = Client.getInstance().getHeight() / 20;
+
+        widthStep = (Client.getInstance().getWidth() - 3 * widthSeparator) / 4;
+        heightStep = (Client.getInstance().getHeight() - 4 * heightSeparator) / 8;
+
+        primaryCharacteristicsRender = new PrimaryCharacteristicsRender(widthSeparator, heightSeparator, widthStep * 2, heightStep * 3, gameCharacter.getAggregatedCharacteristics());
     }
 
     @Override
@@ -33,7 +52,7 @@ public class GameCharacterManageScene implements Scene {
 
     @Override
     public void render() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        primaryCharacteristicsRender.draw();
     }
 
     @Override
