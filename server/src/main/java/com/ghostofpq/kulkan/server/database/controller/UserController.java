@@ -74,10 +74,52 @@ public class UserController {
         return user;
     }
 
+    public User removeGameCharFromTeam(String username, String tokenKey, String gameCharacterName) {
+        User user = getUserForUsername(username);
+        if (tokenKey.equals(user.getTokenKey())) {
+            log.debug("addGameCharToUser : {}", username);
+            GameCharacterDB gameCharacterDB = null;
+            for (GameCharacterDB teamMember : user.getTeam()) {
+                if (teamMember.getName().equals(gameCharacterName)) {
+                    gameCharacterDB = teamMember;
+                    break;
+                }
+            }
+            if (null != gameCharacterDB) {
+                user.getTeam().remove(gameCharacterDB);
+            }
+            user = userRepository.save(user);
+        } else {
+            log.error("verification failed");
+        }
+        return user;
+    }
+
+    public User removeGameCharFromStock(String username, String tokenKey, String gameCharacterName) {
+        User user = getUserForUsername(username);
+        if (tokenKey.equals(user.getTokenKey())) {
+            log.debug("addGameCharToUser : {}", username);
+            GameCharacterDB gameCharacterDB = null;
+            for (GameCharacterDB teamMember : user.getStock()) {
+                if (teamMember.getName().equals(gameCharacterName)) {
+                    gameCharacterDB = teamMember;
+                    break;
+                }
+            }
+            if (null != gameCharacterDB) {
+                user.getStock().remove(gameCharacterDB);
+            }
+            user = userRepository.save(user);
+        } else {
+            log.error("verification failed");
+        }
+        return user;
+    }
+
     public User putGameCharFromTeamToStock(String username, String tokenKey, String gameCharacterName) {
         User user = getUserForUsername(username);
         if (user.getStock().size() == 10) {
-            log.error("TEAM IS COMPLETE");
+            log.error("STOCK IS COMPLETE");
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
                 log.debug("addGameCharToUser : {}", username);

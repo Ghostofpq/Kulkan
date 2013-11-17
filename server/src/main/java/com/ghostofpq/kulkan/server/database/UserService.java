@@ -4,8 +4,7 @@ import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateNewGameCharacter;
-import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
+import com.ghostofpq.kulkan.entities.messages.auth.*;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.User;
@@ -63,9 +62,118 @@ public class UserService implements Runnable {
                 case CREATE_NEW_GAME_CHARACTER_REQUEST:
                     manageCreateGameCharacterRequest(message);
                     break;
+                case PUT_GAME_CHARACTER_FROM_STOCK_TO_TEAM_REQUEST:
+                    managePutGameCharacterFromStockToTeam(message);
+                    break;
+                case PUT_GAME_CHARACTER_FROM_TEAM_TO_STOCK_REQUEST:
+                    managePutGameCharacterFromTeamToStockRequest(message);
+                    break;
+                case DELETE_GAME_CHARACTER_FROM_STOCK_REQUEST:
+                    manageDeleteGameCharacterFromStockRequest(message);
+                    break;
+                case DELETE_GAME_CHARACTER_FROM_TEAM_REQUEST:
+                    manageDeleteGameCharacterFromTeamRequest(message);
+                    break;
+
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
+            }
+        }
+    }
+
+    private void manageDeleteGameCharacterFromTeamRequest(Message message) throws IOException {
+        MessageDeleteGameChararacterFromTeam messageDeleteGameChararacterFromTeam = (MessageDeleteGameChararacterFromTeam) message;
+
+        String username = messageDeleteGameChararacterFromTeam.getUsername();
+        String tokenKey = messageDeleteGameChararacterFromTeam.getKeyToken();
+        String gameCharName = messageDeleteGameChararacterFromTeam.getGameCharName();
+
+        log.debug("Received a DeleteGameChararacterFromTeamRequest");
+        log.debug("Username : '{}'", username);
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharName : '{}'", gameCharName);
+
+        if (null != tokenKey && null != username && null != gameCharName) {
+            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
+                User user = userController.removeGameCharFromTeam(username, tokenKey, gameCharName);
+                Player player = user.toPlayer();
+                MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+                String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+                channelServiceOut.queueDeclare(queueName, false, false, false, null);
+                channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            }
+        }
+    }
+
+    private void manageDeleteGameCharacterFromStockRequest(Message message) throws IOException {
+        MessageDeleteGameChararacterFromStock messageDeleteGameChararacterFromStock = (MessageDeleteGameChararacterFromStock) message;
+
+        String username = messageDeleteGameChararacterFromStock.getUsername();
+        String tokenKey = messageDeleteGameChararacterFromStock.getKeyToken();
+        String gameCharName = messageDeleteGameChararacterFromStock.getGameCharName();
+
+        log.debug("Received a DeleteGameChararacterFromStockRequest");
+        log.debug("Username : '{}'", username);
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharName : '{}'", gameCharName);
+
+        if (null != tokenKey && null != username && null != gameCharName) {
+            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
+                User user = userController.removeGameCharFromStock(username, tokenKey, gameCharName);
+                Player player = user.toPlayer();
+                MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+                String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+                channelServiceOut.queueDeclare(queueName, false, false, false, null);
+                channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            }
+        }
+    }
+
+    private void managePutGameCharacterFromTeamToStockRequest(Message message) throws IOException {
+        MessagePutGameCharacterFromTeamToStock messagePutGameCharacterFromTeamToStock = (MessagePutGameCharacterFromTeamToStock) message;
+
+        String username = messagePutGameCharacterFromTeamToStock.getUsername();
+        String tokenKey = messagePutGameCharacterFromTeamToStock.getKeyToken();
+        String gameCharName = messagePutGameCharacterFromTeamToStock.getGameCharName();
+
+        log.debug("Received a PutGameCharacterFromTeamToStockRequest");
+        log.debug("Username : '{}'", username);
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharName : '{}'", gameCharName);
+
+        if (null != tokenKey && null != username && null != gameCharName) {
+            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
+                User user = userController.putGameCharFromTeamToStock(username, tokenKey, gameCharName);
+                Player player = user.toPlayer();
+                MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+                String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+                channelServiceOut.queueDeclare(queueName, false, false, false, null);
+                channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            }
+        }
+    }
+
+    private void managePutGameCharacterFromStockToTeam(Message message) throws IOException {
+        MessagePutGameCharacterFromStockToTeam messagePutGameCharacterFromStockToTeam = (MessagePutGameCharacterFromStockToTeam) message;
+
+        String username = messagePutGameCharacterFromStockToTeam.getUsername();
+        String tokenKey = messagePutGameCharacterFromStockToTeam.getKeyToken();
+        String gameCharName = messagePutGameCharacterFromStockToTeam.getGameCharName();
+
+        log.debug("Received a PutGameCharacterFromStockToTeamRequest");
+        log.debug("Username : '{}'", username);
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharName : '{}'", gameCharName);
+
+        if (null != tokenKey && null != username && null != gameCharName) {
+            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
+                User user = userController.putGameCharFromStockToTeam(username, tokenKey, gameCharName);
+                Player player = user.toPlayer();
+                MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+                String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+                channelServiceOut.queueDeclare(queueName, false, false, false, null);
+                channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
             }
         }
     }
