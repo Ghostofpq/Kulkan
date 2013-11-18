@@ -56,6 +56,15 @@ public class TeamManagementScene implements Scene {
     public void init() {
         teamManagementCharacterRenderList = new ArrayList<TeamManagementCharacterRender>();
         buttonsNewGameCharacter = new ArrayList<Button>();
+
+        stockManagementCharacterRenderListPage1 = new ArrayList<TeamManagementCharacterRender>();
+        stockManagementCharacterRenderListPage2 = new ArrayList<TeamManagementCharacterRender>();
+        stockManagementCharacterRenderListPage3 = new ArrayList<TeamManagementCharacterRender>();
+
+        buttonsNewGameCharacterPage1 = new ArrayList<Button>();
+        buttonsNewGameCharacterPage2 = new ArrayList<Button>();
+        buttonsNewGameCharacterPage3 = new ArrayList<Button>();
+
         int width = 5 * Client.getInstance().getWidth() / 6;
         int height = 3 * Client.getInstance().getHeight() / 4;
         int[] posXs = {0, width / 2, 0, width / 2};

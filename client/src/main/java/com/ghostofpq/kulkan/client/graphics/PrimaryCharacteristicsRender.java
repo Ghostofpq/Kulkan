@@ -77,8 +77,8 @@ public class PrimaryCharacteristicsRender extends HUDElement {
         posXCharacsMoveLabel = posX + widthStep * 3;
         posYCharacsMoveLabel = posY + heightStep * 2 + fontStep;
 
-        posXCharacsStrength = posX + widthStep * 2 + fontStep;
-        posYCharacsStrength = posY;
+        posXCharacsStrength = posX + widthStep * 2;
+        posYCharacsStrength = posY + fontStep;
 
         posXCharacsEndurance = posX + widthStep * 2;
         posYCharacsEndurance = posY + heightStep + fontStep;

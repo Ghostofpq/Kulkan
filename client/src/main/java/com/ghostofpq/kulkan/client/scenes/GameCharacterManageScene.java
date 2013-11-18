@@ -4,6 +4,7 @@ package com.ghostofpq.kulkan.client.scenes;
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.PrimaryCharacteristicsRender;
+import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 
 public class GameCharacterManageScene implements Scene {
@@ -19,6 +20,7 @@ public class GameCharacterManageScene implements Scene {
     private int heightSeparator = 50;
     private int heightStep;
     private PrimaryCharacteristicsRender primaryCharacteristicsRender;
+    private SecondaryCharacteristicsRender secondaryCharacteristicsRender;
 
     private GameCharacterManageScene() {
     }
@@ -43,6 +45,7 @@ public class GameCharacterManageScene implements Scene {
         heightStep = (Client.getInstance().getHeight() - 4 * heightSeparator) / 8;
 
         primaryCharacteristicsRender = new PrimaryCharacteristicsRender(widthSeparator, heightSeparator, widthStep * 2, heightStep * 3, gameCharacter.getAggregatedCharacteristics());
+        secondaryCharacteristicsRender = new SecondaryCharacteristicsRender(2 * widthSeparator + widthStep * 2, heightSeparator, widthStep * 2, heightStep * 5, gameCharacter.getAggregatedSecondaryCharacteristics());
     }
 
     @Override
@@ -53,6 +56,7 @@ public class GameCharacterManageScene implements Scene {
     @Override
     public void render() {
         primaryCharacteristicsRender.draw();
+        secondaryCharacteristicsRender.draw();
     }
 
     @Override

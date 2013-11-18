@@ -8,11 +8,6 @@ public class TeamManagementCharacterRender extends HUDElement {
     private final String FONT = "optimus_princeps_16";
     private GameCharacter character;
     private int frameWidth;
-    private int frameLength;
-    private int frameHeight;
-    // Origin
-    private int posX;
-    private int posY;
     // Name
     private int namePosX;
     private int namePosY;
@@ -26,13 +21,13 @@ public class TeamManagementCharacterRender extends HUDElement {
     private int xpPosX;
     private int xpPosY;
 
-    public TeamManagementCharacterRender(float posX, float posY, int frameLength, int frameHeight, int frameWidth, GameCharacter character) {
+    public TeamManagementCharacterRender(float posX, float posY, int width, int height, int frameWidth, GameCharacter character) {
         this.posX = (int) posX;
         this.posY = (int) posY;
         this.character = character;
 
-        this.frameLength = frameLength;
-        this.frameHeight = frameHeight;
+        this.width = width;
+        this.height = height;
         this.frameWidth = frameWidth;
 
         calculatePositions();
@@ -52,7 +47,7 @@ public class TeamManagementCharacterRender extends HUDElement {
 
     @Override
     public void draw() {
-        Toolbox.drawFrame(posX, posY, frameLength, frameHeight, frameWidth, Color.white);
+        Toolbox.drawFrame(posX, posY, width, height, frameWidth, Color.white);
         FontManager.getInstance().drawString(FONT, namePosX, namePosY, character.getName(), Color.white);
         FontManager.getInstance().drawString(FONT, lvlPosX, lvlPosY, "LvL : " + character.getLevel(), Color.white);
         FontManager.getInstance().drawString(FONT, racePosX, racePosY, character.getClan().getName(), Color.white);
