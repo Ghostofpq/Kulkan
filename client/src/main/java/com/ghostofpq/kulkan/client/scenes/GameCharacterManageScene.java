@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
+import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.PrimaryCharacteristicsRender;
 import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
@@ -21,6 +22,9 @@ public class GameCharacterManageScene implements Scene {
     private int heightStep;
     private PrimaryCharacteristicsRender primaryCharacteristicsRender;
     private SecondaryCharacteristicsRender secondaryCharacteristicsRender;
+    private KeyValueRender hpRender;
+    private KeyValueRender mpRender;
+    private KeyValueRender xpRender;
 
     private GameCharacterManageScene() {
     }
@@ -46,6 +50,10 @@ public class GameCharacterManageScene implements Scene {
 
         primaryCharacteristicsRender = new PrimaryCharacteristicsRender(widthSeparator, heightSeparator, widthStep * 2, heightStep * 3, gameCharacter.getAggregatedCharacteristics());
         secondaryCharacteristicsRender = new SecondaryCharacteristicsRender(2 * widthSeparator + widthStep * 2, heightSeparator, widthStep * 2, heightStep * 5, gameCharacter.getAggregatedSecondaryCharacteristics());
+
+        hpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 3, widthStep, heightStep, "HP", String.valueOf(gameCharacter.getMaxHealthPoint()), 5);
+        mpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 4, widthStep, heightStep, "MP", String.valueOf(gameCharacter.getMaxManaPoint()), 5);
+        xpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "XP", String.valueOf(gameCharacter.getExperience()), 5);
     }
 
     @Override
@@ -57,6 +65,9 @@ public class GameCharacterManageScene implements Scene {
     public void render() {
         primaryCharacteristicsRender.draw();
         secondaryCharacteristicsRender.draw();
+        hpRender.draw();
+        mpRender.draw();
+        xpRender.draw();
     }
 
     @Override
