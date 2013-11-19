@@ -7,9 +7,22 @@ import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.PrimaryCharacteristicsRender;
 import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
+import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.auth.MessageDeleteGameCharacterFromStock;
+import com.ghostofpq.kulkan.entities.messages.auth.MessageDeleteGameCharacterFromTeam;
+import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
+import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
+import org.lwjgl.input.Mouse;
 
+import java.io.IOException;
+
+@Slf4j
 public class GameCharacterManageScene implements Scene {
     private static volatile GameCharacterManageScene instance = null;
+    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private Channel channelOut;
     private GameCharacter gameCharacter;
     private Button manageJobButton;
     private Button manageEquipementButton;
@@ -17,7 +30,6 @@ public class GameCharacterManageScene implements Scene {
     private Button deleteGameCharButton;
     private int widthSeparator = 50;
     private int widthStep;
-    private int widthStepClan;
     private int heightSeparator = 50;
     private int heightStep;
     private PrimaryCharacteristicsRender primaryCharacteristicsRender;
@@ -52,13 +64,68 @@ public class GameCharacterManageScene implements Scene {
         secondaryCharacteristicsRender = new SecondaryCharacteristicsRender(2 * widthSeparator + widthStep * 2, heightSeparator, widthStep * 2, heightStep * 5, gameCharacter.getAggregatedSecondaryCharacteristics());
 
         hpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 3, widthStep, heightStep, "HP", String.valueOf(gameCharacter.getMaxHealthPoint()), 5);
-        mpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 4, widthStep, heightStep, "MP", String.valueOf(gameCharacter.getMaxManaPoint()), 5);
-        xpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "XP", String.valueOf(gameCharacter.getExperience()), 5);
+        mpRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 3, widthStep, heightStep, "MP", String.valueOf(gameCharacter.getMaxManaPoint()), 5);
+        xpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 4, widthStep, heightStep, "XP", String.valueOf(gameCharacter.getExperience()), 5);
+        xpRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 4, widthStep, heightStep, "LVL", String.valueOf(gameCharacter.getLevel()), 5);
+
+        manageJobButton = new Button(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "Manage Job") {
+            @Override
+            public void onClick() {
+                log.debug("manageJobButton");
+            }
+        };
+
+        manageEquipementButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 5, widthStep, heightStep, "Manage Stuff") {
+            @Override
+            public void onClick() {
+                log.debug("manageEquipementButton");
+            }
+        };
+
+        deleteGameCharButton = new Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Delete Char") {
+            @Override
+            public void onClick() {
+                log.debug("Sending a DeleteGameCharacterRequest");
+                log.debug("Name : '{}'", gameCharacter.getName());
+                try {
+                    log.debug("Sending ");
+                    Player player = Client.getInstance().getPlayer();
+                    if (player.getTeam().contains(gameCharacter)) {
+                        MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                        channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromTeam.getBytes());
+                    } else {
+                        MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                        channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromStock.getBytes());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        quitButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Back") {
+            @Override
+            public void onClick() {
+                Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+            }
+        };
+
+        initConnection();
+    }
+
+    private void initConnection() {
+        try {
+            channelOut = Client.getInstance().getConnection().createChannel();
+            channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void update(long deltaTime) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -68,25 +135,51 @@ public class GameCharacterManageScene implements Scene {
         hpRender.draw();
         mpRender.draw();
         xpRender.draw();
+        manageJobButton.draw();
+        manageEquipementButton.draw();
+        deleteGameCharButton.draw();
+        quitButton.draw();
     }
 
     @Override
     public void manageInput() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        while (Mouse.next()) {
+            if (Mouse.isButtonDown(0)) {
+                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    quitButton.onClick();
+                }
+                if (deleteGameCharButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    deleteGameCharButton.onClick();
+                }
+                if (manageEquipementButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    manageEquipementButton.onClick();
+                }
+                if (manageJobButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    manageJobButton.onClick();
+                }
+            }
+        }
     }
 
     @Override
     public void closeConnections() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void receiveMessage() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public GameCharacter getGameCharacter() {
-        return gameCharacter;
+        Message message = Client.getInstance().receiveMessage();
+        if (null != message) {
+            switch (message.getType()) {
+                case PLAYER_UPDATE:
+                    log.debug("PLAYER_UPDATE");
+                    MessagePlayerUpdate response = (MessagePlayerUpdate) message;
+                    log.debug("CREATE OK");
+                    Client.getInstance().setPlayer(response.getPlayer());
+                    Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    closeConnections();
+                    break;
+            }
+        }
     }
 
     public void setGameCharacter(GameCharacter gameCharacter) {

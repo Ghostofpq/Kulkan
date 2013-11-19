@@ -83,11 +83,11 @@ public class UserService implements Runnable {
     }
 
     private void manageDeleteGameCharacterFromTeamRequest(Message message) throws IOException {
-        MessageDeleteGameChararacterFromTeam messageDeleteGameChararacterFromTeam = (MessageDeleteGameChararacterFromTeam) message;
+        MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = (MessageDeleteGameCharacterFromTeam) message;
 
-        String username = messageDeleteGameChararacterFromTeam.getUsername();
-        String tokenKey = messageDeleteGameChararacterFromTeam.getKeyToken();
-        String gameCharName = messageDeleteGameChararacterFromTeam.getGameCharName();
+        String username = messageDeleteGameCharacterFromTeam.getUsername();
+        String tokenKey = messageDeleteGameCharacterFromTeam.getKeyToken();
+        String gameCharName = messageDeleteGameCharacterFromTeam.getGameCharName();
 
         log.debug("Received a DeleteGameChararacterFromTeamRequest");
         log.debug("Username : '{}'", username);
@@ -107,11 +107,11 @@ public class UserService implements Runnable {
     }
 
     private void manageDeleteGameCharacterFromStockRequest(Message message) throws IOException {
-        MessageDeleteGameChararacterFromStock messageDeleteGameChararacterFromStock = (MessageDeleteGameChararacterFromStock) message;
+        MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = (MessageDeleteGameCharacterFromStock) message;
 
-        String username = messageDeleteGameChararacterFromStock.getUsername();
-        String tokenKey = messageDeleteGameChararacterFromStock.getKeyToken();
-        String gameCharName = messageDeleteGameChararacterFromStock.getGameCharName();
+        String username = messageDeleteGameCharacterFromStock.getUsername();
+        String tokenKey = messageDeleteGameCharacterFromStock.getKeyToken();
+        String gameCharName = messageDeleteGameCharacterFromStock.getGameCharName();
 
         log.debug("Received a DeleteGameChararacterFromStockRequest");
         log.debug("Username : '{}'", username);
