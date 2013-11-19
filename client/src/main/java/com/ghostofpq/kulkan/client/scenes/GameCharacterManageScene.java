@@ -9,9 +9,7 @@ import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageDeleteGameCharacterFromStock;
-import com.ghostofpq.kulkan.entities.messages.auth.MessageDeleteGameCharacterFromTeam;
-import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
+import com.ghostofpq.kulkan.entities.messages.auth.*;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
@@ -28,6 +26,8 @@ public class GameCharacterManageScene implements Scene {
     private Button manageEquipementButton;
     private Button quitButton;
     private Button deleteGameCharButton;
+    private Button putInTeam;
+    private Button putInStock;
     private int widthSeparator = 50;
     private int widthStep;
     private int heightSeparator = 50;
@@ -37,6 +37,7 @@ public class GameCharacterManageScene implements Scene {
     private KeyValueRender hpRender;
     private KeyValueRender mpRender;
     private KeyValueRender xpRender;
+    private KeyValueRender lvlRender;
 
     private GameCharacterManageScene() {
     }
@@ -66,7 +67,7 @@ public class GameCharacterManageScene implements Scene {
         hpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 3, widthStep, heightStep, "HP", String.valueOf(gameCharacter.getMaxHealthPoint()), 5);
         mpRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 3, widthStep, heightStep, "MP", String.valueOf(gameCharacter.getMaxManaPoint()), 5);
         xpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 4, widthStep, heightStep, "XP", String.valueOf(gameCharacter.getExperience()), 5);
-        xpRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 4, widthStep, heightStep, "LVL", String.valueOf(gameCharacter.getLevel()), 5);
+        lvlRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 4, widthStep, heightStep, "LVL", String.valueOf(gameCharacter.getLevel()), 5);
 
         manageJobButton = new Button(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "Manage Job") {
             @Override
@@ -82,7 +83,7 @@ public class GameCharacterManageScene implements Scene {
             }
         };
 
-        deleteGameCharButton = new Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Delete Char") {
+        deleteGameCharButton = new Button(widthSeparator, heightSeparator + heightStep * 7, widthStep, heightStep, "Delete Char") {
             @Override
             public void onClick() {
                 log.debug("Sending a DeleteGameCharacterRequest");
@@ -105,13 +106,49 @@ public class GameCharacterManageScene implements Scene {
             }
         };
 
-        quitButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Back") {
+        quitButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 7, widthStep, heightStep, "Back") {
             @Override
             public void onClick() {
                 Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
             }
         };
 
+        putInTeam = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Team") {
+            @Override
+            public void onClick() {
+                log.debug("Sending a PutInTeamRequest");
+                log.debug("Name : '{}'", gameCharacter.getName());
+                try {
+                    log.debug("Sending ");
+                    Player player = Client.getInstance().getPlayer();
+                    MessagePutGameCharacterFromStockToTeam messagePutGameCharacterFromStockToTeam = new MessagePutGameCharacterFromStockToTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                    channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messagePutGameCharacterFromStockToTeam.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        putInStock = new
+
+                Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Stock") {
+                    @Override
+                    public void onClick() {
+                        log.debug("Sending a PutInTeamRequest");
+                        log.debug("Name : '{}'", gameCharacter.getName());
+                        try {
+                            log.debug("Sending ");
+                            Player player = Client.getInstance().getPlayer();
+                            MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, putGameCharacterFromTeamToStock.getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
         initConnection();
     }
 
@@ -135,10 +172,17 @@ public class GameCharacterManageScene implements Scene {
         hpRender.draw();
         mpRender.draw();
         xpRender.draw();
+        lvlRender.draw();
         manageJobButton.draw();
         manageEquipementButton.draw();
         deleteGameCharButton.draw();
         quitButton.draw();
+        if (isInTeam()) {
+            putInStock.draw();
+        } else {
+            putInTeam.draw();
+        }
+
     }
 
     @Override
@@ -156,6 +200,15 @@ public class GameCharacterManageScene implements Scene {
                 }
                 if (manageJobButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
                     manageJobButton.onClick();
+                }
+                if (isInTeam()) {
+                    if (putInStock.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        putInStock.onClick();
+                    }
+                } else {
+                    if (putInTeam.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        putInTeam.onClick();
+                    }
                 }
             }
         }
@@ -180,6 +233,10 @@ public class GameCharacterManageScene implements Scene {
                     break;
             }
         }
+    }
+
+    private boolean isInTeam() {
+        return Client.getInstance().getPlayer().getTeam().contains(gameCharacter);
     }
 
     public void setGameCharacter(GameCharacter gameCharacter) {
