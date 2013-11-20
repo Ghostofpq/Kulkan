@@ -1,7 +1,7 @@
 package com.ghostofpq.kulkan.entities.job;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.job.capacity.Amelioration;
+import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
 
@@ -18,7 +18,7 @@ public abstract class Job implements Serializable {
     private List<Capacity> skillTree;
 
     private List<Move> unlockedMoves;
-    private List<Amelioration> unlockedAmeliorations;
+    private List<AmeliorationPrimary> unlockedAmeliorationPrimaries;
 
     private int jobPoints;
     private int cumulatedJobPoints;
@@ -31,7 +31,7 @@ public abstract class Job implements Serializable {
         this.cumulatedJobPoints = 0;
 
         this.unlockedMoves = new ArrayList<Move>();
-        this.unlockedAmeliorations = new ArrayList<Amelioration>();
+        this.unlockedAmeliorationPrimaries = new ArrayList<AmeliorationPrimary>();
     }
 
     public void gainJobPoints(int jobPoints) {
@@ -53,7 +53,7 @@ public abstract class Job implements Serializable {
 
             switch (capacity.getType()) {
                 case AMELIORATION:
-                    unlockedAmeliorations.add((Amelioration) capacity);
+                    unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
                     break;
                 case MOVE:
                     unlockedMoves.add((Move) capacity);
@@ -66,8 +66,8 @@ public abstract class Job implements Serializable {
         PrimaryCharacteristics result = new PrimaryCharacteristics(0, 0, 0, 0,
                 0, 0);
 
-        for (Amelioration amelioration : unlockedAmeliorations) {
-            result.plus(amelioration.getCaracteristics());
+        for (AmeliorationPrimary ameliorationPrimary : unlockedAmeliorationPrimaries) {
+            result.plus(ameliorationPrimary.getCaracteristics());
         }
 
         return result;
@@ -109,12 +109,12 @@ public abstract class Job implements Serializable {
         this.unlockedMoves = unlockedMoves;
     }
 
-    public List<Amelioration> getUnlockedAmeliorations() {
-        return unlockedAmeliorations;
+    public List<AmeliorationPrimary> getUnlockedAmeliorationPrimaries() {
+        return unlockedAmeliorationPrimaries;
     }
 
-    public void setUnlockedAmeliorations(List<Amelioration> unlockedAmeliorations) {
-        this.unlockedAmeliorations = unlockedAmeliorations;
+    public void setUnlockedAmeliorationPrimaries(List<AmeliorationPrimary> unlockedAmeliorationPrimaries) {
+        this.unlockedAmeliorationPrimaries = unlockedAmeliorationPrimaries;
     }
 
     public int getJobPoints() {
