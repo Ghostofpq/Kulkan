@@ -527,14 +527,15 @@ public class Game {
     private void newTurn() {
         Player winnerPlayer = getWinnerPlayer();
         if (null != winnerPlayer) {
-            for (Player playerToNotify : playerList) {
-                if (winnerPlayer == playerToNotify) {
+            for (Player player : playerList) {
+                if (winnerPlayer == player) {
                     MessageGameEnd messageGameEnd = new MessageGameEnd(true);
-                    sendMessageToPlayer(playerToNotify, messageGameEnd);
+                    sendMessageToPlayer(player, messageGameEnd);
                 } else {
                     MessageGameEnd messageGameEnd = new MessageGameEnd(false);
-                    sendMessageToPlayer(playerToNotify, messageGameEnd);
+                    sendMessageToPlayer(player, messageGameEnd);
                 }
+                userController.updateGameCharacters(player);
             }
             closeGame();
         } else {
