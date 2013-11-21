@@ -1,6 +1,5 @@
 package com.ghostofpq.kulkan.server.database.controller;
 
-import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.User;
@@ -182,15 +181,7 @@ public class UserController {
 
     public User updateGameCharacters(Player player) {
         User user = getUserForUsername(player.getPseudo());
-        for (GameCharacter teamMember : player.getTeam()) {
-            for (GameCharacterDB userTeamMember : user.getTeam()) {
-                if (userTeamMember.getName().equals(teamMember.getName())) {
-                    log.debug("updating {}", userTeamMember.getName());
-                    userTeamMember = new GameCharacterDB(teamMember);
-                    break;
-                }
-            }
-        }
+        user.updateTeam(player.getTeam());
         user = userRepository.save(user);
         return user;
     }

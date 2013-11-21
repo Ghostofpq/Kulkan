@@ -134,6 +134,13 @@ public class User {
         team.add(new GameCharacterDB(gameCharacter));
     }
 
+    public void updateTeam(List<GameCharacter> gameCharacterList) {
+        team = new ArrayList<GameCharacterDB>();
+        for (GameCharacter gameCharacter : gameCharacterList) {
+            team.add(new GameCharacterDB(gameCharacter));
+        }
+    }
+
     public Player toPlayer() {
         Player result = new Player();
         result.setPseudo(username);
