@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.entities.clan.ClanType;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameCharacterDB {
@@ -21,13 +22,14 @@ public class GameCharacterDB {
     public GameCharacterDB() {
     }
 
-    public GameCharacterDB(String name, Gender gender, ClanType clanType, Integer lvl, Integer currentXp) {
+    public GameCharacterDB(String name, Gender gender, ClanType clanType, Integer lvl, Integer currentXp, List<JobStatusDB> jobStatusDBs) {
         this.id = new ObjectId();
         this.name = name;
         this.gender = gender;
         this.clanType = clanType;
         this.lvl = lvl;
         this.currentXp = currentXp;
+        this.jobStatusDBs = jobStatusDBs;
     }
 
     public GameCharacterDB(GameCharacter gameCharacter) {
@@ -36,6 +38,8 @@ public class GameCharacterDB {
         this.clanType = gameCharacter.getClan().getRaceType();
         this.lvl = gameCharacter.getLevel();
         this.currentXp = gameCharacter.getExperience();
+        this.jobStatusDBs = new ArrayList<JobStatusDB>();
+        jobStatusDBs.add(new JobStatusDB(gameCharacter.getJobWarrior()));
     }
 
     public ObjectId getId() {

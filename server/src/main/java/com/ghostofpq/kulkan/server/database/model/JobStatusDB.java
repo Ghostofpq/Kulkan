@@ -10,20 +10,23 @@ import java.util.Map;
 public class JobStatusDB {
     private JobType jobType;
     private int jobPoints;
-    private int cumulatedJobPoints;
+    private int cumulativeJobPoints;
     private Map<String, Boolean> skillTreeStatus;
 
-    public JobStatusDB(JobType jobType, int jobPoints, int cumulatedJobPoints, Map<String, Boolean> skillTreeStatus) {
+    public JobStatusDB() {
+    }
+
+    public JobStatusDB(JobType jobType, int jobPoints, int cumulativeJobPoints, Map<String, Boolean> skillTreeStatus) {
         this.jobType = jobType;
         this.jobPoints = jobPoints;
-        this.cumulatedJobPoints = cumulatedJobPoints;
+        this.cumulativeJobPoints = cumulativeJobPoints;
         this.skillTreeStatus = skillTreeStatus;
     }
 
     public JobStatusDB(Job job) {
         this.jobType = job.getJobType();
         this.jobPoints = job.getJobPoints();
-        this.cumulatedJobPoints = job.getCumulativeJobPoints();
+        this.cumulativeJobPoints = job.getCumulativeJobPoints();
         this.skillTreeStatus = job.getSkillTreeStatus();
     }
 
@@ -36,7 +39,7 @@ public class JobStatusDB {
         }
         if (null != job) {
             job.setJobPoints(jobPoints);
-            job.setCumulativeJobPoints(cumulatedJobPoints);
+            job.setCumulativeJobPoints(cumulativeJobPoints);
             job.setSkillTreeStatus(skillTreeStatus);
         }
         return job;
@@ -58,12 +61,12 @@ public class JobStatusDB {
         this.jobPoints = jobPoints;
     }
 
-    public int getCumulatedJobPoints() {
-        return cumulatedJobPoints;
+    public int getCumulativeJobPoints() {
+        return cumulativeJobPoints;
     }
 
-    public void setCumulatedJobPoints(int cumulatedJobPoints) {
-        this.cumulatedJobPoints = cumulatedJobPoints;
+    public void setCumulativeJobPoints(int cumulativeJobPoints) {
+        this.cumulativeJobPoints = cumulativeJobPoints;
     }
 
     public Map<String, Boolean> getSkillTreeStatus() {

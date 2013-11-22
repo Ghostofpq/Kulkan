@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.auth.*;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
+import com.ghostofpq.kulkan.server.database.model.JobStatusDB;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
@@ -16,6 +17,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Slf4j
 public class AuthenticationManager implements Runnable {
@@ -108,7 +110,6 @@ public class AuthenticationManager implements Runnable {
         }
     }
 
-
     private void manageAuthenticationRequestMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps) throws IOException {
         MessageAuthenticationRequest authenticationRequest = (MessageAuthenticationRequest) message;
 
@@ -187,9 +188,9 @@ public class AuthenticationManager implements Runnable {
     private void addusers() {
         User user1 = new User("azerty", "123456");
 
-        GameCharacterDB char1 = new GameCharacterDB("azerty1Human", Gender.MALE, ClanType.HUMAN, 1, 0);
-        GameCharacterDB char2 = new GameCharacterDB("azerty2Elve", Gender.FEMALE, ClanType.ELVE, 1, 0);
-        GameCharacterDB char3 = new GameCharacterDB("azerty3Dwarf", Gender.MALE, ClanType.DWARF, 1, 0);
+        GameCharacterDB char1 = new GameCharacterDB("azerty1Human", Gender.MALE, ClanType.HUMAN, 1, 0, new ArrayList<JobStatusDB>());
+        GameCharacterDB char2 = new GameCharacterDB("azerty2Elve", Gender.FEMALE, ClanType.ELVE, 1, 0, new ArrayList<JobStatusDB>());
+        GameCharacterDB char3 = new GameCharacterDB("azerty3Dwarf", Gender.MALE, ClanType.DWARF, 1, 0, new ArrayList<JobStatusDB>());
 
         user1.addGameCharToTeam(char1);
         user1.addGameCharToTeam(char2);
@@ -200,9 +201,9 @@ public class AuthenticationManager implements Runnable {
         }
         User user2 = new User("ghostofpq", "123456");
 
-        GameCharacterDB char4 = new GameCharacterDB("ghostofpq1Human", Gender.MALE, ClanType.HUMAN, 1, 0);
-        GameCharacterDB char5 = new GameCharacterDB("ghostofpq2Elve", Gender.FEMALE, ClanType.ELVE, 1, 0);
-        GameCharacterDB char6 = new GameCharacterDB("ghostofpq3Dwarf", Gender.MALE, ClanType.DWARF, 1, 0);
+        GameCharacterDB char4 = new GameCharacterDB("ghostofpq1Human", Gender.MALE, ClanType.HUMAN, 1, 0, new ArrayList<JobStatusDB>());
+        GameCharacterDB char5 = new GameCharacterDB("ghostofpq2Elve", Gender.FEMALE, ClanType.ELVE, 1, 0, new ArrayList<JobStatusDB>());
+        GameCharacterDB char6 = new GameCharacterDB("ghostofpq3Dwarf", Gender.MALE, ClanType.DWARF, 1, 0, new ArrayList<JobStatusDB>());
 
         user2.addGameCharToTeam(char4);
         user2.addGameCharToTeam(char5);
