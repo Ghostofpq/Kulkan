@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.Warrior;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bson.types.ObjectId;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 @Document
+@Slf4j
 public class User {
     @Id
     private ObjectId id;

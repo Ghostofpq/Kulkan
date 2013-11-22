@@ -328,6 +328,7 @@ public class GameCharacter implements Serializable {
 
     public void setJobWarrior(Warrior jobWarrior) {
         this.jobWarrior = jobWarrior;
+        this.currentJob = this.jobWarrior;
     }
 
     public PrimaryCharacteristics getCharacteristics() {
