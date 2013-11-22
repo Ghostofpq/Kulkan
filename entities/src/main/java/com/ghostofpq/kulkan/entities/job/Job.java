@@ -7,31 +7,47 @@ import com.ghostofpq.kulkan.entities.job.capacity.Move;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Job implements Serializable {
 
     private static final long serialVersionUID = 7613901055857944135L;
+    protected JobType jobType;
+    protected int jobPoints;
+    protected int cumulativeJobPoints;
     private String name;
     private String description;
-
     private List<Capacity> skillTree;
-
     private List<Move> unlockedMoves;
     private List<AmeliorationPrimary> unlockedAmeliorationPrimaries;
 
-    private int jobPoints;
-    private int cumulatedJobPoints;
-
-    public Job(String name, String description) {
+    protected Job(String name, String description) {
         this.name = name;
         this.description = description;
 
         this.jobPoints = 0;
-        this.cumulatedJobPoints = 0;
+        this.cumulativeJobPoints = 0;
 
         this.unlockedMoves = new ArrayList<Move>();
         this.unlockedAmeliorationPrimaries = new ArrayList<AmeliorationPrimary>();
+    }
+
+
+    public Map<String, Boolean> getSkillTreeStatus() {
+        Map<String, Boolean> skillTreeStatus = new HashMap<String, Boolean>();
+        for (Capacity capacity : skillTree) {
+            skillTreeStatus.put(capacity.getName(), capacity.isLocked());
+        }
+        return skillTreeStatus;
+    }
+
+    public void setSkillTreeStatus(Map<String, Boolean> skillTreeStatus) {
+        for (Capacity capacity : skillTree) {
+            if (skillTreeStatus.containsKey(capacity.getName())) ;
+            capacity.setLocked(skillTreeStatus.get(capacity.getName()));
+        }
     }
 
     public void gainJobPoints(int jobPoints) {
@@ -76,6 +92,13 @@ public abstract class Job implements Serializable {
     /**
      * Getters and Setters
      */
+    public JobType getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(JobType jobType) {
+        this.jobType = jobType;
+    }
 
     public String getName() {
         return name;
@@ -125,11 +148,11 @@ public abstract class Job implements Serializable {
         this.jobPoints = jobPoints;
     }
 
-    public int getCumulatedJobPoints() {
-        return cumulatedJobPoints;
+    public int getCumulativeJobPoints() {
+        return cumulativeJobPoints;
     }
 
-    public void setCumulatedJobPoints(int cumulatedJobPoints) {
-        this.cumulatedJobPoints = cumulatedJobPoints;
+    public void setCumulativeJobPoints(int cumulativeJobPoints) {
+        this.cumulativeJobPoints = cumulativeJobPoints;
     }
 }

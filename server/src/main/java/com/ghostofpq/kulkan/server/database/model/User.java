@@ -2,6 +2,8 @@ package com.ghostofpq.kulkan.server.database.model;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.job.Job;
+import com.ghostofpq.kulkan.entities.job.Warrior;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bson.types.ObjectId;
@@ -29,6 +31,7 @@ public class User {
     private List<GameCharacterDB> team;
     private List<GameCharacterDB> stock;
     private Integer grade;
+
 
     public User() {
     }
@@ -142,34 +145,54 @@ public class User {
     }
 
     public Player toPlayer() {
-        Player result = new Player();
-        result.setPseudo(username);
-        result.setTeam(new ArrayList<GameCharacter>());
-        result.setStock(new ArrayList<GameCharacter>());
+        Player player = new Player();
+        player.setPseudo(username);
+        player.setTeam(new ArrayList<GameCharacter>());
+        player.setStock(new ArrayList<GameCharacter>());
 
         for (GameCharacterDB gameCharacterDB : this.team) {
             GameCharacter gameCharacter = new GameCharacter(
-                    result,
+                    player,
                     gameCharacterDB.getName(),
                     gameCharacterDB.getClanType(),
                     gameCharacterDB.getGender(),
                     gameCharacterDB.getLvl(),
                     gameCharacterDB.getCurrentXp()
             );
-            result.getTeam().add(gameCharacter);
+            if (null != gameCharacterDB.getJobStatusDBs()) {
+                for (JobStatusDB jobStatusDB : gameCharacterDB.getJobStatusDBs()) {
+                    Job job = jobStatusDB.toJob();
+                    switch (job.getJobType()) {
+                        case WARRIOR:
+                            gameCharacter.setJobWarrior((Warrior) job);
+                            break;
+                    }
+                }
+            }
+            player.getTeam().add(gameCharacter);
         }
         for (GameCharacterDB gameCharacterDB : this.stock) {
             GameCharacter gameCharacter = new GameCharacter(
-                    result,
+                    player,
                     gameCharacterDB.getName(),
                     gameCharacterDB.getClanType(),
                     gameCharacterDB.getGender(),
                     gameCharacterDB.getLvl(),
                     gameCharacterDB.getCurrentXp()
             );
-            result.getStock().add(gameCharacter);
+            if (null != gameCharacterDB.getJobStatusDBs()) {
+                for (JobStatusDB jobStatusDB : gameCharacterDB.getJobStatusDBs()) {
+                    Job job = jobStatusDB.toJob();
+                    switch (job.getJobType()) {
+                        case WARRIOR:
+                            gameCharacter.setJobWarrior((Warrior) job);
+                            break;
+                    }
+                }
+            }
+            player.getStock().add(gameCharacter);
         }
-        return result;
+        return player;
     }
 
     @Override

@@ -6,6 +6,8 @@ import com.ghostofpq.kulkan.entities.clan.ClanType;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
+import java.util.List;
+
 public class GameCharacterDB {
     @Id
     private ObjectId id;
@@ -14,6 +16,7 @@ public class GameCharacterDB {
     private ClanType clanType;
     private Integer lvl;
     private Integer currentXp;
+    private List<JobStatusDB> jobStatusDBs;
 
     public GameCharacterDB() {
     }
@@ -77,5 +80,13 @@ public class GameCharacterDB {
 
     public void setClanType(ClanType clanType) {
         this.clanType = clanType;
+    }
+
+    public List<JobStatusDB> getJobStatusDBs() {
+        return jobStatusDBs;
+    }
+
+    public void setJobStatusDBs(List<JobStatusDB> jobStatusDBs) {
+        this.jobStatusDBs = jobStatusDBs;
     }
 }

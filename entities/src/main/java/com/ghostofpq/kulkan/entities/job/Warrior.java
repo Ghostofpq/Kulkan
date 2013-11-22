@@ -10,12 +10,12 @@ import java.util.List;
 public class Warrior extends Job {
 
     private static final long serialVersionUID = 2620023619865757113L;
-
     private final static String WARRIOR_NAME = "Warrior";
     private final static String WARRIOR_DESC = "Warriors are stronk";
 
     public Warrior() {
         super(WARRIOR_NAME, WARRIOR_DESC);
+        this.jobType = JobType.WARRIOR;
         this.prepareSkillTree();
     }
 
