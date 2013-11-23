@@ -4,6 +4,8 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.TeamManagementCharacterRender;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
+import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 
@@ -308,6 +310,17 @@ public class TeamManagementScene implements Scene {
 
     @Override
     public void receiveMessage() {
+        Message message = Client.getInstance().receiveMessage();
+        if (null != message) {
+            switch (message.getType()) {
+                case PLAYER_UPDATE:
+                    log.debug("PLAYER_UPDATE");
+                    MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
+                    Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
+                    Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    break;
+            }
+        }
     }
 
     public enum ManagementView {

@@ -2,10 +2,7 @@ package com.ghostofpq.kulkan.server.lobby;
 
 
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyClient;
-import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPing;
-import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyPong;
-import com.ghostofpq.kulkan.entities.messages.lobby.MessageLobbyServer;
+import com.ghostofpq.kulkan.entities.messages.lobby.*;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
@@ -89,11 +86,22 @@ public class LobbyManager {
                 switch (message.getType()) {
                     case LOBBY_CLIENT:
                         MessageLobbyClient messageLobbyClient = (MessageLobbyClient) message;
+                        log.error(" [X] POST FROM {} : [{}]", messageLobbyClient.getKeyToken(), messageLobbyClient.getLobbyMessage());
                         postMessage(messageLobbyClient);
                         break;
                     case LOBBY_PONG:
                         MessageLobbyPong messageLobbyPong = (MessageLobbyPong) message;
                         pongFor(messageLobbyPong.getKeyToken());
+                        break;
+                    case LOBBY_SUBSCRIBE:
+                        MessageSubscribeToLobby messageSubscribeToLobby = (MessageSubscribeToLobby) message;
+                        log.error(" [X] LOBBY_SUBCRIBE : {}", messageSubscribeToLobby.getKeyToken());
+                        addClient(messageSubscribeToLobby.getKeyToken());
+                        break;
+                    case LOBBY_UNSUBCRIBE:
+                        MessageUnsubscribeToLobby messageUnsubscribeToLobby = (MessageUnsubscribeToLobby) message;
+                        log.error(" [X] LOBBY_UNSUBCRIBE : {}", messageUnsubscribeToLobby.getKeyToken());
+                        removeClient(messageUnsubscribeToLobby.getKeyToken());
                         break;
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -105,12 +113,20 @@ public class LobbyManager {
 
     public void addClient(String clientKey) {
         try {
-            log.debug(" [-] ADDING CLIENT KEY : {}", clientKey);
-            String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(clientKey).toString();
-            channelOut.queueDeclare(clientChannelName, false, false, false, null);
-            log.debug(" [-] OPENING QUEUE : {}", clientChannelName);
-            connectedClients.add(clientKey);
-            pongClients.add(clientKey);
+            if (!connectedClients.contains(clientKey)) {
+                log.debug(" [-] ADDING CLIENT KEY : {}", clientKey);
+                String clientChannelName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(clientKey).toString();
+                channelOut.queueDeclare(clientChannelName, false, false, false, null);
+                log.debug(" [-] OPENING QUEUE : {}", clientChannelName);
+                connectedClients.add(clientKey);
+                if (!pongClients.contains(clientKey)) {
+                    pongClients.add(clientKey);
+                } else {
+                    log.error(" CLIENT {} already in ping list", clientKey);
+                }
+            } else {
+                log.error(" CLIENT {} already in connectedClients", clientKey);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

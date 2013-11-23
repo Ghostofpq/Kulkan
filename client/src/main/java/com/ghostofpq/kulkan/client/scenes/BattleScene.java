@@ -14,6 +14,7 @@ import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -666,6 +667,11 @@ public class BattleScene implements Scene {
                         break;
                     case GAME_END:
                         manageMessageGameOver(message);
+                        break;
+                    case PLAYER_UPDATE:
+                        MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
+                        Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
+                        break;
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                         break;

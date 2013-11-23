@@ -9,7 +9,6 @@ import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.JobStatusDB;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
-import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.rabbitmq.client.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -27,8 +26,6 @@ public class AuthenticationManager implements Runnable {
     private Integer hostPort;
     private Integer authKeySize;
     // OTHER BEANS - SPRING
-    @Autowired
-    private LobbyManager lobbyManager;
     @Autowired
     private UserRepository userRepositoryRepository;
     @Autowired
@@ -99,7 +96,7 @@ public class AuthenticationManager implements Runnable {
                 case AUTHENTICATION_REQUEST:
                     manageAuthenticationRequestMessage(message, props, replyProps);
                     break;
-                case CREATE_ACCOUT:
+                case CREATE_ACCOUNT:
                     manageCreateAccountMessage(message, props, replyProps);
                     break;
                 default:
@@ -118,7 +115,6 @@ public class AuthenticationManager implements Runnable {
 
         if (null != user) {
             MessageErrorCode code = MessageErrorCode.OK;
-            lobbyManager.addClient(user.getTokenKey());
             MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
                     authenticationRequest.getPseudo(),
                     authenticationRequest.getPassword(),

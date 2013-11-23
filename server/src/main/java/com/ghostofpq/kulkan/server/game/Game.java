@@ -10,9 +10,11 @@ import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
+import com.ghostofpq.kulkan.server.database.model.User;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -535,7 +537,9 @@ public class Game {
                     MessageGameEnd messageGameEnd = new MessageGameEnd(false);
                     sendMessageToPlayer(player, messageGameEnd);
                 }
-                userController.updateGameCharacters(player);
+                User updatedUser = userController.updateGameCharacters(player);
+                MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(updatedUser.toPlayer());
+                sendMessageToPlayer(player, messagePlayerUpdate);
             }
             closeGame();
         } else {

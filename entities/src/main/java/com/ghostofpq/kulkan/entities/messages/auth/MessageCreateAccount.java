@@ -8,7 +8,7 @@ public class MessageCreateAccount extends Message {
     private String password;
 
     public MessageCreateAccount(String userName, String password) {
-        this.type = MessageType.CREATE_ACCOUT;
+        this.type = MessageType.CREATE_ACCOUNT;
         this.userName = userName;
         this.password = password;
     }
