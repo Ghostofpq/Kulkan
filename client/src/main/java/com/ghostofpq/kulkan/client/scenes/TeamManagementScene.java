@@ -5,7 +5,7 @@ import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.TeamManagementCharacterRender;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
+import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 
