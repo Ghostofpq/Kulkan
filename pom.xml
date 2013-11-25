@@ -18,7 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lwjgl.version>2.8.3</lwjgl.version>
+        <lwjgl.version>2.8.4</lwjgl.version>
         <project.version>0.0.2</project.version>
         <lombok.version>0.12.0</lombok.version>
         <slick.version>239</slick.version>
@@ -45,33 +45,6 @@
     </repositories>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.ghostofpq.kulkan</groupId>
-                <artifactId>commons</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ghostofpq.kulkan</groupId>
-                <artifactId>entities</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ghostofpq.kulkan</groupId>
-                <artifactId>game</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ghostofpq.kulkan</groupId>
-                <artifactId>client</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ghostofpq.kulkan</groupId>
-                <artifactId>server</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-
             <!-- LWJGL -->
             <dependency>
                 <groupId>org.lwjgl.lwjgl</groupId>

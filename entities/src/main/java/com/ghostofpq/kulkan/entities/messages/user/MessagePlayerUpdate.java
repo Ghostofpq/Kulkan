@@ -1,4 +1,4 @@
-package com.ghostofpq.kulkan.entities.messages.auth;
+package com.ghostofpq.kulkan.entities.messages.user;
 
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;

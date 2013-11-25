@@ -94,12 +94,12 @@
         <dependency>
             <artifactId>commons</artifactId>
             <groupId>com.ghostofpq.kulkan</groupId>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <artifactId>entities</artifactId>
             <groupId>com.ghostofpq.kulkan</groupId>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

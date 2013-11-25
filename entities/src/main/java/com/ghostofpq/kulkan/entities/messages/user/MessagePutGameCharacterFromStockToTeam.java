@@ -1,15 +1,15 @@
-package com.ghostofpq.kulkan.entities.messages.auth;
+package com.ghostofpq.kulkan.entities.messages.user;
 
 
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 
-public class MessageDeleteGameCharacterFromStock extends ClientMessage {
+public class MessagePutGameCharacterFromStockToTeam extends ClientMessage {
     private String username;
     private String gameCharName;
 
-    public MessageDeleteGameCharacterFromStock(String keyToken, String username, String gameCharName) {
-        type = MessageType.DELETE_GAME_CHARACTER_FROM_STOCK_REQUEST;
+    public MessagePutGameCharacterFromStockToTeam(String keyToken, String username, String gameCharName) {
+        type = MessageType.PUT_GAME_CHARACTER_FROM_STOCK_TO_TEAM_REQUEST;
         this.keyToken = keyToken;
         this.username = username;
         this.gameCharName = gameCharName;

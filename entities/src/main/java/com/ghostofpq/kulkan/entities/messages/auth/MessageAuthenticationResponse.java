@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.entities.messages.auth;
 
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.MessageErrorCode;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 
 import java.io.Serializable;

@@ -15,7 +15,7 @@
     <properties>
         <main.class>com.ghostofpq.kulkan.client.Client</main.class>
         <natives>${basedir}/target/natives/</natives>
-        <natives.version>0.0.6</natives.version>
+        <natives.version>0.0.5</natives.version>
         <release.natives>natives/</release.natives>
     </properties>
 
@@ -125,12 +125,12 @@
         <dependency>
             <artifactId>commons</artifactId>
             <groupId>com.ghostofpq.kulkan</groupId>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <artifactId>entities</artifactId>
             <groupId>com.ghostofpq.kulkan</groupId>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
 
 
