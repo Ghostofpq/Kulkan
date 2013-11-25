@@ -61,8 +61,8 @@ public class Client {
     public void init() {
         log.debug("HOST : {}", hostIp);
 
-        setHeight(1020);
-        setWidth(1360);
+        setHeight(600);
+        setWidth(800);
         if (instance == null) {
             instance = this;
         }
@@ -75,7 +75,7 @@ public class Client {
             //             , displayModes[i].getBitsPerPixel(), displayModes[i].getFrequency(), displayModes[i].isFullscreenCapable());
             // }
 
-            Display.setDisplayMode(new DisplayMode(1360, 1020));
+            Display.setDisplayMode(new DisplayMode(800, 600));
             Display.setSwapInterval(1);
             Display.sync(60);
             Display.create();
@@ -188,8 +188,20 @@ public class Client {
     }
 
     public void setCurrentScene(Scene currentScene) {
+        if (null != this.currentScene) {
+            try {
+                this.currentScene.closeConnections();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         this.currentScene = currentScene;
         this.currentScene.init();
+        try {
+            this.currentScene.initConnections();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Player getPlayer() {
