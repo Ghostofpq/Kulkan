@@ -69,7 +69,6 @@ public class LoginScene implements Scene {
                         if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
                             MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
                             if (response.getErrorCode().equals(MessageErrorCode.OK)) {
-                                closeConnections();
                                 log.debug("AUTH OK : key={}", response.getTokenKey());
                                 Client.getInstance().setPlayer(response.getPlayer());
                                 Client.getInstance().setTokenKey(response.getTokenKey());
@@ -100,6 +99,7 @@ public class LoginScene implements Scene {
                     }
                 };
         createAccountButton = new
+
                 Button(300, 500, 200, 50, "CREATE ACCOUNT") {
                     @Override
                     public void onClick() {
@@ -134,16 +134,9 @@ public class LoginScene implements Scene {
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
         background = new Background(TextureKey.LOGIN_BACKGROUND);
-        try {
-            initConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(0);
-        }
-
     }
 
-    private void initConnection() throws IOException {
+    public void initConnections() throws IOException {
         channelAuthenticating = Client.getInstance().getConnection().createChannel();
         authenticationReplyQueueName = channelAuthenticating.queueDeclare().getQueue();
         consumer = new QueueingConsumer(channelAuthenticating);
@@ -248,12 +241,8 @@ public class LoginScene implements Scene {
         }
     }
 
-    public void closeConnections() {
-        try {
-            channelAuthenticating.close();
-            log.debug("channelAuthenticating closed");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void closeConnections() throws IOException {
+        channelAuthenticating.close();
+        log.debug("channelAuthenticating closed");
     }
 }

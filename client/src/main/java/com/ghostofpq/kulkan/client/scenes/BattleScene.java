@@ -115,6 +115,10 @@ public class BattleScene implements Scene {
         GraphicsManager.getInstance().requestCenterPosition(cursor);
     }
 
+    @Override
+    public void initConnections() throws IOException {
+    }
+
     public void setBattlefield(Battlefield battlefield) {
         this.battlefield = battlefield;
 
@@ -629,7 +633,6 @@ public class BattleScene implements Scene {
             }
         };
         currentState = BattleSceneState.GAME_OVER;
-        closeConnections();
     }
 
     @Override
@@ -681,7 +684,8 @@ public class BattleScene implements Scene {
     }
 
     @Override
-    public void closeConnections() {
+    public void closeConnections() throws IOException {
+        channelGameOut.close();
     }
 
     @Override

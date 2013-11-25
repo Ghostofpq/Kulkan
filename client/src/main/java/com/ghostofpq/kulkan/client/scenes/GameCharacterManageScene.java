@@ -38,6 +38,8 @@ public class GameCharacterManageScene implements Scene {
     private KeyValueRender mpRender;
     private KeyValueRender xpRender;
     private KeyValueRender lvlRender;
+    private KeyValueRender currentJobRender;
+    private KeyValueRender jobPoints;
 
     private GameCharacterManageScene() {
     }
@@ -68,22 +70,23 @@ public class GameCharacterManageScene implements Scene {
         mpRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 3, widthStep, heightStep, "MP", String.valueOf(gameCharacter.getMaxManaPoint()), 5);
         xpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 4, widthStep, heightStep, "XP", String.valueOf(gameCharacter.getExperience()), 5);
         lvlRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 4, widthStep, heightStep, "LVL", String.valueOf(gameCharacter.getLevel()), 5);
-
-        manageJobButton = new Button(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "Manage Job") {
+        currentJobRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "Job", String.valueOf(gameCharacter.getCurrentJob().getName()), 5);
+        jobPoints = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 5, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getCurrentJob().getJobPoints()), 5);
+        manageJobButton = new Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Job") {
             @Override
             public void onClick() {
                 log.debug("manageJobButton");
             }
         };
 
-        manageEquipementButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 5, widthStep, heightStep, "Manage Stuff") {
+        manageEquipementButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Stuff") {
             @Override
             public void onClick() {
                 log.debug("manageEquipementButton");
             }
         };
 
-        deleteGameCharButton = new Button(widthSeparator, heightSeparator + heightStep * 7, widthStep, heightStep, "Delete Char") {
+        deleteGameCharButton = new Button(widthSeparator, heightSeparator + heightStep * 8, widthStep, heightStep, "Delete Char") {
             @Override
             public void onClick() {
                 log.debug("Sending a DeleteGameCharacterRequest");
@@ -106,14 +109,14 @@ public class GameCharacterManageScene implements Scene {
             }
         };
 
-        quitButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 7, widthStep, heightStep, "Back") {
+        quitButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 8, widthStep, heightStep, "Back") {
             @Override
             public void onClick() {
                 Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
             }
         };
 
-        putInTeam = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Team") {
+        putInTeam = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 7, widthStep, heightStep, "Team") {
             @Override
             public void onClick() {
                 log.debug("Sending a PutInTeamRequest");
@@ -132,7 +135,7 @@ public class GameCharacterManageScene implements Scene {
         };
         putInStock = new
 
-                Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Stock") {
+                Button(widthSeparator, heightSeparator + heightStep * 7, widthStep, heightStep, "Stock") {
                     @Override
                     public void onClick() {
                         log.debug("Sending a PutInTeamRequest");
@@ -149,16 +152,12 @@ public class GameCharacterManageScene implements Scene {
                         }
                     }
                 };
-        initConnection();
     }
 
-    private void initConnection() {
-        try {
-            channelOut = Client.getInstance().getConnection().createChannel();
-            channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void initConnections() throws IOException {
+        channelOut = Client.getInstance().getConnection().createChannel();
+        channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
     }
 
     @Override
@@ -177,6 +176,8 @@ public class GameCharacterManageScene implements Scene {
         manageEquipementButton.draw();
         deleteGameCharButton.draw();
         quitButton.draw();
+        currentJobRender.draw();
+        jobPoints.draw();
         if (isInTeam()) {
             putInStock.draw();
         } else {
@@ -215,7 +216,8 @@ public class GameCharacterManageScene implements Scene {
     }
 
     @Override
-    public void closeConnections() {
+    public void closeConnections() throws IOException {
+        channelOut.close();
     }
 
     @Override
@@ -229,7 +231,7 @@ public class GameCharacterManageScene implements Scene {
                     log.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
                     Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-                    closeConnections();
+
                     break;
             }
         }

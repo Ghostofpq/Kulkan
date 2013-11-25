@@ -9,6 +9,7 @@ import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -175,6 +176,10 @@ public class TeamManagementScene implements Scene {
     }
 
     @Override
+    public void initConnections() throws IOException {
+    }
+
+    @Override
     public void update(long deltaTime) {
 
     }
@@ -305,7 +310,7 @@ public class TeamManagementScene implements Scene {
     }
 
     @Override
-    public void closeConnections() {
+    public void closeConnections() throws IOException {
     }
 
     @Override

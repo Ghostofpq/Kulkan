@@ -119,15 +119,10 @@ public class LobbyScene implements Scene {
         matchFound = false;
         matchId = "";
         background = new Background(TextureKey.BACKGROUND_BASIC);
-        try {
-            initConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(0);
-        }
     }
 
-    private void initConnection() throws IOException {
+    @Override
+    public void initConnections() throws IOException {
         channelLobbyOut = Client.getInstance().getConnection().createChannel();
         channelLobbyOut.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
         channelMatchmakingOut = Client.getInstance().getConnection().createChannel();
@@ -223,8 +218,6 @@ public class LobbyScene implements Scene {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        closeConnections();
     }
 
     public void acceptMatch() {
@@ -324,14 +317,11 @@ public class LobbyScene implements Scene {
         }
     }
 
-    public void closeConnections() {
-        try {
-            channelLobbyOut.close();
-            log.debug("channelLobbyOut closed");
-            channelMatchmakingOut.close();
-            log.debug("channelMatchmakingOut closed");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void closeConnections() throws IOException {
+        channelLobbyOut.close();
+        log.debug("channelLobbyOut closed");
+        channelMatchmakingOut.close();
+        log.debug("channelMatchmakingOut closed");
     }
 }

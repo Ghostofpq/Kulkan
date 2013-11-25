@@ -229,7 +229,6 @@ public class NewGameCharacterScene implements Scene {
 
         maleHasFocus();
         gorillaHasFocus();
-        initConnection();
     }
 
     public void maleHasFocus() {
@@ -419,23 +418,16 @@ public class NewGameCharacterScene implements Scene {
         }
     }
 
-    private void initConnection() {
-        try {
-            channelOut = Client.getInstance().getConnection().createChannel();
-            channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public void initConnections() throws IOException {
+        channelOut = Client.getInstance().getConnection().createChannel();
+        channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
     }
 
     @Override
-    public void closeConnections() {
-        try {
-            channelOut.close();
-            log.debug("channelOut closed");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void closeConnections() throws IOException {
+        channelOut.close();
+        log.debug("channelOut closed");
     }
 
     @Override
@@ -449,7 +441,6 @@ public class NewGameCharacterScene implements Scene {
                     log.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
                     Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-                    closeConnections();
                     break;
             }
         }
