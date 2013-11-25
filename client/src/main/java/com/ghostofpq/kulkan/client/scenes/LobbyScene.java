@@ -7,6 +7,7 @@ import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.auth.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
 import com.rabbitmq.client.Channel;
@@ -102,6 +103,7 @@ public class LobbyScene implements Scene {
             @Override
             public void onClick() {
                 log.debug("MANAGE TEAM");
+                exitLobby();
                 Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
             }
         };
@@ -130,6 +132,9 @@ public class LobbyScene implements Scene {
         channelLobbyOut.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
         channelMatchmakingOut = Client.getInstance().getConnection().createChannel();
         channelMatchmakingOut.queueDeclare(MATCHMAKING_SERVER_QUEUE_NAME_BASE, false, false, false, null);
+
+        MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(Client.getInstance().getTokenKey());
+        channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageSubscribeToLobby.getBytes());
     }
 
     public void setFocusOn(int i) {
@@ -192,10 +197,16 @@ public class LobbyScene implements Scene {
                     break;
                 case GAME_START:
                     log.debug(" [x] GAME START");
+                    exitLobby();
                     MessageGameStart messageGameStart = (MessageGameStart) message;
                     Client.getInstance().setCurrentScene(BattleScene.getInstance());
                     BattleScene.getInstance().setBattlefield(messageGameStart.getBattlefield());
                     BattleScene.getInstance().setGameId(messageGameStart.getGameID());
+                    break;
+                case PLAYER_UPDATE:
+                    log.debug(" [x] PLAYER_UPDATE");
+                    MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
+                    Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
                     break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -203,6 +214,17 @@ public class LobbyScene implements Scene {
 
             }
         }
+    }
+
+    private void exitLobby() {
+        try {
+            MessageUnsubscribeToLobby messageUnsubscribeToLobby = new MessageUnsubscribeToLobby(Client.getInstance().getTokenKey());
+            channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageUnsubscribeToLobby.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        closeConnections();
     }
 
     public void acceptMatch() {

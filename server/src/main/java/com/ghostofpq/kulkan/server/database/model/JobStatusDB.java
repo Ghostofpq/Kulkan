@@ -4,9 +4,11 @@ package com.ghostofpq.kulkan.server.database.model;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.Warrior;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
+@Slf4j
 public class JobStatusDB {
     private JobType jobType;
     private int jobPoints;

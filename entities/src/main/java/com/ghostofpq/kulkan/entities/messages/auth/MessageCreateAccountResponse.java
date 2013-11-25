@@ -8,7 +8,7 @@ public class MessageCreateAccountResponse extends Message {
     private MessageErrorCode errorCode;
 
     public MessageCreateAccountResponse(MessageErrorCode errorCode) {
-        this.type = MessageType.CREATE_ACCOUT_RESPONSE;
+        this.type = MessageType.CREATE_ACCOUNT_RESPONSE;
         this.errorCode = errorCode;
     }
 
