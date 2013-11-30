@@ -34,7 +34,6 @@ public abstract class Job implements Serializable {
         this.unlockedAmeliorationPrimaries = new ArrayList<AmeliorationPrimary>();
     }
 
-
     public Map<String, Boolean> getSkillTreeStatus() {
         Map<String, Boolean> skillTreeStatus = new HashMap<String, Boolean>();
         for (Capacity capacity : skillTree) {
@@ -45,8 +44,11 @@ public abstract class Job implements Serializable {
 
     public void setSkillTreeStatus(Map<String, Boolean> skillTreeStatus) {
         for (Capacity capacity : skillTree) {
-            if (skillTreeStatus.containsKey(capacity.getName())) ;
-            capacity.setLocked(skillTreeStatus.get(capacity.getName()));
+            if (skillTreeStatus.containsKey(capacity.getName())) {
+                capacity.setLocked(skillTreeStatus.get(capacity.getName()));
+            } else {
+                capacity.setLocked(true);
+            }
         }
     }
 

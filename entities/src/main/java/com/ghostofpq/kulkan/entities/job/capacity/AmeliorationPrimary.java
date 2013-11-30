@@ -12,7 +12,7 @@ public class AmeliorationPrimary extends Capacity {
     public AmeliorationPrimary(String name, String description,
                                PrimaryCharacteristics caracteristics, int price) {
         this.prerequisites = new ArrayList<Capacity>();
-
+        this.sons = new ArrayList<Capacity>();
         this.name = name;
         this.description = description;
 

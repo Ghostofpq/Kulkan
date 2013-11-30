@@ -12,6 +12,9 @@ public abstract class Capacity implements Serializable {
     protected int price;
     protected boolean locked;
     protected List<Capacity> prerequisites;
+    protected List<Capacity> sons;
+    protected int maxDepth = 0;
+    protected int numberOfSons = 0;
 
     public boolean isAvailable() {
         if (prerequisites.isEmpty()) {
@@ -26,13 +29,26 @@ public abstract class Capacity implements Serializable {
         }
     }
 
-    public void addPrerequisites(Capacity prerequisite) {
+    public void addPrerequisite(Capacity prerequisite) {
+        maxDepth = Math.max(prerequisite.getMaxDepth() + 1, maxDepth);
         prerequisites.add(prerequisite);
+        prerequisite.addSon(this);
     }
 
     /**
      * Getters and Setters
      */
+    public int getMaxDepth() {
+        return maxDepth;
+    }
+
+    public void addSon(Capacity son) {
+        sons.add(son);
+    }
+
+    public List<Capacity> getSons() {
+        return sons;
+    }
 
     public String getName() {
         return name;

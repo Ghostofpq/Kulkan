@@ -59,7 +59,6 @@ public class GameCharacterManageScene implements Scene {
     public void init() {
         widthSeparator = Client.getInstance().getWidth() / 20;
         heightSeparator = Client.getInstance().getHeight() / 20;
-
         widthStep = (Client.getInstance().getWidth() - 3 * widthSeparator) / 4;
         heightStep = (Client.getInstance().getHeight() - 4 * heightSeparator) / 8;
 
@@ -75,6 +74,8 @@ public class GameCharacterManageScene implements Scene {
         manageJobButton = new Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Job") {
             @Override
             public void onClick() {
+
+                Client.getInstance().setCurrentScene(ManageJobScene.getInstance());
                 log.debug("manageJobButton");
             }
         };
@@ -243,5 +244,6 @@ public class GameCharacterManageScene implements Scene {
 
     public void setGameCharacter(GameCharacter gameCharacter) {
         this.gameCharacter = gameCharacter;
+        ManageJobScene.getInstance().setGameCharacter(gameCharacter);
     }
 }

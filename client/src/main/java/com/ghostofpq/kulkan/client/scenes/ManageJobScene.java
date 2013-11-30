@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.graphics.JobManager;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ public class ManageJobScene implements Scene {
     private final String USER_SERVICE_QUEUE_NAME = "users";
     private GameCharacter gameCharacter;
     private Channel channelOut;
+    private JobManager warriorJobManager;
 
     private ManageJobScene() {
     }
@@ -30,6 +32,7 @@ public class ManageJobScene implements Scene {
 
     public void setGameCharacter(GameCharacter gameCharacter) {
         this.gameCharacter = gameCharacter;
+        warriorJobManager = new JobManager(0, 0, (2 * Client.getInstance().getWidth() / 3), Client.getInstance().getHeight(), this.gameCharacter.getCurrentJob());
     }
 
     @Override
@@ -49,7 +52,7 @@ public class ManageJobScene implements Scene {
 
     @Override
     public void render() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        warriorJobManager.draw();
     }
 
     @Override

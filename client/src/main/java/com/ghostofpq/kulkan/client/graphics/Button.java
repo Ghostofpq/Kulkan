@@ -13,10 +13,10 @@ public abstract class Button extends HUDElement {
     private TextureKey customTexture;
     private TextureKey customTextureFocus;
 
-    public Button(int posX, int posY, int length, int height, String label) {
+    public Button(int posX, int posY, int width, int height, String label) {
         this.posX = posX;
         this.posY = posY;
-        this.width = length;
+        this.width = width;
         this.height = height;
         this.label = label;
         this.hasFocus = false;

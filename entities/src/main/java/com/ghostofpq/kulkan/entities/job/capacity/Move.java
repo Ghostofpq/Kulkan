@@ -8,7 +8,7 @@ public class Move extends Capacity {
 
     public Move(String name, String description, int price) {
         this.prerequisites = new ArrayList<Capacity>();
-
+        this.sons = new ArrayList<Capacity>();
         this.name = name;
         this.description = description;
 

@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.entities.job;
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
+import com.ghostofpq.kulkan.entities.job.capacity.Move;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +59,17 @@ public class Warrior extends Job {
                 "endurance3 desc", endurance3C, 500);
         skillTree.add(endurance3);
 
-        strength2.addPrerequisites(strength1);
-        strength3.addPrerequisites(strength2);
-        endurance2.addPrerequisites(endurance1);
-        endurance3.addPrerequisites(endurance2);
+        Move bisous = new Move("Bisous", "pour doudou en general", 50);
+        skillTree.add(bisous);
+        Move calins = new Move("Calins", "pour doudou en general", 50);
+        skillTree.add(calins);
+
+        strength2.addPrerequisite(strength1);
+        bisous.addPrerequisite(strength1);
+        strength3.addPrerequisite(strength2);
+        endurance2.addPrerequisite(endurance1);
+        calins.addPrerequisite(endurance1);
+        endurance3.addPrerequisite(endurance2);
 
         this.setSkillTree(skillTree);
     }
