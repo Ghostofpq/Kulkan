@@ -1,6 +1,10 @@
 package com.ghostofpq.kulkan.server.database.controller;
 
+import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.job.Job;
+import com.ghostofpq.kulkan.entities.job.JobType;
+import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
@@ -175,6 +179,56 @@ public class UserController {
             } else {
                 log.error("verification failed");
             }
+        }
+        return user;
+    }
+
+    public User unlockCapacityForJobForGameCharacter(String tokenKey, String gameCharacterName, JobType jobType, String capacityName) {
+        User user = getUserForTokenKey(tokenKey);
+        if (null != user) {
+            Player player = user.toPlayer();
+            GameCharacter gameCharacterToUpdate = null;
+            boolean gameCharacterIsInTeam = false;
+            for (GameCharacter teamMember : player.getTeam()) {
+                if (teamMember.getName().equals(gameCharacterName)) {
+                    gameCharacterToUpdate = teamMember;
+                    gameCharacterIsInTeam = true;
+                    break;
+                }
+            }
+            if (null != gameCharacterToUpdate) {
+                for (GameCharacter teamMember : player.getStock()) {
+                    if (teamMember.getName().equals(gameCharacterName)) {
+                        gameCharacterToUpdate = teamMember;
+                        gameCharacterIsInTeam = false;
+                        break;
+                    }
+                }
+            }
+            if (null != gameCharacterToUpdate) {
+                Job jobToUpdate = gameCharacterToUpdate.getJob(jobType);
+                Capacity capacityToUnlock = null;
+                for (Capacity capacity : jobToUpdate.getSkillTree()) {
+                    if (capacity.getName().equals(capacityName)) {
+                        capacityToUnlock = capacity;
+                        break;
+                    }
+                }
+                if (null != gameCharacterToUpdate) {
+                    log.debug("{} unlocks {} for job {} of {}", player.getPseudo(), capacityToUnlock.getName(), jobToUpdate.getName(), gameCharacterToUpdate.getName());
+                    log.debug("JP before  : {}", jobToUpdate.getJobPoints());
+                    jobToUpdate.unlockCapacity(capacityToUnlock);
+                    log.debug("JP after  : {}", jobToUpdate.getJobPoints());
+
+                    user.updateGameChar(gameCharacterToUpdate, gameCharacterIsInTeam);
+                } else {
+                    log.error("Capacity not found");
+                }
+            } else {
+                log.error("GameChar not found");
+            }
+        } else {
+            log.error("User not found");
         }
         return user;
     }

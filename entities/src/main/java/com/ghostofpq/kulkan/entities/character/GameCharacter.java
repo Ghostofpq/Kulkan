@@ -8,6 +8,7 @@ import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.clan.Clan;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.job.Job;
+import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.Warrior;
 import org.springframework.data.annotation.Id;
 
@@ -275,6 +276,15 @@ public class GameCharacter implements Serializable {
         } else {
             hourglass = 100;
             isReadyToPlay = false;
+        }
+    }
+
+    public Job getJob(JobType jobType) {
+        switch (jobType) {
+            case WARRIOR:
+                return jobWarrior;
+            default:
+                return null;
         }
     }
 

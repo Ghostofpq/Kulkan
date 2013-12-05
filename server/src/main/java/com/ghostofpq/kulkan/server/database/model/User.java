@@ -146,6 +146,32 @@ public class User {
         }
     }
 
+    public void updateGameChar(GameCharacter gameCharacter, boolean gameCharacterIsInTeam) {
+        if (gameCharacterIsInTeam) {
+            updateGameCharFromTeam(gameCharacter);
+        } else {
+            updateGameCharFromStock(gameCharacter);
+        }
+    }
+
+    public void updateGameCharFromTeam(GameCharacter gameCharacter) {
+        for (GameCharacterDB gameCharacterDB : getTeam()) {
+            if (gameCharacterDB.getName().equals(gameCharacter.getName())) {
+                gameCharacterDB = new GameCharacterDB(gameCharacter);
+                break;
+            }
+        }
+    }
+
+    public void updateGameCharFromStock(GameCharacter gameCharacter) {
+        for (GameCharacterDB gameCharacterDB : getStock()) {
+            if (gameCharacterDB.getName().equals(gameCharacter.getName())) {
+                gameCharacterDB = new GameCharacterDB(gameCharacter);
+                break;
+            }
+        }
+    }
+
     public Player toPlayer() {
         Player player = new Player();
         player.setPseudo(username);

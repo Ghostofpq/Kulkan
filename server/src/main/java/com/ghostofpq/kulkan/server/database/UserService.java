@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.server.database;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
+import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
@@ -76,7 +77,9 @@ public class UserService implements Runnable {
                 case DELETE_GAME_CHARACTER_FROM_TEAM_REQUEST:
                     manageDeleteGameCharacterFromTeamRequest(message);
                     break;
-
+                case CHARACTER_UNLOCK_CAPACITY:
+                    manageUnlockCapacityForGameCharacterRequest(message);
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
@@ -210,6 +213,35 @@ public class UserService implements Runnable {
             log.error("Gender : '{}'", gender);
             log.error("ClanType : '{}'", clanType);
         }
+    }
+
+    private void manageUnlockCapacityForGameCharacterRequest(Message message) throws IOException {
+        MessageUnlockCapacity messageUnlockCapacity = (MessageUnlockCapacity) message;
+        String tokenKey = messageUnlockCapacity.getKeyToken();
+        String gameCharName = messageUnlockCapacity.getGameCharName();
+        JobType job = messageUnlockCapacity.getJob();
+        String capacityName = messageUnlockCapacity.getCapacityName();
+        if (null != tokenKey && null != gameCharName && null != job && null != capacityName && !tokenKey.isEmpty() && !gameCharName.isEmpty() && !capacityName.isEmpty()) {
+            log.debug("Received an UnlockCapacityRequest from [{}]", tokenKey);
+            log.debug("GC Name : '{}'", gameCharName);
+            log.debug("Job : '{}'", job);
+            log.debug("Capacity : '{}'", capacityName);
+
+            User user = userController.unlockCapacityForJobForGameCharacter(tokenKey, gameCharName, job, capacityName);
+            Player player = user.toPlayer();
+
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            log.debug(" [-] OPENING QUEUE : {}", queueName);
+            channelServiceOut.queueDeclare(queueName, false, false, false, null);
+            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+        } else {
+            log.error("Received a bugged UnlockCapacityRequest from [{}]", tokenKey);
+            log.debug("GC Name : '{}'", gameCharName);
+            log.debug("Job : '{}'", job);
+            log.debug("Capacity : '{}'", capacityName);
+        }
+
     }
 
     // THREAD ROUTINE
