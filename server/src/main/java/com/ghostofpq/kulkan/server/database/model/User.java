@@ -156,7 +156,7 @@ public class User {
 
     public void updateGameCharFromTeam(GameCharacter gameCharacter) {
         for (GameCharacterDB gameCharacterDB : getTeam()) {
-            if (gameCharacterDB.getName().equals(gameCharacter.getName())) {
+            if (gameCharacterDB.getId().equals(gameCharacter.getId())) {
                 gameCharacterDB = new GameCharacterDB(gameCharacter);
                 break;
             }
@@ -165,7 +165,7 @@ public class User {
 
     public void updateGameCharFromStock(GameCharacter gameCharacter) {
         for (GameCharacterDB gameCharacterDB : getStock()) {
-            if (gameCharacterDB.getName().equals(gameCharacter.getName())) {
+            if (gameCharacterDB.getId().equals(gameCharacter.getId())) {
                 gameCharacterDB = new GameCharacterDB(gameCharacter);
                 break;
             }
@@ -180,6 +180,7 @@ public class User {
 
         for (GameCharacterDB gameCharacterDB : this.team) {
             GameCharacter gameCharacter = new GameCharacter(
+                    gameCharacterDB.getId(),
                     player,
                     gameCharacterDB.getName(),
                     gameCharacterDB.getClanType(),
@@ -201,6 +202,7 @@ public class User {
         }
         for (GameCharacterDB gameCharacterDB : this.stock) {
             GameCharacter gameCharacter = new GameCharacter(
+                    gameCharacterDB.getId(),
                     player,
                     gameCharacterDB.getName(),
                     gameCharacterDB.getClanType(),

@@ -33,6 +33,7 @@ public class GameCharacterDB {
     }
 
     public GameCharacterDB(GameCharacter gameCharacter) {
+        this.id = new ObjectId();
         this.name = gameCharacter.getName();
         this.gender = gameCharacter.getGender();
         this.clanType = gameCharacter.getClan().getRaceType();

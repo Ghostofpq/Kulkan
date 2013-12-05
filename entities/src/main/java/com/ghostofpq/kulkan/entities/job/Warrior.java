@@ -27,7 +27,7 @@ public class Warrior extends Job {
         PrimaryCharacteristics strength1C = new PrimaryCharacteristics(5, 0, 0,
                 0, 0, 0);
         AmeliorationPrimary strength1 = new AmeliorationPrimary("strength1",
-                "strength1 desc", strength1C, 50);
+                "strength1 desc", strength1C, 10);
         skillTree.add(strength1);
 
         PrimaryCharacteristics strength2C = new PrimaryCharacteristics(10, 0,

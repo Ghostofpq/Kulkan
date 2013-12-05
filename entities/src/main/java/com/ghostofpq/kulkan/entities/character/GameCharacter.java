@@ -10,7 +10,7 @@ import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.Warrior;
-import org.springframework.data.annotation.Id;
+import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -21,8 +21,7 @@ public class GameCharacter implements Serializable {
     private final int DEFAULT_START_LEVEL = 1;
     private final int DEFAULT_START_XP = 0;
     private final int DEFAULT_START_NEXT_LEVEL = 100;
-    @Id
-    private String id;
+    private ObjectId id;
     /**
      * Owner
      */
@@ -116,8 +115,9 @@ public class GameCharacter implements Serializable {
      * @param race   {@link com.ghostofpq.kulkan.entities.clan.ClanType} of the character
      * @param gender {@link Gender} of the character
      */
-    public GameCharacter(Player player, String name, ClanType race, Gender gender) {
+    public GameCharacter(ObjectId id, Player player, String name, ClanType race, Gender gender) {
         // Identity
+        this.id = id;
         this.name = name;
         this.clan = Clan.Clan(race);
         this.gender = gender;
@@ -144,8 +144,9 @@ public class GameCharacter implements Serializable {
         initChar();
     }
 
-    public GameCharacter(Player player, String name, ClanType race, Gender gender, int level, int experience) {
+    public GameCharacter(ObjectId id, Player player, String name, ClanType race, Gender gender, int level, int experience) {
         // Identity
+        this.id = id;
         this.name = name;
         this.clan = Clan.Clan(race);
         this.gender = gender;
@@ -518,11 +519,8 @@ public class GameCharacter implements Serializable {
         this.hasActed = hasActed;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 }
