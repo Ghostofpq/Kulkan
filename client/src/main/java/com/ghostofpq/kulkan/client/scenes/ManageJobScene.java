@@ -3,8 +3,14 @@ package com.ghostofpq.kulkan.client.scenes;
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.JobManager;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
+import com.ghostofpq.kulkan.entities.job.JobType;
+import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
+import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
+import com.ghostofpq.kulkan.entities.messages.user.MessageUnlockCapacity;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 
@@ -57,7 +63,23 @@ public class ManageJobScene implements Scene {
 
     @Override
     public void manageInput() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        while (Mouse.next()) {
+            if (Mouse.isButtonDown(0)) {
+                if (warriorJobManager.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    Capacity capacity = warriorJobManager.clickedCapacity(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY());
+                    if (null != capacity) {
+                        MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(Client.getInstance().getTokenKey(), gameCharacter.getName(), JobType.WARRIOR, capacity.getName());
+                        try {
+                            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageUnlockCapacity.getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -67,6 +89,17 @@ public class ManageJobScene implements Scene {
 
     @Override
     public void receiveMessage() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Message message = Client.getInstance().receiveMessage();
+        if (null != message) {
+            switch (message.getType()) {
+                case PLAYER_UPDATE:
+                    log.debug("PLAYER_UPDATE");
+                    MessagePlayerUpdate response = (MessagePlayerUpdate) message;
+                    log.debug("CREATE OK");
+                    Client.getInstance().setPlayer(response.getPlayer());
+                    Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    break;
+            }
+        }
     }
 }
