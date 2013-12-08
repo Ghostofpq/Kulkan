@@ -35,6 +35,14 @@ public abstract class Capacity implements Serializable {
         prerequisite.addSon(this);
     }
 
+    public boolean canBeUnlock(int jobPoints) {
+        if (isAvailable() && jobPoints >= getPrice()
+                && isLocked()) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Getters and Setters
      */

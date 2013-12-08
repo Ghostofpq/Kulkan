@@ -1,7 +1,9 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.JobManager;
+import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
@@ -21,6 +23,14 @@ public class ManageJobScene implements Scene {
     private GameCharacter gameCharacter;
     private Channel channelOut;
     private JobManager warriorJobManager;
+    private KeyValueRender jobType;
+    private KeyValueRender jobPoints;
+    private KeyValueRender cumulatedJobPoints;
+    private Button unlockCapacity;
+    private Button quitButton;
+    private Capacity selectedCapacity;
+    private int widthSeparator = Client.getInstance().getWidth() / 20;
+    private int heightSeparator = Client.getInstance().getHeight() / 20;
 
     private ManageJobScene() {
     }
@@ -37,8 +47,10 @@ public class ManageJobScene implements Scene {
     }
 
     public void setGameCharacter(GameCharacter gameCharacter) {
+        int widthStep = (Client.getInstance().getWidth() - 3 * widthSeparator) / 5;
+        int heightStep = (Client.getInstance().getHeight() - 3 * heightSeparator) / 8;
         this.gameCharacter = gameCharacter;
-        warriorJobManager = new JobManager(0, 0, (2 * Client.getInstance().getWidth() / 3), Client.getInstance().getHeight(), gameCharacter.getJob(gameCharacter.getCurrentJob()));
+        warriorJobManager = new JobManager(widthSeparator, heightStep + 2 * heightSeparator, (3 * widthStep), 7 * heightStep, gameCharacter.getJob(gameCharacter.getCurrentJob()));
     }
 
     @Override
@@ -49,6 +61,26 @@ public class ManageJobScene implements Scene {
 
     @Override
     public void init() {
+        selectedCapacity = null;
+        int widthStep = (Client.getInstance().getWidth() - 5 * widthSeparator) / 5;
+        int heightStep = (Client.getInstance().getHeight() - 4 * heightSeparator) / 8;
+        jobType = new KeyValueRender(widthSeparator, heightSeparator, widthStep, heightStep, "JOB", String.valueOf(gameCharacter.getCurrentJob()), 5);
+        jobPoints = new KeyValueRender(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 5);
+        cumulatedJobPoints = new KeyValueRender(widthSeparator * 3 + 2 * widthStep, heightSeparator, widthStep, heightStep, "TOTAL", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getCumulativeJobPoints()), 5);
+
+        unlockCapacity = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 3 + 6 * heightStep, widthStep * 2, heightStep, "Unlock Capacity") {
+            @Override
+            public void onClick() {
+                unlockSelectedCapacity();
+            }
+        };
+
+        quitButton = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 3 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
+            @Override
+            public void onClick() {
+                Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+            }
+        };
     }
 
     @Override
@@ -59,25 +91,44 @@ public class ManageJobScene implements Scene {
     @Override
     public void render() {
         warriorJobManager.draw();
+        jobType.draw();
+        jobPoints.draw();
+        cumulatedJobPoints.draw();
+        quitButton.draw();
+        if (null != selectedCapacity && selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
+            unlockCapacity.draw();
+        }
     }
 
     @Override
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (warriorJobManager.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    quitButton.onClick();
+                } else if (unlockCapacity.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    if (null != selectedCapacity && selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
+                        unlockCapacity.onClick();
+                    }
+                } else if (warriorJobManager.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
                     Capacity capacity = warriorJobManager.clickedCapacity(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY());
                     if (null != capacity) {
-                        MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(Client.getInstance().getTokenKey(), gameCharacter.getName(), JobType.WARRIOR, capacity.getName());
-                        try {
-                            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageUnlockCapacity.getBytes());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        selectedCapacity = capacity;
                     }
                 }
+            }
+        }
+    }
+
+    public void unlockSelectedCapacity() {
+        if (null != selectedCapacity) {
+            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(Client.getInstance().getTokenKey(), gameCharacter.getName(), JobType.WARRIOR, selectedCapacity.getName());
+            try {
+                channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageUnlockCapacity.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -97,7 +148,9 @@ public class ManageJobScene implements Scene {
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     log.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
-                    setGameCharacter(response.getPlayer().getGameCharWithId(gameCharacter.getId()));
+                    GameCharacter updatedGameCharacter = response.getPlayer().getGameCharWithId(gameCharacter.getId());
+                    setGameCharacter(updatedGameCharacter);
+                    GameCharacterManageScene.getInstance().setGameCharacter(updatedGameCharacter);
                     Client.getInstance().setCurrentScene(instance);
                     break;
             }

@@ -71,11 +71,7 @@ public abstract class Job implements Serializable {
     }
 
     public boolean canUnlockCapacity(Capacity capacity) {
-        if (capacity.isAvailable() && this.jobPoints >= capacity.getPrice()
-                && capacity.isLocked()) {
-            return true;
-        }
-        return false;
+        return capacity.canBeUnlock(this.jobPoints);
     }
 
     public void unlockCapacity(Capacity capacity) {
