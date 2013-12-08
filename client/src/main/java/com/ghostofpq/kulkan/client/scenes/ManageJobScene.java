@@ -38,7 +38,7 @@ public class ManageJobScene implements Scene {
 
     public void setGameCharacter(GameCharacter gameCharacter) {
         this.gameCharacter = gameCharacter;
-        warriorJobManager = new JobManager(0, 0, (2 * Client.getInstance().getWidth() / 3), Client.getInstance().getHeight(), this.gameCharacter.getCurrentJob());
+        warriorJobManager = new JobManager(0, 0, (2 * Client.getInstance().getWidth() / 3), Client.getInstance().getHeight(), gameCharacter.getJob(gameCharacter.getCurrentJob()));
     }
 
     @Override
@@ -97,7 +97,8 @@ public class ManageJobScene implements Scene {
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     log.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
-                    Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    setGameCharacter(response.getPlayer().getGameCharWithId(gameCharacter.getId()));
+                    Client.getInstance().setCurrentScene(instance);
                     break;
             }
         }

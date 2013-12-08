@@ -69,8 +69,8 @@ public class GameCharacterManageScene implements Scene {
         mpRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 3, widthStep, heightStep, "MP", String.valueOf(gameCharacter.getMaxManaPoint()), 5);
         xpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 4, widthStep, heightStep, "XP", String.valueOf(gameCharacter.getExperience()), 5);
         lvlRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 4, widthStep, heightStep, "LVL", String.valueOf(gameCharacter.getLevel()), 5);
-        currentJobRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "Job", String.valueOf(gameCharacter.getCurrentJob().getName()), 5);
-        jobPoints = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 5, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getCurrentJob().getJobPoints()), 5);
+        currentJobRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "Job", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getName()), 5);
+        jobPoints = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 5, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 5);
         manageJobButton = new Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Job") {
             @Override
             public void onClick() {
@@ -231,8 +231,8 @@ public class GameCharacterManageScene implements Scene {
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     log.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
-                    Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-
+                    setGameCharacter(response.getPlayer().getGameCharWithId(gameCharacter.getId()));
+                    Client.getInstance().setCurrentScene(instance);
                     break;
             }
         }

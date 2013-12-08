@@ -190,21 +190,20 @@ public class UserService implements Runnable {
         String name = messageCreateNewGameCharacter.getName();
         Gender gender = messageCreateNewGameCharacter.getGender();
         ClanType clanType = messageCreateNewGameCharacter.getClanType();
-
+        JobType currentJob = JobType.WARRIOR;
         if (null != name && null != gender && null != clanType && !name.isEmpty()) {
             log.debug("Received a CreateGameCharacterRequest from [{}]", tokenKey);
             log.debug("Name : '{}'", name);
             log.debug("Gender : '{}'", gender);
             log.debug("ClanType : '{}'", clanType);
 
-            GameCharacterDB gameCharacterDB = new GameCharacterDB(name, gender, clanType, 1, 0, new ArrayList<JobStatusDB>());
+            GameCharacterDB gameCharacterDB = new GameCharacterDB(name, gender, clanType, 1, 0, currentJob, new ArrayList<JobStatusDB>());
             User user = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), tokenKey, gameCharacterDB);
             Player player = user.toPlayer();
 
             MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            log.debug(" [-] OPENING QUEUE : {}", queueName);
             channelServiceOut.queueDeclare(queueName, false, false, false, null);
             channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
         } else {
@@ -232,7 +231,6 @@ public class UserService implements Runnable {
 
             MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            log.debug(" [-] OPENING QUEUE : {}", queueName);
             channelServiceOut.queueDeclare(queueName, false, false, false, null);
             channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
         } else {

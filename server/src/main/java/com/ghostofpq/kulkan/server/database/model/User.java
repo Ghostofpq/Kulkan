@@ -155,18 +155,18 @@ public class User {
     }
 
     public void updateGameCharFromTeam(GameCharacter gameCharacter) {
-        for (GameCharacterDB gameCharacterDB : getTeam()) {
+        for (GameCharacterDB gameCharacterDB : team) {
             if (gameCharacterDB.getId().equals(gameCharacter.getId())) {
-                gameCharacterDB = new GameCharacterDB(gameCharacter);
+                team.set(team.indexOf(gameCharacterDB), new GameCharacterDB(gameCharacter));
                 break;
             }
         }
     }
 
     public void updateGameCharFromStock(GameCharacter gameCharacter) {
-        for (GameCharacterDB gameCharacterDB : getStock()) {
+        for (GameCharacterDB gameCharacterDB : stock) {
             if (gameCharacterDB.getId().equals(gameCharacter.getId())) {
-                gameCharacterDB = new GameCharacterDB(gameCharacter);
+                team.set(team.indexOf(gameCharacterDB), new GameCharacterDB(gameCharacter));
                 break;
             }
         }
@@ -198,6 +198,7 @@ public class User {
                     }
                 }
             }
+            gameCharacter.setCurrentJob(gameCharacterDB.getCurrentJob());
             player.getTeam().add(gameCharacter);
         }
         for (GameCharacterDB gameCharacterDB : this.stock) {
@@ -220,6 +221,7 @@ public class User {
                     }
                 }
             }
+            gameCharacter.setCurrentJob(gameCharacterDB.getCurrentJob());
             player.getStock().add(gameCharacter);
         }
         return player;

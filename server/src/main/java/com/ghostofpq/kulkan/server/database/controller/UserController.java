@@ -215,12 +215,13 @@ public class UserController {
                     }
                 }
                 if (null != gameCharacterToUpdate) {
-                    log.debug("{} unlocks {} for job {} of {}", player.getPseudo(), capacityToUnlock.getName(), jobToUpdate.getName(), gameCharacterToUpdate.getName());
+                    log.debug("{} unlocks {} ({} jp) for job {} of {}", player.getPseudo(), capacityToUnlock.getName(), capacityToUnlock.getPrice(), jobToUpdate.getName(), gameCharacterToUpdate.getName());
                     log.debug("JP before  : {}", jobToUpdate.getJobPoints());
                     jobToUpdate.unlockCapacity(capacityToUnlock);
                     log.debug("JP after  : {}", jobToUpdate.getJobPoints());
 
                     user.updateGameChar(gameCharacterToUpdate, gameCharacterIsInTeam);
+                    user = userRepository.save(user);
                 } else {
                     log.error("Capacity not found");
                 }

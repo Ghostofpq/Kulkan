@@ -1,5 +1,7 @@
 package com.ghostofpq.kulkan.entities.character;
 
+import org.bson.types.ObjectId;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,25 @@ public class Player implements Serializable {
     }
 
     public Player() {
+    }
+
+    public GameCharacter getGameCharWithId(ObjectId id) {
+        GameCharacter result = null;
+        for (GameCharacter gameCharacter : team) {
+            if (gameCharacter.getId().equals(id)) {
+                result = gameCharacter;
+                break;
+            }
+        }
+        if (null == result) {
+            for (GameCharacter gameCharacter : stock) {
+                if (gameCharacter.getId().equals(id)) {
+                    result = gameCharacter;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     /**

@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public abstract class Job implements Serializable {
 
     private static final long serialVersionUID = 7613901055857944135L;
@@ -27,7 +29,7 @@ public abstract class Job implements Serializable {
         this.name = name;
         this.description = description;
 
-        this.jobPoints = 0;
+        this.jobPoints = 500;
         this.cumulativeJobPoints = 0;
 
         this.unlockedMoves = new ArrayList<Move>();
@@ -58,7 +60,7 @@ public abstract class Job implements Serializable {
 
     public boolean canUnlockCapacity(Capacity capacity) {
         if (capacity.isAvailable() && this.jobPoints >= capacity.getPrice()
-                && !capacity.isLocked()) {
+                && capacity.isLocked()) {
             return true;
         }
         return false;

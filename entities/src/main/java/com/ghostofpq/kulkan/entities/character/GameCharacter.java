@@ -57,9 +57,9 @@ public class GameCharacter implements Serializable {
 
     // Learnings
     /**
-     * Current {@link com.ghostofpq.kulkan.entities.job.Job} of the character
+     * Current {@link com.ghostofpq.kulkan.entities.job.JobType} of the character
      */
-    private Job currentJob;
+    private JobType currentJob;
     /**
      * {@link com.ghostofpq.kulkan.entities.job.Warrior} path of the character
      */
@@ -130,7 +130,7 @@ public class GameCharacter implements Serializable {
 
         // Jobs
         jobWarrior = new Warrior();
-        currentJob = jobWarrior;
+        currentJob = JobType.WARRIOR;
 
         // Caracteristics
         characteristics = getClan().getBaseCaracteristics();
@@ -159,7 +159,7 @@ public class GameCharacter implements Serializable {
 
         // Jobs
         jobWarrior = new Warrior();
-        currentJob = jobWarrior;
+        currentJob = JobType.WARRIOR;
 
         // Caracteristics
         characteristics = getClan().getBaseCaracteristics();
@@ -189,7 +189,7 @@ public class GameCharacter implements Serializable {
     }
 
     public void gainJobpoints(int jobPoints) {
-        this.currentJob.gainJobPoints(jobPoints);
+        getJob(this.currentJob).gainJobPoints(jobPoints);
     }
 
     public boolean canLevelUp() {
@@ -325,11 +325,11 @@ public class GameCharacter implements Serializable {
         return nextLevel;
     }
 
-    public Job getCurrentJob() {
+    public JobType getCurrentJob() {
         return currentJob;
     }
 
-    public void setCurrentJob(Job currentJob) {
+    public void setCurrentJob(JobType currentJob) {
         this.currentJob = currentJob;
     }
 
@@ -339,7 +339,7 @@ public class GameCharacter implements Serializable {
 
     public void setJobWarrior(Warrior jobWarrior) {
         this.jobWarrior = jobWarrior;
-        this.currentJob = this.jobWarrior;
+        this.currentJob = JobType.WARRIOR;
     }
 
     public PrimaryCharacteristics getCharacteristics() {
