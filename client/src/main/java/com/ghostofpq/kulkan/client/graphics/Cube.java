@@ -29,8 +29,31 @@ public class Cube extends DrawableObject implements Serializable {
         this.setVisible(true);
         this.setSelectable(true);
         this.setMoving(false);
-        textureTop = TextureKey.GRASS;
-        side = TextureKey.EARTH;
+
+        int randomTop = (int) (Math.random() * 10);
+        if (randomTop == 0) {
+            textureTop = TextureKey.EARTH_TOP_00;
+        } else if (randomTop == 1) {
+            textureTop = TextureKey.EARTH_TOP_01;
+        } else if (randomTop == 2) {
+            textureTop = TextureKey.EARTH_TOP_02;
+        } else if (randomTop == 3) {
+            textureTop = TextureKey.EARTH_TOP_03;
+        } else if (randomTop == 4) {
+            textureTop = TextureKey.EARTH_TOP_04;
+        } else if (randomTop == 5) {
+            textureTop = TextureKey.EARTH_TOP_05;
+        } else if (randomTop == 6) {
+            textureTop = TextureKey.EARTH_TOP_06;
+        } else if (randomTop == 7) {
+            textureTop = TextureKey.EARTH_TOP_07;
+        } else if (randomTop == 8) {
+            textureTop = TextureKey.EARTH_TOP_08;
+        } else {
+            textureTop = TextureKey.EARTH_TOP_09;
+        }
+
+
         highlight = HighlightColor.NONE;
 
         // Creating the facets
@@ -45,10 +68,25 @@ public class Cube extends DrawableObject implements Serializable {
         PositionAbsolute p8 = positionAbsolute.plus(1f, 1f, 0);
 
         facetZenith = new Facet(position, p5, p8, p7, p6, textureTop);
-        facetSouth = new Facet(position, p6, p7, p3, p2, side);
-        facetWest = new Facet(position, p5, p6, p2, p1, side);
-        facetNorth = new Facet(position, p8, p5, p1, p4, side);
-        facetEast = new Facet(position, p7, p8, p4, p3, side);
+        facetSouth = new Facet(position, p6, p7, p3, p2, randomTextureSide());
+        facetWest = new Facet(position, p5, p6, p2, p1, randomTextureSide());
+        facetNorth = new Facet(position, p8, p5, p1, p4, randomTextureSide());
+        facetEast = new Facet(position, p7, p8, p4, p3, randomTextureSide());
+    }
+
+    private TextureKey randomTextureSide() {
+        TextureKey result;
+        int randomSide = (int) (Math.random() * 4);
+        if (randomSide == 0) {
+            result = TextureKey.EARTH_SIDE_00;
+        } else if (randomSide == 1) {
+            result = TextureKey.EARTH_SIDE_01;
+        } else if (randomSide == 2) {
+            result = TextureKey.EARTH_SIDE_02;
+        } else {
+            result = TextureKey.EARTH_SIDE_03;
+        }
+        return result;
     }
 
     public void update(long deltaTime) {

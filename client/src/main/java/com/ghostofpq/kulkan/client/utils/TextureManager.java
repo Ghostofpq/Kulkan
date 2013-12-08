@@ -32,6 +32,22 @@ public class TextureManager {
             Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/login_background.jpg"));
             Texture backgroundBasic = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/background_basic.jpg"));
 
+            Texture earthTop00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_00.png"));
+            Texture earthTop01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_01.png"));
+            Texture earthTop02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_02.png"));
+            Texture earthTop03 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_03.png"));
+            Texture earthTop04 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_04.png"));
+            Texture earthTop05 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_05.png"));
+            Texture earthTop06 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_06.png"));
+            Texture earthTop07 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_07.png"));
+            Texture earthTop08 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_08.png"));
+            Texture earthTop09 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_09.png"));
+
+            Texture earthSide00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_00.png"));
+            Texture earthSide01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_01.png"));
+            Texture earthSide02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_02.png"));
+            Texture earthSide03 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_03.png"));
+
 
             textureMap.put(TextureKey.GRASS, grass);
             textureMap.put(TextureKey.EARTH, earth);
@@ -49,6 +65,25 @@ public class TextureManager {
 
             textureMap.put(TextureKey.LOGIN_BACKGROUND, loginBackground);
             textureMap.put(TextureKey.BACKGROUND_BASIC, backgroundBasic);
+
+
+            textureMap.put(TextureKey.EARTH_TOP_00, earthTop00);
+            textureMap.put(TextureKey.EARTH_TOP_01, earthTop01);
+            textureMap.put(TextureKey.EARTH_TOP_02, earthTop02);
+            textureMap.put(TextureKey.EARTH_TOP_03, earthTop03);
+            textureMap.put(TextureKey.EARTH_TOP_04, earthTop04);
+            textureMap.put(TextureKey.EARTH_TOP_05, earthTop05);
+            textureMap.put(TextureKey.EARTH_TOP_06, earthTop06);
+            textureMap.put(TextureKey.EARTH_TOP_07, earthTop07);
+            textureMap.put(TextureKey.EARTH_TOP_08, earthTop08);
+            textureMap.put(TextureKey.EARTH_TOP_09, earthTop09);
+
+            textureMap.put(TextureKey.EARTH_SIDE_00, earthSide00);
+            textureMap.put(TextureKey.EARTH_SIDE_01, earthSide01);
+            textureMap.put(TextureKey.EARTH_SIDE_02, earthSide02);
+            textureMap.put(TextureKey.EARTH_SIDE_03, earthSide03);
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }

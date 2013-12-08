@@ -68,9 +68,9 @@ public class ManageJobScene implements Scene {
         selectedCapacity = null;
         int widthStep = (Client.getInstance().getWidth() - 5 * widthSeparator) / 5;
         int heightStep = (Client.getInstance().getHeight() - 6 * heightSeparator) / 8;
-        jobType = new KeyValueRender(widthSeparator, heightSeparator, widthStep, heightStep, "JOB", String.valueOf(gameCharacter.getCurrentJob()), 5);
-        jobPoints = new KeyValueRender(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 5);
-        cumulatedJobPoints = new KeyValueRender(widthSeparator * 3 + 2 * widthStep, heightSeparator, widthStep, heightStep, "TOTAL", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getCumulativeJobPoints()), 5);
+        jobType = new KeyValueRender(widthSeparator, heightSeparator, widthStep, heightStep, "JOB", String.valueOf(gameCharacter.getCurrentJob()), 3);
+        jobPoints = new KeyValueRender(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 7);
+        cumulatedJobPoints = new KeyValueRender(widthSeparator * 3 + 2 * widthStep, heightSeparator, widthStep, heightStep, "TOTAL", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getCumulativeJobPoints()), 7);
         selectedCapacityName = new KeyValueRender(widthSeparator * 4 + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Capacity", "0", 5);
 
         capacityDescription = new TextArea(widthSeparator * 4 + 3 * widthStep, heightSeparator * 2 + heightStep, 15, 10);

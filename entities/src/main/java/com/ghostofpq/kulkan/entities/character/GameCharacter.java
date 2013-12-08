@@ -182,7 +182,7 @@ public class GameCharacter implements Serializable {
 
     public void gainXp(double experience) {
         this.experience += experience;
-        if (canLevelUp()) {
+        while (canLevelUp()) {
             this.experience -= nextLevel;
             levelUp();
         }
@@ -235,7 +235,8 @@ public class GameCharacter implements Serializable {
     }
 
     public void calculateAggregatedCaracteristics() {
-        this.aggregatedCharacteristics = characteristics;
+        this.aggregatedCharacteristics = new PrimaryCharacteristics();
+        this.aggregatedCharacteristics.plus(characteristics);
         this.aggregatedCharacteristics.plus(getBonusFromJobs());
         this.aggregatedCharacteristics.plus(getBonusFromEquipement());
         this.aggregatedSecondaryCharacteristics = new SecondaryCharacteristics(aggregatedCharacteristics);
