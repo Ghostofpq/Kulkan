@@ -29,7 +29,7 @@ public abstract class Job implements Serializable {
         this.name = name;
         this.description = description;
 
-        this.jobPoints = 500;
+        this.jobPoints = 0;
         this.cumulativeJobPoints = 0;
 
         this.unlockedMoves = new ArrayList<Move>();
@@ -48,6 +48,17 @@ public abstract class Job implements Serializable {
         for (Capacity capacity : skillTree) {
             if (skillTreeStatus.containsKey(capacity.getName())) {
                 capacity.setLocked(skillTreeStatus.get(capacity.getName()));
+
+                if (!skillTreeStatus.get(capacity.getName())) {
+                    switch (capacity.getType()) {
+                        case AMELIORATION:
+                            unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                            break;
+                        case MOVE:
+                            unlockedMoves.add((Move) capacity);
+                            break;
+                    }
+                }
             } else {
                 capacity.setLocked(true);
             }
@@ -56,6 +67,7 @@ public abstract class Job implements Serializable {
 
     public void gainJobPoints(int jobPoints) {
         this.jobPoints += jobPoints;
+        this.cumulativeJobPoints += jobPoints;
     }
 
     public boolean canUnlockCapacity(Capacity capacity) {

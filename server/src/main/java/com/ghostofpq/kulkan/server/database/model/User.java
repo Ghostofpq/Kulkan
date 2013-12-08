@@ -199,6 +199,7 @@ public class User {
                 }
             }
             gameCharacter.setCurrentJob(gameCharacterDB.getCurrentJob());
+            gameCharacter.calculateAggregatedCaracteristics();
             player.getTeam().add(gameCharacter);
         }
         for (GameCharacterDB gameCharacterDB : this.stock) {
@@ -222,6 +223,7 @@ public class User {
                 }
             }
             gameCharacter.setCurrentJob(gameCharacterDB.getCurrentJob());
+            gameCharacter.calculateAggregatedCaracteristics();
             player.getStock().add(gameCharacter);
         }
         return player;

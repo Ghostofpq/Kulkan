@@ -47,10 +47,7 @@ public class JobManager extends HUDElement {
     }
 
     public void placeCapacity(Capacity capacity) {
-        if (capacities.keySet().contains(capacity)) {
-            log.debug("{} is already placed", capacity.getName());
-        } else {
-            log.debug("placing {}", capacity.getName());
+        if (!capacities.keySet().contains(capacity)) {
             int capacitySlot = 0;
             for (Capacity capacityPlaced : capacities.keySet()) {
                 if (capacityPlaced.getMaxDepth() == capacity.getMaxDepth()) {

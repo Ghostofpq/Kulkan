@@ -234,7 +234,7 @@ public class GameCharacter implements Serializable {
         return result;
     }
 
-    private void calculateAggregatedCaracteristics() {
+    public void calculateAggregatedCaracteristics() {
         this.aggregatedCharacteristics = characteristics;
         this.aggregatedCharacteristics.plus(getBonusFromJobs());
         this.aggregatedCharacteristics.plus(getBonusFromEquipement());
