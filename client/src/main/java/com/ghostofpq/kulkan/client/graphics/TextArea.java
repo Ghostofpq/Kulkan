@@ -48,8 +48,11 @@ public class TextArea extends HUDElement {
             int nextIndex = Math.min(input.length(), maxLength);
             String buffer = input.substring(0, nextIndex);
             input = input.substring(nextIndex);
-            log.debug(" [x] Adding : [{}]", buffer);
             textInputs.add(buffer);
         }
+    }
+
+    public void clear() {
+        textInputs = new ArrayList<String>();
     }
 }

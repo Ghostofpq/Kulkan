@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.JobManager;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
+import com.ghostofpq.kulkan.client.graphics.TextArea;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
@@ -26,9 +27,12 @@ public class ManageJobScene implements Scene {
     private KeyValueRender jobType;
     private KeyValueRender jobPoints;
     private KeyValueRender cumulatedJobPoints;
+    private KeyValueRender selectedCapacityName;
+    private KeyValueRender capacityPrice;
     private Button unlockCapacity;
     private Button quitButton;
     private Capacity selectedCapacity;
+    private TextArea capacityDescription;
     private int widthSeparator = Client.getInstance().getWidth() / 20;
     private int heightSeparator = Client.getInstance().getHeight() / 20;
 
@@ -63,19 +67,25 @@ public class ManageJobScene implements Scene {
     public void init() {
         selectedCapacity = null;
         int widthStep = (Client.getInstance().getWidth() - 5 * widthSeparator) / 5;
-        int heightStep = (Client.getInstance().getHeight() - 4 * heightSeparator) / 8;
+        int heightStep = (Client.getInstance().getHeight() - 6 * heightSeparator) / 8;
         jobType = new KeyValueRender(widthSeparator, heightSeparator, widthStep, heightStep, "JOB", String.valueOf(gameCharacter.getCurrentJob()), 5);
         jobPoints = new KeyValueRender(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 5);
         cumulatedJobPoints = new KeyValueRender(widthSeparator * 3 + 2 * widthStep, heightSeparator, widthStep, heightStep, "TOTAL", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getCumulativeJobPoints()), 5);
+        selectedCapacityName = new KeyValueRender(widthSeparator * 4 + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Capacity", "0", 5);
 
-        unlockCapacity = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 3 + 6 * heightStep, widthStep * 2, heightStep, "Unlock Capacity") {
+        capacityDescription = new TextArea(widthSeparator * 4 + 3 * widthStep, heightSeparator * 2 + heightStep, 15, 10);
+
+
+        capacityPrice = new KeyValueRender(widthSeparator * 4 + 3 * widthStep, heightSeparator * 3 + 5 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
+
+        unlockCapacity = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 4 + 6 * heightStep, widthStep * 2, heightStep, "Unlock Capacity") {
             @Override
             public void onClick() {
                 unlockSelectedCapacity();
             }
         };
 
-        quitButton = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 3 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
+        quitButton = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 5 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
             @Override
             public void onClick() {
                 Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
@@ -95,8 +105,14 @@ public class ManageJobScene implements Scene {
         jobPoints.draw();
         cumulatedJobPoints.draw();
         quitButton.draw();
-        if (null != selectedCapacity && selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
-            unlockCapacity.draw();
+
+        if (null != selectedCapacity) {
+            capacityPrice.draw();
+            selectedCapacityName.draw();
+            capacityDescription.draw();
+            if (selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
+                unlockCapacity.draw();
+            }
         }
     }
 
@@ -114,6 +130,10 @@ public class ManageJobScene implements Scene {
                     Capacity capacity = warriorJobManager.clickedCapacity(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY());
                     if (null != capacity) {
                         selectedCapacity = capacity;
+                        selectedCapacityName.setValue(capacity.getName());
+                        capacityDescription.clear();
+                        capacityDescription.addLine(capacity.getDescription());
+                        capacityPrice.setValue(String.valueOf(capacity.getPrice()));
                     }
                 }
             }

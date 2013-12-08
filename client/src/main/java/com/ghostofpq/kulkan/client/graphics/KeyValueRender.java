@@ -38,4 +38,8 @@ public class KeyValueRender extends HUDElement {
         FontManager.getInstance().drawString(FONT, posXKey, posYKey, key, Color.white);
         FontManager.getInstance().drawString(FONT, posXValue, posYValue, value, Color.white);
     }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }
