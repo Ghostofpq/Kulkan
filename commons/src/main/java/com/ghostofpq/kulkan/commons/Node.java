@@ -1,17 +1,46 @@
 package com.ghostofpq.kulkan.commons;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Node<T> implements Serializable, Comparable<Node<T>> {
+/**
+ * Element of @link{com.ghostofpq.kulkan.commons.Tree}.<br/>
+ * Implement @link{Comparable} on the distance to the root Node.
+ *
+ * @param <T> Type of the content.
+ */
+public class Node<T> implements Comparable<Node<T>> {
+    /**
+     * @link{com.ghostofpq.kulkan.commons.Tree} in which the Node is contained.
+     */
     private Tree<T> tree;
+    /**
+     * Content.
+     */
     private T data;
+    /**
+     * Parent.
+     */
     private Node<T> parent;
+    /**
+     * Children.
+     */
     private List<Node<T>> children;
+    /**
+     * Distance between this Node and the root Node.<br/>
+     * (Not necessarily the number of element between this Node and the root Node)
+     */
     private int distanceFromTop;
 
+    /**
+     * Constructor
+     *
+     * @param data            Node content
+     * @param tree            Tree containing this Node
+     * @param parent          Parent Node
+     * @param distanceFromTop Distance from root Node
+     */
     public Node(T data, Tree<T> tree, Node<T> parent, int distanceFromTop) {
         this.setTree(tree);
         this.setData(data);
@@ -20,6 +49,13 @@ public class Node<T> implements Serializable, Comparable<Node<T>> {
         this.setChildren(new ArrayList<Node<T>>());
     }
 
+    /**
+     * Create a child Node to this Node.
+     *
+     * @param childData Node content
+     * @param distance  Distance to this Node
+     * @return created Node
+     */
     public Node<T> addChild(T childData, int distance) {
         int childDistanceFromTop = (getDistanceFromTop() + distance);
         Node<T> child = new Node<T>(childData, getTree(), this, childDistanceFromTop);
@@ -27,6 +63,12 @@ public class Node<T> implements Serializable, Comparable<Node<T>> {
         return child;
     }
 
+    /**
+     * Checks recursively if the element is in a subtree with this Node as the root Node.
+     *
+     * @param element element to search.
+     * @return true if the element is contained.
+     */
     public boolean contains(T element) {
         boolean result = false;
 
@@ -43,10 +85,15 @@ public class Node<T> implements Serializable, Comparable<Node<T>> {
                 }
             }
         }
-
         return result;
     }
 
+    /**
+     * Searches recursively the Nodes where the data field is equal to the element in a subtree with this Node as the root Node.
+     *
+     * @param element element to search
+     * @return the List of Node where the the data field is equal to the element.
+     */
     public List<Node<T>> find(T element) {
         List<Node<T>> result = new ArrayList<Node<T>>();
         if (getData().equals(element)) {
