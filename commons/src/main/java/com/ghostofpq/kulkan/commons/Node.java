@@ -89,7 +89,7 @@ public class Node<T> implements Comparable<Node<T>> {
     }
 
     /**
-     * Searches recursively the Nodes where the data field is equal to the element in a subtree with this Node as the root Node.
+     * Searches recursively the Nodes where the data field is equal to the element.
      *
      * @param element element to search
      * @return the List of Node where the the data field is equal to the element.
@@ -105,6 +105,11 @@ public class Node<T> implements Comparable<Node<T>> {
         return result;
     }
 
+    /**
+     * Assemble recursively the path to the root Node.
+     *
+     * @return the path to the top as a List of Nodes
+     */
     public List<T> getPathToTop() {
         List<T> result = new ArrayList<T>();
         Node<T> node = this;
@@ -115,12 +120,22 @@ public class Node<T> implements Comparable<Node<T>> {
         return result;
     }
 
+    /**
+     * Get the path from the root Node to this Node.
+     *
+     * @return the path from the top as a List of Nodes
+     */
     public List<T> getPathFromTop() {
         List<T> result = getPathToTop();
         Collections.reverse(result);
         return result;
     }
 
+    /**
+     * Get all the element contained in the subtree with this Node as the root Node.
+     *
+     * @return all the element contained as a List of element.
+     */
     public List<T> getAllElements() {
         List<T> result = new ArrayList<T>();
         result.add(getData());
@@ -130,6 +145,11 @@ public class Node<T> implements Comparable<Node<T>> {
         return result;
     }
 
+    /**
+     * Remove recursively all the Node where the data field is equal to the element.
+     *
+     * @param element element to search
+     */
     public void remove(T element) {
         for (int i = 0; i < getChildren().size(); i++) {
             if (getChildren().get(i).getData().equals(element)) {
@@ -143,6 +163,10 @@ public class Node<T> implements Comparable<Node<T>> {
     }
 
     @Override
+    /**
+     * Compare two Nodes on the distance to the top. <br/>
+     * If the distance is superior, then the Node is superior.
+     */
     public int compareTo(Node<T> other) {
         int res;
         if (getDistanceFromTop() < other.getDistanceFromTop()) {
