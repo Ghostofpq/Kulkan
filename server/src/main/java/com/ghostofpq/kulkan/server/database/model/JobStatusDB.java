@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.server.database.model;
 
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
+import com.ghostofpq.kulkan.entities.job.Mage;
 import com.ghostofpq.kulkan.entities.job.Warrior;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +38,9 @@ public class JobStatusDB {
         switch (jobType) {
             case WARRIOR:
                 job = new Warrior();
+                break;
+            case MAGE:
+                job = new Mage();
                 break;
         }
         if (null != job) {

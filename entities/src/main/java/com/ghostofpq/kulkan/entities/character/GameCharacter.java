@@ -9,6 +9,7 @@ import com.ghostofpq.kulkan.entities.clan.Clan;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
+import com.ghostofpq.kulkan.entities.job.Mage;
 import com.ghostofpq.kulkan.entities.job.Warrior;
 import org.bson.types.ObjectId;
 
@@ -64,6 +65,7 @@ public class GameCharacter implements Serializable {
      * {@link com.ghostofpq.kulkan.entities.job.Warrior} path of the character
      */
     private Warrior jobWarrior;
+    private Mage jobMage;
 
     // Caracteristics
     /**
@@ -130,6 +132,7 @@ public class GameCharacter implements Serializable {
 
         // Jobs
         jobWarrior = new Warrior();
+        jobMage = new Mage();
         currentJob = JobType.WARRIOR;
 
         // Caracteristics
@@ -159,6 +162,7 @@ public class GameCharacter implements Serializable {
 
         // Jobs
         jobWarrior = new Warrior();
+        jobMage = new Mage();
         currentJob = JobType.WARRIOR;
 
         // Caracteristics
@@ -341,6 +345,14 @@ public class GameCharacter implements Serializable {
     public void setJobWarrior(Warrior jobWarrior) {
         this.jobWarrior = jobWarrior;
         this.currentJob = JobType.WARRIOR;
+    }
+
+    public Mage getJobMage() {
+        return jobMage;
+    }
+
+    public void setJobMage(Mage jobMage) {
+        this.jobMage = jobMage;
     }
 
     public PrimaryCharacteristics getCharacteristics() {

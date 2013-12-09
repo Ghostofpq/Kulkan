@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.server.database.model;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.job.Job;
+import com.ghostofpq.kulkan.entities.job.Mage;
 import com.ghostofpq.kulkan.entities.job.Warrior;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -195,6 +196,9 @@ public class User {
                         case WARRIOR:
                             gameCharacter.setJobWarrior((Warrior) job);
                             break;
+                        case MAGE:
+                            gameCharacter.setJobMage((Mage) job);
+                            break;
                     }
                 }
             }
@@ -218,6 +222,9 @@ public class User {
                     switch (job.getJobType()) {
                         case WARRIOR:
                             gameCharacter.setJobWarrior((Warrior) job);
+                            break;
+                        case MAGE:
+                            gameCharacter.setJobMage((Mage) job);
                             break;
                     }
                 }

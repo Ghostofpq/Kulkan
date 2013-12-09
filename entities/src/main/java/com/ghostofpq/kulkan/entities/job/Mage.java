@@ -8,41 +8,42 @@ import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Warrior extends Job {
-    private final static String WARRIOR_NAME = "Warrior";
-    private final static String WARRIOR_DESC = "Warriors are stronk";
+public class Mage extends Job {
+    private final static String MAGE_NAME = "Mage";
+    private final static String MAGE_DESC = "Mages are stiffy";
 
-    public Warrior() {
-        super(WARRIOR_NAME, WARRIOR_DESC);
-        this.jobType = JobType.WARRIOR;
+    public Mage() {
+        super(MAGE_NAME, MAGE_DESC);
+        this.jobType = JobType.MAGE;
         this.prepareSkillTree();
+
     }
 
     // Warrior Skills
     private void prepareSkillTree() {
         List<Capacity> skillTree = new ArrayList<Capacity>();
 
-        Move fatMandalleMove = new Move("Grosse mandalle", "Enorme mandalle dans la face du mec", 0);
-        skillTree.add(fatMandalleMove);
-        this.unlockCapacity(fatMandalleMove);
+        Move magicBallMove = new Move("Magic Ball", "Throw a ball full of magic", 0);
+        skillTree.add(magicBallMove);
+        this.unlockCapacity(magicBallMove);
 
-        PrimaryCharacteristics strength1C = new PrimaryCharacteristics(5, 0, 0,
+        PrimaryCharacteristics intelligence1C = new PrimaryCharacteristics(5, 0, 0,
                 0, 0, 0);
-        AmeliorationPrimary strength1 = new AmeliorationPrimary("S1",
-                "Add 5 strength", strength1C, 10);
-        skillTree.add(strength1);
+        AmeliorationPrimary intelligence1 = new AmeliorationPrimary("I1",
+                "Add 5 Intelligence", intelligence1C, 10);
+        skillTree.add(intelligence1);
 
-        PrimaryCharacteristics strength2C = new PrimaryCharacteristics(10, 0,
+        PrimaryCharacteristics intelligence2C = new PrimaryCharacteristics(10, 0,
                 0, 0, 0, 0);
-        AmeliorationPrimary strength2 = new AmeliorationPrimary("S2",
-                "Add 10 strength", strength2C, 150);
-        skillTree.add(strength2);
+        AmeliorationPrimary intelligence2 = new AmeliorationPrimary("I2",
+                "Add 10 Intelligence", intelligence2C, 150);
+        skillTree.add(intelligence2);
 
-        PrimaryCharacteristics strength3C = new PrimaryCharacteristics(20, 0,
+        PrimaryCharacteristics intelligence3C = new PrimaryCharacteristics(20, 0,
                 0, 0, 0, 0);
-        AmeliorationPrimary strength3 = new AmeliorationPrimary("S3",
-                "Add 20 strength", strength3C, 500);
-        skillTree.add(strength3);
+        AmeliorationPrimary intelligence3 = new AmeliorationPrimary("I3",
+                "Add 20 Intelligence", intelligence3C, 500);
+        skillTree.add(intelligence3);
 
         PrimaryCharacteristics endurance1C = new PrimaryCharacteristics(0, 5,
                 0, 0, 0, 0);
@@ -61,16 +62,10 @@ public class Warrior extends Job {
                 "Add 20 endurance", endurance3C, 500);
         skillTree.add(endurance3);
 
-        Move bisous = new Move("Bisous", "pour doudou en general", 50);
-        skillTree.add(bisous);
-        Move calins = new Move("Calins", "pour doudou en general", 50);
-        skillTree.add(calins);
 
-        strength2.addPrerequisite(strength1);
-        bisous.addPrerequisite(strength1);
-        strength3.addPrerequisite(strength2);
+        intelligence2.addPrerequisite(intelligence1);
+        intelligence3.addPrerequisite(intelligence2);
         endurance2.addPrerequisite(endurance1);
-        calins.addPrerequisite(endurance1);
         endurance3.addPrerequisite(endurance2);
 
         this.setSkillTree(skillTree);
