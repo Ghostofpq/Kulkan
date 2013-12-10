@@ -24,6 +24,7 @@ public class GameCharacterManageScene implements Scene {
     private GameCharacter gameCharacter;
     private Button manageJobButton;
     private Button manageEquipementButton;
+    private Button changeJobButton;
     private Button quitButton;
     private Button deleteGameCharButton;
     private Button putInTeam;
@@ -80,7 +81,14 @@ public class GameCharacterManageScene implements Scene {
             }
         };
 
-        manageEquipementButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Stuff") {
+        changeJobButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Change Job") {
+            @Override
+            public void onClick() {
+                Client.getInstance().setCurrentScene(ChangeJobScene.getInstance());
+            }
+        };
+
+        manageEquipementButton = new Button(widthSeparator + 2 * widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Stuff") {
             @Override
             public void onClick() {
                 log.debug("manageEquipementButton");
@@ -179,6 +187,7 @@ public class GameCharacterManageScene implements Scene {
         quitButton.draw();
         currentJobRender.draw();
         jobPoints.draw();
+        changeJobButton.draw();
         if (isInTeam()) {
             putInStock.draw();
         } else {
@@ -211,6 +220,9 @@ public class GameCharacterManageScene implements Scene {
                     if (putInTeam.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
                         putInTeam.onClick();
                     }
+                }
+                if (changeJobButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    changeJobButton.onClick();
                 }
             }
         }
