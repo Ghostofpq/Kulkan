@@ -257,5 +257,6 @@ public class GameCharacterManageScene implements Scene {
     public void setGameCharacter(GameCharacter gameCharacter) {
         this.gameCharacter = gameCharacter;
         ManageJobScene.getInstance().setGameCharacter(gameCharacter);
+        ChangeJobScene.getInstance().setGameCharacter(gameCharacter);
     }
 }

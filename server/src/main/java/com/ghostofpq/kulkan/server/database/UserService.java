@@ -103,9 +103,13 @@ public class UserService implements Runnable {
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("NewJob : '{}'", newJob);
         if (null != tokenKey && null != gameCharId && null != newJob) {
-
+            User user = userController.setNewJobForGameCharacterWithId(tokenKey, gameCharId, newJob);
+            Player player = user.toPlayer();
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            channelServiceOut.queueDeclare(queueName, false, false, false, null);
+            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
         }
-
     }
 
     private void manageDeleteGameCharacterFromTeamRequest(Message message) throws IOException {

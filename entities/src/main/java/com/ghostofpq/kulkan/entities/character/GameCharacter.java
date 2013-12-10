@@ -289,6 +289,8 @@ public class GameCharacter implements Serializable {
         switch (jobType) {
             case WARRIOR:
                 return jobWarrior;
+            case MAGE:
+                return jobMage;
             default:
                 return null;
         }
@@ -336,6 +338,7 @@ public class GameCharacter implements Serializable {
 
     public void setCurrentJob(JobType currentJob) {
         this.currentJob = currentJob;
+        updateLifeAndManaPoint();
     }
 
     public Warrior getJobWarrior() {
@@ -344,7 +347,6 @@ public class GameCharacter implements Serializable {
 
     public void setJobWarrior(Warrior jobWarrior) {
         this.jobWarrior = jobWarrior;
-        this.currentJob = JobType.WARRIOR;
     }
 
     public Mage getJobMage() {

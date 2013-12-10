@@ -2,7 +2,10 @@ package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
+import com.ghostofpq.kulkan.entities.character.GameCharacter;
+import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.user.MessageChangeJob;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import java.io.IOException;
 public class ChangeJobScene implements Scene {
     private static volatile ChangeJobScene instance = null;
     private final String USER_SERVICE_QUEUE_NAME = "users";
+    private GameCharacter gameCharacter;
     private Channel channelOut;
     private Button warriorButton;
     private Button mageButton;
@@ -33,6 +37,10 @@ public class ChangeJobScene implements Scene {
         return instance;
     }
 
+    public void setGameCharacter(GameCharacter gameCharacter) {
+        this.gameCharacter = gameCharacter;
+    }
+
     @Override
     public void init() {
         int widthSeparator = Client.getInstance().getWidth() / 20;
@@ -45,6 +53,14 @@ public class ChangeJobScene implements Scene {
             @Override
             public void onClick() {
                 log.debug("Warrior");
+                MessageChangeJob messageChangeJob = new MessageChangeJob(Client.getInstance().getTokenKey(), gameCharacter.getId(), JobType.WARRIOR);
+                try {
+                    channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageChangeJob.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
 
@@ -52,6 +68,14 @@ public class ChangeJobScene implements Scene {
             @Override
             public void onClick() {
                 log.debug("Mage");
+                MessageChangeJob messageChangeJob = new MessageChangeJob(Client.getInstance().getTokenKey(), gameCharacter.getId(), JobType.MAGE);
+                try {
+                    channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageChangeJob.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
 
