@@ -10,6 +10,7 @@ import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -60,9 +61,33 @@ public class UserController {
         if (userList.size() == 1) {
             user = userList.get(0);
         } else if (userList.size() > 1) {
-            log.error("multiple results for authKey : [{}]", tokenKey);
+            log.error("Multiple results for authKey : [{}]", tokenKey);
         } else {
-            log.error("no result for authKey : [{}]", tokenKey);
+            log.error("No result for authKey : [{}]", tokenKey);
+        }
+        return user;
+    }
+
+    public User setNewJobForGameCharacterWithId(String tokenKey, ObjectId gameCharId, JobType newJob) {
+        User user = getUserForTokenKey(tokenKey);
+        if (null != user) {
+            GameCharacterDB gameCharacterDB = null;
+            for (GameCharacterDB teamMember : user.getTeam()) {
+                if (teamMember.getId().equals(gameCharId)) {
+                    gameCharacterDB = teamMember;
+                    break;
+                }
+            }
+            if (null == gameCharacterDB) {
+                for (GameCharacterDB teamMember : user.getStock()) {
+                    if (teamMember.getId().equals(gameCharId)) {
+                        gameCharacterDB = teamMember;
+                        break;
+                    }
+                }
+            }
+            gameCharacterDB.setCurrentJob(newJob);
+            user = userRepository.save(user);
         }
         return user;
     }
