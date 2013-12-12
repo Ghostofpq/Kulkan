@@ -23,7 +23,7 @@ public class ManageJobScene implements Scene {
     private final String USER_SERVICE_QUEUE_NAME = "users";
     private GameCharacter gameCharacter;
     private Channel channelOut;
-    private JobManager warriorJobManager;
+    private JobManager jobManager;
     private KeyValueRender jobType;
     private KeyValueRender jobPoints;
     private KeyValueRender cumulatedJobPoints;
@@ -54,7 +54,7 @@ public class ManageJobScene implements Scene {
         int widthStep = (Client.getInstance().getWidth() - 3 * widthSeparator) / 5;
         int heightStep = (Client.getInstance().getHeight() - 3 * heightSeparator) / 8;
         this.gameCharacter = gameCharacter;
-        warriorJobManager = new JobManager(widthSeparator, heightStep + 2 * heightSeparator, (3 * widthStep), 7 * heightStep, gameCharacter.getJob(gameCharacter.getCurrentJob()));
+        jobManager = new JobManager(widthSeparator, heightStep + 2 * heightSeparator, (3 * widthStep), 7 * heightStep, gameCharacter.getJob(gameCharacter.getCurrentJob()));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ManageJobScene implements Scene {
 
     @Override
     public void render() {
-        warriorJobManager.draw();
+        jobManager.draw();
         jobType.draw();
         jobPoints.draw();
         cumulatedJobPoints.draw();
@@ -126,8 +126,8 @@ public class ManageJobScene implements Scene {
                     if (null != selectedCapacity && selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
                         unlockCapacity.onClick();
                     }
-                } else if (warriorJobManager.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    Capacity capacity = warriorJobManager.clickedCapacity(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY());
+                } else if (jobManager.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    Capacity capacity = jobManager.clickedCapacity(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY());
                     if (null != capacity) {
                         selectedCapacity = capacity;
                         selectedCapacityName.setValue(capacity.getName());

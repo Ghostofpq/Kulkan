@@ -49,6 +49,7 @@ public class GameCharacterDB {
         this.currentJob = gameCharacter.getCurrentJob();
         this.jobStatusDBs = new ArrayList<JobStatusDB>();
         jobStatusDBs.add(new JobStatusDB(gameCharacter.getJobWarrior()));
+        jobStatusDBs.add(new JobStatusDB(gameCharacter.getJobMage()));
     }
 
     public ObjectId getId() {

@@ -61,16 +61,9 @@ public class Warrior extends Job {
                 "Add 20 endurance", endurance3C, 500);
         skillTree.add(endurance3);
 
-        Move bisous = new Move("Bisous", "pour doudou en general", 50);
-        skillTree.add(bisous);
-        Move calins = new Move("Calins", "pour doudou en general", 50);
-        skillTree.add(calins);
-
         strength2.addPrerequisite(strength1);
-        bisous.addPrerequisite(strength1);
         strength3.addPrerequisite(strength2);
         endurance2.addPrerequisite(endurance1);
-        calins.addPrerequisite(endurance1);
         endurance3.addPrerequisite(endurance2);
 
         this.setSkillTree(skillTree);

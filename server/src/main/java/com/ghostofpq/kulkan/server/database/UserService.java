@@ -81,10 +81,34 @@ public class UserService implements Runnable {
                 case CHARACTER_UNLOCK_CAPACITY:
                     manageUnlockCapacityForGameCharacterRequest(message);
                     break;
+                case CHARACTER_CHANGE_JOB:
+                    manageChangeJobRequest(message);
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
             }
+        }
+    }
+
+    private void manageChangeJobRequest(Message message) throws IOException {
+        MessageChangeJob messageChangeJob = (MessageChangeJob) message;
+
+        String tokenKey = messageChangeJob.getKeyToken();
+        ObjectId gameCharId = messageChangeJob.getGameCharId();
+        JobType newJob = messageChangeJob.getNewJob();
+
+        log.debug("Received a DeleteGameChararacterFromTeamRequest");
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharId : '{}'", gameCharId);
+        log.debug("NewJob : '{}'", newJob);
+        if (null != tokenKey && null != gameCharId && null != newJob) {
+            User user = userController.setNewJobForGameCharacterWithId(tokenKey, gameCharId, newJob);
+            Player player = user.toPlayer();
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            channelServiceOut.queueDeclare(queueName, false, false, false, null);
+            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
         }
     }
 
