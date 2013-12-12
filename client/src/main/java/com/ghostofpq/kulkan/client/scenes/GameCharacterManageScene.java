@@ -96,10 +96,10 @@ public class GameCharacterManageScene implements Scene {
                     log.debug("Sending ");
                     Player player = Client.getInstance().getPlayer();
                     if (player.getTeam().contains(gameCharacter)) {
-                        MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                        MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
                         channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromTeam.getBytes());
                     } else {
-                        MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                        MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
                         channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromStock.getBytes());
                     }
                 } catch (IOException e) {
@@ -125,7 +125,7 @@ public class GameCharacterManageScene implements Scene {
                 try {
                     log.debug("Sending ");
                     Player player = Client.getInstance().getPlayer();
-                    MessagePutGameCharacterFromStockToTeam messagePutGameCharacterFromStockToTeam = new MessagePutGameCharacterFromStockToTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                    MessagePutGameCharacterFromStockToTeam messagePutGameCharacterFromStockToTeam = new MessagePutGameCharacterFromStockToTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
                     channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messagePutGameCharacterFromStockToTeam.getBytes());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -144,7 +144,7 @@ public class GameCharacterManageScene implements Scene {
                         try {
                             log.debug("Sending ");
                             Player player = Client.getInstance().getPlayer();
-                            MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getName());
+                            MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
                             channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, putGameCharacterFromTeamToStock.getBytes());
                         } catch (IOException e) {
                             e.printStackTrace();

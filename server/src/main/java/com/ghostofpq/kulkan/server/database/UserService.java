@@ -15,6 +15,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -92,16 +93,16 @@ public class UserService implements Runnable {
 
         String username = messageDeleteGameCharacterFromTeam.getUsername();
         String tokenKey = messageDeleteGameCharacterFromTeam.getKeyToken();
-        String gameCharName = messageDeleteGameCharacterFromTeam.getGameCharName();
+        ObjectId gameCharId = messageDeleteGameCharacterFromTeam.getGameCharId();
 
         log.debug("Received a DeleteGameChararacterFromTeamRequest");
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
-        log.debug("GameCharName : '{}'", gameCharName);
+        log.debug("GameCharId : '{}'", gameCharId);
 
-        if (null != tokenKey && null != username && null != gameCharName) {
-            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
-                User user = userController.removeGameCharFromTeam(username, tokenKey, gameCharName);
+        if (null != tokenKey && null != username && null != gameCharId) {
+            if (!tokenKey.isEmpty() && !username.isEmpty()) {
+                User user = userController.removeGameCharFromTeam(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -116,16 +117,16 @@ public class UserService implements Runnable {
 
         String username = messageDeleteGameCharacterFromStock.getUsername();
         String tokenKey = messageDeleteGameCharacterFromStock.getKeyToken();
-        String gameCharName = messageDeleteGameCharacterFromStock.getGameCharName();
+        ObjectId gameCharId = messageDeleteGameCharacterFromStock.getGameCharId();
 
         log.debug("Received a DeleteGameChararacterFromStockRequest");
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
-        log.debug("GameCharName : '{}'", gameCharName);
+        log.debug("GameCharName : '{}'", gameCharId);
 
-        if (null != tokenKey && null != username && null != gameCharName) {
-            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
-                User user = userController.removeGameCharFromStock(username, tokenKey, gameCharName);
+        if (null != tokenKey && null != username && null != gameCharId) {
+            if (!tokenKey.isEmpty() && !username.isEmpty()) {
+                User user = userController.removeGameCharFromStock(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -140,16 +141,16 @@ public class UserService implements Runnable {
 
         String username = messagePutGameCharacterFromTeamToStock.getUsername();
         String tokenKey = messagePutGameCharacterFromTeamToStock.getKeyToken();
-        String gameCharName = messagePutGameCharacterFromTeamToStock.getGameCharName();
+        ObjectId gameCharId = messagePutGameCharacterFromTeamToStock.getGameCharId();
 
         log.debug("Received a PutGameCharacterFromTeamToStockRequest");
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
-        log.debug("GameCharName : '{}'", gameCharName);
+        log.debug("GameCharName : '{}'", gameCharId);
 
-        if (null != tokenKey && null != username && null != gameCharName) {
-            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
-                User user = userController.putGameCharFromTeamToStock(username, tokenKey, gameCharName);
+        if (null != tokenKey && null != username && null != gameCharId) {
+            if (!tokenKey.isEmpty() && !username.isEmpty()) {
+                User user = userController.putGameCharFromTeamToStock(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -164,16 +165,16 @@ public class UserService implements Runnable {
 
         String username = messagePutGameCharacterFromStockToTeam.getUsername();
         String tokenKey = messagePutGameCharacterFromStockToTeam.getKeyToken();
-        String gameCharName = messagePutGameCharacterFromStockToTeam.getGameCharName();
+        ObjectId gameCharId = messagePutGameCharacterFromStockToTeam.getGameCharId();
 
         log.debug("Received a PutGameCharacterFromStockToTeamRequest");
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
-        log.debug("GameCharName : '{}'", gameCharName);
+        log.debug("GameCharName : '{}'", gameCharId);
 
-        if (null != tokenKey && null != username && null != gameCharName) {
-            if (!tokenKey.isEmpty() && !username.isEmpty() && !gameCharName.isEmpty()) {
-                User user = userController.putGameCharFromStockToTeam(username, tokenKey, gameCharName);
+        if (null != tokenKey && null != username && null != gameCharId) {
+            if (!tokenKey.isEmpty() && !username.isEmpty()) {
+                User user = userController.putGameCharFromStockToTeam(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
                 String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -191,6 +192,7 @@ public class UserService implements Runnable {
         Gender gender = messageCreateNewGameCharacter.getGender();
         ClanType clanType = messageCreateNewGameCharacter.getClanType();
         JobType currentJob = JobType.WARRIOR;
+
         if (null != name && null != gender && null != clanType && !name.isEmpty()) {
             log.debug("Received a CreateGameCharacterRequest from [{}]", tokenKey);
             log.debug("Name : '{}'", name);
@@ -217,16 +219,16 @@ public class UserService implements Runnable {
     private void manageUnlockCapacityForGameCharacterRequest(Message message) throws IOException {
         MessageUnlockCapacity messageUnlockCapacity = (MessageUnlockCapacity) message;
         String tokenKey = messageUnlockCapacity.getKeyToken();
-        String gameCharName = messageUnlockCapacity.getGameCharName();
+        ObjectId gameCharId = messageUnlockCapacity.getGameCharId();
         JobType job = messageUnlockCapacity.getJob();
         String capacityName = messageUnlockCapacity.getCapacityName();
-        if (null != tokenKey && null != gameCharName && null != job && null != capacityName && !tokenKey.isEmpty() && !gameCharName.isEmpty() && !capacityName.isEmpty()) {
+        if (null != tokenKey && null != gameCharId && null != job && null != capacityName && !tokenKey.isEmpty() && !capacityName.isEmpty()) {
             log.debug("Received an UnlockCapacityRequest from [{}]", tokenKey);
-            log.debug("GC Name : '{}'", gameCharName);
+            log.debug("GC Name : '{}'", gameCharId);
             log.debug("Job : '{}'", job);
             log.debug("Capacity : '{}'", capacityName);
 
-            User user = userController.unlockCapacityForJobForGameCharacter(tokenKey, gameCharName, job, capacityName);
+            User user = userController.unlockCapacityForJobForGameCharacter(tokenKey, gameCharId, job, capacityName);
             Player player = user.toPlayer();
 
             MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
@@ -235,7 +237,7 @@ public class UserService implements Runnable {
             channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
         } else {
             log.error("Received a bugged UnlockCapacityRequest from [{}]", tokenKey);
-            log.debug("GC Name : '{}'", gameCharName);
+            log.debug("GC Name : '{}'", gameCharId);
             log.debug("Job : '{}'", job);
             log.debug("Capacity : '{}'", capacityName);
         }

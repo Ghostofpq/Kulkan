@@ -10,8 +10,10 @@ import com.ghostofpq.kulkan.server.database.model.User;
 import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -89,13 +91,13 @@ public class UserController {
         return user;
     }
 
-    public User removeGameCharFromTeam(String username, String tokenKey, String gameCharacterName) {
+    public User removeGameCharFromTeam(String username, String tokenKey, ObjectId gameCharacterId) {
         User user = getUserForUsername(username);
         if (tokenKey.equals(user.getTokenKey())) {
-            log.debug("addGameCharToUser : {}", username);
+            log.debug("removeGameCharFromTeam : {}", username);
             GameCharacterDB gameCharacterDB = null;
             for (GameCharacterDB teamMember : user.getTeam()) {
-                if (teamMember.getName().equals(gameCharacterName)) {
+                if (teamMember.getId().equals(gameCharacterId)) {
                     gameCharacterDB = teamMember;
                     break;
                 }
@@ -110,14 +112,14 @@ public class UserController {
         return user;
     }
 
-    public User removeGameCharFromStock(String username, String tokenKey, String gameCharacterName) {
+    public User removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) {
         User user = getUserForUsername(username);
         if (tokenKey.equals(user.getTokenKey())) {
             log.debug("addGameCharToUser : {}", username);
             GameCharacterDB gameCharacterDB = null;
-            for (GameCharacterDB teamMember : user.getStock()) {
-                if (teamMember.getName().equals(gameCharacterName)) {
-                    gameCharacterDB = teamMember;
+            for (GameCharacterDB stockMember : user.getStock()) {
+                if (stockMember.getId().equals(gameCharacterId)) {
+                    gameCharacterDB = stockMember;
                     break;
                 }
             }
@@ -131,7 +133,7 @@ public class UserController {
         return user;
     }
 
-    public User putGameCharFromTeamToStock(String username, String tokenKey, String gameCharacterName) {
+    public User putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) {
         User user = getUserForUsername(username);
         if (user.getStock().size() >= 12) {
             log.error("STOCK IS COMPLETE");
@@ -140,7 +142,7 @@ public class UserController {
                 log.debug("addGameCharToUser : {}", username);
                 GameCharacterDB gameCharacterDB = null;
                 for (GameCharacterDB teamMember : user.getTeam()) {
-                    if (teamMember.getName().equals(gameCharacterName)) {
+                    if (teamMember.getId().equals(gameCharacterId)) {
                         gameCharacterDB = teamMember;
                         break;
                     }
@@ -157,7 +159,7 @@ public class UserController {
         return user;
     }
 
-    public User putGameCharFromStockToTeam(String username, String tokenKey, String gameCharacterName) {
+    public User putGameCharFromStockToTeam(String username, String tokenKey, ObjectId gameCharacterId) {
         User user = getUserForUsername(username);
         if (user.getTeam().size() >= 4) {
             log.error("TEAM IS COMPLETE");
@@ -165,9 +167,9 @@ public class UserController {
             if (tokenKey.equals(user.getTokenKey())) {
                 log.debug("addGameCharToUser : {}", username);
                 GameCharacterDB gameCharacterDB = null;
-                for (GameCharacterDB teamMember : user.getStock()) {
-                    if (teamMember.getName().equals(gameCharacterName)) {
-                        gameCharacterDB = teamMember;
+                for (GameCharacterDB stockMember : user.getStock()) {
+                    if (stockMember.getId().equals(gameCharacterId)) {
+                        gameCharacterDB = stockMember;
                         break;
                     }
                 }
@@ -183,26 +185,18 @@ public class UserController {
         return user;
     }
 
-    public User unlockCapacityForJobForGameCharacter(String tokenKey, String gameCharacterName, JobType jobType, String capacityName) {
+    public User unlockCapacityForJobForGameCharacter(String tokenKey, ObjectId gameCharacterId, JobType jobType, String capacityName) {
         User user = getUserForTokenKey(tokenKey);
         if (null != user) {
             Player player = user.toPlayer();
             GameCharacter gameCharacterToUpdate = null;
-            boolean gameCharacterIsInTeam = false;
-            for (GameCharacter teamMember : player.getTeam()) {
-                if (teamMember.getName().equals(gameCharacterName)) {
-                    gameCharacterToUpdate = teamMember;
-                    gameCharacterIsInTeam = true;
+            List<GameCharacter> allGameCharactersForUser = new ArrayList<GameCharacter>();
+            allGameCharactersForUser.addAll(player.getTeam());
+            allGameCharactersForUser.addAll(player.getStock());
+            for (GameCharacter gameCharacter : allGameCharactersForUser) {
+                if (gameCharacter.getId().equals(gameCharacterId)) {
+                    gameCharacterToUpdate = gameCharacter;
                     break;
-                }
-            }
-            if (null != gameCharacterToUpdate) {
-                for (GameCharacter teamMember : player.getStock()) {
-                    if (teamMember.getName().equals(gameCharacterName)) {
-                        gameCharacterToUpdate = teamMember;
-                        gameCharacterIsInTeam = false;
-                        break;
-                    }
                 }
             }
             if (null != gameCharacterToUpdate) {
@@ -219,8 +213,7 @@ public class UserController {
                     log.debug("JP before  : {}", jobToUpdate.getJobPoints());
                     jobToUpdate.unlockCapacity(capacityToUnlock);
                     log.debug("JP after  : {}", jobToUpdate.getJobPoints());
-
-                    user.updateGameChar(gameCharacterToUpdate, gameCharacterIsInTeam);
+                    user.updateGameChar(gameCharacterToUpdate, user.getTeam().contains(gameCharacterToUpdate));
                     user = userRepository.save(user);
                 } else {
                     log.error("Capacity not found");

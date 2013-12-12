@@ -506,7 +506,7 @@ public class GameCharacter implements Serializable {
 
         GameCharacter that = (GameCharacter) o;
 
-        if (!name.equals(that.name)) return false;
+        if (!id.equals(that.id)) return false;
 
         return true;
     }
