@@ -11,17 +11,17 @@ import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.rabbitmq.client.Channel;
-import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class LobbyScene implements Scene {
-
+    private static final Logger LOG = LoggerFactory.getLogger(LobbyScene.class);
     private static volatile LobbyScene instance = null;
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
     private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
@@ -78,7 +78,7 @@ public class LobbyScene implements Scene {
         quitButton = new Button(550, 0, 50, 50, "QUIT") {
             @Override
             public void onClick() {
-                log.debug("QUIT");
+                LOG.debug("QUIT");
                 Client.getInstance().quit();
             }
         };
@@ -86,7 +86,7 @@ public class LobbyScene implements Scene {
         acceptButton = new Button(550, 100, 50, 50, "ACCEPT") {
             @Override
             public void onClick() {
-                log.debug("ACCEPT");
+                LOG.debug("ACCEPT");
                 acceptMatch();
             }
         };
@@ -94,7 +94,7 @@ public class LobbyScene implements Scene {
         refuseButton = new Button(550, 150, 50, 50, "REFUSE") {
             @Override
             public void onClick() {
-                log.debug("REFUSE");
+                LOG.debug("REFUSE");
                 refuseMatch();
             }
         };
@@ -102,7 +102,7 @@ public class LobbyScene implements Scene {
         manageTeamButton = new Button(550, 200, 50, 50, "MANAGE TEAM") {
             @Override
             public void onClick() {
-                log.debug("MANAGE TEAM");
+                LOG.debug("MANAGE TEAM");
                 exitLobby();
                 Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
             }
@@ -144,7 +144,7 @@ public class LobbyScene implements Scene {
             if (!inputText.getContent().isEmpty()) {
                 MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
                 channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageLobbyClient.getBytes());
-                log.debug(" [-] WRITE ON {} : [{}]", LOBBY_SERVER_QUEUE_NAME_BASE, messageLobbyClient.getLobbyMessage());
+                LOG.debug(" [-] WRITE ON {} : [{}]", LOBBY_SERVER_QUEUE_NAME_BASE, messageLobbyClient.getLobbyMessage());
                 inputText.clear();
             }
         } catch (IOException e) {
@@ -156,7 +156,7 @@ public class LobbyScene implements Scene {
         MessageLobbyPong pong = new MessageLobbyPong(Client.getInstance().getTokenKey());
         try {
             channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, pong.getBytes());
-            log.debug(" [-] PONG ON {}", LOBBY_SERVER_QUEUE_NAME_BASE);
+            LOG.debug(" [-] PONG ON {}", LOBBY_SERVER_QUEUE_NAME_BASE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -170,28 +170,28 @@ public class LobbyScene implements Scene {
                 case LOBBY_SERVER:
                     MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
                     String receivedTextMessage = receivedMessage.getMessage();
-                    log.debug(" [x] Received Message : [{}]", receivedTextMessage);
+                    LOG.debug(" [x] Received Message : [{}]", receivedTextMessage);
                     if (!receivedTextMessage.isEmpty()) {
                         lobbyMessages.addLine(receivedTextMessage);
                     }
                     break;
                 case LOBBY_PING:
-                    log.debug(" [x] Received Ping");
+                    LOG.debug(" [x] Received Ping");
                     sendLobbyPong();
                     break;
                 case MATCHMAKING_MATCH_FOUND:
-                    log.debug(" [x] MATCH FOUND");
+                    LOG.debug(" [x] MATCH FOUND");
                     MessageMatchFound messageMatchFound = (MessageMatchFound) message;
                     matchFound = true;
                     matchId = messageMatchFound.getMatchKey();
                     break;
                 case MATCHMAKING_MATCH_ABORT:
-                    log.debug(" [x] MATCH ABORT");
+                    LOG.debug(" [x] MATCH ABORT");
                     matchFound = false;
                     matchId = "";
                     break;
                 case GAME_START:
-                    log.debug(" [x] GAME START");
+                    LOG.debug(" [x] GAME START");
                     exitLobby();
                     MessageGameStart messageGameStart = (MessageGameStart) message;
                     Client.getInstance().setCurrentScene(BattleScene.getInstance());
@@ -199,12 +199,12 @@ public class LobbyScene implements Scene {
                     BattleScene.getInstance().setGameId(messageGameStart.getGameID());
                     break;
                 case PLAYER_UPDATE:
-                    log.debug(" [x] PLAYER_UPDATE");
+                    LOG.debug(" [x] PLAYER_UPDATE");
                     MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
                     Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
                     break;
                 default:
-                    log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
+                    LOG.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
 
             }
@@ -225,7 +225,7 @@ public class LobbyScene implements Scene {
             MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(Client.getInstance().getTokenKey(), matchId);
             try {
                 channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingAccept.getBytes());
-                log.debug(" [-] ACCEPT MATCH");
+                LOG.debug(" [-] ACCEPT MATCH");
                 matchFound = false;
                 matchId = "";
             } catch (IOException e) {
@@ -239,7 +239,7 @@ public class LobbyScene implements Scene {
             MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(Client.getInstance().getTokenKey(), matchId);
             try {
                 channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingRefuse.getBytes());
-                log.debug(" [-] REFUSE MATCH");
+                LOG.debug(" [-] REFUSE MATCH");
                 matchFound = false;
                 matchId = "";
             } catch (IOException e) {
@@ -252,7 +252,7 @@ public class LobbyScene implements Scene {
         MessageMatchmakingSubscribe messageMatchmakingSubscribe = new MessageMatchmakingSubscribe(Client.getInstance().getTokenKey());
         try {
             channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingSubscribe.getBytes());
-            log.debug(" [-] SUBSCRIBE MATCHMAKING");
+            LOG.debug(" [-] SUBSCRIBE MATCHMAKING");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -320,8 +320,8 @@ public class LobbyScene implements Scene {
     @Override
     public void closeConnections() throws IOException {
         channelLobbyOut.close();
-        log.debug("channelLobbyOut closed");
+        LOG.debug("channelLobbyOut closed");
         channelMatchmakingOut.close();
-        log.debug("channelMatchmakingOut closed");
+        LOG.debug("channelMatchmakingOut closed");
     }
 }

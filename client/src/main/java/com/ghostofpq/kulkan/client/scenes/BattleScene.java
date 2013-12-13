@@ -17,17 +17,17 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.rabbitmq.client.Channel;
-import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
 
-@Slf4j
 public class BattleScene implements Scene {
-
+    private static final Logger LOG = LoggerFactory.getLogger(BattleScene.class);
     private static volatile BattleScene instance = null;
     private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
     // COMMUNICATIONS
@@ -473,7 +473,7 @@ public class BattleScene implements Scene {
 
     public void postMessage(ClientMessage message) {
         try {
-            log.debug(" [-] POST MESSAGE {} ON {}", message.getType(), gameQueueName);
+            LOG.debug(" [-] POST MESSAGE {} ON {}", message.getType(), gameQueueName);
             channelGameOut.basicPublish("", gameQueueName, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -481,7 +481,7 @@ public class BattleScene implements Scene {
     }
 
     private void manageMessageStartDeployment(Message message) {
-        log.debug(" [-] START_DEPLOYMENT");
+        LOG.debug(" [-] START_DEPLOYMENT");
         MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
         characterListToDeploy = messageDeploymentStart.getCharacterList();
         playerNumber = messageDeploymentStart.getPlayerNumber();
@@ -493,7 +493,7 @@ public class BattleScene implements Scene {
 
     private void manageMessageOtherPlayerDeployment(Message message) {
         MessageDeploymentPositionsOfPlayer messageDeploymentPositionsOfPlayer = (MessageDeploymentPositionsOfPlayer) message;
-        log.debug(" [-] DEPLOYMENT OF PLAYER {}", messageDeploymentPositionsOfPlayer.getPlayerNumber());
+        LOG.debug(" [-] DEPLOYMENT OF PLAYER {}", messageDeploymentPositionsOfPlayer.getPlayerNumber());
         for (GameCharacter gameCharacter : messageDeploymentPositionsOfPlayer.getCharacterList()) {
             GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(gameCharacter,
                     gameCharacter.getPosition(),
@@ -506,13 +506,13 @@ public class BattleScene implements Scene {
 
     private void manageMessageAllCharacter(Message message) {
         MessageUpdateCharacters messageUpdateCharacters = (MessageUpdateCharacters) message;
-        log.debug(" [-] UPDATE ALL CHARACTERS");
+        LOG.debug(" [-] UPDATE ALL CHARACTERS");
         for (GameCharacter gameCharacter : messageUpdateCharacters.getCharacterList()) {
             for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
                 if (gameCharacterRepresentation.getCharacter().equals(gameCharacter)) {
                     gameCharacterRepresentation.updateCharacter(gameCharacter);
                     if (!gameCharacterRepresentation.getPosition().equals(gameCharacter.getPosition())) {
-                        log.error("[X] CHAR {} IS MISPLACED ! {}/{}", gameCharacter.getName(),
+                        LOG.error("[X] CHAR {} IS MISPLACED ! {}/{}", gameCharacter.getName(),
                                 gameCharacterRepresentation.getPosition(), gameCharacter.getPosition());
                     }
                 }
@@ -522,7 +522,7 @@ public class BattleScene implements Scene {
 
     private void manageMessageCharacterToPlay(Message message) {
         MessageCharacterToPlay messageCharacterToPlay = (MessageCharacterToPlay) message;
-        log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharacterToPlay().getName());
+        LOG.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharacterToPlay().getName());
 
 
         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
@@ -551,12 +551,12 @@ public class BattleScene implements Scene {
     private void manageMessageCharacterPositionToMoveResponse(Message message) {
         MessagePositionToMoveResponse messagePositionToMoveResponse = (MessagePositionToMoveResponse) message;
         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_MOVE)) {
-            log.debug(" [-] RECEIVED POSITIONS TO MOVE");
+            LOG.debug(" [-] RECEIVED POSITIONS TO MOVE");
             possiblePositionsToMove = messagePositionToMoveResponse.getPossiblePositionsToMove();
             highlightPossiblePositionsToMove();
             currentState = BattleSceneState.MOVE;
         } else {
-            log.error(" [-] RECEIVED POSITIONS TO MOVE");
+            LOG.error(" [-] RECEIVED POSITIONS TO MOVE");
         }
     }
 
@@ -574,12 +574,12 @@ public class BattleScene implements Scene {
     private void manageMessageCharacterPositionToAttackResponse(Message message) {
         MessagePositionToAttackResponse messagePositionToAttackResponse = (MessagePositionToAttackResponse) message;
         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK)) {
-            log.debug(" [-] RECEIVED POSITIONS TO ATTACK");
+            LOG.debug(" [-] RECEIVED POSITIONS TO ATTACK");
             possiblePositionsToAttack = messagePositionToAttackResponse.getPossiblePositionsToAttack();
             highlightPossiblePositionsToAttack();
             currentState = BattleSceneState.ATTACK;
         } else {
-            log.error(" [-] RECEIVED POSITIONS TO ATTACK");
+            LOG.error(" [-] RECEIVED POSITIONS TO ATTACK");
         }
     }
 
@@ -599,7 +599,7 @@ public class BattleScene implements Scene {
             int damages = messageCharacterAttacks.getDamages();
             boolean crit = messageCharacterAttacks.crits();
             boolean hit = messageCharacterAttacks.hits();
-            log.debug("{} takes {} damage from {}", attackedCharRepresentation.getCharacter().getName(), damages, attackingCharRepresentation.getCharacter().getName());
+            LOG.debug("{} takes {} damage from {}", attackedCharRepresentation.getCharacter().getName(), damages, attackingCharRepresentation.getCharacter().getName());
             attackedCharRepresentation.getCharacter().addHealthPoint(-damages);
         }
     }
@@ -611,7 +611,7 @@ public class BattleScene implements Scene {
             if (characterRepresentation.getCharacter().equals(messageCharacterGainsXP.getCharacter())) {
                 characterRepresentation.getCharacter().gainXp(messageCharacterGainsXP.getExperiencePoints());
                 characterRepresentation.getCharacter().gainJobpoints(messageCharacterGainsXP.getJobPoints());
-                log.debug("{} gains {} exp and {} job points", messageCharacterGainsXP.getCharacter().getName(),
+                LOG.debug("{} gains {} exp and {} job points", messageCharacterGainsXP.getCharacter().getName(),
                         messageCharacterGainsXP.getExperiencePoints(), messageCharacterGainsXP.getJobPoints());
                 break;
             }
@@ -676,7 +676,7 @@ public class BattleScene implements Scene {
                         Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
                         break;
                     default:
-                        log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
+                        LOG.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                         break;
                 }
             }
@@ -782,7 +782,7 @@ public class BattleScene implements Scene {
 
     public void deployCharacterPosition() {
         if (battlefield.getDeploymentZones().get(playerNumber).contains(cursor)) {
-            log.debug(" [-] PLACE CHARACTER AT {}", cursor.toString());
+            LOG.debug(" [-] PLACE CHARACTER AT {}", cursor.toString());
             Position position = new Position(cursor);
             position.plusY(1);
             currentGameCharacter.setHeadingAngle(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
@@ -851,7 +851,7 @@ public class BattleScene implements Scene {
 
         MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(Client.getInstance().getTokenKey(), playerNumber, gameCharacterList);
 
-        log.debug(" [-] DEPLOYMENT FINISHED FOR {}", messageDeploymentFinishedForPlayer.getKeyToken());
+        LOG.debug(" [-] DEPLOYMENT FINISHED FOR {}", messageDeploymentFinishedForPlayer.getKeyToken());
         postMessage(messageDeploymentFinishedForPlayer);
 
     }
@@ -875,10 +875,10 @@ public class BattleScene implements Scene {
     private void highlightPossiblePositionsToMove() {
         for (Position possiblePositionToMove : possiblePositionsToMove) {
             if (battlefieldRepresentation.containsKey(possiblePositionToMove)) {
-                log.debug("highlight green {}", possiblePositionToMove.toString());
+                LOG.debug("highlight green {}", possiblePositionToMove.toString());
                 battlefieldRepresentation.get(possiblePositionToMove).setHighlight(HighlightColor.GREEN);
             } else {
-                log.error("{} can't be highlighted", possiblePositionToMove.toString());
+                LOG.error("{} can't be highlighted", possiblePositionToMove.toString());
             }
         }
     }
@@ -992,7 +992,7 @@ public class BattleScene implements Scene {
     private boolean pointOfViewHasChanged() {
         boolean result = false;
         if (!currentPointOfView.equals(GraphicsManager.getInstance().getCurrentPointOfView())) {
-            log.debug("POV={}", GraphicsManager.getInstance().getCurrentPointOfView());
+            LOG.debug("POV={}", GraphicsManager.getInstance().getCurrentPointOfView());
             currentPointOfView = GraphicsManager.getInstance().getCurrentPointOfView();
             result = true;
         }

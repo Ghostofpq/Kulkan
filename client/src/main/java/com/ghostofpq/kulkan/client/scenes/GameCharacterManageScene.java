@@ -11,13 +11,14 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
 import com.rabbitmq.client.Channel;
-import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-@Slf4j
 public class GameCharacterManageScene implements Scene {
+    private static final Logger LOG = LoggerFactory.getLogger(GameCharacterManageScene.class);
     private static volatile GameCharacterManageScene instance = null;
     private final String USER_SERVICE_QUEUE_NAME = "users";
     private Channel channelOut;
@@ -77,80 +78,90 @@ public class GameCharacterManageScene implements Scene {
             public void onClick() {
 
                 Client.getInstance().setCurrentScene(ManageJobScene.getInstance());
-                log.debug("manageJobButton");
+                LOG.debug("manageJobButton");
             }
         };
 
-        changeJobButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Change Job") {
-            @Override
-            public void onClick() {
-                Client.getInstance().setCurrentScene(ChangeJobScene.getInstance());
-            }
-        };
+        changeJobButton = new
 
-        manageEquipementButton = new Button(widthSeparator + 2 * widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Stuff") {
-            @Override
-            public void onClick() {
-                log.debug("manageEquipementButton");
-            }
-        };
-
-        deleteGameCharButton = new Button(widthSeparator, heightSeparator + heightStep * 8, widthStep, heightStep, "Delete Char") {
-            @Override
-            public void onClick() {
-                log.debug("Sending a DeleteGameCharacterRequest");
-                log.debug("Name : '{}'", gameCharacter.getName());
-                try {
-                    log.debug("Sending ");
-                    Player player = Client.getInstance().getPlayer();
-                    if (player.getTeam().contains(gameCharacter)) {
-                        MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
-                        channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromTeam.getBytes());
-                    } else {
-                        MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
-                        channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromStock.getBytes());
+                Button(widthSeparator + widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Change Job") {
+                    @Override
+                    public void onClick() {
+                        Client.getInstance().setCurrentScene(ChangeJobScene.getInstance());
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+                };
 
-        quitButton = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 8, widthStep, heightStep, "Back") {
-            @Override
-            public void onClick() {
-                Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-            }
-        };
+        manageEquipementButton = new
 
-        putInTeam = new Button(widthSeparator + widthStep, heightSeparator + heightStep * 7, widthStep, heightStep, "Team") {
-            @Override
-            public void onClick() {
-                log.debug("Sending a PutInTeamRequest");
-                log.debug("Name : '{}'", gameCharacter.getName());
-                try {
-                    log.debug("Sending ");
-                    Player player = Client.getInstance().getPlayer();
-                    MessagePutGameCharacterFromStockToTeam messagePutGameCharacterFromStockToTeam = new MessagePutGameCharacterFromStockToTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
-                    channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messagePutGameCharacterFromStockToTeam.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+                Button(widthSeparator + 2 * widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Stuff") {
+                    @Override
+                    public void onClick() {
+                        LOG.debug("manageEquipementButton");
+                    }
+                };
+
+        deleteGameCharButton = new
+
+                Button(widthSeparator, heightSeparator + heightStep * 8, widthStep, heightStep, "Delete Char") {
+                    @Override
+                    public void onClick() {
+                        LOG.debug("Sending a DeleteGameCharacterRequest");
+                        LOG.debug("Name : '{}'", gameCharacter.getName());
+                        try {
+                            LOG.debug("Sending ");
+                            Player player = Client.getInstance().getPlayer();
+                            if (player.getTeam().contains(gameCharacter)) {
+                                MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
+                                channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromTeam.getBytes());
+                            } else {
+                                MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
+                                channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageDeleteGameCharacterFromStock.getBytes());
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+        quitButton = new
+
+                Button(widthSeparator + widthStep, heightSeparator + heightStep * 8, widthStep, heightStep, "Back") {
+                    @Override
+                    public void onClick() {
+                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    }
+                };
+
+        putInTeam = new
+
+                Button(widthSeparator + widthStep, heightSeparator + heightStep * 7, widthStep, heightStep, "Team") {
+                    @Override
+                    public void onClick() {
+                        LOG.debug("Sending a PutInTeamRequest");
+                        LOG.debug("Name : '{}'", gameCharacter.getName());
+                        try {
+                            LOG.debug("Sending ");
+                            Player player = Client.getInstance().getPlayer();
+                            MessagePutGameCharacterFromStockToTeam messagePutGameCharacterFromStockToTeam = new MessagePutGameCharacterFromStockToTeam(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
+                            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messagePutGameCharacterFromStockToTeam.getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
         putInStock = new
 
                 Button(widthSeparator, heightSeparator + heightStep * 7, widthStep, heightStep, "Stock") {
                     @Override
                     public void onClick() {
-                        log.debug("Sending a PutInTeamRequest");
-                        log.debug("Name : '{}'", gameCharacter.getName());
+                        LOG.debug("Sending a PutInTeamRequest");
+                        LOG.debug("Name : '{}'", gameCharacter.getName());
                         try {
-                            log.debug("Sending ");
+                            LOG.debug("Sending ");
                             Player player = Client.getInstance().getPlayer();
                             MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(Client.getInstance().getTokenKey(), player.getPseudo(), gameCharacter.getId());
                             channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, putGameCharacterFromTeamToStock.getBytes());
@@ -239,9 +250,9 @@ public class GameCharacterManageScene implements Scene {
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
-                    log.debug("PLAYER_UPDATE");
+                    LOG.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    log.debug("CREATE OK");
+                    LOG.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
                     setGameCharacter(response.getPlayer().getGameCharWithId(gameCharacter.getId()));
                     Client.getInstance().setCurrentScene(instance);

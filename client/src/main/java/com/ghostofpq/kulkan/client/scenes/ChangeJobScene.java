@@ -8,13 +8,14 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageChangeJob;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.rabbitmq.client.Channel;
-import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-@Slf4j
 public class ChangeJobScene implements Scene {
+    private static final Logger LOG = LoggerFactory.getLogger(ChangeJobScene.class);
     private static volatile ChangeJobScene instance = null;
     private final String USER_SERVICE_QUEUE_NAME = "users";
     private GameCharacter gameCharacter;
@@ -52,7 +53,7 @@ public class ChangeJobScene implements Scene {
         warriorButton = new Button(widthSeparator, heightSeparator, widthStep, heightStep, "Warrior") {
             @Override
             public void onClick() {
-                log.debug("Warrior");
+                LOG.debug("Warrior");
                 MessageChangeJob messageChangeJob = new MessageChangeJob(Client.getInstance().getTokenKey(), gameCharacter.getId(), JobType.WARRIOR);
                 try {
                     channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageChangeJob.getBytes());
@@ -64,27 +65,31 @@ public class ChangeJobScene implements Scene {
             }
         };
 
-        mageButton = new Button(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "Mage") {
-            @Override
-            public void onClick() {
-                log.debug("Mage");
-                MessageChangeJob messageChangeJob = new MessageChangeJob(Client.getInstance().getTokenKey(), gameCharacter.getId(), JobType.MAGE);
-                try {
-                    channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageChangeJob.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+        mageButton = new
 
-        quitButton = new Button(widthSeparator * 4 + widthStep * 3, heightSeparator * 4 + heightStep * 3, widthStep, heightStep, "Back") {
-            @Override
-            public void onClick() {
-                Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-            }
-        };
+                Button(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "Mage") {
+                    @Override
+                    public void onClick() {
+                        LOG.debug("Mage");
+                        MessageChangeJob messageChangeJob = new MessageChangeJob(Client.getInstance().getTokenKey(), gameCharacter.getId(), JobType.MAGE);
+                        try {
+                            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageChangeJob.getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+        quitButton = new
+
+                Button(widthSeparator * 4 + widthStep * 3, heightSeparator * 4 + heightStep * 3, widthStep, heightStep, "Back") {
+                    @Override
+                    public void onClick() {
+                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    }
+                };
 
     }
 
@@ -125,7 +130,7 @@ public class ChangeJobScene implements Scene {
     @Override
     public void closeConnections() throws IOException {
         channelOut.close();
-        log.debug("channelOut closed");
+        LOG.debug("channelOut closed");
     }
 
     @Override
@@ -134,7 +139,7 @@ public class ChangeJobScene implements Scene {
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
-                    log.debug("PLAYER_UPDATE");
+                    LOG.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     Client.getInstance().setPlayer(response.getPlayer());
                     Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());

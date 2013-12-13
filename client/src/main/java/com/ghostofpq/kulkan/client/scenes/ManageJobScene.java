@@ -12,13 +12,14 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.messages.user.MessageUnlockCapacity;
 import com.rabbitmq.client.Channel;
-import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-@Slf4j
 public class ManageJobScene implements Scene {
+    private static final Logger LOG = LoggerFactory.getLogger(ManageJobScene.class);
     private static volatile ManageJobScene instance = null;
     private final String USER_SERVICE_QUEUE_NAME = "users";
     private GameCharacter gameCharacter;
@@ -85,12 +86,13 @@ public class ManageJobScene implements Scene {
             }
         };
 
-        quitButton = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 5 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
-            @Override
-            public void onClick() {
-                Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
-            }
-        };
+        quitButton = new
+                Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 5 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
+                    @Override
+                    public void onClick() {
+                        Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                    }
+                };
     }
 
     @Override
@@ -164,9 +166,9 @@ public class ManageJobScene implements Scene {
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
-                    log.debug("PLAYER_UPDATE");
+                    LOG.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    log.debug("CREATE OK");
+                    LOG.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
                     GameCharacter updatedGameCharacter = response.getPlayer().getGameCharWithId(gameCharacter.getId());
                     setGameCharacter(updatedGameCharacter);

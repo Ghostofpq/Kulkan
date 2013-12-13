@@ -16,17 +16,17 @@ import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateAccountResponse;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
-import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class LoginScene implements Scene {
-
+    private static final Logger LOG = LoggerFactory.getLogger(LoginScene.class);
     private static volatile LoginScene instance = null;
     private final String AUTHENTICATION_QUEUE_NAME = "authentication";
     private String authenticationReplyQueueName;
@@ -69,16 +69,16 @@ public class LoginScene implements Scene {
                         if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
                             MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
                             if (response.getErrorCode().equals(MessageErrorCode.OK)) {
-                                log.debug("AUTH OK : key={}", response.getTokenKey());
+                                LOG.debug("AUTH OK : key={}", response.getTokenKey());
                                 Client.getInstance().setPlayer(response.getPlayer());
                                 Client.getInstance().setTokenKey(response.getTokenKey());
                                 Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                             } else {
-                                log.debug("AUTH KO : BAD INFO");
+                                LOG.debug("AUTH KO : BAD INFO");
                             }
                         }
                     } else {
-                        log.debug("SERVER DOWN");
+                        LOG.debug("SERVER DOWN");
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -89,15 +89,19 @@ public class LoginScene implements Scene {
                 }
             }
         };
+
+
         quitButton = new
 
                 Button(300, 450, 200, 50, "QUIT") {
                     @Override
                     public void onClick() {
-                        log.debug("QUIT");
+                        LOG.debug("QUIT");
                         Client.getInstance().quit();
                     }
                 };
+
+
         createAccountButton = new
 
                 Button(300, 500, 200, 50, "CREATE ACCOUNT") {
@@ -110,13 +114,13 @@ public class LoginScene implements Scene {
                                 if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
                                     MessageCreateAccountResponse response = (MessageCreateAccountResponse) result;
                                     if (response.getErrorCode().equals(MessageErrorCode.OK)) {
-                                        log.debug("CREATE ACCOUT OK");
+                                        LOG.debug("CREATE ACCOUT OK");
                                     } else {
-                                        log.debug("CREATE ACCOUT KO : USER ALREADY USED");
+                                        LOG.debug("CREATE ACCOUT KO : USER ALREADY USED");
                                     }
                                 }
                             } else {
-                                log.debug("SERVER DOWN");
+                                LOG.debug("SERVER DOWN");
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -144,7 +148,7 @@ public class LoginScene implements Scene {
     }
 
     public Message requestServer(Message message) throws Exception {
-        log.debug("create account");
+        LOG.debug("create account");
         Message response = null;
         String corrId = java.util.UUID.randomUUID().toString();
 
@@ -154,12 +158,12 @@ public class LoginScene implements Scene {
                 .replyTo(authenticationReplyQueueName)
                 .build();
         channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, props, message.getBytes());
-        log.debug(" [x] Sent '{}'", message.getType());
+        LOG.debug(" [x] Sent '{}'", message.getType());
         QueueingConsumer.Delivery delivery = consumer.nextDelivery(1000);
         if (null != delivery) {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 response = Message.loadFromBytes(delivery.getBody());
-                log.debug(" [x] Received '{}'", response.getType());
+                LOG.debug(" [x] Received '{}'", response.getType());
             }
         }
         return response;
@@ -243,6 +247,6 @@ public class LoginScene implements Scene {
 
     public void closeConnections() throws IOException {
         channelAuthenticating.close();
-        log.debug("channelAuthenticating closed");
+        LOG.debug("channelAuthenticating closed");
     }
 }
