@@ -147,27 +147,18 @@ public class User {
         }
     }
 
-    public void updateGameChar(GameCharacter gameCharacter, boolean gameCharacterIsInTeam) {
-        if (gameCharacterIsInTeam) {
-            updateGameCharFromTeam(gameCharacter);
-        } else {
-            updateGameCharFromStock(gameCharacter);
-        }
-    }
-
-    public void updateGameCharFromTeam(GameCharacter gameCharacter) {
+    public void updateGameChar(GameCharacter gameCharacter) {
         for (GameCharacterDB gameCharacterDB : team) {
             if (gameCharacterDB.getId().equals(gameCharacter.getId())) {
+                log.debug("Updating TeamMember : {}", gameCharacter.getName());
                 team.set(team.indexOf(gameCharacterDB), new GameCharacterDB(gameCharacter));
                 break;
             }
         }
-    }
-
-    public void updateGameCharFromStock(GameCharacter gameCharacter) {
         for (GameCharacterDB gameCharacterDB : stock) {
             if (gameCharacterDB.getId().equals(gameCharacter.getId())) {
-                team.set(team.indexOf(gameCharacterDB), new GameCharacterDB(gameCharacter));
+                log.debug("Updating StockMember : {}", gameCharacter.getName());
+                stock.set(stock.indexOf(gameCharacterDB), new GameCharacterDB(gameCharacter));
                 break;
             }
         }

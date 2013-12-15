@@ -237,7 +237,7 @@ public class UserController {
                     log.debug("JP before  : {}", jobToUpdate.getJobPoints());
                     jobToUpdate.unlockCapacity(capacityToUnlock);
                     log.debug("JP after  : {}", jobToUpdate.getJobPoints());
-                    user.updateGameChar(gameCharacterToUpdate, user.getTeam().contains(gameCharacterToUpdate));
+                    user.updateGameChar(gameCharacterToUpdate);
                     user = userRepository.save(user);
                 } else {
                     log.error("Capacity not found");
