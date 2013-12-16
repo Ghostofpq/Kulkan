@@ -6,7 +6,6 @@ public enum ItemType {
     NECKLACE,
     RING,
 
-    WEAPON_1H,
-    WEAPON_2H,
+    WEAPON,
     LEFT_HAND
 }
