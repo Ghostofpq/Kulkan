@@ -32,7 +32,7 @@ public class GameCharacter implements Serializable {
      */
     private String name;
     /**
-     * {@link com.ghostofpq.kulkan.entities.clan.ClanType}
+     * {@link com.ghostofpq.kulkan.entities.clan.Clan}
      */
     private Clan clan;
     /**
