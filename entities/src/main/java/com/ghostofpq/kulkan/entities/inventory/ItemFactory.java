@@ -40,7 +40,7 @@ public class ItemFactory {
         }
     }
 
-    public static Item createClothArmor() {
+    private static Item createClothArmor() {
         // id
         String id = "000";
         // name
@@ -60,7 +60,7 @@ public class ItemFactory {
         return new Armor(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createIronHelm() {
+    private static Item createIronHelm() {
         // id
         String id = "001";
         // name
@@ -79,7 +79,7 @@ public class ItemFactory {
         return new Helm(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createYewWand() {
+    private static Item createYewWand() {
         // id
         String id = "002";
         // name
@@ -99,7 +99,7 @@ public class ItemFactory {
         return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createStoneClub() {
+    private static Item createStoneClub() {
         // id
         String id = "003";
         // name
@@ -120,7 +120,7 @@ public class ItemFactory {
         return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, range, WeaponType.ONE_HANDED);
     }
 
-    public static Item createSling() {
+    private static Item createSling() {
         // id
         String id = "004";
         // name
@@ -141,7 +141,7 @@ public class ItemFactory {
         return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, range, WeaponType.RANGE);
     }
 
-    public static Item createLifeRing() {
+    private static Item createLifeRing() {
         // id
         String id = "005";
         // name
@@ -161,7 +161,7 @@ public class ItemFactory {
         return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createStrengthRing() {
+    private static Item createStrengthRing() {
         // id
         String id = "006";
         // name
@@ -181,7 +181,7 @@ public class ItemFactory {
         return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createWillNecklace() {
+    private static Item createWillNecklace() {
         // id
         String id = "007";
         // name
@@ -201,7 +201,7 @@ public class ItemFactory {
         return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createAgilityNecklace() {
+    private static Item createAgilityNecklace() {
         // id
         String id = "008";
         // name
@@ -221,7 +221,7 @@ public class ItemFactory {
         return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createWoodenShield() {
+    private static Item createWoodenShield() {
         // id
         String id = "009";
         // name
@@ -241,7 +241,7 @@ public class ItemFactory {
         return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
     }
 
-    public static Item createTwoHandedSword() {
+    private static Item createTwoHandedSword() {
         // id
         String id = "010";
         // name
