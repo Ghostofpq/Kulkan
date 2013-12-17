@@ -10,9 +10,19 @@ import java.util.List;
 public class Weapon extends Item {
 
     private Range range;
+    private WeaponType weaponType;
 
-    public Weapon(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, ItemType itemType, Range range) {
-        super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, itemType);
+    public Weapon(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, Range range, WeaponType weaponType) {
+        super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, ItemType.WEAPON);
         this.range = range;
+        this.weaponType = weaponType;
+    }
+
+    public Range getRange() {
+        return range;
+    }
+
+    public WeaponType getWeaponType() {
+        return weaponType;
     }
 }

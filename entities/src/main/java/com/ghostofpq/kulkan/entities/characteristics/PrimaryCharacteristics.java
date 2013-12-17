@@ -48,23 +48,47 @@ public class PrimaryCharacteristics implements Serializable {
         return strength;
     }
 
+    public void setStrength(int strength) {
+        this.strength = strength;
+    }
+
     public int getEndurance() {
         return endurance;
+    }
+
+    public void setEndurance(int endurance) {
+        this.endurance = endurance;
     }
 
     public int getIntelligence() {
         return intelligence;
     }
 
+    public void setIntelligence(int intelligence) {
+        this.intelligence = intelligence;
+    }
+
     public int getWill() {
         return will;
+    }
+
+    public void setWill(int will) {
+        this.will = will;
     }
 
     public int getAgility() {
         return agility;
     }
 
+    public void setAgility(int agility) {
+        this.agility = agility;
+    }
+
     public int getMovement() {
         return movement;
+    }
+
+    public void setMovement(int movement) {
+        this.movement = movement;
     }
 }

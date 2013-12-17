@@ -7,5 +7,5 @@ public enum ItemType {
     RING,
 
     WEAPON,
-    LEFT_HAND
+    HELD_ITEM
 }

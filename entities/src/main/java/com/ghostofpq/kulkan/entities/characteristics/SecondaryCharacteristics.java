@@ -135,51 +135,103 @@ public class SecondaryCharacteristics implements Serializable {
         return attackDamage;
     }
 
+    public void setAttackDamage(int attackDamage) {
+        this.attackDamage = attackDamage;
+    }
+
     public int getMagicalDamage() {
         return magicalDamage;
+    }
+
+    public void setMagicalDamage(int magicalDamage) {
+        this.magicalDamage = magicalDamage;
     }
 
     public int getArmor() {
         return armor;
     }
 
+    public void setArmor(int armor) {
+        this.armor = armor;
+    }
+
     public int getMagicResist() {
         return magicResist;
+    }
+
+    public void setMagicResist(int magicResist) {
+        this.magicResist = magicResist;
     }
 
     public int getArmorPenetration() {
         return armorPenetration;
     }
 
+    public void setArmorPenetration(int armorPenetration) {
+        this.armorPenetration = armorPenetration;
+    }
+
     public int getMagicPenetration() {
         return magicPenetration;
+    }
+
+    public void setMagicPenetration(int magicPenetration) {
+        this.magicPenetration = magicPenetration;
     }
 
     public int getSpeed() {
         return speed;
     }
 
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
     public int getLifeRegeneration() {
         return lifeRegeneration;
+    }
+
+    public void setLifeRegeneration(int lifeRegeneration) {
+        this.lifeRegeneration = lifeRegeneration;
     }
 
     public int getManaRegeneration() {
         return manaRegeneration;
     }
 
+    public void setManaRegeneration(int manaRegeneration) {
+        this.manaRegeneration = manaRegeneration;
+    }
+
     public BigDecimal getEscape() {
         return escape;
+    }
+
+    public void setEscape(BigDecimal escape) {
+        this.escape = escape;
     }
 
     public BigDecimal getCriticalStrike() {
         return criticalStrike;
     }
 
+    public void setCriticalStrike(BigDecimal criticalStrike) {
+        this.criticalStrike = criticalStrike;
+    }
+
     public BigDecimal getPrecision() {
         return precision;
     }
 
+    public void setPrecision(BigDecimal precision) {
+        this.precision = precision;
+    }
+
     public BigDecimal getResilience() {
         return resilience;
+    }
+
+    public void setResilience(BigDecimal resilience) {
+        this.resilience = resilience;
     }
 }
