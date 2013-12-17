@@ -7,21 +7,49 @@ import com.ghostofpq.kulkan.entities.job.JobType;
 import java.util.List;
 
 public abstract class Item {
-    private int itemID;
+    private String itemID;
     private String name;
     private String description;
-    private PrimaryCharacteristics primaryCaracteristics;
-    private SecondaryCharacteristics secondaryCaracteristics;
+    private PrimaryCharacteristics primaryCharacteristics;
+    private SecondaryCharacteristics secondaryCharacteristics;
     private List<JobType> authorizedJobs;
     private ItemType itemType;
 
-    protected Item(int itemID, String name, String description, PrimaryCharacteristics primaryCaracteristics, SecondaryCharacteristics secondaryCaracteristics, List<JobType> authorizedJobs, ItemType itemType) {
+    protected Item(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, ItemType itemType) {
         this.itemID = itemID;
         this.name = name;
         this.description = description;
-        this.primaryCaracteristics = primaryCaracteristics;
-        this.secondaryCaracteristics = secondaryCaracteristics;
+        this.primaryCharacteristics = primaryCharacteristics;
+        this.secondaryCharacteristics = secondaryCharacteristics;
         this.authorizedJobs = authorizedJobs;
         this.itemType = itemType;
+    }
+
+    public String getItemID() {
+        return itemID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public PrimaryCharacteristics getPrimaryCharacteristics() {
+        return primaryCharacteristics;
+    }
+
+    public SecondaryCharacteristics getSecondaryCharacteristics() {
+        return secondaryCharacteristics;
+    }
+
+    public List<JobType> getAuthorizedJobs() {
+        return authorizedJobs;
+    }
+
+    public ItemType getItemType() {
+        return itemType;
     }
 }

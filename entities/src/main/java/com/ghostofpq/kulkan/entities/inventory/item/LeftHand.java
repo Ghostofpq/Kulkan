@@ -6,8 +6,8 @@ import com.ghostofpq.kulkan.entities.job.JobType;
 
 import java.util.List;
 
-public class Necklace extends Item {
-    public Necklace(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs) {
+public class LeftHand extends Item {
+    public LeftHand(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs) {
         super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, ItemType.NECKLACE);
     }
 }

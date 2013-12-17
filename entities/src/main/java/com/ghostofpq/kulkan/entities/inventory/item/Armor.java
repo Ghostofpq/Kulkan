@@ -7,7 +7,7 @@ import com.ghostofpq.kulkan.entities.job.JobType;
 import java.util.List;
 
 public class Armor extends Item {
-    public Armor(int itemID, String name, String description, PrimaryCharacteristics primaryCaracteristics, SecondaryCharacteristics secondaryCaracteristics, List<JobType> authorizedJobs) {
-        super(itemID, name, description, primaryCaracteristics, secondaryCaracteristics, authorizedJobs, ItemType.ARMOR);
+    public Armor(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs) {
+        super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, ItemType.ARMOR);
     }
 }
