@@ -14,6 +14,7 @@ public class Player implements Serializable {
     private List<GameCharacter> team;
     private List<GameCharacter> stock;
     private Inventory inventory;
+    private Integer money;
 
     public Player(String pseudo) {
         this.pseudo = pseudo;
@@ -21,6 +22,7 @@ public class Player implements Serializable {
         team = new ArrayList<GameCharacter>();
         stock = new ArrayList<GameCharacter>();
         inventory = new Inventory();
+        money = 0;
     }
 
     public GameCharacter getGameCharWithId(ObjectId id) {
@@ -109,8 +111,19 @@ public class Player implements Serializable {
         return pseudo.hashCode();
     }
 
-
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public Integer getMoney() {
+        return money;
+    }
+
+    public void setMoney(Integer money) {
+        this.money = money;
     }
 }

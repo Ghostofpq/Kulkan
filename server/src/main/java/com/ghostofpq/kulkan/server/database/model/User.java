@@ -2,6 +2,7 @@ package com.ghostofpq.kulkan.server.database.model;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.inventory.Inventory;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.Mage;
 import com.ghostofpq.kulkan.entities.job.Warrior;
@@ -34,7 +35,8 @@ public class User {
     private List<GameCharacterDB> team;
     private List<GameCharacterDB> stock;
     private Integer grade;
-
+    private Integer money;
+    private Inventory inventory;
 
     public User() {
     }
@@ -44,8 +46,11 @@ public class User {
         this.username = username;
         this.passwordSalt = RandomStringUtils.randomAscii(20);
         this.password = DigestUtils.shaHex(password + passwordSalt);
-        team = new ArrayList<GameCharacterDB>();
-        stock = new ArrayList<GameCharacterDB>();
+        this.team = new ArrayList<GameCharacterDB>();
+        this.stock = new ArrayList<GameCharacterDB>();
+        this.grade = 0;
+        this.money = 0;
+        this.inventory = new Inventory();
     }
 
     public ObjectId getId() {
@@ -165,8 +170,7 @@ public class User {
     }
 
     public Player toPlayer() {
-        Player player = new Player();
-        player.setPseudo(username);
+        Player player = new Player(username);
         player.setTeam(new ArrayList<GameCharacter>());
         player.setStock(new ArrayList<GameCharacter>());
 
@@ -223,6 +227,12 @@ public class User {
             gameCharacter.setCurrentJob(gameCharacterDB.getCurrentJob());
             gameCharacter.calculateAggregatedCaracteristics();
             player.getStock().add(gameCharacter);
+        }
+        if (null != inventory) {
+            player.setInventory(inventory);
+        }
+        if (null != money) {
+            player.setMoney(money);
         }
         return player;
     }
