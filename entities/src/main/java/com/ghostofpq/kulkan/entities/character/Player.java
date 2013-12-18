@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.entities.character;
 
+import com.ghostofpq.kulkan.entities.inventory.Inventory;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
@@ -12,15 +13,14 @@ public class Player implements Serializable {
     private int grade;
     private List<GameCharacter> team;
     private List<GameCharacter> stock;
+    private Inventory inventory;
 
     public Player(String pseudo) {
         this.pseudo = pseudo;
 
         team = new ArrayList<GameCharacter>();
         stock = new ArrayList<GameCharacter>();
-    }
-
-    public Player() {
+        inventory = new Inventory();
     }
 
     public GameCharacter getGameCharWithId(ObjectId id) {
@@ -107,5 +107,10 @@ public class Player implements Serializable {
     @Override
     public int hashCode() {
         return pseudo.hashCode();
+    }
+
+
+    public Inventory getInventory() {
+        return inventory;
     }
 }

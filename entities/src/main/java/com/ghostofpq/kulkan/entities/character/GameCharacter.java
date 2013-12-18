@@ -7,6 +7,8 @@ import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.clan.Clan;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
+import com.ghostofpq.kulkan.entities.inventory.Equipement;
+import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.Mage;
@@ -109,6 +111,7 @@ public class GameCharacter implements Serializable {
     private boolean hasMoved;
     private boolean hasActed;
     private boolean isReadyToPlay;
+    private Equipement equipement;
 
     /**
      * Creates a new Character level 1 Warrior.
@@ -134,6 +137,7 @@ public class GameCharacter implements Serializable {
         jobWarrior = new Warrior();
         jobMage = new Mage();
         currentJob = JobType.WARRIOR;
+        equipement = new Equipement();
 
         // Caracteristics
         characteristics = getClan().getBaseCaracteristics();
@@ -164,6 +168,7 @@ public class GameCharacter implements Serializable {
         jobWarrior = new Warrior();
         jobMage = new Mage();
         currentJob = JobType.WARRIOR;
+        equipement = new Equipement();
 
         // Caracteristics
         characteristics = getClan().getBaseCaracteristics();
@@ -536,6 +541,72 @@ public class GameCharacter implements Serializable {
 
     public ObjectId getId() {
         return id;
+    }
+
+    public void equip(Item item) {
+        player.getInventory().removeOne(item.getItemID());
+        switch (item.getItemType()) {
+            case WEAPON:
+                Weapon weapon = (Weapon) item;
+                if (weapon.getWeaponType().equals(WeaponType.TWO_HANDED)) {
+                    unequip(ItemType.HELD_ITEM);
+                }
+                equipement.setWeapon(weapon);
+                break;
+            case RING:
+                Ring ring = (Ring) item;
+                equipement.setRing(ring);
+                break;
+            case NECKLACE:
+                Necklace necklace = (Necklace) item;
+                equipement.setNecklace(necklace);
+                break;
+            case HELMET:
+                Helm helm = (Helm) item;
+                equipement.setHelm(helm);
+                break;
+            case ARMOR:
+                Armor armor = (Armor) item;
+                equipement.setArmor(armor);
+                break;
+            case HELD_ITEM:
+                HeldItem heldItem = (HeldItem) item;
+                equipement.setHeldItem(heldItem);
+                break;
+        }
+    }
+
+    public void unequip(ItemType itemType) {
+        Item itemToRemove = null;
+        switch (itemType) {
+            case WEAPON:
+                itemToRemove = equipement.getWeapon();
+                equipement.setWeapon(null);
+                break;
+            case RING:
+                itemToRemove = equipement.getRing();
+                equipement.setRing(null);
+                break;
+            case NECKLACE:
+                itemToRemove = equipement.getNecklace();
+                equipement.setNecklace(null);
+                break;
+            case HELMET:
+                itemToRemove = equipement.getHelm();
+                equipement.setHelm(null);
+                break;
+            case ARMOR:
+                itemToRemove = equipement.getArmor();
+                equipement.setArmor(null);
+                break;
+            case HELD_ITEM:
+                itemToRemove = equipement.getHeldItem();
+                equipement.setHeldItem(null);
+                break;
+        }
+        if (null != itemToRemove) {
+            player.getInventory().addOne(itemToRemove.getItemID());
+        }
     }
 
 }
