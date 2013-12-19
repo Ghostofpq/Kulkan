@@ -38,8 +38,10 @@ public class InputManager {
     public void saveInputMap() {
         try {
             String path = new StringBuilder().append("./conf/inputs.map").toString();
+            File confFile = new File(path);
+            confFile.createNewFile();
             FileOutputStream fileOut =
-                    new FileOutputStream(path.toString());
+                    new FileOutputStream(confFile);
             ObjectOutputStream out =
                     new ObjectOutputStream(fileOut);
             out.writeObject(inputMap);
