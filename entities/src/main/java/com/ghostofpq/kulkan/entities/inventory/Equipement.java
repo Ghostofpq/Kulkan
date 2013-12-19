@@ -2,7 +2,9 @@ package com.ghostofpq.kulkan.entities.inventory;
 
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 
-public class Equipement {
+import java.io.Serializable;
+
+public class Equipement implements Serializable {
     private Helm helm;
     private Armor armor;
     private Weapon weapon;

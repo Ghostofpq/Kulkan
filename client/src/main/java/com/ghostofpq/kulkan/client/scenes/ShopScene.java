@@ -63,7 +63,7 @@ public class ShopScene implements Scene {
         itemIdPriceMap.put("009", 10);
         itemIdPriceMap.put("010", 10);
         itemIdPriceMap.put("011", 10);
-
+        buttons = new ArrayList<Button>();
         selectedItem = null;
         int widthStep = (Client.getInstance().getWidth() - 5 * widthSeparator) / 5;
         int heightStep = (Client.getInstance().getHeight() - 6 * heightSeparator) / 8;
@@ -71,7 +71,7 @@ public class ShopScene implements Scene {
         itemDescription = new TextArea(widthSeparator * 4 + 3 * widthStep, heightSeparator * 2 + heightStep, 15, 10);
         itemPrice = new KeyValueRender(widthSeparator * 4 + 3 * widthStep, heightSeparator * 3 + 5 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
 
-        buyItem = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 4 + 6 * heightStep, widthStep * 2, heightStep, "Unlock Capacity") {
+        buyItem = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 4 + 6 * heightStep, widthStep * 2, heightStep, "Buy") {
             @Override
             public void onClick() {
                 buySelectedItem();
@@ -83,34 +83,35 @@ public class ShopScene implements Scene {
                 Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 5 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
                     @Override
                     public void onClick() {
-                        Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                        Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                     }
                 };
 
         int widthOfCanvas = 3 * widthStep;
         int heightOfCanvas = Client.getInstance().getHeight();
 
-        int widthStepOfCanvas = (widthOfCanvas - 6 * widthSeparator) / 4;
+        int widthStepOfCanvas = (widthOfCanvas - 5 * widthSeparator) / 4;
         int heightStepOfCanvas = (heightOfCanvas - 4 * heightSeparator) / 3;
 
         // it will be images, but for now names should do great
-        List<String> itemNames = new ArrayList<String>();
-        itemNames.add("Cloth armor");
-        itemNames.add("Iron Helm");
-        itemNames.add("Yew wand");
-        itemNames.add("Stone club");
-        itemNames.add("Sling");
-        itemNames.add("Life Ring");
-        itemNames.add("Strength Ring");
-        itemNames.add("Will Necklace");
-        itemNames.add("Agility Necklace");
-        itemNames.add("Wooden Shield");
-        itemNames.add("Two Handed Sword");
+        Map<String, String> itemNamesToId = new HashMap<String, String>();
+        itemNamesToId.put("Cloth armor", "000");
+        itemNamesToId.put("Iron Helm", "001");
+        itemNamesToId.put("Yew wand", "002");
+        itemNamesToId.put("Stone club", "003");
+        itemNamesToId.put("Sling", "004");
+        itemNamesToId.put("Life Ring", "005");
+        itemNamesToId.put("Strength Ring", "006");
+        itemNamesToId.put("Will Necklace", "007");
+        itemNamesToId.put("Agility Necklace", "008");
+        itemNamesToId.put("Wooden Shield", "009");
+        itemNamesToId.put("Two Handed Sword", "010");
 
         int posX = widthSeparator;
         int posY = heightSeparator;
-        for (final String itemId : itemNames) {
-            Button button = new Button(posX, posY, widthStepOfCanvas, heightStepOfCanvas, itemId) {
+        for (String itemName : itemNamesToId.keySet()) {
+            final String itemId = itemNamesToId.get(itemName);
+            Button button = new Button(posX, posY, widthStepOfCanvas, heightStepOfCanvas, itemName) {
                 @Override
                 public void onClick() {
                     setSelectedItem(itemId);
@@ -118,10 +119,10 @@ public class ShopScene implements Scene {
             };
             buttons.add(button);
 
-            posX += widthOfCanvas + widthSeparator;
+            posX += widthStepOfCanvas + widthSeparator;
             if (posX >= widthOfCanvas) {
                 posX = widthSeparator;
-                posY += heightOfCanvas + heightSeparator;
+                posY += heightStepOfCanvas + heightSeparator;
             }
         }
     }
@@ -150,15 +151,31 @@ public class ShopScene implements Scene {
 
     @Override
     public void render() {
+        for (Button button : buttons) {
+            button.draw();
+        }
+
+        if (null != selectedItem) {
+            itemPrice.draw();
+            selectedItemName.draw();
+            itemDescription.draw();
+            buyItem.draw();
+
+        }
+        quitButton.draw();
     }
 
     @Override
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                for (Button button : buttons) {
-                    if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                        button.onClick();
+                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    quitButton.onClick();
+                } else {
+                    for (Button button : buttons) {
+                        if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                            button.onClick();
+                        }
                     }
                 }
             }

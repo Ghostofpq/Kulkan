@@ -1,9 +1,10 @@
 package com.ghostofpq.kulkan.entities.inventory;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Inventory {
+public class Inventory implements Serializable {
     private Map<String, Integer> itemIdQuantityMap;
 
     public Inventory() {

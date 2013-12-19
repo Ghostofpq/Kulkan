@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.entities.inventory.item;
 
-public enum WeaponType {
+import java.io.Serializable;
+
+public enum WeaponType implements Serializable {
     ONE_HANDED,
     TWO_HANDED,
     RANGE

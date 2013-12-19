@@ -31,6 +31,7 @@ public class LobbyScene implements Scene {
     private TextArea lobbyMessages;
     private Button postButton;
     private Button matchmakingButton;
+    private Button shopButton;
     private Button quitButton;
     private Button acceptButton;
     private Button refuseButton;
@@ -107,13 +108,21 @@ public class LobbyScene implements Scene {
                 Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
             }
         };
-
+        shopButton = new Button(550, 250, 50, 50, "SHOP") {
+            @Override
+            public void onClick() {
+                LOG.debug("SHOP TEAM");
+                exitLobby();
+                Client.getInstance().setCurrentScene(ShopScene.getInstance());
+            }
+        };
         hudElementList.add(inputText);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
         hudElementList.add(lobbyMessages);
         hudElementList.add(quitButton);
         hudElementList.add(manageTeamButton);
+        hudElementList.add(shopButton);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
         matchFound = false;

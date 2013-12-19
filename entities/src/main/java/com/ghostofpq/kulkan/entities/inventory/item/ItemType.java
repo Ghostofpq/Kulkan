@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.entities.inventory.item;
 
-public enum ItemType {
+import java.io.Serializable;
+
+public enum ItemType implements Serializable {
     HELMET,
     ARMOR,
     NECKLACE,

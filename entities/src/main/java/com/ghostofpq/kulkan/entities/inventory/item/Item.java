@@ -4,9 +4,10 @@ import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.JobType;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class Item {
+public abstract class Item implements Serializable {
     private String itemID;
     private String name;
     private String description;
