@@ -81,7 +81,7 @@ public class AuthenticationManager implements Runnable {
     }
 
     private void receiveMessage() throws InterruptedException, IOException {
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
         if (null != delivery) {
             AMQP.BasicProperties props = delivery.getProperties();
             AMQP.BasicProperties replyProps = new AMQP.BasicProperties.Builder()

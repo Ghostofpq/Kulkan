@@ -58,7 +58,7 @@ public class UserService implements Runnable {
     }
 
     private void receiveMessage() throws InterruptedException, IOException {
-        QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
+        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
         if (null != delivery) {
             Message message = Message.loadFromBytes(delivery.getBody());
             log.debug(" [x] RECEIVED '{}' ON {}", message.getType(), serviceQueueName);

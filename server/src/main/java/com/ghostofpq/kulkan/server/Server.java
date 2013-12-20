@@ -62,8 +62,11 @@ public class Server {
         }
 
         authenticationManager.setRequestClose(true);
+        authThread.interrupt();
         gameManager.setRequestClose(true);
+        gameManagerThread.interrupt();
         userService.setRequestClose(true);
+        userServiceThread.interrupt();
     }
 
     public void shutDown() {
