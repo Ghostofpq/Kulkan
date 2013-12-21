@@ -11,8 +11,8 @@ import java.util.List;
 
 @Slf4j
 public class TextArea extends HUDElement {
-    private final String FONT = "optimus_princeps_16";
     public List<String> textInputs;
+    private String fontName = "optimus_princeps_16";
     private int maxLength;
     private int numberOfLineToShow;
 
@@ -22,6 +22,17 @@ public class TextArea extends HUDElement {
         this.maxLength = maxLength;
         this.hasFocus = false;
         this.numberOfLineToShow = numberOfLineToShow;
+        this.fontName = "optimus_princeps_16";
+        textInputs = new ArrayList<String>();
+    }
+
+    public TextArea(int posX, int posY, int width, int height, String fontName) {
+        this.posX = posX;
+        this.posY = posY;
+        this.maxLength = width / (FontManager.getInstance().getFontMap().get(fontName).getWidth("a"));
+        this.hasFocus = false;
+        this.numberOfLineToShow = height / (FontManager.getInstance().getFontMap().get(fontName).getHeight("A"));
+        this.fontName = fontName;
         textInputs = new ArrayList<String>();
     }
 
@@ -33,8 +44,8 @@ public class TextArea extends HUDElement {
             for (int i = 1; i <= numberOfLineToShow; i++) {
                 if (textInputs.size() - i >= 0) {
                     int posXText = posX;
-                    int posYText = posY + (numberOfLineToShow - i) * FontManager.getInstance().getFontMap().get(FONT).getHeight("AAA");
-                    FontManager.getInstance().drawString(FONT, posXText, posYText, textInputs.get(textInputs.size() - i), Color.white);
+                    int posYText = posY + (numberOfLineToShow - i) * FontManager.getInstance().getFontMap().get(fontName).getHeight("AAA");
+                    FontManager.getInstance().drawString(fontName, posXText, posYText, textInputs.get(textInputs.size() - i), Color.white);
                 } else {
                     break;
                 }

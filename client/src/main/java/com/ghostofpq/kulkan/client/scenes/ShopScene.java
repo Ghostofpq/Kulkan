@@ -65,13 +65,13 @@ public class ShopScene implements Scene {
         itemIdPriceMap.put("011", 10);
         buttons = new ArrayList<Button>();
         selectedItem = null;
-        int widthStep = (Client.getInstance().getWidth() - 5 * widthSeparator) / 5;
+        int widthStep = (Client.getInstance().getWidth() - widthSeparator) / 5;
         int heightStep = (Client.getInstance().getHeight() - 6 * heightSeparator) / 8;
-        selectedItemName = new KeyValueRender(widthSeparator * 4 + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Item", "0", 5);
-        itemDescription = new TextArea(widthSeparator * 4 + 3 * widthStep, heightSeparator * 2 + heightStep, 15, 10);
-        itemPrice = new KeyValueRender(widthSeparator * 4 + 3 * widthStep, heightSeparator * 3 + 5 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
+        selectedItemName = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Item", "0", 5);
+        itemDescription = new TextArea(widthSeparator + 3 * widthStep, heightSeparator * 2 + heightStep, widthStep * 2, heightStep, "optimus_princeps_16");
+        itemPrice = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 3 + 5 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
 
-        buyItem = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 4 + 6 * heightStep, widthStep * 2, heightStep, "Buy") {
+        buyItem = new Button(widthSeparator + 3 * widthStep, heightSeparator * 4 + 6 * heightStep, widthStep * 2, heightStep, "Buy") {
             @Override
             public void onClick() {
                 buySelectedItem();
@@ -80,7 +80,7 @@ public class ShopScene implements Scene {
 
         quitButton = new
 
-                Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 5 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
+                Button(widthSeparator + 3 * widthStep, heightSeparator * 5 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
                     @Override
                     public void onClick() {
                         Client.getInstance().setCurrentScene(LobbyScene.getInstance());
@@ -90,8 +90,8 @@ public class ShopScene implements Scene {
         int widthOfCanvas = 3 * widthStep;
         int heightOfCanvas = Client.getInstance().getHeight();
 
-        int widthStepOfCanvas = (widthOfCanvas - 5 * widthSeparator) / 4;
-        int heightStepOfCanvas = (heightOfCanvas - 4 * heightSeparator) / 3;
+        int widthStepOfCanvas = (widthOfCanvas - 4 * widthSeparator) / 3;
+        int heightStepOfCanvas = (heightOfCanvas - 5 * heightSeparator) / 4;
 
         // it will be images, but for now names should do great
         Map<String, String> itemNamesToId = new HashMap<String, String>();
@@ -120,7 +120,7 @@ public class ShopScene implements Scene {
             buttons.add(button);
 
             posX += widthStepOfCanvas + widthSeparator;
-            if (posX >= widthOfCanvas) {
+            if (posX + widthStepOfCanvas >= widthOfCanvas) {
                 posX = widthSeparator;
                 posY += heightStepOfCanvas + heightSeparator;
             }
