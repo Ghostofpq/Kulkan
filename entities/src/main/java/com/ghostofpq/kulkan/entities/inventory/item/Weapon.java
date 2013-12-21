@@ -12,8 +12,8 @@ public class Weapon extends Item {
     private Range range;
     private WeaponType weaponType;
 
-    public Weapon(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, Range range, WeaponType weaponType) {
-        super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, ItemType.WEAPON);
+    public Weapon(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, int price, Range range, WeaponType weaponType) {
+        super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, ItemType.WEAPON, price);
         this.range = range;
         this.weaponType = weaponType;
     }

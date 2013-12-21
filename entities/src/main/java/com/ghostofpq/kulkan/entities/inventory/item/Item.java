@@ -15,8 +15,9 @@ public abstract class Item implements Serializable {
     private SecondaryCharacteristics secondaryCharacteristics;
     private List<JobType> authorizedJobs;
     private ItemType itemType;
+    private int price;
 
-    protected Item(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, ItemType itemType) {
+    protected Item(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, ItemType itemType, int price) {
         this.itemID = itemID;
         this.name = name;
         this.description = description;
@@ -24,6 +25,11 @@ public abstract class Item implements Serializable {
         this.secondaryCharacteristics = secondaryCharacteristics;
         this.authorizedJobs = authorizedJobs;
         this.itemType = itemType;
+        this.price = price;
+    }
+
+    public int getPrice() {
+        return price;
     }
 
     public String getItemID() {

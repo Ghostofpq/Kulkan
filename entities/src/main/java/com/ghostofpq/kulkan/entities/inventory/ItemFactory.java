@@ -56,8 +56,10 @@ public class ItemFactory {
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
         authorizedJobs.add(JobType.MAGE);
+        // price
+        int price = 10;
         // create
-        return new Armor(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new Armor(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createIronHelm() {
@@ -75,8 +77,10 @@ public class ItemFactory {
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
+        // price
+        int price = 10;
         // create
-        return new Helm(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new Helm(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createYewWand() {
@@ -95,8 +99,10 @@ public class ItemFactory {
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.MAGE);
+        // price
+        int price = 10;
         // create
-        return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createStoneClub() {
@@ -116,8 +122,10 @@ public class ItemFactory {
         authorizedJobs.add(JobType.WARRIOR);
         // range
         Range range = new Range(RangeType.CROSS, 0, 1);
+        // price
+        int price = 10;
         // create
-        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, range, WeaponType.ONE_HANDED);
+        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price, range, WeaponType.ONE_HANDED);
     }
 
     private static Item createSling() {
@@ -137,8 +145,10 @@ public class ItemFactory {
         authorizedJobs.add(JobType.MAGE);
         // range
         Range range = new Range(RangeType.CIRCLE, 2, 5);
+        // price
+        int price = 10;
         // create
-        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, range, WeaponType.RANGE);
+        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price, range, WeaponType.RANGE);
     }
 
     private static Item createLifeRing() {
@@ -157,8 +167,10 @@ public class ItemFactory {
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
         authorizedJobs.add(JobType.MAGE);
+        // price
+        int price = 10;
         // create
-        return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createStrengthRing() {
@@ -177,8 +189,10 @@ public class ItemFactory {
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
         authorizedJobs.add(JobType.MAGE);
+        // price
+        int price = 10;
         // create
-        return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createWillNecklace() {
@@ -197,8 +211,10 @@ public class ItemFactory {
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
         authorizedJobs.add(JobType.MAGE);
+        // price
+        int price = 10;
         // create
-        return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createAgilityNecklace() {
@@ -217,8 +233,10 @@ public class ItemFactory {
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
         authorizedJobs.add(JobType.MAGE);
+        // price
+        int price = 10;
         // create
-        return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createWoodenShield() {
@@ -237,8 +255,10 @@ public class ItemFactory {
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
         authorizedJobs.add(JobType.MAGE);
+        // price
+        int price = 10;
         // create
-        return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs);
+        return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
     }
 
     private static Item createTwoHandedSword() {
@@ -258,7 +278,9 @@ public class ItemFactory {
         authorizedJobs.add(JobType.WARRIOR);
         // range
         Range range = new Range(RangeType.CROSS, 0, 2);
+        // price
+        int price = 100;
         // create
-        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, range, WeaponType.TWO_HANDED);
+        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price, range, WeaponType.TWO_HANDED);
     }
 }

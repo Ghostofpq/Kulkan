@@ -2,6 +2,8 @@ package com.ghostofpq.kulkan.server.database.controller;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
+import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
@@ -244,6 +246,27 @@ public class UserController {
                 }
             } else {
                 log.error("GameChar not found");
+            }
+        } else {
+            log.error("User not found");
+        }
+        return user;
+    }
+
+    public User buyItem(String tokenKey, String itemId) {
+        User user = getUserForTokenKey(tokenKey);
+        if (null != user) {
+            Item itemToBuy = ItemFactory.createItem(itemId);
+            if (null != itemToBuy) {
+                if (itemToBuy.getPrice() <= user.getMoney()) {
+                    log.debug("{} just bought a {}", user.getFirstName(), itemToBuy.getName());
+                    user.setMoney(user.getMoney() - itemToBuy.getPrice());
+                    user.getInventory().addOne(itemId);
+                } else {
+                    log.warn("{} can't buy a {}", user.getFirstName(), itemToBuy.getName());
+                }
+            } else {
+                log.error("Item not found");
             }
         } else {
             log.error("User not found");

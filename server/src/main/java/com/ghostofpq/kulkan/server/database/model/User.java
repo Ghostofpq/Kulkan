@@ -237,6 +237,18 @@ public class User {
         return player;
     }
 
+    public Integer getMoney() {
+        return money;
+    }
+
+    public void setMoney(Integer money) {
+        this.money = money;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
     @Override
     public String toString() {
         return new StringBuilder().append("User{")

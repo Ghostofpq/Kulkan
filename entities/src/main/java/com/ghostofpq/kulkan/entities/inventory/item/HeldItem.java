@@ -7,7 +7,7 @@ import com.ghostofpq.kulkan.entities.job.JobType;
 import java.util.List;
 
 public class HeldItem extends Item {
-    public HeldItem(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs) {
-        super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, ItemType.HELD_ITEM);
+    public HeldItem(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, int price) {
+        super(itemID, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, ItemType.HELD_ITEM, price);
     }
 }
