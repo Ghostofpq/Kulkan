@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.TextArea;
 import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
+import com.ghostofpq.kulkan.entities.messages.user.MessageBuyItem;
 import com.rabbitmq.client.Channel;
 import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
@@ -136,7 +137,15 @@ public class ShopScene implements Scene {
     }
 
     private void buySelectedItem() {
-
+        MessageBuyItem messageBuyItem = new MessageBuyItem(Client.getInstance().getTokenKey(), selectedItem.getItemID());
+        try {
+            LOG.debug("Sending ");
+            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageBuyItem.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
