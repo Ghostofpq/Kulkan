@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class LobbyManager {
+public class LobbyManager implements Runnable {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
     private AuthenticationManager authenticationManager;
@@ -32,10 +32,13 @@ public class LobbyManager {
     private Channel channelLobbyIn;
     private QueueingConsumer lobbyConsumer;
     private long lastTimePing;
+    // THREAD ROUTINE
+    private boolean requestClose;
     @Autowired
     private UserController userController;
 
     private LobbyManager() {
+        requestClose = false;
         connectedClients = new ArrayList<String>();
         pongClients = new ArrayList<String>();
         lastTimePing = System.currentTimeMillis();
@@ -64,13 +67,22 @@ public class LobbyManager {
         }
     }
 
-    public void run() throws IOException, InterruptedException {
-        receiveMessage();
-
+    public void run() {
+        while (!requestClose) {
+            try {
+                receiveMessage();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        closeChannel();
+              /*
         if (deltaTimeInMillis() >= 15000) {
             pingClients();
             lastTimePing = System.currentTimeMillis();
-        }
+        }                                   */
     }
 
     private long deltaTimeInMillis() {
@@ -78,7 +90,7 @@ public class LobbyManager {
     }
 
     public void receiveMessage() throws IOException, InterruptedException {
-        QueueingConsumer.Delivery delivery = lobbyConsumer.nextDelivery(1);
+        QueueingConsumer.Delivery delivery = lobbyConsumer.nextDelivery();
         if (null != delivery) {
             log.debug(" [-] RECEIVED MESSAGE ON : {}", LOBBY_SERVER_QUEUE_NAME_BASE);
             Message message = Message.loadFromBytes(delivery.getBody());
@@ -198,5 +210,9 @@ public class LobbyManager {
 
     public void setHostPort(Integer hostPort) {
         this.hostPort = hostPort;
+    }
+
+    public void setRequestClose(boolean requestClose) {
+        this.requestClose = requestClose;
     }
 }

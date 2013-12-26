@@ -20,24 +20,26 @@ import java.io.IOException;
 @Slf4j
 public class Server {
     private static final java.lang.String CONTEXT_URI = "META-INF/spring/server-context.xml";
+    private Thread gameManagerThread;
+    private Thread authThread;
+    private Thread lobbyManagerThread;
+    private Thread userServiceThread;
+    private Thread matchmakingManagerThread;
     private AuthenticationManager authenticationManager;
     private LobbyManager lobbyManager;
     private GameManager gameManager;
     private MatchmakingManager matchmakingManager;
-    private boolean requestClose;
     @Autowired
     private UserService userService;
 
     private Server() {
-        //createMAp();
-        requestClose = false;
     }
 
     public static void main(String[] argv) throws IOException, InterruptedException {
         ApplicationContext context = new ClassPathXmlApplicationContext(CONTEXT_URI);
         Server s = ((Server) context.getBean("server"));
         s.init();
-        s.run();
+        s.start();
     }
 
     private void init() throws IOException, InterruptedException {
@@ -47,34 +49,33 @@ public class Server {
         userService.initConnection();
     }
 
-    public void run() throws IOException, InterruptedException {
-        Thread authThread = new Thread(authenticationManager);
+    public void start() throws IOException, InterruptedException {
+        authThread = new Thread(authenticationManager);
         authThread.start();
-        Thread gameManagerThread = new Thread(gameManager);
+        gameManagerThread = new Thread(gameManager);
         gameManagerThread.start();
-        Thread userServiceThread = new Thread(userService);
+        userServiceThread = new Thread(userService);
         userServiceThread.start();
+        lobbyManagerThread = new Thread(lobbyManager);
+        lobbyManagerThread.start();
+        matchmakingManagerThread = new Thread(matchmakingManager);
+        matchmakingManagerThread.start();
+    }
 
-
-        while (!requestClose) {
-            lobbyManager.run();
-            matchmakingManager.run();
-        }
-
+    public void shutDown() {
         authenticationManager.setRequestClose(true);
         authThread.interrupt();
         gameManager.setRequestClose(true);
         gameManagerThread.interrupt();
         userService.setRequestClose(true);
         userServiceThread.interrupt();
+        lobbyManager.setRequestClose(true);
+        lobbyManagerThread.interrupt();
+        matchmakingManager.setRequestClose(true);
+        matchmakingManagerThread.interrupt();
     }
 
-    public void shutDown() {
-        requestClose = true;
-    }
-
-    public void createMAp() {
-
+    public void createMap() {
         int length = 10;
         int height = 5;
         int depth = 10;
@@ -102,7 +103,6 @@ public class Server {
 
         SaveManager saveManager = SaveManager.getInstance();
         saveManager.saveMap(battlefield, "mapTest1");
-
     }
 
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {

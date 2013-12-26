@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class MatchmakingManager {
+public class MatchmakingManager implements Runnable {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
     private String hostIp;
@@ -42,6 +42,8 @@ public class MatchmakingManager {
     private int matchmapIncrementor;
     @Autowired
     private UserController userController;
+    // THREAD ROUTINE
+    private boolean requestClose;
 
     private MatchmakingManager() {
         matchmapIncrementor = 0;
@@ -72,14 +74,23 @@ public class MatchmakingManager {
         }
     }
 
-    public void run() throws IOException, InterruptedException {
-        receiveMessage();
-        match();
-        checkMatchPropositions();
+    public void run() {
+        while (!requestClose) {
+            try {
+                receiveMessage();
+                match();
+                checkMatchPropositions();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        closeChannel();
     }
 
     public void receiveMessage() throws IOException, InterruptedException {
-        QueueingConsumer.Delivery delivery = matchmakingConsumer.nextDelivery(1);
+        QueueingConsumer.Delivery delivery = matchmakingConsumer.nextDelivery();
         if (null != delivery) {
             Message message = Message.loadFromBytes(delivery.getBody());
             if (null != message) {
@@ -219,6 +230,14 @@ public class MatchmakingManager {
         }
     }
 
+    public void closeChannel() {
+        try {
+            channelOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public String insertInMatchMap(Match match) {
         String matchKey = String.valueOf(matchmapIncrementor);
         matchMap.put(matchKey, match);
@@ -244,5 +263,9 @@ public class MatchmakingManager {
 
     public void setHostPort(Integer hostPort) {
         this.hostPort = hostPort;
+    }
+
+    public void setRequestClose(boolean requestClose) {
+        this.requestClose = requestClose;
     }
 }
