@@ -84,10 +84,32 @@ public class UserService implements Runnable {
                 case CHARACTER_CHANGE_JOB:
                     manageChangeJobRequest(message);
                     break;
+                case BUY_ITEM_REQUEST:
+                    manageBuyItem(message);
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
             }
+        }
+    }
+
+    private void manageBuyItem(Message message) throws IOException {
+        MessageBuyItem messageBuyItem=(MessageBuyItem) message;
+
+        String tokenKey = messageBuyItem.getKeyToken();
+        String itemId  = messageBuyItem.getItemId();
+
+        log.debug("Received a BuyItemRequest");
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("ItemId : '{}'", itemId);
+        if (null != tokenKey && null != itemId) {
+            User user = userController.buyItem(tokenKey,itemId);
+            Player player = user.toPlayer();
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            channelServiceOut.queueDeclare(queueName, false, false, false, null);
+            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
         }
     }
 

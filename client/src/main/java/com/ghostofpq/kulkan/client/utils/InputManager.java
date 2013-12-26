@@ -53,9 +53,8 @@ public class InputManager {
     }
 
     public void checkDirectoriesExist() {
-        File confFolder = new File("./conf/");
-        if (!confFolder.exists()) {
-            confFolder.mkdir();
+        File inputMapFile = new File("./conf/inputs.map");
+        if (!inputMapFile.exists()) {
             inputMap = new InputMap();
             saveInputMap();
         } else {
