@@ -27,6 +27,7 @@ public class ShopScene implements Scene {
     private KeyValueRender money;
     private KeyValueRender selectedItemName;
     private KeyValueRender itemPrice;
+    private KeyValueRender itemStock;
     private Button buyItem;
     private Button quitButton;
     private Item selectedItem;
@@ -67,12 +68,12 @@ public class ShopScene implements Scene {
         buttons = new ArrayList<Button>();
         selectedItem = null;
         int widthStep = (Client.getInstance().getWidth() - widthSeparator) / 5;
-        int heightStep = (Client.getInstance().getHeight() - 6 * heightSeparator) / 8;
+        int heightStep = (Client.getInstance().getHeight() - 7 * heightSeparator) / 6;
         selectedItemName = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Item", "0", 5);
-        itemDescription = new TextArea(widthSeparator + 3 * widthStep, heightSeparator * 2 + heightStep, widthStep * 2, heightStep, "optimus_princeps_16");
-        itemPrice = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 3 + 5 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
-
-        buyItem = new Button(widthSeparator + 3 * widthStep, heightSeparator * 4 + 6 * heightStep, widthStep * 2, heightStep, "Buy") {
+        itemDescription = new TextArea(widthSeparator + 3 * widthStep, heightSeparator * 2 + 1 * heightStep, widthStep * 2, heightStep, "optimus_princeps_16");
+        itemPrice = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 3 + 2 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
+        itemStock = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 4 + 3 * heightStep, widthStep * 2, heightStep, "Stock", "0", 5);
+        buyItem = new Button(widthSeparator + 3 * widthStep, heightSeparator * 5 + 4 * heightStep, widthStep * 2, heightStep, "Buy") {
             @Override
             public void onClick() {
                 buySelectedItem();
@@ -81,7 +82,7 @@ public class ShopScene implements Scene {
 
         quitButton = new
 
-                Button(widthSeparator + 3 * widthStep, heightSeparator * 5 + 7 * heightStep, widthStep * 2, heightStep, "Back") {
+                Button(widthSeparator + 3 * widthStep, heightSeparator * 6 + 5 * heightStep, widthStep * 2, heightStep, "Back") {
                     @Override
                     public void onClick() {
                         Client.getInstance().setCurrentScene(LobbyScene.getInstance());
@@ -134,6 +135,7 @@ public class ShopScene implements Scene {
         itemDescription.clear();
         itemDescription.addLine(selectedItem.getDescription());
         itemPrice.setValue(itemIdPriceMap.get(itemId).toString());
+        itemStock.setValue(String.valueOf(Client.getInstance().getPlayer().getInventory().getNumberOf(itemId)));
     }
 
     private void buySelectedItem() {
@@ -168,8 +170,8 @@ public class ShopScene implements Scene {
             itemPrice.draw();
             selectedItemName.draw();
             itemDescription.draw();
+            itemStock.draw();
             buyItem.draw();
-
         }
         quitButton.draw();
     }
@@ -180,6 +182,8 @@ public class ShopScene implements Scene {
             if (Mouse.isButtonDown(0)) {
                 if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
                     quitButton.onClick();
+                } else if (buyItem.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    buyItem.onClick();
                 } else {
                     for (Button button : buttons) {
                         if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {

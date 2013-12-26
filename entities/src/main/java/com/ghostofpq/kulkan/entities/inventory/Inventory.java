@@ -42,4 +42,12 @@ public class Inventory implements Serializable {
     public void removeOne(String itemId) throws IllegalArgumentException {
         remove(itemId, 1);
     }
+
+    public int getNumberOf(String itemId) {
+        Integer result = itemIdQuantityMap.get(itemId);
+        if (null == result) {
+            result = 0;
+        }
+        return result;
+    }
 }
