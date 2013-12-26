@@ -262,8 +262,9 @@ public class UserController {
                     log.debug("{} just bought a {}", user.getFirstName(), itemToBuy.getName());
                     user.setMoney(user.getMoney() - itemToBuy.getPrice());
                     user.getInventory().addOne(itemId);
+                    user = userRepository.save(user);
                 } else {
-                    log.warn("{} can't buy a {}", user.getFirstName(), itemToBuy.getName());
+                    log.warn("{} can't buy a {}", user.getUsername(), itemToBuy.getName());
                 }
             } else {
                 log.error("Item not found");

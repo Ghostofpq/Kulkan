@@ -49,7 +49,7 @@ public class User {
         this.team = new ArrayList<GameCharacterDB>();
         this.stock = new ArrayList<GameCharacterDB>();
         this.grade = 0;
-        this.money = 0;
+        this.money = 100;
         this.inventory = new Inventory();
     }
 

@@ -4,9 +4,12 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.TextArea;
+import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
+import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageBuyItem;
+import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.rabbitmq.client.Channel;
 import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
@@ -22,7 +25,6 @@ public class ShopScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(ShopScene.class);
     private static volatile ShopScene instance = null;
     private final String USER_SERVICE_QUEUE_NAME = "users";
-    private Map<String, Integer> itemIdPriceMap;
     private Channel channelOut;
     private KeyValueRender money;
     private KeyValueRender selectedItemName;
@@ -52,42 +54,28 @@ public class ShopScene implements Scene {
 
     @Override
     public void init() {
-        itemIdPriceMap = new HashMap<String, Integer>();
-        itemIdPriceMap.put("000", 10);
-        itemIdPriceMap.put("001", 10);
-        itemIdPriceMap.put("002", 10);
-        itemIdPriceMap.put("003", 10);
-        itemIdPriceMap.put("004", 10);
-        itemIdPriceMap.put("005", 10);
-        itemIdPriceMap.put("006", 10);
-        itemIdPriceMap.put("007", 10);
-        itemIdPriceMap.put("008", 10);
-        itemIdPriceMap.put("009", 10);
-        itemIdPriceMap.put("010", 10);
-        itemIdPriceMap.put("011", 10);
         buttons = new ArrayList<Button>();
         selectedItem = null;
         int widthStep = (Client.getInstance().getWidth() - widthSeparator) / 5;
-        int heightStep = (Client.getInstance().getHeight() - 7 * heightSeparator) / 6;
+        int heightStep = (Client.getInstance().getHeight() - 8 * heightSeparator) / 7;
         selectedItemName = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Item", "0", 5);
         itemDescription = new TextArea(widthSeparator + 3 * widthStep, heightSeparator * 2 + 1 * heightStep, widthStep * 2, heightStep, "optimus_princeps_16");
         itemPrice = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 3 + 2 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
-        itemStock = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 4 + 3 * heightStep, widthStep * 2, heightStep, "Stock", "0", 5);
-        buyItem = new Button(widthSeparator + 3 * widthStep, heightSeparator * 5 + 4 * heightStep, widthStep * 2, heightStep, "Buy") {
+        money = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 4 + 3 * heightStep, widthStep * 2, heightStep, "Money", "0", 5);
+        itemStock = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 5 + 4 * heightStep, widthStep * 2, heightStep, "Stock", "0", 5);
+        buyItem = new Button(widthSeparator + 3 * widthStep, heightSeparator * 6 + 5 * heightStep, widthStep * 2, heightStep, "Buy") {
             @Override
             public void onClick() {
                 buySelectedItem();
             }
         };
 
-        quitButton = new
-
-                Button(widthSeparator + 3 * widthStep, heightSeparator * 6 + 5 * heightStep, widthStep * 2, heightStep, "Back") {
-                    @Override
-                    public void onClick() {
-                        Client.getInstance().setCurrentScene(LobbyScene.getInstance());
-                    }
-                };
+        quitButton = new Button(widthSeparator + 3 * widthStep, heightSeparator * 7 + 6 * heightStep, widthStep * 2, heightStep, "Back") {
+            @Override
+            public void onClick() {
+                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+            }
+        };
 
         int widthOfCanvas = 3 * widthStep;
         int heightOfCanvas = Client.getInstance().getHeight();
@@ -97,22 +85,22 @@ public class ShopScene implements Scene {
 
         // it will be images, but for now names should do great
         Map<String, String> itemNamesToId = new HashMap<String, String>();
-        itemNamesToId.put("Cloth armor", "000");
-        itemNamesToId.put("Iron Helm", "001");
-        itemNamesToId.put("Yew wand", "002");
-        itemNamesToId.put("Stone club", "003");
-        itemNamesToId.put("Sling", "004");
-        itemNamesToId.put("Life Ring", "005");
-        itemNamesToId.put("Strength Ring", "006");
-        itemNamesToId.put("Will Necklace", "007");
-        itemNamesToId.put("Agility Necklace", "008");
-        itemNamesToId.put("Wooden Shield", "009");
-        itemNamesToId.put("Two Handed Sword", "010");
+        itemNamesToId.put("000","Cloth armor");
+        itemNamesToId.put("001","Iron Helm");
+        itemNamesToId.put("002","Yew wand");
+        itemNamesToId.put("003","Stone club");
+        itemNamesToId.put("004","Sling");
+        itemNamesToId.put("005","Life Ring");
+        itemNamesToId.put("006","Strength Ring");
+        itemNamesToId.put("007","Will Necklace");
+        itemNamesToId.put("008","Agility Necklace");
+        itemNamesToId.put("009","Wooden Shield");
+        itemNamesToId.put("010","Two Handed Sword");
 
         int posX = widthSeparator;
         int posY = heightSeparator;
-        for (String itemName : itemNamesToId.keySet()) {
-            final String itemId = itemNamesToId.get(itemName);
+        for (final String itemId : itemNamesToId.keySet()) {
+            final String itemName = itemNamesToId.get(itemId);
             Button button = new Button(posX, posY, widthStepOfCanvas, heightStepOfCanvas, itemName) {
                 @Override
                 public void onClick() {
@@ -134,8 +122,9 @@ public class ShopScene implements Scene {
         selectedItemName.setValue(selectedItem.getName());
         itemDescription.clear();
         itemDescription.addLine(selectedItem.getDescription());
-        itemPrice.setValue(itemIdPriceMap.get(itemId).toString());
+        itemPrice.setValue(String.valueOf(selectedItem.getPrice()));
         itemStock.setValue(String.valueOf(Client.getInstance().getPlayer().getInventory().getNumberOf(itemId)));
+        money.setValue(String.valueOf(Client.getInstance().getPlayer().getMoney()));
     }
 
     private void buySelectedItem() {
@@ -172,6 +161,7 @@ public class ShopScene implements Scene {
             itemDescription.draw();
             itemStock.draw();
             buyItem.draw();
+            money.draw();
         }
         quitButton.draw();
     }
@@ -202,5 +192,18 @@ public class ShopScene implements Scene {
 
     @Override
     public void receiveMessage() {
+        Message message = Client.getInstance().receiveMessage();
+        if (null != message) {
+            switch (message.getType()) {
+                case PLAYER_UPDATE:
+                    LOG.debug("PLAYER_UPDATE");
+                    MessagePlayerUpdate response = (MessagePlayerUpdate) message;
+                    LOG.debug("CREATE OK");
+                    Client.getInstance().setPlayer(response.getPlayer());
+                    itemStock.setValue(String.valueOf(Client.getInstance().getPlayer().getInventory().getNumberOf(selectedItem.getItemID())));
+                    money.setValue(String.valueOf(Client.getInstance().getPlayer().getMoney()));
+                    break;
+            }
+        }
     }
 }
