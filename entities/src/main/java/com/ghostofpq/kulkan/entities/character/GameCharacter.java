@@ -602,4 +602,8 @@ public class GameCharacter implements Serializable {
         }
     }
 
+
+    public Equipment getEquipment() {
+        return equipment;
+    }
 }
