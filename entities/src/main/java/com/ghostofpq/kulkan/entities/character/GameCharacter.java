@@ -197,7 +197,7 @@ public class GameCharacter implements Serializable {
         }
     }
 
-    public void gainJobpoints(int jobPoints) {
+    public void gainJobPoints(int jobPoints) {
         getJob(this.currentJob).gainJobPoints(jobPoints);
     }
 
@@ -229,11 +229,12 @@ public class GameCharacter implements Serializable {
         maxManaPoint = getIntelligence() * 10;
     }
 
-     public void calculateAggregatedCharacteristics() {
+    public void calculateAggregatedCharacteristics() {
         this.aggregatedCharacteristics = new PrimaryCharacteristics();
         this.aggregatedCharacteristics.plus(characteristics);
         this.aggregatedCharacteristics.plus(getJob(this.currentJob).getAggregatedCaracteristics());
         this.aggregatedCharacteristics.plus(equipment.getPrimaryCharacteristics());
+
         this.aggregatedSecondaryCharacteristics = new SecondaryCharacteristics(aggregatedCharacteristics);
         this.aggregatedSecondaryCharacteristics.plus(equipment.getSecondaryCharacteristics());
     }
@@ -530,8 +531,12 @@ public class GameCharacter implements Serializable {
         return id;
     }
 
-    public void equip(Item item) {
-        player.getInventory().removeOne(item.getItemID());
+    public void equip(Item item) throws IllegalArgumentException {
+        if (null != item) {
+            player.getInventory().removeOne(item.getItemID());
+        } else {
+            throw new IllegalArgumentException("item can't be null");
+        }
         switch (item.getItemType()) {
             case WEAPON:
                 Weapon weapon = (Weapon) item;
@@ -561,6 +566,7 @@ public class GameCharacter implements Serializable {
                 equipment.setHeldItem(heldItem);
                 break;
         }
+
     }
 
     public void unequip(ItemType itemType) {

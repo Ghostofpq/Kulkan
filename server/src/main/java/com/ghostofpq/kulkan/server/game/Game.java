@@ -352,7 +352,7 @@ public class Game {
                                 sendToAll(messageCharacterAttacks);
                                 characterWhoAttacks.setHasActed(true);
                                 characterWhoAttacks.gainXp(damages);
-                                characterWhoAttacks.gainJobpoints(5);
+                                characterWhoAttacks.gainJobPoints(5);
                                 MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(characterWhoAttacks, damages, 5);
                                 sendToAll(messageCharacterGainsXP);
 

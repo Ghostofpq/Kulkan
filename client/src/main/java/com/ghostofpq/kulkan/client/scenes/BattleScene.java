@@ -610,7 +610,7 @@ public class BattleScene implements Scene {
         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
             if (characterRepresentation.getCharacter().equals(messageCharacterGainsXP.getCharacter())) {
                 characterRepresentation.getCharacter().gainXp(messageCharacterGainsXP.getExperiencePoints());
-                characterRepresentation.getCharacter().gainJobpoints(messageCharacterGainsXP.getJobPoints());
+                characterRepresentation.getCharacter().gainJobPoints(messageCharacterGainsXP.getJobPoints());
                 LOG.debug("{} gains {} exp and {} job points", messageCharacterGainsXP.getCharacter().getName(),
                         messageCharacterGainsXP.getExperiencePoints(), messageCharacterGainsXP.getJobPoints());
                 break;
