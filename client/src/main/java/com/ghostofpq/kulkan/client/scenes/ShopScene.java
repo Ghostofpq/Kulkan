@@ -198,7 +198,6 @@ public class ShopScene implements Scene {
                 case PLAYER_UPDATE:
                     LOG.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    LOG.debug("CREATE OK");
                     Client.getInstance().setPlayer(response.getPlayer());
                     itemStock.setValue(String.valueOf(Client.getInstance().getPlayer().getInventory().getNumberOf(selectedItem.getItemID())));
                     money.setValue(String.valueOf(Client.getInstance().getPlayer().getMoney()));
