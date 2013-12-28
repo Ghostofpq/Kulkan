@@ -198,7 +198,7 @@ public class User {
                 }
             }
             gameCharacter.setCurrentJob(gameCharacterDB.getCurrentJob());
-            gameCharacter.calculateAggregatedCaracteristics();
+            gameCharacter.calculateAggregatedCharacteristics();
             player.getTeam().add(gameCharacter);
         }
         for (GameCharacterDB gameCharacterDB : this.stock) {
@@ -225,7 +225,7 @@ public class User {
                 }
             }
             gameCharacter.setCurrentJob(gameCharacterDB.getCurrentJob());
-            gameCharacter.calculateAggregatedCaracteristics();
+            gameCharacter.calculateAggregatedCharacteristics();
             player.getStock().add(gameCharacter);
         }
         if (null != inventory) {

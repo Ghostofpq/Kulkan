@@ -7,7 +7,7 @@ import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.clan.Clan;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
-import com.ghostofpq.kulkan.entities.inventory.Equipement;
+import com.ghostofpq.kulkan.entities.inventory.Equipment;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
@@ -111,7 +111,7 @@ public class GameCharacter implements Serializable {
     private boolean hasMoved;
     private boolean hasActed;
     private boolean isReadyToPlay;
-    private Equipement equipement;
+    private Equipment equipment;
 
     /**
      * Creates a new Character level 1 Warrior.
@@ -137,7 +137,7 @@ public class GameCharacter implements Serializable {
         jobWarrior = new Warrior();
         jobMage = new Mage();
         currentJob = JobType.WARRIOR;
-        equipement = new Equipement();
+        equipment = new Equipment();
 
         // Caracteristics
         characteristics = getClan().getBaseCaracteristics();
@@ -168,7 +168,7 @@ public class GameCharacter implements Serializable {
         jobWarrior = new Warrior();
         jobMage = new Mage();
         currentJob = JobType.WARRIOR;
-        equipement = new Equipement();
+        equipment = new Equipment();
 
         // Caracteristics
         characteristics = getClan().getBaseCaracteristics();
@@ -224,31 +224,18 @@ public class GameCharacter implements Serializable {
     }
 
     private void updateLifeAndManaPoint() {
-        calculateAggregatedCaracteristics();
+        calculateAggregatedCharacteristics();
         maxHealthPoint = getEndurance() * 10;
         maxManaPoint = getIntelligence() * 10;
     }
 
-    private PrimaryCharacteristics getBonusFromJobs() {
-        PrimaryCharacteristics result = new PrimaryCharacteristics(0, 0, 0, 0,
-                0, 0);
-        result.plus(jobWarrior.getAggregatedCaracteristics());
-        return result;
-    }
-
-    private PrimaryCharacteristics getBonusFromEquipement() {
-        PrimaryCharacteristics result = new PrimaryCharacteristics(0, 0, 0, 0,
-                0, 0);
-
-        return result;
-    }
-
-    public void calculateAggregatedCaracteristics() {
+     public void calculateAggregatedCharacteristics() {
         this.aggregatedCharacteristics = new PrimaryCharacteristics();
         this.aggregatedCharacteristics.plus(characteristics);
-        this.aggregatedCharacteristics.plus(getBonusFromJobs());
-        this.aggregatedCharacteristics.plus(getBonusFromEquipement());
+        this.aggregatedCharacteristics.plus(getJob(this.currentJob).getAggregatedCaracteristics());
+        this.aggregatedCharacteristics.plus(equipment.getPrimaryCharacteristics());
         this.aggregatedSecondaryCharacteristics = new SecondaryCharacteristics(aggregatedCharacteristics);
+        this.aggregatedSecondaryCharacteristics.plus(equipment.getSecondaryCharacteristics());
     }
 
     public void addHealthPoint(int healthPoint) {
@@ -551,27 +538,27 @@ public class GameCharacter implements Serializable {
                 if (weapon.getWeaponType().equals(WeaponType.TWO_HANDED)) {
                     unequip(ItemType.HELD_ITEM);
                 }
-                equipement.setWeapon(weapon);
+                equipment.setWeapon(weapon);
                 break;
             case RING:
                 Ring ring = (Ring) item;
-                equipement.setRing(ring);
+                equipment.setRing(ring);
                 break;
             case NECKLACE:
                 Necklace necklace = (Necklace) item;
-                equipement.setNecklace(necklace);
+                equipment.setNecklace(necklace);
                 break;
             case HELMET:
                 Helm helm = (Helm) item;
-                equipement.setHelm(helm);
+                equipment.setHelm(helm);
                 break;
             case ARMOR:
                 Armor armor = (Armor) item;
-                equipement.setArmor(armor);
+                equipment.setArmor(armor);
                 break;
             case HELD_ITEM:
                 HeldItem heldItem = (HeldItem) item;
-                equipement.setHeldItem(heldItem);
+                equipment.setHeldItem(heldItem);
                 break;
         }
     }
@@ -580,28 +567,28 @@ public class GameCharacter implements Serializable {
         Item itemToRemove = null;
         switch (itemType) {
             case WEAPON:
-                itemToRemove = equipement.getWeapon();
-                equipement.setWeapon(null);
+                itemToRemove = equipment.getWeapon();
+                equipment.setWeapon(null);
                 break;
             case RING:
-                itemToRemove = equipement.getRing();
-                equipement.setRing(null);
+                itemToRemove = equipment.getRing();
+                equipment.setRing(null);
                 break;
             case NECKLACE:
-                itemToRemove = equipement.getNecklace();
-                equipement.setNecklace(null);
+                itemToRemove = equipment.getNecklace();
+                equipment.setNecklace(null);
                 break;
             case HELMET:
-                itemToRemove = equipement.getHelm();
-                equipement.setHelm(null);
+                itemToRemove = equipment.getHelm();
+                equipment.setHelm(null);
                 break;
             case ARMOR:
-                itemToRemove = equipement.getArmor();
-                equipement.setArmor(null);
+                itemToRemove = equipment.getArmor();
+                equipment.setArmor(null);
                 break;
             case HELD_ITEM:
-                itemToRemove = equipement.getHeldItem();
-                equipement.setHeldItem(null);
+                itemToRemove = equipment.getHeldItem();
+                equipment.setHeldItem(null);
                 break;
         }
         if (null != itemToRemove) {
