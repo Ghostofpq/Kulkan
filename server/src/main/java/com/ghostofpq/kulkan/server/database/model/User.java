@@ -4,10 +4,10 @@ import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.inventory.Inventory;
 import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
-import com.ghostofpq.kulkan.entities.inventory.item.*;
-import com.ghostofpq.kulkan.entities.job.Job;
-import com.ghostofpq.kulkan.entities.job.Mage;
-import com.ghostofpq.kulkan.entities.job.Warrior;
+import com.ghostofpq.kulkan.entities.inventory.item.Item;
+import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
+import com.ghostofpq.kulkan.entities.inventory.item.Weapon;
+import com.ghostofpq.kulkan.entities.inventory.item.WeaponType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -217,5 +217,27 @@ public class User {
 
     public boolean equals(User obj) {
         return this.getId().equals(obj.getId());
+    }
+
+    public void equipItem(String itemId, GameCharacterDB gameCharacter) {
+        try {
+            inventory.removeOne(itemId);
+            Item item= ItemFactory.createItem(itemId);
+            if(item.getItemType().equals(ItemType.WEAPON)){
+                if(((Weapon)item).getWeaponType().equals(WeaponType.TWO_HANDED)){
+                    unequipItem(ItemType.HELD_ITEM,gameCharacter);
+                }
+            }
+            gameCharacter.equipItem(item.getItemType(),itemId);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    public void unequipItem(ItemType itemType, GameCharacterDB gameCharacter) {
+        String itemId = gameCharacter.unequipItem(itemType);
+        if (null != itemId) {
+            inventory.addOne(itemId);
+        }
     }
 }

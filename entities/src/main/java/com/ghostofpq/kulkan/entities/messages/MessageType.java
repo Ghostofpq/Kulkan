@@ -56,6 +56,8 @@ public enum MessageType implements Serializable {
     CHARACTER_UNLOCK_CAPACITY,
     CHARACTER_CHANGE_JOB,
     BUY_ITEM_REQUEST,
+    EQUIP_ITEM,
+    UNEQUIP_ITEM,
     PLAYER_UPDATE;
 
 }

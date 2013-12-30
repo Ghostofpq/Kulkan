@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.server.database;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
+import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
@@ -87,6 +88,13 @@ public class UserService implements Runnable {
                 case BUY_ITEM_REQUEST:
                     manageBuyItem(message);
                     break;
+                case EQUIP_ITEM:
+                    manageEquipItem(message);
+                    break;
+                case UNEQUIP_ITEM:
+                    manageUnequipItem(message);
+                    break;
+
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
@@ -94,17 +102,60 @@ public class UserService implements Runnable {
         }
     }
 
+    private void manageEquipItem(Message message) throws IOException {
+        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = (MessageEquipItemOnGameCharacter) message;
+
+        String tokenKey = messageEquipItemOnGameCharacter.getKeyToken();
+        ObjectId gameCharId = messageEquipItemOnGameCharacter.getGameCharId();
+        String itemId = messageEquipItemOnGameCharacter.getItemId();
+
+        log.debug("Received a EquipItem");
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharId : '{}'", gameCharId);
+        log.debug("ItemId : '{}'", itemId);
+
+        if (null != tokenKey && null != gameCharId && null != itemId) {
+            User user = userController.equipItem(tokenKey, gameCharId, itemId);
+            Player player = user.toPlayer();
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            channelServiceOut.queueDeclare(queueName, false, false, false, null);
+            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+        }
+    }
+
+    private void manageUnequipItem(Message message) throws IOException {
+        MessageUnequipItemOnGameCharacter messageUnequipItemOnGameCharacter = (MessageUnequipItemOnGameCharacter) message;
+
+        String tokenKey = messageUnequipItemOnGameCharacter.getKeyToken();
+        ObjectId gameCharId = messageUnequipItemOnGameCharacter.getGameCharId();
+        ItemType itemType = messageUnequipItemOnGameCharacter.getItemType();
+
+        log.debug("Received a UnequipItemRequest");
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharId : '{}'", gameCharId);
+        log.debug("ItemType : '{}'", itemType);
+        if (null != tokenKey && null != gameCharId && null != itemType) {
+            User user = userController.unequipItem(tokenKey, gameCharId, itemType);
+            Player player = user.toPlayer();
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+            channelServiceOut.queueDeclare(queueName, false, false, false, null);
+            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+        }
+    }
+
     private void manageBuyItem(Message message) throws IOException {
-        MessageBuyItem messageBuyItem=(MessageBuyItem) message;
+        MessageBuyItem messageBuyItem = (MessageBuyItem) message;
 
         String tokenKey = messageBuyItem.getKeyToken();
-        String itemId  = messageBuyItem.getItemId();
+        String itemId = messageBuyItem.getItemId();
 
         log.debug("Received a BuyItemRequest");
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("ItemId : '{}'", itemId);
         if (null != tokenKey && null != itemId) {
-            User user = userController.buyItem(tokenKey,itemId);
+            User user = userController.buyItem(tokenKey, itemId);
             Player player = user.toPlayer();
             MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();

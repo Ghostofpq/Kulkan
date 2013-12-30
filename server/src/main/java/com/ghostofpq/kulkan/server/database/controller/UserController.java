@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
+import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
@@ -274,6 +275,39 @@ public class UserController {
         }
         return user;
     }
+
+    public User equipItem(String tokenKey, ObjectId gameCharId, String itemId) {
+        User user = getUserForTokenKey(tokenKey);
+        if (null != user) {
+            List<GameCharacterDB> allGameCharactersForUser = new ArrayList<GameCharacterDB>();
+            allGameCharactersForUser.addAll(user.getTeam());
+            allGameCharactersForUser.addAll(user.getStock());
+            for (GameCharacterDB gameCharacter : allGameCharactersForUser) {
+                if (gameCharacter.getId().equals(gameCharId)) {
+                    user.equipItem(itemId, gameCharacter);
+                    user = userRepository.save(user);
+                }
+            }
+        }
+        return user;
+    }
+
+    public User unequipItem(String tokenKey, ObjectId gameCharId, ItemType itemType) {
+        User user = getUserForTokenKey(tokenKey);
+        if (null != user) {
+            List<GameCharacterDB> allGameCharactersForUser = new ArrayList<GameCharacterDB>();
+            allGameCharactersForUser.addAll(user.getTeam());
+            allGameCharactersForUser.addAll(user.getStock());
+            for (GameCharacterDB gameCharacter : allGameCharactersForUser) {
+                if (gameCharacter.getId().equals(gameCharId)) {
+                    user.unequipItem(itemType, gameCharacter);
+                    user = userRepository.save(user);
+                }
+            }
+        }
+        return user;
+    }
+
 
     public User updateGameCharacters(Player player) {
         User user = getUserForUsername(player.getPseudo());

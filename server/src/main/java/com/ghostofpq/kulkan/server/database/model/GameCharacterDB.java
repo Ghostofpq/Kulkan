@@ -255,4 +255,58 @@ public class GameCharacterDB {
     public void setHelm(String helm) {
         this.helm = helm;
     }
+
+    public void equipItem(ItemType itemType,String itemId) {
+        switch (itemType) {
+            case WEAPON:
+                setWeapon(itemId);
+                break;
+            case RING:
+                setRing(itemId);
+                break;
+            case NECKLACE:
+                setNecklace(itemId);
+                break;
+            case HELMET:
+                setHelm(itemId);
+                break;
+            case ARMOR:
+                setArmor(itemId);
+                break;
+            case HELD_ITEM:
+                setHeldItem(itemId);
+                break;
+        }
+    }
+
+    public String unequipItem(ItemType itemType) {
+        String itemId = null;
+        switch (itemType) {
+            case WEAPON:
+                itemId = getWeapon();
+                setWeapon(null);
+                break;
+            case RING:
+                itemId = getRing();
+                setRing(null);
+                break;
+            case NECKLACE:
+                itemId = getNecklace();
+                setNecklace(null);
+                break;
+            case HELMET:
+                itemId = getHelm();
+                setHelm(null);
+                break;
+            case ARMOR:
+                itemId = getArmor();
+                setArmor(null);
+                break;
+            case HELD_ITEM:
+                itemId = getHeldItem();
+                setHeldItem(null);
+                break;
+        }
+        return itemId;
+    }
 }
