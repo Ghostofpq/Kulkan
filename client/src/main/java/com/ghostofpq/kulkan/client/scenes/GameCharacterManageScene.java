@@ -96,7 +96,8 @@ public class GameCharacterManageScene implements Scene {
                 Button(widthSeparator + 2 * widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Stuff") {
                     @Override
                     public void onClick() {
-                        LOG.debug("manageEquipementButton");
+                        ManageEquipementScene.getInstance().setGameCharacter(gameCharacter);
+                        Client.getInstance().setCurrentScene(ManageEquipementScene.getInstance());
                     }
                 };
 
