@@ -355,6 +355,7 @@ public class ManageEquipementScene implements Scene {
                     GameCharacter updatedGameCharacter = response.getPlayer().getGameCharWithId(gameCharacter.getId());
                     setGameCharacter(updatedGameCharacter);
                     GameCharacterManageScene.getInstance().setGameCharacter(updatedGameCharacter);
+                    init();
                     break;
             }
         }

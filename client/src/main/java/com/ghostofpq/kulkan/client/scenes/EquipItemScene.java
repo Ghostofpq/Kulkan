@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.TextArea;
+import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.messages.Message;
@@ -171,7 +172,9 @@ public class EquipItemScene implements Scene {
                     LOG.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     Client.getInstance().setPlayer(response.getPlayer());
-                    ManageEquipementScene.getInstance().setGameCharacter(response.getPlayer().getGameCharWithId(gameCharId));
+                    GameCharacter gameCharacter = response.getPlayer().getGameCharWithId(gameCharId);
+                    ManageEquipementScene.getInstance().setGameCharacter(gameCharacter);
+                    GameCharacterManageScene.getInstance().setGameCharacter(gameCharacter);
                     Client.getInstance().setCurrentScene(ManageEquipementScene.getInstance());
                     break;
             }
