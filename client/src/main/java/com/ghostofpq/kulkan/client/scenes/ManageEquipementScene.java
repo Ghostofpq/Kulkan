@@ -208,7 +208,9 @@ public class ManageEquipementScene implements Scene {
     }
 
     public void changeToSceneEquipItem(ItemType itemType) {
-        LOG.debug("{}", itemType);
+        EquipItemScene.getInstance().setFilter(itemType);
+        EquipItemScene.getInstance().setGameCharId(gameCharacter.getId());
+        Client.getInstance().setCurrentScene(EquipItemScene.getInstance());
     }
 
     public void unequipItemType(ItemType itemType) {

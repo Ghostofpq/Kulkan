@@ -1,7 +1,12 @@
 package com.ghostofpq.kulkan.entities.inventory;
 
+import com.ghostofpq.kulkan.entities.inventory.item.Item;
+import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Inventory implements Serializable {
@@ -49,5 +54,18 @@ public class Inventory implements Serializable {
             result = 0;
         }
         return result;
+    }
+
+    public List<Item> getItemsByType(ItemType itemType) {
+        List<Item> itemList = new ArrayList<Item>();
+        for (String itemId : itemIdQuantityMap.keySet()) {
+            Item item = ItemFactory.createItem(itemId);
+            if (item.getItemType().equals(itemType)) {
+                if (itemIdQuantityMap.get(itemId) > 0) {
+                    itemList.add(item);
+                }
+            }
+        }
+        return itemList;
     }
 }
