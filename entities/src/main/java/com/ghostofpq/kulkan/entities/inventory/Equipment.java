@@ -3,6 +3,8 @@ package com.ghostofpq.kulkan.entities.inventory;
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
+import com.ghostofpq.kulkan.entities.utils.Range;
+import com.ghostofpq.kulkan.entities.utils.RangeType;
 
 import java.io.Serializable;
 
@@ -63,6 +65,14 @@ public class Equipment implements Serializable {
 
     public void setRing(Ring ring) {
         this.ring = ring;
+    }
+
+    public Range getRange() {
+        if (weapon != null) {
+            return weapon.getRange();
+        } else {
+            return new Range(RangeType.CROSS, 0, 1);
+        }
     }
 
     public PrimaryCharacteristics getPrimaryCharacteristics() {

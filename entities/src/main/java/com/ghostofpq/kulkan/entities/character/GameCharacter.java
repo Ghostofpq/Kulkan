@@ -13,6 +13,8 @@ import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.Mage;
 import com.ghostofpq.kulkan.entities.job.Warrior;
+import com.ghostofpq.kulkan.entities.utils.Range;
+import com.ghostofpq.kulkan.entities.utils.RangeType;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
@@ -494,6 +496,14 @@ public class GameCharacter implements Serializable {
         this.headingAngle = headingAngle;
     }
 
+    public Range getRange() {
+        if (equipment != null) {
+            return equipment.getRange();
+        } else {
+            return new Range(RangeType.CROSS, 0, 1);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -601,7 +611,6 @@ public class GameCharacter implements Serializable {
             player.getInventory().addOne(itemToRemove.getItemID());
         }
     }
-
 
     public Equipment getEquipment() {
         return equipment;
