@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.commons.Node;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
+import com.ghostofpq.kulkan.entities.utils.Range;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -223,6 +224,25 @@ public class Battlefield implements Serializable {
                 }
             }
         }
+    }
+
+    public List<Position> getPossiblePositionsToAttack(Position position, Range range) {
+        Tree<Position> positionTree = new Tree<Position>(position);
+        List<Position> result = new ArrayList<Position>();
+        switch (range.getRangeType()) {
+            case CIRCLE:
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1);
+                Tree<Position> innerCircle = new Tree<Position>(position);
+                getPossiblePositions(position, innerCircle.getRoot(), range.getMinRange(), range.getMinRange(), 1);
+                result = positionTree.getAllElements();
+                result.removeAll(innerCircle.getAllElements());
+                break;
+            case CROSS:
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1);
+                result = positionTree.getAllElements();
+                break;
+        }
+        return result;
     }
 
     private List<Position> getPossiblePositionsAt(int x, int z, int height) {

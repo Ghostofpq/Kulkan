@@ -7,12 +7,6 @@ public enum RangeType {
     // X X O X X
     //     X
     //     X
-    SQUARE,
-    //
-    //   X X X
-    //   X O X
-    //   X X X
-    //
     CIRCLE
     //     X
     //   X X X

@@ -12,6 +12,7 @@ import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
+import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.User;
@@ -504,8 +505,8 @@ public class Game {
 
     private List<Position> getPossiblePositionsToAttack(GameCharacter gameCharacter) {
         Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
-        Tree<Position> possiblePositionsToAttackTree = battlefield.getPositionTree(characterPosition, 1, 0, 0);
-        List<Position> result = possiblePositionsToAttackTree.getAllElements();
+        Range range = gameCharacter.getRange();
+        List<Position> result = battlefield.getPossiblePositionsToAttack(characterPosition, range);
         result.remove(characterPosition);
         return result;
     }

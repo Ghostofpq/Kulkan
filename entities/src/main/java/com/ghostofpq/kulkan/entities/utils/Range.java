@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.entities.utils;
 
-public class Range {
+import java.io.Serializable;
+
+public class Range implements Serializable {
 
     private RangeType rangeType;
     private int minRange;
@@ -10,5 +12,17 @@ public class Range {
         this.rangeType = rangeType;
         this.minRange = minRange;
         this.maxRange = maxRange;
+    }
+
+    public RangeType getRangeType() {
+        return rangeType;
+    }
+
+    public int getMinRange() {
+        return minRange;
+    }
+
+    public int getMaxRange() {
+        return maxRange;
     }
 }
