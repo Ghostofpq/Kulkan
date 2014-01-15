@@ -30,11 +30,13 @@ public class MenuSelectAction {
 
         this.options.add(0, MenuSelectActions.MOVE);
         this.options.add(1, MenuSelectActions.ATTACK);
-        this.options.add(2, MenuSelectActions.END_TURN);
+        this.options.add(2, MenuSelectActions.CAPACITY);
+        this.options.add(3, MenuSelectActions.END_TURN);
 
         this.optionsState.add(0, true);
         this.optionsState.add(1, true);
         this.optionsState.add(2, true);
+        this.optionsState.add(3, true);
     }
 
     public void reinitMenu() {
@@ -42,6 +44,7 @@ public class MenuSelectAction {
         this.optionsState.set(0, true);
         this.optionsState.set(1, true);
         this.optionsState.set(2, true);
+        this.optionsState.set(3, true);
     }
 
     public void render(Color color) {
@@ -74,6 +77,7 @@ public class MenuSelectAction {
 
     public void setHasActed() {
         optionsState.set(1, false);
+        optionsState.set(2, false);
         incrementOptionsIndex();
     }
 
@@ -108,6 +112,7 @@ public class MenuSelectAction {
     public enum MenuSelectActions {
         MOVE("Move"),
         ATTACK("Attack"),
+        CAPACITY("Capacity"),
         END_TURN("End Turn");
         private final String propertyName;
 

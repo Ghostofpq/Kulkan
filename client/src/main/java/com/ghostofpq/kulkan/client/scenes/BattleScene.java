@@ -97,10 +97,6 @@ public class BattleScene implements Scene {
         targetGameCharacterRepresentation = null;
         characterRenderLeft = null;
         characterRenderRight = null;
-        List<String> options = new ArrayList<String>();
-        options.add("Move");
-        options.add("Attack");
-        options.add("End Turn");
         menuSelectAction = new MenuSelectAction(300, 0, 200, 100, 2);
         // LOGIC
         currentState = BattleSceneState.PENDING;
