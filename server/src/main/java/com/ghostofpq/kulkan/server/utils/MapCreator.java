@@ -22,9 +22,9 @@ public class MapCreator {
 
         for (int i = 0; i < length; i++) {
             Position position = new Position(i, 0, 0);
-            battlefield.addDeployementZone(0, position);
+            battlefield.addDeploymentZone(0, position);
             Position position2 = new Position(i, 0, depth - 1);
-            battlefield.addDeployementZone(1, position2);
+            battlefield.addDeploymentZone(1, position2);
         }
         battlefield.setStartingPointsOfViewForPlayer(0, PointOfView.SOUTH);
         battlefield.setStartingPointsOfViewForPlayer(1, PointOfView.NORTH);

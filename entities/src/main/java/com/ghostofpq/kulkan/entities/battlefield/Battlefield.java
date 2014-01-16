@@ -33,7 +33,7 @@ public class Battlefield implements Serializable {
         startingPointsOfView = new HashMap<Integer, PointOfView>();
     }
 
-    public void addDeployementZone(Integer playerNumber, Position position) {
+    public void addDeploymentZone(Integer playerNumber, Position position) {
         if (null != playerNumber) {
             List<Position> deploymentZone = deploymentZones.get(playerNumber);
             if (null == deploymentZone) {
