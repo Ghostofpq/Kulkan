@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.battlefield;
 
 import com.ghostofpq.kulkan.commons.Node;
+import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class BattlefieldTest {
         int heightLimit = 2;
         int jumpLimit = 1;
 
-        Tree<Position> result = battlefield.getPositionTree(originPoint, dist, heightLimit, jumpLimit);
+        Tree<Position> result = battlefield.getPositionTree(originPoint, dist, heightLimit, jumpLimit, false, PointOfView.NORTH);
         //log.debug(" TEST 1 ");
         //log.debug("     {} : {}", result.getRoot().getData().toString(), result.getRoot().getDistanceFromTop());
         //log.debug("{} children", result.getRoot().getChildren().size());
@@ -83,7 +84,7 @@ public class BattlefieldTest {
         int heightLimit = 2;
         int jumpLimit = 1;
 
-        Tree<Position> result = battlefield.getPositionTree(originPoint, dist, heightLimit, jumpLimit);
+        Tree<Position> result = battlefield.getPositionTree(originPoint, dist, heightLimit, jumpLimit, false, PointOfView.NORTH);
         //log.debug(" TEST 2");
         // log.debug("     {} : {}", result.getRoot().getData().toString(), result.getRoot().getDistanceFromTop());
         for (Node<Position> child : result.getRoot().getChildren()) {

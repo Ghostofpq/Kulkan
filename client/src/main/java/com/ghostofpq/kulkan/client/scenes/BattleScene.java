@@ -53,6 +53,7 @@ public class BattleScene implements Scene {
     private CharacterRender characterRenderRight;
     private MenuSelectAction menuSelectAction;
     private Button gameOverButton;
+    private MenuSelectCapacity menuSelectCapacity;
     // LOGIC
     private BattleSceneState currentState;
     private List<Position> possiblePositionsToMove;
@@ -60,6 +61,7 @@ public class BattleScene implements Scene {
     private List<Position> positionsToSelect;
     private List<GameCharacter> characterListToDeploy;
     private List<GameCharacterRepresentation> characterRepresentationList;
+
 
     private BattleScene() {
     }
@@ -98,6 +100,7 @@ public class BattleScene implements Scene {
         characterRenderLeft = null;
         characterRenderRight = null;
         menuSelectAction = new MenuSelectAction(300, 0, 200, 100, 2);
+        menuSelectCapacity = null;
         // LOGIC
         currentState = BattleSceneState.PENDING;
         possiblePositionsToMove = new ArrayList<Position>();
@@ -198,6 +201,8 @@ public class BattleScene implements Scene {
             }
         } else if (currentState.equals(BattleSceneState.ACTION)) {
             menuSelectAction.decrementOptionsIndex();
+        } else if (currentState.equals(BattleSceneState.CAPACITY_SELECT)) {
+            menuSelectCapacity.decrementOptionsIndex();
         }
     }
 
@@ -239,6 +244,8 @@ public class BattleScene implements Scene {
             }
         } else if (currentState.equals(BattleSceneState.ACTION)) {
             menuSelectAction.incrementOptionsIndex();
+        } else if (currentState.equals(BattleSceneState.CAPACITY_SELECT)) {
+            menuSelectCapacity.incrementOptionsIndex();
         }
     }
 
@@ -280,6 +287,8 @@ public class BattleScene implements Scene {
             }
         } else if (currentState.equals(BattleSceneState.ACTION)) {
             menuSelectAction.decrementOptionsIndex();
+        } else if (currentState.equals(BattleSceneState.CAPACITY_SELECT)) {
+            menuSelectCapacity.decrementOptionsIndex();
         }
     }
 
@@ -321,6 +330,8 @@ public class BattleScene implements Scene {
             }
         } else if (currentState.equals(BattleSceneState.ACTION)) {
             menuSelectAction.incrementOptionsIndex();
+        } else if (currentState.equals(BattleSceneState.CAPACITY_SELECT)) {
+            menuSelectCapacity.incrementOptionsIndex();
         }
     }
 
@@ -385,6 +396,9 @@ public class BattleScene implements Scene {
                 } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.ATTACK)) {
                     sendPositionToAttackRequest();
                     currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
+                } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.CAPACITY)) {
+                    menuSelectCapacity = new MenuSelectCapacity(300, 0, 200, 100, 2, currentGameCharacter.getJob(currentGameCharacter.getCurrentJob()).getUnlockedMoves(), currentGameCharacter.getCurrentManaPoint());
+                    currentState = BattleSceneState.CAPACITY_SELECT;
                 } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.END_TURN)) {
                     currentState = BattleSceneState.END_TURN;
                 }
@@ -398,6 +412,12 @@ public class BattleScene implements Scene {
                 sendActionAttack();
                 possiblePositionsToAttack = new ArrayList<Position>();
                 currentState = BattleSceneState.PENDING;
+                break;
+            case CAPACITY_SELECT:
+                currentState = BattleSceneState.ACTION;
+                break;
+            case CAPACITY_PLACE:
+                currentState = BattleSceneState.ACTION;
                 break;
             case END_TURN:
                 sendEndTurn();
@@ -706,6 +726,9 @@ public class BattleScene implements Scene {
         }
         if (null != targetGameCharacterRepresentation && !targetGameCharacterRepresentation.equals(currentGameCharacterRepresentation)) {
             characterRenderRight.render(Color.white);
+        }
+        if (null != menuSelectCapacity && currentState.equals(BattleSceneState.CAPACITY_SELECT)) {
+            menuSelectCapacity.render(Color.white);
         }
         if (currentState.equals(BattleSceneState.ACTION)) {
             menuSelectAction.render(Color.white);

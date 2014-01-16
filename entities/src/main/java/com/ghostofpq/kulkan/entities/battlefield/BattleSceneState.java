@@ -9,6 +9,7 @@ public enum BattleSceneState {
     ACTION,
     MOVE,
     ATTACK,
+    CAPACITY,
     CAPACITY_SELECT,
     CAPACITY_PLACE,
     END_TURN,
