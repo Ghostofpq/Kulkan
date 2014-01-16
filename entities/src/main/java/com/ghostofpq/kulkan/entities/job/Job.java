@@ -90,7 +90,7 @@ public abstract class Job implements Serializable {
         }
     }
 
-    public PrimaryCharacteristics getAggregatedCaracteristics() {
+    public PrimaryCharacteristics getAggregatedCharacteristics() {
         PrimaryCharacteristics result = new PrimaryCharacteristics(0, 0, 0, 0,
                 0, 0);
 
