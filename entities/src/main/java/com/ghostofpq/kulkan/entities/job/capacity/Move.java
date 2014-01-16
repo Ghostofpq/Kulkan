@@ -10,8 +10,8 @@ public class Move extends Capacity {
     private MoveRangeType moveRangeType;
     private MoveName moveName;
     private int manaCost;
-    private Range range1;
-    private Range range2;
+    private Range range;
+    private Range areaOfEffect;
 
     public Move(String name, String description, int price, MoveRangeType moveRangeType, MoveName moveName, int manaCost) {
         this.prerequisites = new ArrayList<Capacity>();
@@ -24,8 +24,8 @@ public class Move extends Capacity {
         this.manaCost = manaCost;
         this.price = price;
         this.locked = true;
-        range1 = null;
-        range2 = null;
+        range = null;
+        areaOfEffect = null;
     }
 
     public MoveRangeType getMoveRangeType() {
@@ -40,19 +40,19 @@ public class Move extends Capacity {
         return manaCost;
     }
 
-    public Range getRange1() {
-        return range1;
+    public Range getRange() {
+        return range;
     }
 
-    public void setRange1(Range range1) {
-        this.range1 = range1;
+    public void setRange1(Range range) {
+        this.range = range;
     }
 
-    public Range getRange2() {
-        return range2;
+    public Range getAreaOfEffect() {
+        return areaOfEffect;
     }
 
-    public void setRange2(Range range2) {
-        this.range2 = range2;
+    public void setAreaOfEffect(Range areaOfEffect) {
+        this.areaOfEffect = areaOfEffect;
     }
 }
