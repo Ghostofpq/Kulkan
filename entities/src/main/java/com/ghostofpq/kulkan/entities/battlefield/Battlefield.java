@@ -184,29 +184,29 @@ public class Battlefield implements Serializable {
         return path;
     }
 
-    public Tree<Position> getPositionTree(Position position, int dist, int heightLimit, int jumpLimit) {
+    public Tree<Position> getPositionTree(Position position, int dist, int heightLimit, int jumpLimit, boolean straight, PointOfView pointOfView) {
         Tree<Position> positionTree = new Tree<Position>(position);
-        getPossiblePositions(position, positionTree.getRoot(), dist, heightLimit, jumpLimit);
+        getPossiblePositions(position, positionTree.getRoot(), dist, heightLimit, jumpLimit, straight, pointOfView);
         return positionTree;
     }
 
-    public void getPossiblePositions(Position position, Node<Position> parent, int dist, int heightLimit, int jumpLimit) {
+    public void getPossiblePositions(Position position, Node<Position> parent, int dist, int heightLimit, int jumpLimit, boolean straight, PointOfView pointOfView) {
         if (dist <= 0) {
             return;
         }
 
         List<Position> possiblePositions = new ArrayList<Position>();
 
-        if (position.getX() > 0) {
+        if (position.getX() > 0 && (!straight || pointOfView.equals(PointOfView.WEST))) {
             possiblePositions.addAll(getPossiblePositionsAt(position.getX() - 1, position.getZ(), heightLimit));
         }
-        if (position.getX() < getLength()) {
+        if (position.getX() < getLength() && (!straight || pointOfView.equals(PointOfView.EAST))) {
             possiblePositions.addAll(getPossiblePositionsAt(position.getX() + 1, position.getZ(), heightLimit));
         }
-        if (position.getZ() > 0) {
+        if (position.getZ() > 0 && (!straight || pointOfView.equals(PointOfView.NORTH))) {
             possiblePositions.addAll(getPossiblePositionsAt(position.getX(), position.getZ() - 1, heightLimit));
         }
-        if (position.getZ() < getDepth()) {
+        if (position.getZ() < getDepth() && (!straight || pointOfView.equals(PointOfView.SOUTH))) {
             possiblePositions.addAll(getPossiblePositionsAt(position.getX(), position.getZ() + 1, heightLimit));
         }
 
@@ -215,12 +215,12 @@ public class Battlefield implements Serializable {
                 Node<Position> child = parent.addChild(possiblePosition, 1);
 
                 if (child != null) {
-                    getPossiblePositions(possiblePosition, child, dist - 1, heightLimit, jumpLimit);
+                    getPossiblePositions(possiblePosition, child, dist - 1, heightLimit, jumpLimit, straight, pointOfView);
                 }
             } else if (Math.abs(position.getY() - possiblePosition.getY()) <= jumpLimit) {
                 Node<Position> child = parent.addChild(possiblePosition, 1 + jumpLimit);
                 if (child != null) {
-                    getPossiblePositions(possiblePosition, child, dist - (1 + jumpLimit), heightLimit, jumpLimit);
+                    getPossiblePositions(possiblePosition, child, dist - (1 + jumpLimit), heightLimit, jumpLimit, straight, pointOfView);
                 }
             }
         }
@@ -231,14 +231,20 @@ public class Battlefield implements Serializable {
         List<Position> result = new ArrayList<Position>();
         switch (range.getRangeType()) {
             case CIRCLE:
-                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1);
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, false, PointOfView.NORTH);
                 Tree<Position> innerCircle = new Tree<Position>(position);
-                getPossiblePositions(position, innerCircle.getRoot(), range.getMinRange(), range.getMinRange(), 1);
+                getPossiblePositions(position, innerCircle.getRoot(), range.getMinRange(), range.getMinRange(), 1, false, PointOfView.NORTH);
                 result = positionTree.getAllElements();
                 result.removeAll(innerCircle.getAllElements());
                 break;
+            case SQUARE:
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, false, PointOfView.NORTH);
+                result = positionTree.getAllElements();
+                break;
             case CROSS:
-                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1);
+
+
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, false, PointOfView.NORTH);
                 result = positionTree.getAllElements();
                 break;
         }

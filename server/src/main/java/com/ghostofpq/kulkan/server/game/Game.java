@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.server.game;
 
 import com.ghostofpq.kulkan.commons.Node;
+import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
@@ -489,7 +490,7 @@ public class Game {
 
     private Tree<Position> getPossiblePositionsToMoveTree(GameCharacter gameCharacter) {
         Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
-        Tree<Position> result = battlefield.getPositionTree(characterPosition, 3, 2, 1);
+        Tree<Position> result = battlefield.getPositionTree(characterPosition, 3, 2, 1, false, PointOfView.NORTH);
         for (Player player : playerList) {
             for (GameCharacter character : player.getTeam()) {
                 if (!character.equals(gameCharacter)) {

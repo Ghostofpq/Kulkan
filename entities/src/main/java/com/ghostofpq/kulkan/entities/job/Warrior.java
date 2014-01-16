@@ -1,9 +1,7 @@
 package com.ghostofpq.kulkan.entities.job;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
-import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
-import com.ghostofpq.kulkan.entities.job.capacity.Move;
+import com.ghostofpq.kulkan.entities.job.capacity.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +20,12 @@ public class Warrior extends Job {
     private void prepareSkillTree() {
         List<Capacity> skillTree = new ArrayList<Capacity>();
 
-        Move fatMandalleMove = new Move("Grosse mandalle", "Enorme mandalle dans la face du mec", 0);
-        skillTree.add(fatMandalleMove);
-        this.unlockCapacity(fatMandalleMove);
+        Move dash = new Move("Dash", "Enorme Dash dans la face du mec", 0, MoveRangeType.RANGE, MoveName.DASH, 20);
+        skillTree.add(dash);
+        this.unlockCapacity(dash);
+
+        Move empower = new Move("Empower", "+10 Strength", 0, MoveRangeType.SELF, MoveName.EMPOWER, 20);
+        skillTree.add(empower);
 
         PrimaryCharacteristics strength1C = new PrimaryCharacteristics(5, 0, 0,
                 0, 0, 0);

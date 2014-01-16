@@ -1,9 +1,7 @@
 package com.ghostofpq.kulkan.entities.job;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
-import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
-import com.ghostofpq.kulkan.entities.job.capacity.Move;
+import com.ghostofpq.kulkan.entities.job.capacity.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,7 @@ public class Mage extends Job {
     private void prepareSkillTree() {
         List<Capacity> skillTree = new ArrayList<Capacity>();
 
-        Move magicBallMove = new Move("Magic Ball", "Throw a ball full of magic", 0);
+        Move magicBallMove = new Move("Magic Ball", "Throw a ball full of magic", 0, MoveRangeType.RANGE_RANGE, MoveName.FIREBALL, 15);
         skillTree.add(magicBallMove);
         this.unlockCapacity(magicBallMove);
 
