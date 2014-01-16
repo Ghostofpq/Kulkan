@@ -44,7 +44,7 @@ public class Move extends Capacity {
         return range;
     }
 
-    public void setRange1(Range range) {
+    public void setRange(Range range) {
         this.range = range;
     }
 
