@@ -242,9 +242,10 @@ public class Battlefield implements Serializable {
                 result = positionTree.getAllElements();
                 break;
             case CROSS:
-
-
-                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, false, PointOfView.NORTH);
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, true, PointOfView.NORTH);
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, true, PointOfView.SOUTH);
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, true, PointOfView.EAST);
+                getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, true, PointOfView.WEST);
                 result = positionTree.getAllElements();
                 break;
         }
