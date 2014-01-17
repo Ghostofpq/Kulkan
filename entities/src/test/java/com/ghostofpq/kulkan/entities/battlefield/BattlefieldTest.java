@@ -85,22 +85,22 @@ public class BattlefieldTest {
     }
 
     @Test
-    public void getPossiblePositionsToAttackRangeCross() {
+    public void getPossiblePositionsToAttackRangeSquare() {
         Battlefield battlefield = flatBattlefield(10, 5, 10);
 
         Position originPoint = new Position(2, 0, 2);
 
-        Range range = new Range(RangeType.CROSS, 0, 2);
+        Range range = new Range(RangeType.SQUARE, 0, 2);
 
         List<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
 
-        // X 0 1 2 3 4
+        //   0 1 2 3 4 X
         // 0     X
-        // 1     X
+        // 1   X X X
         // 2 X X O X X
-        // 3     X
+        // 3   X X X
         // 4     X
-
+        // Z
         assert (result.contains(new Position(2, 0, 2)));
         assert (result.contains(new Position(1, 0, 2)));
         assert (result.contains(new Position(0, 0, 2)));
@@ -110,6 +110,113 @@ public class BattlefieldTest {
         assert (result.contains(new Position(2, 0, 0)));
         assert (result.contains(new Position(2, 0, 3)));
         assert (result.contains(new Position(2, 0, 4)));
+        assert (result.contains(new Position(1, 0, 1)));
+        assert (result.contains(new Position(1, 0, 3)));
+        assert (result.contains(new Position(3, 0, 1)));
+        assert (result.contains(new Position(3, 0, 3)));
+
+        assert (!result.contains(new Position(0, 0, 0)));
+        assert (!result.contains(new Position(1, 0, 0)));
+        assert (!result.contains(new Position(3, 0, 0)));
+        assert (!result.contains(new Position(4, 0, 0)));
+        assert (!result.contains(new Position(0, 0, 1)));
+        assert (!result.contains(new Position(4, 0, 1)));
+        assert (!result.contains(new Position(0, 0, 3)));
+        assert (!result.contains(new Position(4, 0, 3)));
+        assert (!result.contains(new Position(0, 0, 4)));
+        assert (!result.contains(new Position(1, 0, 4)));
+        assert (!result.contains(new Position(3, 0, 4)));
+        assert (!result.contains(new Position(4, 0, 4)));
+    }
+
+    @Test
+    public void getPossiblePositionsToAttackRangeCircle() {
+        Battlefield battlefield = flatBattlefield(10, 5, 10);
+
+        Position originPoint = new Position(2, 0, 2);
+
+        Range range = new Range(RangeType.CIRCLE, 1, 2);
+
+        List<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
+
+        //   0 1 2 3 4 X
+        // 0     X
+        // 1   X   X
+        // 2 X   O   X
+        // 3   X   X
+        // 4     X
+        // Z
+
+        assert (result.contains(new Position(0, 0, 2)));
+        assert (result.contains(new Position(1, 0, 1)));
+        assert (result.contains(new Position(1, 0, 3)));
+        assert (result.contains(new Position(2, 0, 0)));
+        assert (result.contains(new Position(2, 0, 4)));
+        assert (result.contains(new Position(3, 0, 1)));
+        assert (result.contains(new Position(3, 0, 3)));
+        assert (result.contains(new Position(4, 0, 2)));
+
+        assert (!result.contains(new Position(0, 0, 0)));
+        assert (!result.contains(new Position(1, 0, 0)));
+        assert (!result.contains(new Position(3, 0, 0)));
+        assert (!result.contains(new Position(4, 0, 0)));
+        assert (!result.contains(new Position(0, 0, 1)));
+        assert (!result.contains(new Position(2, 0, 1)));
+        assert (!result.contains(new Position(4, 0, 1)));
+        assert (!result.contains(new Position(1, 0, 2)));
+        assert (!result.contains(new Position(3, 0, 2)));
+        assert (!result.contains(new Position(0, 0, 3)));
+        assert (!result.contains(new Position(2, 0, 3)));
+        assert (!result.contains(new Position(4, 0, 3)));
+        assert (!result.contains(new Position(0, 0, 4)));
+        assert (!result.contains(new Position(1, 0, 4)));
+        assert (!result.contains(new Position(3, 0, 4)));
+        assert (!result.contains(new Position(4, 0, 4)));
+    }
+
+    @Test
+    public void getPossiblePositionsToAttackRangeCross() {
+        Battlefield battlefield = flatBattlefield(10, 5, 10);
+
+        Position originPoint = new Position(2, 0, 2);
+
+        Range range = new Range(RangeType.CROSS, 0, 2);
+
+        List<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
+
+        //   0 1 2 3 4 X
+        // 0     X
+        // 1     X
+        // 2 X X O X X
+        // 3     X
+        // 4     X
+        // Z
+        assert (result.contains(new Position(2, 0, 2)));
+        assert (result.contains(new Position(1, 0, 2)));
+        assert (result.contains(new Position(0, 0, 2)));
+        assert (result.contains(new Position(3, 0, 2)));
+        assert (result.contains(new Position(4, 0, 2)));
+        assert (result.contains(new Position(2, 0, 1)));
+        assert (result.contains(new Position(2, 0, 0)));
+        assert (result.contains(new Position(2, 0, 3)));
+        assert (result.contains(new Position(2, 0, 4)));
+
+        assert (!result.contains(new Position(0, 0, 0)));
+        assert (!result.contains(new Position(1, 0, 0)));
+        assert (!result.contains(new Position(3, 0, 0)));
+        assert (!result.contains(new Position(4, 0, 0)));
+        assert (!result.contains(new Position(0, 0, 1)));
+        assert (!result.contains(new Position(1, 0, 1)));
+        assert (!result.contains(new Position(3, 0, 1)));
+        assert (!result.contains(new Position(4, 0, 1)));
+        assert (!result.contains(new Position(0, 0, 3)));
+        assert (!result.contains(new Position(1, 0, 3)));
+        assert (!result.contains(new Position(3, 0, 3)));
+        assert (!result.contains(new Position(4, 0, 3)));
+        assert (!result.contains(new Position(0, 0, 0)));
+        assert (!result.contains(new Position(1, 0, 0)));
+        assert (!result.contains(new Position(3, 0, 4)));
+        assert (!result.contains(new Position(4, 0, 4)));
     }
 
     private Battlefield flatBattlefield(int length, int height, int depth) {
