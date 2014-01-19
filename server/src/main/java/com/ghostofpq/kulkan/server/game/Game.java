@@ -13,6 +13,7 @@ import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
+import com.ghostofpq.kulkan.entities.messages.game.capacity.MessageCapacityFireball;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
@@ -354,6 +355,7 @@ public class Game {
                                 }
                                 MessageCharacterAttacks messageCharacterAttacks = new MessageCharacterAttacks(characterWhoAttacks, characterAttacked, hit, damages, crit);
                                 sendToAll(messageCharacterAttacks);
+
                                 characterWhoAttacks.setHasActed(true);
                                 characterWhoAttacks.gainXp(damages);
                                 characterWhoAttacks.gainJobPoints(5);
@@ -471,12 +473,69 @@ public class Game {
         MessageCharacterActionCapacity messageCharacterActionCapacity = (MessageCharacterActionCapacity) message;
         GameCharacter character = getEquivalentCharacter(messageCharacterActionCapacity.getCharacter());
         if (character.equals(currentCharToPlay)) {
-            Position position = messageCharacterActionCapacity.getPositionToUseCapacity();
+            Position positionToUse = messageCharacterActionCapacity.getPositionToUseCapacity();
+            Move move = messageCharacterActionCapacity.getMove();
+            Range rangeToUse = null;
+            switch (move.getMoveRangeType()) {
+                case RANGE:
+                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                    break;
+                case RANGE_AOE:
+                    rangeToUse = move.getAreaOfEffect();
+                    break;
+                case SELF:
+                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                    break;
+                case WEAPON:
+                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                    break;
+                case WEAPON_AOE:
+                    rangeToUse = move.getAreaOfEffect();
+                    break;
+            }
+            List<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(positionToUse, rangeToUse);
+            int totalDamage = 0;
+            switch (move.getMoveName()) {
+                case FIREBALL:
+                    List<GameCharacter> targets = new ArrayList<GameCharacter>();
+                    Map<GameCharacter, Integer> gameCharacterDamageMap = new HashMap<GameCharacter, Integer>();
+                    for (Position position : areaOfEffect) {
+                        GameCharacter target = getGameCharacterAtPosition(position);
+                        if (null != target) {
+                            targets.add(target);
+                        }
+                    }
+                    for (GameCharacter targetedChar : targets) {
+                        int magicArmor = (targetedChar.getAggregatedSecondaryCharacteristics().getMagicResist() - character.getAggregatedSecondaryCharacteristics().getMagicPenetration());
+                        double ratio = 100 / (100 - magicArmor);
+                        double estimatedDamage = ratio * character.getMagicalDamage() * 10;
+                        int damage = (int) Math.floor(estimatedDamage);
+                        gameCharacterDamageMap.put(targetedChar, damage);
+                        targetedChar.addHealthPoint(-damage);
+                        totalDamage += damage;
+                    }
+                    MessageCapacityFireball messageCapacityFireball = new MessageCapacityFireball(character, gameCharacterDamageMap, positionToUse, areaOfEffect, move.getManaCost());
+                    sendToAll(messageCapacityFireball);
+                    break;
+                case EMPOWER:
+                    // SET STATUS STRENGTH 10
+                    break;
+                case DASH:
+                    break;
+                case KNOCKUP:
+                    break;
+            }
 
-            Position characterPosition = currentCharToPlay.getPosition().plusYNew(-1);
-            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(currentCharToPlay, characterPosition);
+
+            character.setHasActed(true);
+            character.gainXp(totalDamage);
+            character.gainJobPoints(5);
+            MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(character, totalDamage, 5);
+            sendToAll(messageCharacterGainsXP);
+
+            Position characterPosition = character.getPosition().plusYNew(-1);
+            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(character, characterPosition);
             sendMessageToChannel(messageCharacterActionCapacity.getKeyToken(), messageCharacterToPlay);
-
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
         }

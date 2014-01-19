@@ -16,6 +16,7 @@ import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
+import com.ghostofpq.kulkan.entities.messages.game.capacity.MessageCapacityFireball;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.rabbitmq.client.Channel;
 import org.lwjgl.input.Keyboard;
@@ -591,6 +592,7 @@ public class BattleScene implements Scene {
         GraphicsManager.getInstance().requestCenterPosition(cursor);
         updateCursorTarget();
         menuSelectAction.reinitMenu();
+        selectedMove = null;
         if (messageCharacterToPlay.getCharacterToPlay().hasMoved()) {
             menuSelectAction.setHasMoved();
         }
@@ -693,6 +695,26 @@ public class BattleScene implements Scene {
         }
     }
 
+    private void manageCapacityFireball(Message message) {
+        MessageCapacityFireball messageCapacityFireball = (MessageCapacityFireball) message;
+
+        for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
+            if (characterRepresentation.getCharacter().equals(messageCapacityFireball.getGameCharacter())) {
+                characterRepresentation.getCharacter().addManaPoint(-messageCapacityFireball.getManaCost());
+            }
+        }
+
+        for (GameCharacter gameCharacter : messageCapacityFireball.getGameCharacterDamageMap().keySet()) {
+            for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
+                if (characterRepresentation.getCharacter().equals(gameCharacter)) {
+                    characterRepresentation.getCharacter().addHealthPoint(-messageCapacityFireball.getGameCharacterDamageMap().get(gameCharacter));
+                }
+            }
+        }
+
+
+    }
+
     private void manageMessageGameOver(Message message) {
         MessageGameEnd messageGameEnd = (MessageGameEnd) message;
         String buttonText;
@@ -758,6 +780,10 @@ public class BattleScene implements Scene {
                         MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
                         Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
                         break;
+                    case CAPACITY_FIREBALL:
+                        manageCapacityFireball(message);
+                        break;
+
                     default:
                         LOG.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                         break;
@@ -932,7 +958,7 @@ public class BattleScene implements Scene {
     }
 
     private void sendActionCapacity() {
-        MessageCharacterActionCapacity messageCharacterUsesCapacity = new MessageCharacterActionCapacity(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+        MessageCharacterActionCapacity messageCharacterUsesCapacity = new MessageCharacterActionCapacity(Client.getInstance().getTokenKey(), currentGameCharacter, cursor, selectedMove);
         postMessage(messageCharacterUsesCapacity);
     }
 
