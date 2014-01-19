@@ -28,8 +28,8 @@ public class MessageCharacterActionAttack extends ClientMessage implements Seria
 
     @Override
     public String toString() {
-        return new StringBuffer().
-                append("Message Type :").append(type).append(System.getProperty("line.separator"))
+        return new StringBuffer()
+                .append("Message Type :").append(type).append(System.getProperty("line.separator"))
                 .append("KeyToken :").append(keyToken).append(System.getProperty("line.separator"))
                 .append("PositionToAttack :").append(positionToAttack.toString())
                 .toString();

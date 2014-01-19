@@ -18,4 +18,12 @@ public class MessagePositionToMoveRequest extends ClientMessage implements Seria
     public GameCharacter getCharacter() {
         return character;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuffer()
+                .append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("Character :").append(character.getName())
+                .toString();
+    }
 }

@@ -22,9 +22,9 @@ public class MessageCharacterPositionToUseCapacityResponse extends Message imple
 
     @Override
     public String toString() {
-        return new StringBuffer().
-                append("Message Type :").append(type).append(System.getProperty("line.separator"))
-                .append("possiblePositionsToUseCapacity :").append(possiblePositionsToUseCapacity.toString())
+        return new StringBuffer()
+                .append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("PossiblePositionsToUseCapacity :").append(possiblePositionsToUseCapacity.toString())
                 .toString();
     }
 }

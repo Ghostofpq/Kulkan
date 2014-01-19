@@ -18,4 +18,13 @@ public class MessagePositionToMoveResponse extends Message implements Serializab
     public List<Position> getPossiblePositionsToMove() {
         return possiblePositionsToMove;
     }
+
+
+    @Override
+    public String toString() {
+        return new StringBuffer()
+                .append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("PossiblePositionsToMove :").append(possiblePositionsToMove.toString())
+                .toString();
+    }
 }

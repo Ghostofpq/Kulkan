@@ -502,6 +502,7 @@ public class BattleScene implements Scene {
 
     public void postMessage(ClientMessage message) {
         try {
+            LOG.debug(message.toString());
             LOG.debug(" [-] POST MESSAGE {} ON {}", message.getType(), gameQueueName);
             channelGameOut.basicPublish("", gameQueueName, null, message.getBytes());
         } catch (IOException e) {

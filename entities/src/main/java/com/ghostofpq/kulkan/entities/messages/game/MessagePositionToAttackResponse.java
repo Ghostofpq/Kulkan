@@ -18,4 +18,12 @@ public class MessagePositionToAttackResponse extends Message implements Serializ
     public List<Position> getPossiblePositionsToAttack() {
         return possiblePositionsToAttack;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuffer()
+                .append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("PossiblePositionsToAttack :").append(possiblePositionsToAttack.toString())
+                .toString();
+    }
 }
