@@ -649,13 +649,13 @@ public class BattleScene implements Scene {
 
     private void manageMessagePositionToUseCapacityResponse(Message message) {
         MessageCharacterPositionToUseCapacityResponse messageCharacterPositionToUseCapacityResponse = (MessageCharacterPositionToUseCapacityResponse) message;
-        if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_MOVE)) {
-            LOG.debug(" [-] RECEIVED POSITIONS TO MOVE");
+        if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY)) {
+            LOG.debug(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
             possiblePositionsToUseCapacity = messageCharacterPositionToUseCapacityResponse.getPossiblePositionsToUseCapacity();
             highlightPossiblePositionsToUseCapacity();
             currentState = BattleSceneState.CAPACITY_PLACE;
         } else {
-            LOG.error(" [-] RECEIVED POSITIONS TO MOVE");
+            LOG.error(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
         }
     }
 
@@ -681,6 +681,8 @@ public class BattleScene implements Scene {
         if (!engineIsBusy()) {
             Message message = Client.getInstance().receiveMessage();
             if (null != message) {
+                LOG.debug("RECEIVED");
+                LOG.debug(message.toString());
                 switch (message.getType()) {
                     case START_DEPLOYMENT:
                         manageMessageStartDeployment(message);

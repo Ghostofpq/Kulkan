@@ -2,6 +2,8 @@ package com.ghostofpq.kulkan.entities.job;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.*;
+import com.ghostofpq.kulkan.entities.utils.Range;
+import com.ghostofpq.kulkan.entities.utils.RangeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +23,13 @@ public class Warrior extends Job {
         List<Capacity> skillTree = new ArrayList<Capacity>();
 
         Move dash = new Move("Dash", "Enorme Dash dans la face du mec", 0, MoveRangeType.RANGE, MoveName.DASH, 20);
+        Range range = new Range(RangeType.CROSS, 0, 3);
+        dash.setRange(range);
         skillTree.add(dash);
         this.unlockCapacity(dash);
 
         Move empower = new Move("Empower", "+10 Strength", 0, MoveRangeType.SELF, MoveName.EMPOWER, 20);
         skillTree.add(empower);
-
         PrimaryCharacteristics strength1C = new PrimaryCharacteristics(5, 0, 0,
                 0, 0, 0);
         AmeliorationPrimary strength1 = new AmeliorationPrimary("S1",

@@ -9,11 +9,13 @@ import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.CombatCalculator;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.utils.Range;
+import com.ghostofpq.kulkan.entities.utils.RangeType;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
 import com.ghostofpq.kulkan.server.database.model.User;
@@ -402,6 +404,47 @@ public class Game {
         }
     }
 
+    private void manageMessageCharRequestToUseCapacity(ClientMessage message) {
+        MessageCharacterPositionToUseCapacityRequest characterPositionToUseCapacityRequest = (MessageCharacterPositionToUseCapacityRequest) message;
+        GameCharacter character = getEquivalentCharacter(characterPositionToUseCapacityRequest.getCharacter());
+        if (character.equals(currentCharToPlay)) {
+            Move move = characterPositionToUseCapacityRequest.getSelectedMove();
+            Range rangeToUse = null;
+            switch (move.getMoveRangeType()) {
+                case RANGE:
+                    rangeToUse = move.getRange();
+                    break;
+                case RANGE_AOE:
+                    rangeToUse = move.getRange();
+                    break;
+                case SELF:
+                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                    break;
+                case WEAPON:
+                    rangeToUse = character.getRange();
+                    break;
+
+            }
+            Position characterPosition = getCharacterPosition(character).plusYNew(-1);
+            List<Position> possiblePositionsToUseCapacity = battlefield.getPossiblePositionsToAttack(characterPosition, rangeToUse);
+
+            MessageCharacterPositionToUseCapacityResponse messageCharacterPositionToUseCapacityResponse = new MessageCharacterPositionToUseCapacityResponse(possiblePositionsToUseCapacity);
+            sendMessageToChannel(characterPositionToUseCapacityRequest.getKeyToken(), messageCharacterPositionToUseCapacityResponse);
+        } else {
+            log.error(" [X] UNEXPECTED CHAR TO PLAY");
+        }
+    }
+
+    private void manageMessageCharCapacityPlace(ClientMessage message) {
+        MessageCharacterActionCapacity messageCharacterActionCapacity = (MessageCharacterActionCapacity) message;
+        GameCharacter character = getEquivalentCharacter(messageCharacterActionCapacity.getCharacter());
+        if (character.equals(currentCharToPlay)) {
+            Position position = messageCharacterActionCapacity.getPositionToUseCapacity();
+        } else {
+            log.error(" [X] UNEXPECTED CHAR TO PLAY");
+        }
+    }
+
     public void receiveMessage() {
         try {
             QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
@@ -428,6 +471,13 @@ public class Game {
                                 log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }
                             break;
+                        case CHARACTER_POSITION_TO_USE_CAPACITY_REQUEST:
+                            if (messageIsExpected(message)) {
+                                manageMessageCharRequestToUseCapacity(message);
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
+                            }
+                            break;
                         case CHARACTER_ACTION_MOVE:
                             if (messageIsExpected(message)) {
                                 manageMessageCharMoves(message);
@@ -445,6 +495,14 @@ public class Game {
                         case CHARACTER_ACTION_END_TURN:
                             if (messageIsExpected(message)) {
                                 manageMessageCharEndTurn(message);
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
+                            }
+                            break;
+
+                        case CHARACTER_ACTION_CAPACITY_USE:
+                            if (messageIsExpected(message)) {
+                                manageMessageCharCapacityPlace(message);
                             } else {
                                 log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }

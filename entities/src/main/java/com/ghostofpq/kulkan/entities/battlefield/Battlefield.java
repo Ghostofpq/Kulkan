@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.utils.Range;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class Battlefield implements Serializable {
 
     private static final long serialVersionUID = -6878010880627782277L;
@@ -229,11 +231,25 @@ public class Battlefield implements Serializable {
     public List<Position> getPossiblePositionsToAttack(Position position, Range range) {
         Tree<Position> positionTree = new Tree<Position>(position);
         List<Position> result = new ArrayList<Position>();
+
+        log.debug("Getting the possible position to attack from {}", position.toString());
+
+        log.debug("type {}", range.getRangeType());
+        log.debug("minRange {}", range.getMinRange());
+        log.debug("maxRange {}", range.getMaxRange());
         switch (range.getRangeType()) {
             case CIRCLE:
                 getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, false, PointOfView.NORTH);
+                log.debug("OuterCircle:");
+                for (Position pos : positionTree.getAllElements()) {
+                    log.debug(pos.toString());
+                }
                 Tree<Position> innerCircle = new Tree<Position>(position);
                 getPossiblePositions(position, innerCircle.getRoot(), range.getMinRange(), range.getMinRange(), 1, false, PointOfView.NORTH);
+                log.debug("InnerCircle:");
+                for (Position pos : positionTree.getAllElements()) {
+                    log.debug(pos.toString());
+                }
                 result = positionTree.getAllElements();
                 result.removeAll(innerCircle.getAllElements());
                 break;
@@ -249,6 +265,10 @@ public class Battlefield implements Serializable {
                 result = positionTree.getAllElements();
                 break;
         }
+        log.debug("Result:");
+        for (Position pos : result) {
+            log.debug(pos.toString());
+        }
         return result;
     }
 
@@ -257,6 +277,7 @@ public class Battlefield implements Serializable {
         for (Position position : battlefieldElementMap.keySet()) {
             if ((position.getX() == x) && (position.getZ() == z)) {
                 if (canMoveTo(position, height)) {
+                    log.debug("adding {}", position.toString());
                     possiblePositions.add(position);
                 }
             }

@@ -4,5 +4,5 @@ public enum MoveRangeType {
     SELF,
     WEAPON,
     RANGE,
-    RANGE_RANGE;
+    RANGE_AOE;
 }
