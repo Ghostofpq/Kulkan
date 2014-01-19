@@ -1,13 +1,13 @@
 package com.ghostofpq.kulkan.entities.messages.game;
 
 import com.ghostofpq.kulkan.commons.Position;
-import com.ghostofpq.kulkan.entities.messages.ClientMessage;
+import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class MessagePositionToAttackResponse extends ClientMessage implements Serializable {
+public class MessagePositionToAttackResponse extends Message implements Serializable {
     private List<Position> possiblePositionsToAttack;
 
     public MessagePositionToAttackResponse(List<Position> possiblePositionsToAttack) {

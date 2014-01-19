@@ -29,4 +29,14 @@ public class MessageCharacterGainsXP extends Message implements Serializable {
     public int getJobPoints() {
         return jobPoints;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuffer().
+                append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("Character :").append(character.getName()).append(System.getProperty("line.separator"))
+                .append("ExperiencePoints :").append(experiencePoints).append(System.getProperty("line.separator"))
+                .append("JobPoints :").append(jobPoints)
+                .toString();
+    }
 }

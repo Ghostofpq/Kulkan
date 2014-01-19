@@ -24,4 +24,14 @@ public class MessageCharacterToPlay extends Message implements Serializable {
     public Position getPositionOfCursor() {
         return positionOfCursor;
     }
+
+
+    @Override
+    public String toString() {
+        return new StringBuffer().
+                append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("Character :").append(characterToPlay.getName()).append(System.getProperty("line.separator"))
+                .append("PositionOfCursor :").append(positionOfCursor.toString())
+                .toString();
+    }
 }

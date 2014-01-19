@@ -12,6 +12,7 @@ import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
+import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.*;
@@ -58,10 +59,12 @@ public class BattleScene implements Scene {
     private BattleSceneState currentState;
     private List<Position> possiblePositionsToMove;
     private List<Position> possiblePositionsToAttack;
+    private List<Position> possiblePositionsToUseCapacity;
+    private List<Position> capacityAreaOfEffect;
     private List<Position> positionsToSelect;
     private List<GameCharacter> characterListToDeploy;
     private List<GameCharacterRepresentation> characterRepresentationList;
-
+    private Move selectedMove;
 
     private BattleScene() {
     }
@@ -108,6 +111,9 @@ public class BattleScene implements Scene {
         positionsToSelect = new ArrayList<Position>();
         characterListToDeploy = new ArrayList<GameCharacter>();
         characterRepresentationList = new ArrayList<GameCharacterRepresentation>();
+        possiblePositionsToUseCapacity = new ArrayList<Position>();
+        capacityAreaOfEffect = new ArrayList<Position>();
+        selectedMove = null;
 
         GraphicsManager.getInstance().setupLights();
         GraphicsManager.getInstance().ready3D();
@@ -405,18 +411,25 @@ public class BattleScene implements Scene {
                 break;
             case MOVE:
                 sendActionMove();
+                cleanHighlightPossiblePositionsToMove();
                 possiblePositionsToMove = new ArrayList<Position>();
                 currentState = BattleSceneState.PENDING;
                 break;
             case ATTACK:
                 sendActionAttack();
+                cleanHighlightPossiblePositionsToAttack();
                 possiblePositionsToAttack = new ArrayList<Position>();
                 currentState = BattleSceneState.PENDING;
                 break;
             case CAPACITY_SELECT:
-                currentState = BattleSceneState.ACTION;
+                selectedMove = menuSelectCapacity.getSelectedOption();
+                sendPositionToUseCapacityRequest();
+                menuSelectCapacity = null;
+                currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY;
                 break;
             case CAPACITY_PLACE:
+                sendActionCapacity();
+                cleanHighlightPossiblePositionsToUseCapacity();
                 currentState = BattleSceneState.ACTION;
                 break;
             case END_TURN:
@@ -622,7 +635,6 @@ public class BattleScene implements Scene {
 
     private void manageMessageCharacterGainsXP(Message message) {
         MessageCharacterGainsXP messageCharacterGainsXP = (MessageCharacterGainsXP) message;
-
         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
             if (characterRepresentation.getCharacter().equals(messageCharacterGainsXP.getCharacter())) {
                 characterRepresentation.getCharacter().gainXp(messageCharacterGainsXP.getExperiencePoints());
@@ -631,6 +643,18 @@ public class BattleScene implements Scene {
                         messageCharacterGainsXP.getExperiencePoints(), messageCharacterGainsXP.getJobPoints());
                 break;
             }
+        }
+    }
+
+    private void manageMessagePositionToUseCapacityResponse(Message message) {
+        MessageCharacterPositionToUseCapacityResponse messageCharacterPositionToUseCapacityResponse = (MessageCharacterPositionToUseCapacityResponse) message;
+        if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_MOVE)) {
+            LOG.debug(" [-] RECEIVED POSITIONS TO MOVE");
+            possiblePositionsToUseCapacity = messageCharacterPositionToUseCapacityResponse.getPossiblePositionsToUseCapacity();
+            highlightPossiblePositionsToUseCapacity();
+            currentState = BattleSceneState.CAPACITY_PLACE;
+        } else {
+            LOG.error(" [-] RECEIVED POSITIONS TO MOVE");
         }
     }
 
@@ -686,6 +710,9 @@ public class BattleScene implements Scene {
                         break;
                     case GAME_END:
                         manageMessageGameOver(message);
+                        break;
+                    case CHARACTER_POSITION_TO_USE_CAPACITY_RESPONSE:
+                        manageMessagePositionToUseCapacityResponse(message);
                         break;
                     case PLAYER_UPDATE:
                         MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
@@ -842,7 +869,6 @@ public class BattleScene implements Scene {
     private void sendActionMove() {
         MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(Client.getInstance().getTokenKey(), playerNumber, currentGameCharacter, cursor);
         postMessage(messageCharacterActionMove);
-        cleanHighlightPossiblePositionsToMove();
     }
 
     private void sendPositionToAttackRequest() {
@@ -853,7 +879,16 @@ public class BattleScene implements Scene {
     private void sendActionAttack() {
         MessageCharacterActionAttack messageCharacterActionAttack = new MessageCharacterActionAttack(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
         postMessage(messageCharacterActionAttack);
-        cleanHighlightPossiblePositionsToAttack();
+    }
+
+    private void sendPositionToUseCapacityRequest() {
+        MessageCharacterPositionToUseCapacityRequest messageCharacterPositionToUseCapacityRequest = new MessageCharacterPositionToUseCapacityRequest(Client.getInstance().getTokenKey(), currentGameCharacter, selectedMove);
+        postMessage(messageCharacterPositionToUseCapacityRequest);
+    }
+
+    private void sendActionCapacity() {
+        MessageCharacterActionCapacity messageCharacterUsesCapacity = new MessageCharacterActionCapacity(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
+        postMessage(messageCharacterUsesCapacity);
     }
 
     private void sendEndTurn() {
@@ -920,6 +955,25 @@ public class BattleScene implements Scene {
         for (Position possiblePositionToAttack : possiblePositionsToAttack) {
             if (battlefieldRepresentation.get(possiblePositionToAttack).getHighlight().equals(HighlightColor.RED)) {
                 battlefieldRepresentation.get(possiblePositionToAttack).setHighlight(HighlightColor.NONE);
+            }
+        }
+    }
+
+    private void highlightPossiblePositionsToUseCapacity() {
+        for (Position possiblePositionToUseCapacity : possiblePositionsToUseCapacity) {
+            if (battlefieldRepresentation.containsKey(possiblePositionToUseCapacity)) {
+                LOG.debug("highlight red {}", possiblePositionToUseCapacity.toString());
+                battlefieldRepresentation.get(possiblePositionToUseCapacity).setHighlight(HighlightColor.RED);
+            } else {
+                LOG.error("{} can't be highlighted", possiblePositionToUseCapacity.toString());
+            }
+        }
+    }
+
+    private void cleanHighlightPossiblePositionsToUseCapacity() {
+        for (Position possiblePositionToUseCapacity : possiblePositionsToUseCapacity) {
+            if (battlefieldRepresentation.get(possiblePositionToUseCapacity).getHighlight().equals(HighlightColor.RED)) {
+                battlefieldRepresentation.get(possiblePositionToUseCapacity).setHighlight(HighlightColor.NONE);
             }
         }
     }

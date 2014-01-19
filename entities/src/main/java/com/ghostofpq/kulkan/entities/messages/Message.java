@@ -19,4 +19,10 @@ public abstract class Message implements Serializable {
     public byte[] getBytes() {
         return SerializationUtils.serialize(this);
     }
+
+    public String toString() {
+        return new StringBuffer().append("Message Type :").append(type).toString();
+    }
+
+    ;
 }

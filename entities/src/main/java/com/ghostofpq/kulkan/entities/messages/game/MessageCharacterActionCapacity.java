@@ -7,23 +7,23 @@ import com.ghostofpq.kulkan.entities.messages.MessageType;
 
 import java.io.Serializable;
 
-public class MessageCharacterActionAttack extends ClientMessage implements Serializable {
+public class MessageCharacterActionCapacity extends ClientMessage implements Serializable {
     private GameCharacter character;
-    private Position positionToAttack;
+    private Position positionToUseCapacity;
 
-    public MessageCharacterActionAttack(String keyToken, GameCharacter character, Position positionToAttack) {
-        type = MessageType.CHARACTER_ACTION_ATTACK;
+    public MessageCharacterActionCapacity(String keyToken, GameCharacter character, Position positionToUseCapacity) {
+        type = MessageType.CHARACTER_ACTION_CAPACITY_USE;
         this.keyToken = keyToken;
         this.character = character;
-        this.positionToAttack = positionToAttack;
+        this.positionToUseCapacity = positionToUseCapacity;
     }
 
     public GameCharacter getCharacter() {
         return character;
     }
 
-    public Position getPositionToAttack() {
-        return positionToAttack;
+    public Position getPositionToUseCapacity() {
+        return positionToUseCapacity;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MessageCharacterActionAttack extends ClientMessage implements Seria
         return new StringBuffer().
                 append("Message Type :").append(type).append(System.getProperty("line.separator"))
                 .append("KeyToken :").append(keyToken).append(System.getProperty("line.separator"))
-                .append("PositionToAttack :").append(positionToAttack.toString())
+                .append("PositionToUseCapacity :").append(positionToUseCapacity.toString())
                 .toString();
     }
 }

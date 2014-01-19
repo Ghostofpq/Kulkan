@@ -24,4 +24,14 @@ public class MessageCharacterEndTurn extends ClientMessage implements Serializab
     public int getPlayerNumber() {
         return playerNumber;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuffer().
+                append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("KeyToken :").append(keyToken).append(System.getProperty("line.separator"))
+                .append("Character :").append(character.getName()).append(System.getProperty("line.separator"))
+                .append("PlayerNumber :").append(playerNumber)
+                .toString();
+    }
 }

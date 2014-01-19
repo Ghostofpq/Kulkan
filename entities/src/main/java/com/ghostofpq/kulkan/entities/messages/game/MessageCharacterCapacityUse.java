@@ -33,4 +33,15 @@ public class MessageCharacterCapacityUse extends ClientMessage implements Serial
     public Position getSelectedPosition() {
         return selectedPosition;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuffer().
+                append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("KeyToken :").append(keyToken).append(System.getProperty("line.separator"))
+                .append("Character :").append(character.getName()).append(System.getProperty("line.separator"))
+                .append("SelectedMove :").append(selectedMove.getName()).append(System.getProperty("line.separator"))
+                .append("SelectedPosition :").append(selectedPosition.toString())
+                .toString();
+    }
 }

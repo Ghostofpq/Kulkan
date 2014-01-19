@@ -25,4 +25,13 @@ public class MessageCharacterMoves extends Message implements Serializable {
     public List<Position> getPath() {
         return path;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuffer().
+                append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("Character :").append(character.getName()).append(System.getProperty("line.separator"))
+                .append("Path :").append(path.toString())
+                .toString();
+    }
 }

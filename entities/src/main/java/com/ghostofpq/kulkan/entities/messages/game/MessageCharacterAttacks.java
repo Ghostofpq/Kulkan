@@ -42,4 +42,16 @@ public class MessageCharacterAttacks extends Message implements Serializable {
     public boolean crits() {
         return crits;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuffer().
+                append("Message Type :").append(type).append(System.getProperty("line.separator"))
+                .append("AttackingChar :").append(attackingChar.getName()).append(System.getProperty("line.separator"))
+                .append("TargetedChar :").append(targetedChar.getName()).append(System.getProperty("line.separator"))
+                .append("Damages :").append(damages).append(System.getProperty("line.separator"))
+                .append("Crits :").append(crits).append(System.getProperty("line.separator"))
+                .append("Hits :").append(hits)
+                .toString();
+    }
 }
