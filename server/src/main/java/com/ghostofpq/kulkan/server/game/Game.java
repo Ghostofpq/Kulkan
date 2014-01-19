@@ -435,11 +435,48 @@ public class Game {
         }
     }
 
-    private void manageMessageCharCapacityPlace(ClientMessage message) {
+    private void manageMessageCapacityAOERequest(ClientMessage message) {
+        MessageCapacityAOERequest messageCapacityAOERequest = (MessageCapacityAOERequest) message;
+        GameCharacter character = getEquivalentCharacter(messageCapacityAOERequest.getCharacter());
+        if (character.equals(currentCharToPlay)) {
+            Move move = messageCapacityAOERequest.getSelectedMove();
+            Range rangeToUse = null;
+            switch (move.getMoveRangeType()) {
+                case RANGE:
+                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                    break;
+                case RANGE_AOE:
+                    rangeToUse = move.getAreaOfEffect();
+                    break;
+                case SELF:
+                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                    break;
+                case WEAPON:
+                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                    break;
+                case WEAPON_AOE:
+                    rangeToUse = move.getAreaOfEffect();
+                    break;
+            }
+            List<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(messageCapacityAOERequest.getPosition(), rangeToUse);
+
+            MessageCapacityAOEResponse messageCapacityAOEResponse = new MessageCapacityAOEResponse(areaOfEffect);
+            sendMessageToChannel(messageCapacityAOERequest.getKeyToken(), messageCapacityAOEResponse);
+        } else {
+            log.error(" [X] UNEXPECTED CHAR TO PLAY");
+        }
+    }
+
+    private void manageMessageCharCapacityUse(ClientMessage message) {
         MessageCharacterActionCapacity messageCharacterActionCapacity = (MessageCharacterActionCapacity) message;
         GameCharacter character = getEquivalentCharacter(messageCharacterActionCapacity.getCharacter());
         if (character.equals(currentCharToPlay)) {
             Position position = messageCharacterActionCapacity.getPositionToUseCapacity();
+
+            Position characterPosition = currentCharToPlay.getPosition().plusYNew(-1);
+            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(currentCharToPlay, characterPosition);
+            sendMessageToChannel(messageCharacterActionCapacity.getKeyToken(), messageCharacterToPlay);
+
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
         }
@@ -478,6 +515,14 @@ public class Game {
                                 log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }
                             break;
+                        case CHARACTER_CAPACITY_AOE_REQUEST: {
+                            if (messageIsExpected(message)) {
+                                manageMessageCapacityAOERequest(message);
+                            } else {
+                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
+                            }
+                            break;
+                        }
                         case CHARACTER_ACTION_MOVE:
                             if (messageIsExpected(message)) {
                                 manageMessageCharMoves(message);
@@ -502,7 +547,7 @@ public class Game {
 
                         case CHARACTER_ACTION_CAPACITY_USE:
                             if (messageIsExpected(message)) {
-                                manageMessageCharCapacityPlace(message);
+                                manageMessageCharCapacityUse(message);
                             } else {
                                 log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
                             }

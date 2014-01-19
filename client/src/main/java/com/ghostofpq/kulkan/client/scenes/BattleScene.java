@@ -173,7 +173,8 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
-                || currentState.equals(BattleSceneState.PENDING)) {
+                || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
                     cursorLeft();
@@ -216,7 +217,8 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
-                || currentState.equals(BattleSceneState.PENDING)) {
+                || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
                     cursorRight();
@@ -259,7 +261,8 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
-                || currentState.equals(BattleSceneState.PENDING)) {
+                || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
                     cursorDown();
@@ -302,7 +305,8 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.DEPLOY_POSITION)
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
-                || currentState.equals(BattleSceneState.PENDING)) {
+                || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
                     cursorUp();
@@ -346,7 +350,8 @@ public class BattleScene implements Scene {
                 || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
-                || currentState.equals(BattleSceneState.PENDING)) {
+                || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
                     GraphicsManager.getInstance().requestPointOfView(PointOfView.NORTH);
@@ -369,7 +374,8 @@ public class BattleScene implements Scene {
                 || currentState.equals(BattleSceneState.DEPLOY_HEADING_ANGLE)
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
-                || currentState.equals(BattleSceneState.PENDING)) {
+                || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
                     GraphicsManager.getInstance().requestPointOfView(PointOfView.SOUTH);
@@ -428,9 +434,14 @@ public class BattleScene implements Scene {
                 currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY;
                 break;
             case CAPACITY_PLACE:
-                sendActionCapacity();
+                sendCapacityAOERequest();
                 cleanHighlightPossiblePositionsToUseCapacity();
-                currentState = BattleSceneState.ACTION;
+                currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE;
+                break;
+            case CAPACITY_USE:
+                sendActionCapacity();
+                cleanHighlightCapacityAreaOfEffect();
+                currentState = BattleSceneState.PENDING;
                 break;
             case END_TURN:
                 sendEndTurn();
@@ -441,7 +452,18 @@ public class BattleScene implements Scene {
     }
 
     private void manageInputCancel() {
-        Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+        switch (currentState) {
+            case CAPACITY_USE:
+                currentState = BattleSceneState.ACTION;
+                cleanHighlightCapacityAreaOfEffect();
+                battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.NONE);
+                cursor = currentGameCharacter.getPosition().plusYNew(-1);
+                battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
+                GraphicsManager.getInstance().requestCenterPosition(cursor);
+                break;
+            default:
+                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+        }
     }
 
     @Override
@@ -659,6 +681,18 @@ public class BattleScene implements Scene {
         }
     }
 
+    private void manageMessageCapacityAOEResponse(Message message) {
+        MessageCapacityAOEResponse messageCapacityAOEResponse = (MessageCapacityAOEResponse) message;
+        if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE)) {
+            LOG.debug(" [-] RECEIVED CAPACITY AOE");
+            capacityAreaOfEffect = messageCapacityAOEResponse.getAreaOfEffect();
+            highlightCapacityAreaOfEffect();
+            currentState = BattleSceneState.CAPACITY_USE;
+        } else {
+            LOG.error(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
+        }
+    }
+
     private void manageMessageGameOver(Message message) {
         MessageGameEnd messageGameEnd = (MessageGameEnd) message;
         String buttonText;
@@ -716,6 +750,9 @@ public class BattleScene implements Scene {
                         break;
                     case CHARACTER_POSITION_TO_USE_CAPACITY_RESPONSE:
                         manageMessagePositionToUseCapacityResponse(message);
+                        break;
+                    case CHARACTER_CAPACITY_AOE_RESPONSE:
+                        manageMessageCapacityAOEResponse(message);
                         break;
                     case PLAYER_UPDATE:
                         MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
@@ -889,6 +926,11 @@ public class BattleScene implements Scene {
         postMessage(messageCharacterPositionToUseCapacityRequest);
     }
 
+    private void sendCapacityAOERequest() {
+        MessageCapacityAOERequest messageCapacityAOERequest = new MessageCapacityAOERequest(Client.getInstance().getTokenKey(), currentGameCharacter, selectedMove, cursor);
+        postMessage(messageCapacityAOERequest);
+    }
+
     private void sendActionCapacity() {
         MessageCharacterActionCapacity messageCharacterUsesCapacity = new MessageCharacterActionCapacity(Client.getInstance().getTokenKey(), currentGameCharacter, cursor);
         postMessage(messageCharacterUsesCapacity);
@@ -977,6 +1019,25 @@ public class BattleScene implements Scene {
         for (Position possiblePositionToUseCapacity : possiblePositionsToUseCapacity) {
             if (battlefieldRepresentation.get(possiblePositionToUseCapacity).getHighlight().equals(HighlightColor.RED)) {
                 battlefieldRepresentation.get(possiblePositionToUseCapacity).setHighlight(HighlightColor.NONE);
+            }
+        }
+    }
+
+    private void highlightCapacityAreaOfEffect() {
+        for (Position position : capacityAreaOfEffect) {
+            if (battlefieldRepresentation.containsKey(position)) {
+                LOG.debug("highlight green {}", position.toString());
+                battlefieldRepresentation.get(position).setHighlight(HighlightColor.GREEN);
+            } else {
+                LOG.error("{} can't be highlighted", position.toString());
+            }
+        }
+    }
+
+    private void cleanHighlightCapacityAreaOfEffect() {
+        for (Position position : capacityAreaOfEffect) {
+            if (battlefieldRepresentation.get(position).getHighlight().equals(HighlightColor.GREEN)) {
+                battlefieldRepresentation.get(position).setHighlight(HighlightColor.NONE);
             }
         }
     }
@@ -1100,6 +1161,11 @@ public class BattleScene implements Scene {
         }
         if (currentState.equals(BattleSceneState.ATTACK)) {
             if (possiblePositionsToAttack.contains(cursor)) {
+                battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.RED);
+            }
+        }
+        if (currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
+            if (possiblePositionsToUseCapacity.contains(cursor)) {
                 battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.RED);
             }
         }
