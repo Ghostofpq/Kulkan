@@ -81,10 +81,14 @@ public abstract class Job implements Serializable {
 
             switch (capacity.getType()) {
                 case AMELIORATION:
-                    unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                    if (!unlockedAmeliorationPrimaries.contains((AmeliorationPrimary) capacity)) {
+                        unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                    }
                     break;
                 case MOVE:
-                    unlockedMoves.add((Move) capacity);
+                    if (!unlockedMoves.contains((Move) capacity)) {
+                        unlockedMoves.add((Move) capacity);
+                    }
                     break;
             }
         }
