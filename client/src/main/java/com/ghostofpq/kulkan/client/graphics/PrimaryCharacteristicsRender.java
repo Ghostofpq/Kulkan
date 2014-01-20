@@ -3,7 +3,6 @@ package com.ghostofpq.kulkan.client.graphics;
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import org.newdawn.slick.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class PrimaryCharacteristicsRender extends HUDElement {
     private final String FONT = "optimus_princeps_16";
@@ -47,8 +46,7 @@ public class PrimaryCharacteristicsRender extends HUDElement {
     // Characs Move Position
     private int posXCharacsMove;
     private int posYCharacsMove;
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public PrimaryCharacteristicsRender(int posX, int posY, int length, int height, PrimaryCharacteristics primaryCharacteristics) {
         this.posX = posX;

@@ -4,7 +4,6 @@ import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import lombok.extern.slf4j.Slf4j;
 import org.newdawn.slick.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -21,8 +20,7 @@ public class MenuSelectCapacity {
     private List<Move> moveList;
     private int currentMana;
 
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public MenuSelectCapacity(int posX, int posY, int frameLength, int frameHeight, int frameWidth, List<Move> moveList, int currentMana) {
         this.posX = posX;

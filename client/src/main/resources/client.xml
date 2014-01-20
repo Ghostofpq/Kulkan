@@ -12,11 +12,10 @@
             location="classpath:application.properties"/>
     <context:annotation-config/>
 
-
-    <bean id="Client" class="com.ghostofpq.kulkan.client.Client">
-        <property name="hostIp" value="${hostIp.ip}"/>
+    <bean id="client" class="com.ghostofpq.kulkan.client.Client">
+    <property name="hostIp" value="${hostIp.ip}"/>
         <property name="hostPort" value="${hostIp.hostPort}"/>
     </bean>
 
-    <bean id="FontManager" class="com.ghostofpq.kulkan.client.utils.FontManager"/>
+
 </beans>

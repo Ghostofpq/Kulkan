@@ -3,7 +3,6 @@ package com.ghostofpq.kulkan.client.graphics;
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import org.newdawn.slick.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class CharacterRender {
     private final String FONT = "optimus_princeps_16";
@@ -107,8 +106,7 @@ public class CharacterRender {
     private BarRender experienceBar;
     private BarRender lifeBar;
     private BarRender manaBar;
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public CharacterRender(float posX, float posY, int frameLength, int frameHeight, int frameWidth, GameCharacter character) {
         this.posX = (int) posX;

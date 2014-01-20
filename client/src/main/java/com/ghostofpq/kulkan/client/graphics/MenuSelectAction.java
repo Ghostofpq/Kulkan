@@ -3,7 +3,6 @@ package com.ghostofpq.kulkan.client.graphics;
 
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import org.newdawn.slick.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +18,7 @@ public class MenuSelectAction {
     private List<Boolean> optionsState;
     private int index;
 
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public MenuSelectAction(int posX, int posY, int frameLength, int frameHeight, int frameWidth) {
         this.posX = posX;

@@ -3,7 +3,6 @@ package com.ghostofpq.kulkan.client.graphics;
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import org.newdawn.slick.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TeamManagementCharacterRender extends HUDElement {
     private final String FONT = "optimus_princeps_16";
@@ -21,8 +20,7 @@ public class TeamManagementCharacterRender extends HUDElement {
     // xp
     private int xpPosX;
     private int xpPosY;
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public TeamManagementCharacterRender(float posX, float posY, int width, int height, int frameWidth, GameCharacter character) {
         this.posX = (int) posX;

@@ -6,15 +6,13 @@ import com.ghostofpq.kulkan.client.utils.TextureManager;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class Button extends HUDElement {
     private final String FONT = "optimus_princeps_16";
     protected String label;
     private TextureKey customTexture;
     private TextureKey customTextureFocus;
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public Button(int posX, int posY, int width, int height, String label) {
         this.posX = posX;

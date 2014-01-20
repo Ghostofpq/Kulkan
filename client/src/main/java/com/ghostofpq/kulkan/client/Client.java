@@ -52,7 +52,8 @@ public class Client {
     public static void main(String[] argv) {
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("client.xml");
-        Client g = ((Client) context.getBean("Client"));
+        Client g = ((Client) context.getBean("client"));
+
         g.init();
         g.setCurrentScene(LoginScene.getInstance());
         g.run();

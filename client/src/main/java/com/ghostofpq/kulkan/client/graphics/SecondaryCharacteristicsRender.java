@@ -70,6 +70,7 @@ public class SecondaryCharacteristicsRender extends HUDElement {
     // Characs Resilience Position
     private int posXCharacsResilience;
     private int posYCharacsResilience;
+    private FontManager fontManager = FontManager.getInstance();
 
     public SecondaryCharacteristicsRender(int posX, int posY, int length, int height, SecondaryCharacteristics secondaryCharacteristics) {
         this.posX = posX;
@@ -81,7 +82,7 @@ public class SecondaryCharacteristicsRender extends HUDElement {
 
         widthStep = length / 6;
         heightStep = height / 5;
-        fontStep = (heightStep - FontManager.getInstance().getFontMap().get(FONT).getHeight("Testouilles")) / 2;
+        fontStep = (heightStep - fontManager.getFontMap().get(FONT).getHeight("Testouilles")) / 2;
 
         posXCharacsAttackLabel = posX;
         posYCharacsAttackLabel = posY + fontStep;
@@ -136,34 +137,34 @@ public class SecondaryCharacteristicsRender extends HUDElement {
 
     @Override
     public void draw() {
-        FontManager.getInstance().drawString(FONT, posXCharacsAttackLabel, posYCharacsAttackLabel, "Attack", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsAttack, posYCharacsAttack, String.valueOf(secondaryCharacteristics.getAttackDamage()), Color.white);
+        fontManager.drawString(FONT, posXCharacsAttackLabel, posYCharacsAttackLabel, "Attack", Color.white);
+        fontManager.drawString(FONT, posXCharacsAttack, posYCharacsAttack, String.valueOf(secondaryCharacteristics.getAttackDamage()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsMagicAttackLabel, posYCharacsMagicAttackLabel, "Magic Power", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsMagicAttack, posYCharacsMagicAttack, String.valueOf(secondaryCharacteristics.getMagicalDamage()), Color.white);
+        fontManager.drawString(FONT, posXCharacsMagicAttackLabel, posYCharacsMagicAttackLabel, "Magic Power", Color.white);
+        fontManager.drawString(FONT, posXCharacsMagicAttack, posYCharacsMagicAttack, String.valueOf(secondaryCharacteristics.getMagicalDamage()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsArmorLabel, posYCharacsArmorLabel, "Armor", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsArmor, posYCharacsArmor, String.valueOf(secondaryCharacteristics.getArmor()), Color.white);
+        fontManager.drawString(FONT, posXCharacsArmorLabel, posYCharacsArmorLabel, "Armor", Color.white);
+        fontManager.drawString(FONT, posXCharacsArmor, posYCharacsArmor, String.valueOf(secondaryCharacteristics.getArmor()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsMagicArmorLabel, posYCharacsMagicArmorLabel, "Magic Armor", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsMagicArmor, posYCharacsMagicArmor, String.valueOf(secondaryCharacteristics.getMagicResist()), Color.white);
+        fontManager.drawString(FONT, posXCharacsMagicArmorLabel, posYCharacsMagicArmorLabel, "Magic Armor", Color.white);
+        fontManager.drawString(FONT, posXCharacsMagicArmor, posYCharacsMagicArmor, String.valueOf(secondaryCharacteristics.getMagicResist()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsArmorPenLabel, posYCharacsArmorPenLabel, "Armor Pen", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsArmorPen, posYCharacsArmorPen, String.valueOf(secondaryCharacteristics.getArmor()), Color.white);
+        fontManager.drawString(FONT, posXCharacsArmorPenLabel, posYCharacsArmorPenLabel, "Armor Pen", Color.white);
+        fontManager.drawString(FONT, posXCharacsArmorPen, posYCharacsArmorPen, String.valueOf(secondaryCharacteristics.getArmor()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsMagicPenLabel, posYCharacsMagicPenLabel, "Magic Pen", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsMagicPen, posYCharacsMagicPen, String.valueOf(secondaryCharacteristics.getMagicPenetration()), Color.white);
+        fontManager.drawString(FONT, posXCharacsMagicPenLabel, posYCharacsMagicPenLabel, "Magic Pen", Color.white);
+        fontManager.drawString(FONT, posXCharacsMagicPen, posYCharacsMagicPen, String.valueOf(secondaryCharacteristics.getMagicPenetration()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsPrecisionLabel, posYCharacsPrecisionLabel, "Precision", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsPrecision, posYCharacsPrecision, String.valueOf(secondaryCharacteristics.getPrecision()), Color.white);
+        fontManager.drawString(FONT, posXCharacsPrecisionLabel, posYCharacsPrecisionLabel, "Precision", Color.white);
+        fontManager.drawString(FONT, posXCharacsPrecision, posYCharacsPrecision, String.valueOf(secondaryCharacteristics.getPrecision()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsEscapeLabel, posYCharacsEscapeLabel, "Escape", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsEscape, posYCharacsEscape, String.valueOf(secondaryCharacteristics.getEscape()), Color.white);
+        fontManager.drawString(FONT, posXCharacsEscapeLabel, posYCharacsEscapeLabel, "Escape", Color.white);
+        fontManager.drawString(FONT, posXCharacsEscape, posYCharacsEscape, String.valueOf(secondaryCharacteristics.getEscape()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsCriticalStrikeLabel, posYCharacsCriticalStrikeLabel, "Critical Strike", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsCriticalStrike, posYCharacsCriticalStrike, String.valueOf(secondaryCharacteristics.getCriticalStrike()), Color.white);
+        fontManager.drawString(FONT, posXCharacsCriticalStrikeLabel, posYCharacsCriticalStrikeLabel, "Critical Strike", Color.white);
+        fontManager.drawString(FONT, posXCharacsCriticalStrike, posYCharacsCriticalStrike, String.valueOf(secondaryCharacteristics.getCriticalStrike()), Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsResilienceLabel, posYCharacsResilienceLabel, "Resilience", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsResilience, posYCharacsResilience, String.valueOf(secondaryCharacteristics.getResilience()), Color.white);
+        fontManager.drawString(FONT, posXCharacsResilienceLabel, posYCharacsResilienceLabel, "Resilience", Color.white);
+        fontManager.drawString(FONT, posXCharacsResilience, posYCharacsResilience, String.valueOf(secondaryCharacteristics.getResilience()), Color.white);
     }
 }

@@ -4,7 +4,6 @@ import com.ghostofpq.kulkan.client.utils.FontManager;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class BarRender {
     private Color colorBack;
@@ -18,8 +17,7 @@ public class BarRender {
     private float posX4;
     private float posY4;
     private String text;
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public BarRender(float value, float maxValue, float posX, float posY, float width, float height, Color color, Color colorBack) {
         this.posXBegin = posX;
