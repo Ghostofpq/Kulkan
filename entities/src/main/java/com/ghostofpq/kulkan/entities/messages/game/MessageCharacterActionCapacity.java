@@ -35,10 +35,10 @@ public class MessageCharacterActionCapacity extends ClientMessage implements Ser
 
     @Override
     public String toString() {
-        return new StringBuffer()
-                .append("Message Type :").append(type).append(System.getProperty("line.separator"))
-                .append("KeyToken :").append(keyToken).append(System.getProperty("line.separator"))
-                .append("PositionToUseCapacity :").append(positionToUseCapacity.toString())
+        return new StringBuffer().append(System.getProperty("line.separator"))
+                .append("Message Type : ").append(type).append(System.getProperty("line.separator"))
+                .append("KeyToken : ").append(keyToken).append(System.getProperty("line.separator"))
+                .append("PositionToUseCapacity : ").append(positionToUseCapacity.toString())
                 .toString();
     }
 }

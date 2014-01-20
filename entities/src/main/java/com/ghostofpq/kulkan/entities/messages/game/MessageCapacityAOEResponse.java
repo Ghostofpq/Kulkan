@@ -22,7 +22,7 @@ public class MessageCapacityAOEResponse extends Message implements Serializable 
 
     @Override
     public String toString() {
-        return new StringBuffer()
+        return new StringBuffer().append(System.getProperty("line.separator"))
                 .append("Message Type : ").append(type).append(System.getProperty("line.separator"))
                 .append("areaOfEffect : ").append(areaOfEffect.toString())
                 .toString();

@@ -34,11 +34,11 @@ public class MessageCharacterActionMove extends ClientMessage implements Seriali
 
     @Override
     public String toString() {
-        return new StringBuffer()
-                .append("Message Type :").append(type).append(System.getProperty("line.separator"))
-                .append("KeyToken :").append(keyToken).append(System.getProperty("line.separator"))
-                .append("PositionToMove :").append(positionToMove.toString()).append(System.getProperty("line.separator"))
-                .append("PlayerNumber :").append(playerNumber)
+        return new StringBuffer().append(System.getProperty("line.separator"))
+                .append("Message Type : ").append(type).append(System.getProperty("line.separator"))
+                .append("KeyToken : ").append(keyToken).append(System.getProperty("line.separator"))
+                .append("PositionToMove : ").append(positionToMove.toString()).append(System.getProperty("line.separator"))
+                .append("PlayerNumber : ").append(playerNumber)
                 .toString();
     }
 }
