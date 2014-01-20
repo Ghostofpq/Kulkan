@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.client.graphics;
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class TeamManagementCharacterRender extends HUDElement {
     private final String FONT = "optimus_princeps_16";
@@ -20,6 +21,8 @@ public class TeamManagementCharacterRender extends HUDElement {
     // xp
     private int xpPosX;
     private int xpPosY;
+    @Autowired
+    private FontManager fontManager;
 
     public TeamManagementCharacterRender(float posX, float posY, int width, int height, int frameWidth, GameCharacter character) {
         this.posX = (int) posX;
@@ -48,10 +51,10 @@ public class TeamManagementCharacterRender extends HUDElement {
     @Override
     public void draw() {
         Toolbox.drawFrame(posX, posY, width, height, frameWidth, Color.white);
-        FontManager.getInstance().drawString(FONT, namePosX, namePosY, character.getName(), Color.white);
-        FontManager.getInstance().drawString(FONT, lvlPosX, lvlPosY, "LvL : " + character.getLevel(), Color.white);
-        FontManager.getInstance().drawString(FONT, racePosX, racePosY, character.getClan().getName(), Color.white);
-        FontManager.getInstance().drawString(FONT, xpPosX, xpPosY, String.valueOf(character.getExperience()), Color.white);
+        fontManager.drawString(FONT, namePosX, namePosY, character.getName(), Color.white);
+        fontManager.drawString(FONT, lvlPosX, lvlPosY, "LvL : " + character.getLevel(), Color.white);
+        fontManager.drawString(FONT, racePosX, racePosY, character.getClan().getName(), Color.white);
+        fontManager.drawString(FONT, xpPosX, xpPosY, String.valueOf(character.getExperience()), Color.white);
     }
 
     public GameCharacter getCharacter() {

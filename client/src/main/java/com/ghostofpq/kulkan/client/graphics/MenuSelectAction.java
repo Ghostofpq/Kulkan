@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.client.graphics;
 
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ public class MenuSelectAction {
     private List<MenuSelectActions> options;
     private List<Boolean> optionsState;
     private int index;
+
+    @Autowired
+    private FontManager fontManager;
 
     public MenuSelectAction(int posX, int posY, int frameLength, int frameHeight, int frameWidth) {
         this.posX = posX;
@@ -55,14 +59,14 @@ public class MenuSelectAction {
             int optionY = posY;
             optionY += optionHeight;
             for (int i = 0; i < options.size(); i++) {
-                int optionX = posX + ((frameLength - FontManager.getInstance().getFontMap().get(FONT).getWidth(options.get(i).toString())) / 2);
+                int optionX = posX + ((frameLength - fontManager.getFontMap().get(FONT).getWidth(options.get(i).toString())) / 2);
                 if (options.get(index).equals(options.get(i))) {
-                    FontManager.getInstance().drawString(FONT, optionX, optionY, options.get(i).toString(), Color.yellow);
+                    fontManager.drawString(FONT, optionX, optionY, options.get(i).toString(), Color.yellow);
                 } else {
                     if (optionsState.get(i)) {
-                        FontManager.getInstance().drawString(FONT, optionX, optionY, options.get(i).toString(), Color.white);
+                        fontManager.drawString(FONT, optionX, optionY, options.get(i).toString(), Color.white);
                     } else {
-                        FontManager.getInstance().drawString(FONT, optionX, optionY, options.get(i).toString(), Color.gray);
+                        fontManager.drawString(FONT, optionX, optionY, options.get(i).toString(), Color.gray);
                     }
                 }
                 optionY += optionHeight;

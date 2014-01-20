@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.client.graphics;
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class CharacterRender {
     private final String FONT = "optimus_princeps_16";
@@ -106,6 +107,8 @@ public class CharacterRender {
     private BarRender experienceBar;
     private BarRender lifeBar;
     private BarRender manaBar;
+    @Autowired
+    private FontManager fontManager;
 
     public CharacterRender(float posX, float posY, int frameLength, int frameHeight, int frameWidth, GameCharacter character) {
         this.posX = (int) posX;
@@ -125,12 +128,12 @@ public class CharacterRender {
         nameFrameHeight = (1 * frameHeight / 5);
         nameFrameLength = frameLength;
 
-        posXName = posX + ((frameLength / 2) - FontManager.getInstance().getFontMap().get(FONT).getWidth(character.getName())) / 2;
-        posYName = posY + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight(character.getName())) / 2;
-        posXClan = posX + (frameLength / 2) + (((3 * frameLength) / 10) - FontManager.getInstance().getFontMap().get(FONT).getWidth(character.getClan().getName())) / 2;
-        posYClan = posY + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight(character.getClan().getName())) / 2;
-        posXLevel = posX + (frameLength / 2) + ((3 * frameLength) / 10) + (((2 * frameLength) / 10) - FontManager.getInstance().getFontMap().get(FONT).getWidth("LvL : " + character.getLevel())) / 2;
-        posYLevel = posY + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight("LvL : " + character.getLevel())) / 2;
+        posXName = posX + ((frameLength / 2) - fontManager.getFontMap().get(FONT).getWidth(character.getName())) / 2;
+        posYName = posY + (nameFrameHeight - fontManager.getFontMap().get(FONT).getHeight(character.getName())) / 2;
+        posXClan = posX + (frameLength / 2) + (((3 * frameLength) / 10) - fontManager.getFontMap().get(FONT).getWidth(character.getClan().getName())) / 2;
+        posYClan = posY + (nameFrameHeight - fontManager.getFontMap().get(FONT).getHeight(character.getClan().getName())) / 2;
+        posXLevel = posX + (frameLength / 2) + ((3 * frameLength) / 10) + (((2 * frameLength) / 10) - fontManager.getFontMap().get(FONT).getWidth("LvL : " + character.getLevel())) / 2;
+        posYLevel = posY + (nameFrameHeight - fontManager.getFontMap().get(FONT).getHeight("LvL : " + character.getLevel())) / 2;
         //Bars Frame
         barsFrameLength = (2 * frameLength / 3) + frameWidth / 2;
         barsFrameHeight = (3 * frameHeight / 5) + frameWidth;
@@ -151,12 +154,12 @@ public class CharacterRender {
         posXBar3 = posXBar1;
         posYBar3 = posYBar2 + (barsFrameHeight / 3);
 
-        posXLabel1 = posXBarsFrame + (((barsFrameLength / 4) - FontManager.getInstance().getFontMap().get(FONT).getWidth("HP")) / 2);
-        posYLabel1 = posYBarsFrame + (((barsFrameHeight / 3) - FontManager.getInstance().getFontMap().get(FONT).getHeight("HP")) / 2);
-        posXLabel2 = posXBarsFrame + (((barsFrameLength / 4) - FontManager.getInstance().getFontMap().get(FONT).getWidth("MP")) / 2);
-        posYLabel2 = posYBarsFrame + (barsFrameHeight / 3) + (((barsFrameHeight / 3) - FontManager.getInstance().getFontMap().get(FONT).getHeight("HP")) / 2);
-        posXLabel3 = posXBarsFrame + (((barsFrameLength / 4) - FontManager.getInstance().getFontMap().get(FONT).getWidth("XP")) / 2);
-        posYLabel3 = posYBarsFrame + ((2 * barsFrameHeight) / 3) + (((barsFrameHeight / 3) - FontManager.getInstance().getFontMap().get(FONT).getHeight("HP")) / 2);
+        posXLabel1 = posXBarsFrame + (((barsFrameLength / 4) - fontManager.getFontMap().get(FONT).getWidth("HP")) / 2);
+        posYLabel1 = posYBarsFrame + (((barsFrameHeight / 3) - fontManager.getFontMap().get(FONT).getHeight("HP")) / 2);
+        posXLabel2 = posXBarsFrame + (((barsFrameLength / 4) - fontManager.getFontMap().get(FONT).getWidth("MP")) / 2);
+        posYLabel2 = posYBarsFrame + (barsFrameHeight / 3) + (((barsFrameHeight / 3) - fontManager.getFontMap().get(FONT).getHeight("HP")) / 2);
+        posXLabel3 = posXBarsFrame + (((barsFrameLength / 4) - fontManager.getFontMap().get(FONT).getWidth("XP")) / 2);
+        posYLabel3 = posYBarsFrame + ((2 * barsFrameHeight) / 3) + (((barsFrameHeight / 3) - fontManager.getFontMap().get(FONT).getHeight("HP")) / 2);
 
         lifeBar = new BarRender(character.getCurrentHealthPoint(), character.getMaxHealthPoint(), posXBar1, posYBar1, barsLength, barsHeight, Color.green, Color.red);
         manaBar = new BarRender(character.getCurrentManaPoint(), character.getMaxManaPoint(), posXBar2, posYBar2, barsLength, barsHeight, Color.blue, Color.darkGray);
@@ -169,53 +172,53 @@ public class CharacterRender {
         posXCharacsFrame = posX + barsFrameLength - frameWidth;
         posYCharacsFrame = posY + nameFrameHeight - frameWidth;
         // LABELS
-        posXCharacsStrengthLabel = posXCharacsFrame + ((characsFrameLength / 6 - FontManager.getInstance().getFontMap().get(FONT).getWidth("S")) / 2);
-        posYCharacsStrengthLabel = posYCharacsFrame + ((characsFrameHeight / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight("S")) / 2);
+        posXCharacsStrengthLabel = posXCharacsFrame + ((characsFrameLength / 6 - fontManager.getFontMap().get(FONT).getWidth("S")) / 2);
+        posYCharacsStrengthLabel = posYCharacsFrame + ((characsFrameHeight / 3 - fontManager.getFontMap().get(FONT).getHeight("S")) / 2);
 
-        posXCharacsEnduranceLabel = posXCharacsFrame + (characsFrameLength / 2) + ((characsFrameLength / 6 - FontManager.getInstance().getFontMap().get(FONT).getWidth("E")) / 2);
-        posYCharacsEnduranceLabel = posYCharacsFrame + ((characsFrameHeight / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight("E")) / 2);
+        posXCharacsEnduranceLabel = posXCharacsFrame + (characsFrameLength / 2) + ((characsFrameLength / 6 - fontManager.getFontMap().get(FONT).getWidth("E")) / 2);
+        posYCharacsEnduranceLabel = posYCharacsFrame + ((characsFrameHeight / 3 - fontManager.getFontMap().get(FONT).getHeight("E")) / 2);
 
-        posXCharacsIntelligenceLabel = posXCharacsFrame + ((characsFrameLength / 6 - FontManager.getInstance().getFontMap().get(FONT).getWidth("I")) / 2);
-        posYCharacsIntelligenceLabel = posYCharacsFrame + (characsFrameHeight / 3) + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight("I")) / 2);
+        posXCharacsIntelligenceLabel = posXCharacsFrame + ((characsFrameLength / 6 - fontManager.getFontMap().get(FONT).getWidth("I")) / 2);
+        posYCharacsIntelligenceLabel = posYCharacsFrame + (characsFrameHeight / 3) + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getHeight("I")) / 2);
 
-        posXCharacsWillLabel = posXCharacsFrame + (characsFrameLength / 2) + ((characsFrameLength / 6 - FontManager.getInstance().getFontMap().get(FONT).getWidth("W")) / 2);
-        posYCharacsWillLabel = posYCharacsFrame + (characsFrameHeight / 3) + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight("W")) / 2);
+        posXCharacsWillLabel = posXCharacsFrame + (characsFrameLength / 2) + ((characsFrameLength / 6 - fontManager.getFontMap().get(FONT).getWidth("W")) / 2);
+        posYCharacsWillLabel = posYCharacsFrame + (characsFrameHeight / 3) + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getHeight("W")) / 2);
 
-        posXCharacsAgilityLabel = posXCharacsFrame + ((characsFrameLength / 6 - FontManager.getInstance().getFontMap().get(FONT).getWidth("A")) / 2);
-        posYCharacsAgilityLabel = posYCharacsFrame + ((2 * characsFrameHeight) / 3) + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getWidth("A")) / 2);
+        posXCharacsAgilityLabel = posXCharacsFrame + ((characsFrameLength / 6 - fontManager.getFontMap().get(FONT).getWidth("A")) / 2);
+        posYCharacsAgilityLabel = posYCharacsFrame + ((2 * characsFrameHeight) / 3) + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getWidth("A")) / 2);
 
-        posXCharacsMoveLabel = posXCharacsFrame + (characsFrameLength / 2) + ((characsFrameLength / 6 - FontManager.getInstance().getFontMap().get(FONT).getWidth("M")) / 2);
-        posYCharacsMoveLabel = posYCharacsFrame + ((2 * characsFrameHeight) / 3) + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight("M")) / 2);
+        posXCharacsMoveLabel = posXCharacsFrame + (characsFrameLength / 2) + ((characsFrameLength / 6 - fontManager.getFontMap().get(FONT).getWidth("M")) / 2);
+        posYCharacsMoveLabel = posYCharacsFrame + ((2 * characsFrameHeight) / 3) + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getHeight("M")) / 2);
         // VALUES
         posXCharacsStrength = posXCharacsFrame + (characsFrameLength / 6)
-                + ((characsFrameLength / 3 - FontManager.getInstance().getFontMap().get(FONT).getWidth(String.valueOf(character.getStrength()))) / 2);
+                + ((characsFrameLength / 3 - fontManager.getFontMap().get(FONT).getWidth(String.valueOf(character.getStrength()))) / 2);
         posYCharacsStrength = posYCharacsFrame
-                + ((characsFrameHeight / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight(String.valueOf(character.getStrength()))) / 2);
+                + ((characsFrameHeight / 3 - fontManager.getFontMap().get(FONT).getHeight(String.valueOf(character.getStrength()))) / 2);
 
         posXCharacsEndurance = posXCharacsFrame + (characsFrameLength / 2) + (characsFrameLength / 6)
-                + ((characsFrameLength / 3 - FontManager.getInstance().getFontMap().get(FONT).getWidth(String.valueOf(character.getEndurance()))) / 2);
+                + ((characsFrameLength / 3 - fontManager.getFontMap().get(FONT).getWidth(String.valueOf(character.getEndurance()))) / 2);
         posYCharacsEndurance = posYCharacsFrame
-                + ((characsFrameHeight / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight(String.valueOf(character.getEndurance()))) / 2);
+                + ((characsFrameHeight / 3 - fontManager.getFontMap().get(FONT).getHeight(String.valueOf(character.getEndurance()))) / 2);
 
         posXCharacsIntelligence = posXCharacsFrame + (characsFrameLength / 6)
-                + ((characsFrameLength / 3 - FontManager.getInstance().getFontMap().get(FONT).getWidth(String.valueOf(character.getIntelligence()))) / 2);
+                + ((characsFrameLength / 3 - fontManager.getFontMap().get(FONT).getWidth(String.valueOf(character.getIntelligence()))) / 2);
         posYCharacsIntelligence = posYCharacsFrame + (characsFrameHeight / 3)
-                + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight(String.valueOf(character.getIntelligence()))) / 2);
+                + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getHeight(String.valueOf(character.getIntelligence()))) / 2);
 
         posXCharacsWill = posXCharacsFrame + (characsFrameLength / 2) + (characsFrameLength / 6)
-                + ((characsFrameLength / 3 - FontManager.getInstance().getFontMap().get(FONT).getWidth(String.valueOf(character.getWill()))) / 2);
+                + ((characsFrameLength / 3 - fontManager.getFontMap().get(FONT).getWidth(String.valueOf(character.getWill()))) / 2);
         posYCharacsWill = posYCharacsFrame + (characsFrameHeight / 3)
-                + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight(String.valueOf(character.getWill()))) / 2);
+                + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getHeight(String.valueOf(character.getWill()))) / 2);
 
         posXCharacsAgility = posXCharacsFrame + (characsFrameLength / 6)
-                + ((characsFrameLength / 3 - FontManager.getInstance().getFontMap().get(FONT).getWidth(String.valueOf(character.getAgility()))) / 2);
+                + ((characsFrameLength / 3 - fontManager.getFontMap().get(FONT).getWidth(String.valueOf(character.getAgility()))) / 2);
         posYCharacsAgility = posYCharacsFrame + ((2 * characsFrameHeight) / 3)
-                + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight(String.valueOf(character.getAgility()))) / 2);
+                + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getHeight(String.valueOf(character.getAgility()))) / 2);
 
         posXCharacsMove = posXCharacsFrame + (characsFrameLength / 2) + (characsFrameLength / 6)
-                + ((characsFrameLength / 3 - FontManager.getInstance().getFontMap().get(FONT).getWidth(String.valueOf(character.getMovement()))) / 2);
+                + ((characsFrameLength / 3 - fontManager.getFontMap().get(FONT).getWidth(String.valueOf(character.getMovement()))) / 2);
         posYCharacsMove = posYCharacsFrame + ((2 * characsFrameHeight) / 3)
-                + (((characsFrameHeight) / 3 - FontManager.getInstance().getFontMap().get(FONT).getHeight(String.valueOf(character.getMovement()))) / 2);
+                + (((characsFrameHeight) / 3 - fontManager.getFontMap().get(FONT).getHeight(String.valueOf(character.getMovement()))) / 2);
 
         //Job Frame
 
@@ -225,43 +228,43 @@ public class CharacterRender {
         jobFrameLength = frameLength;
         jobFrameHeight = (1 * frameHeight / 5) + frameWidth;
 
-        posXJob = posXJobFrame + ((frameLength / 2) - FontManager.getInstance().getFontMap().get(FONT).getWidth(character.getJob(character.getCurrentJob()).getName())) / 2;
-        posYJob = posYJobFrame + (jobFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight(character.getJob(character.getCurrentJob()).getName())) / 2;
+        posXJob = posXJobFrame + ((frameLength / 2) - fontManager.getFontMap().get(FONT).getWidth(character.getJob(character.getCurrentJob()).getName())) / 2;
+        posYJob = posYJobFrame + (jobFrameHeight - fontManager.getFontMap().get(FONT).getHeight(character.getJob(character.getCurrentJob()).getName())) / 2;
 
-        posXJobPoints = posXJobFrame + (frameLength / 2) + ((3 * frameLength) / 10) + (((2 * frameLength) / 10) - FontManager.getInstance().getFontMap().get(FONT).getWidth("JP : " + character.getJob(character.getCurrentJob()).getJobPoints())) / 2;
-        posYJobPoints = posYJobFrame + (nameFrameHeight - FontManager.getInstance().getFontMap().get(FONT).getHeight("JP : " + character.getJob(character.getCurrentJob()).getJobPoints())) / 2;
+        posXJobPoints = posXJobFrame + (frameLength / 2) + ((3 * frameLength) / 10) + (((2 * frameLength) / 10) - fontManager.getFontMap().get(FONT).getWidth("JP : " + character.getJob(character.getCurrentJob()).getJobPoints())) / 2;
+        posYJobPoints = posYJobFrame + (nameFrameHeight - fontManager.getFontMap().get(FONT).getHeight("JP : " + character.getJob(character.getCurrentJob()).getJobPoints())) / 2;
     }
 
     public void render(Color color) {
 
         Toolbox.drawFrame(posX, posY, nameFrameLength, nameFrameHeight, frameWidth, color);
-        FontManager.getInstance().drawString(FONT, posXName, posYName, character.getName(), Color.white);
-        FontManager.getInstance().drawString(FONT, posXClan, posYClan, character.getClan().getName(), Color.white);
-        FontManager.getInstance().drawString(FONT, posXLevel, posYLevel, "LvL : " + character.getLevel(), Color.white);
+        fontManager.drawString(FONT, posXName, posYName, character.getName(), Color.white);
+        fontManager.drawString(FONT, posXClan, posYClan, character.getClan().getName(), Color.white);
+        fontManager.drawString(FONT, posXLevel, posYLevel, "LvL : " + character.getLevel(), Color.white);
 
         Toolbox.drawFrame(posXBarsFrame, posYBarsFrame, barsFrameLength, barsFrameHeight, frameWidth, color);
-        FontManager.getInstance().drawString(FONT, posXLabel1, posYLabel1, "HP", Color.white);
-        FontManager.getInstance().drawString(FONT, posXLabel2, posYLabel2, "MP", Color.white);
-        FontManager.getInstance().drawString(FONT, posXLabel3, posYLabel3, "XP", Color.white);
+        fontManager.drawString(FONT, posXLabel1, posYLabel1, "HP", Color.white);
+        fontManager.drawString(FONT, posXLabel2, posYLabel2, "MP", Color.white);
+        fontManager.drawString(FONT, posXLabel3, posYLabel3, "XP", Color.white);
 
         Toolbox.drawFrame(posXCharacsFrame, posYCharacsFrame, characsFrameLength, characsFrameHeight, frameWidth, color);
-        FontManager.getInstance().drawString(FONT, posXCharacsStrengthLabel, posYCharacsStrengthLabel, "S", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsEnduranceLabel, posYCharacsEnduranceLabel, "E", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsIntelligenceLabel, posYCharacsIntelligenceLabel, "I", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsWillLabel, posYCharacsWillLabel, "W", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsAgilityLabel, posYCharacsAgilityLabel, "A", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsMoveLabel, posYCharacsMoveLabel, "M", Color.white);
+        fontManager.drawString(FONT, posXCharacsStrengthLabel, posYCharacsStrengthLabel, "S", Color.white);
+        fontManager.drawString(FONT, posXCharacsEnduranceLabel, posYCharacsEnduranceLabel, "E", Color.white);
+        fontManager.drawString(FONT, posXCharacsIntelligenceLabel, posYCharacsIntelligenceLabel, "I", Color.white);
+        fontManager.drawString(FONT, posXCharacsWillLabel, posYCharacsWillLabel, "W", Color.white);
+        fontManager.drawString(FONT, posXCharacsAgilityLabel, posYCharacsAgilityLabel, "A", Color.white);
+        fontManager.drawString(FONT, posXCharacsMoveLabel, posYCharacsMoveLabel, "M", Color.white);
 
-        FontManager.getInstance().drawString(FONT, posXCharacsStrength, posYCharacsStrength, String.valueOf(character.getStrength()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsEndurance, posYCharacsEndurance, String.valueOf(character.getEndurance()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsIntelligence, posYCharacsIntelligence, String.valueOf(character.getIntelligence()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsWill, posYCharacsWill, String.valueOf(character.getWill()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsAgility, posYCharacsAgility, String.valueOf(character.getIntelligence()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsMove, posYCharacsMove, String.valueOf(character.getMovement()), Color.white);
+        fontManager.drawString(FONT, posXCharacsStrength, posYCharacsStrength, String.valueOf(character.getStrength()), Color.white);
+        fontManager.drawString(FONT, posXCharacsEndurance, posYCharacsEndurance, String.valueOf(character.getEndurance()), Color.white);
+        fontManager.drawString(FONT, posXCharacsIntelligence, posYCharacsIntelligence, String.valueOf(character.getIntelligence()), Color.white);
+        fontManager.drawString(FONT, posXCharacsWill, posYCharacsWill, String.valueOf(character.getWill()), Color.white);
+        fontManager.drawString(FONT, posXCharacsAgility, posYCharacsAgility, String.valueOf(character.getIntelligence()), Color.white);
+        fontManager.drawString(FONT, posXCharacsMove, posYCharacsMove, String.valueOf(character.getMovement()), Color.white);
 
         Toolbox.drawFrame(posXJobFrame, posYJobFrame, jobFrameLength, jobFrameHeight, frameWidth, color);
-        FontManager.getInstance().drawString(FONT, posXJob, posYJob, character.getJob(character.getCurrentJob()).getName(), Color.white);
-        FontManager.getInstance().drawString(FONT, posXJobPoints, posYJobPoints, "JP : " + character.getJob(character.getCurrentJob()).getJobPoints(), Color.white);
+        fontManager.drawString(FONT, posXJob, posYJob, character.getJob(character.getCurrentJob()).getName(), Color.white);
+        fontManager.drawString(FONT, posXJobPoints, posYJobPoints, "JP : " + character.getJob(character.getCurrentJob()).getJobPoints(), Color.white);
 
         experienceBar.render();
         lifeBar.render();

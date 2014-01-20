@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import lombok.extern.slf4j.Slf4j;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -19,6 +20,9 @@ public class MenuSelectCapacity {
     private int index;
     private List<Move> moveList;
     private int currentMana;
+
+    @Autowired
+    private FontManager fontManager;
 
     public MenuSelectCapacity(int posX, int posY, int frameLength, int frameHeight, int frameWidth, List<Move> moveList, int currentMana) {
         this.posX = posX;
@@ -42,14 +46,14 @@ public class MenuSelectCapacity {
             int optionY = posY;
             optionY += optionHeight;
             for (int i = 0; i < moveList.size(); i++) {
-                int optionX = posX + ((frameLength - FontManager.getInstance().getFontMap().get(FONT).getWidth(moveList.get(i).getName())) / 2);
+                int optionX = posX + ((frameLength - fontManager.getFontMap().get(FONT).getWidth(moveList.get(i).getName())) / 2);
                 if (moveList.get(index).equals(moveList.get(i))) {
-                    FontManager.getInstance().drawString(FONT, optionX, optionY, moveList.get(i).getName(), Color.yellow);
+                    fontManager.drawString(FONT, optionX, optionY, moveList.get(i).getName(), Color.yellow);
                 } else {
                     if (moveList.get(i).getManaCost() <= currentMana) {
-                        FontManager.getInstance().drawString(FONT, optionX, optionY, moveList.get(i).getName(), Color.white);
+                        fontManager.drawString(FONT, optionX, optionY, moveList.get(i).getName(), Color.white);
                     } else {
-                        FontManager.getInstance().drawString(FONT, optionX, optionY, moveList.get(i).getName(), Color.gray);
+                        fontManager.drawString(FONT, optionX, optionY, moveList.get(i).getName(), Color.gray);
                     }
                 }
                 optionY += optionHeight;

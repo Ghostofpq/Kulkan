@@ -7,12 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class TextField extends HUDElement {
     private final String FONT = "optimus_princeps_16";
     protected String content;
     private int maxLength;
+    @Autowired
+    private FontManager fontManager;
 
     public TextField(int posX, int posY, int length, int height, int maxLength) {
         this.posX = posX;
@@ -47,10 +50,10 @@ public class TextField extends HUDElement {
         GL11.glEnd();
 
 
-        int posXText = posX + (width - FontManager.getInstance().getFontMap().get(FONT).getWidth(getContentToPrint())) / 2;
-        int posYText = posY + (height - FontManager.getInstance().getFontMap().get(FONT).getHeight(getContentToPrint())) / 2;
+        int posXText = posX + (width - fontManager.getFontMap().get(FONT).getWidth(getContentToPrint())) / 2;
+        int posYText = posY + (height - fontManager.getFontMap().get(FONT).getHeight(getContentToPrint())) / 2;
 
-        FontManager.getInstance().drawString(FONT, posXText, posYText, getContentToPrint(), Color.white);
+        fontManager.drawString(FONT, posXText, posYText, getContentToPrint(), Color.white);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 

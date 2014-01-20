@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.client.utils.FontManager;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,8 @@ public class TextArea extends HUDElement {
     private String fontName = "optimus_princeps_16";
     private int maxLength;
     private int numberOfLineToShow;
+    @Autowired
+    private FontManager fontManager;
 
     public TextArea(int posX, int posY, int maxLength, int numberOfLineToShow) {
         this.posX = posX;
@@ -29,9 +32,9 @@ public class TextArea extends HUDElement {
     public TextArea(int posX, int posY, int width, int height, String fontName) {
         this.posX = posX;
         this.posY = posY;
-        this.maxLength = width / (FontManager.getInstance().getFontMap().get(fontName).getWidth("a"));
+        this.maxLength = width / (fontManager.getFontMap().get(fontName).getWidth("a"));
         this.hasFocus = false;
-        this.numberOfLineToShow = height / (FontManager.getInstance().getFontMap().get(fontName).getHeight("A"));
+        this.numberOfLineToShow = height / (fontManager.getFontMap().get(fontName).getHeight("A"));
         this.fontName = fontName;
         textInputs = new ArrayList<String>();
     }
@@ -44,8 +47,8 @@ public class TextArea extends HUDElement {
             for (int i = 1; i <= numberOfLineToShow; i++) {
                 if (textInputs.size() - i >= 0) {
                     int posXText = posX;
-                    int posYText = posY + (numberOfLineToShow - i) * FontManager.getInstance().getFontMap().get(fontName).getHeight("AAA");
-                    FontManager.getInstance().drawString(fontName, posXText, posYText, textInputs.get(textInputs.size() - i), Color.white);
+                    int posYText = posY + (numberOfLineToShow - i) * fontManager.getFontMap().get(fontName).getHeight("AAA");
+                    fontManager.drawString(fontName, posXText, posYText, textInputs.get(textInputs.size() - i), Color.white);
                 } else {
                     break;
                 }

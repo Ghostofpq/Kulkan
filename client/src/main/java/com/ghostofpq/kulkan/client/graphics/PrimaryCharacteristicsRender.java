@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.client.graphics;
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class PrimaryCharacteristicsRender extends HUDElement {
     private final String FONT = "optimus_princeps_16";
@@ -46,6 +47,8 @@ public class PrimaryCharacteristicsRender extends HUDElement {
     // Characs Move Position
     private int posXCharacsMove;
     private int posYCharacsMove;
+    @Autowired
+    private FontManager fontManager;
 
     public PrimaryCharacteristicsRender(int posX, int posY, int length, int height, PrimaryCharacteristics primaryCharacteristics) {
         this.posX = posX;
@@ -57,7 +60,7 @@ public class PrimaryCharacteristicsRender extends HUDElement {
 
         widthStep = length / 6;
         heightStep = height / 3;
-        fontStep = (heightStep - FontManager.getInstance().getFontMap().get(FONT).getHeight("Testouilles")) / 2;
+        fontStep = (heightStep - fontManager.getFontMap().get(FONT).getHeight("Testouilles")) / 2;
 
         posXCharacsStrengthLabel = posX;
         posYCharacsStrengthLabel = posY + fontStep;
@@ -98,17 +101,17 @@ public class PrimaryCharacteristicsRender extends HUDElement {
 
     @Override
     public void draw() {
-        FontManager.getInstance().drawString(FONT, posXCharacsStrengthLabel, posYCharacsStrengthLabel, "Strength", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsStrength, posYCharacsStrength, String.valueOf(primaryCharacteristics.getStrength()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsEnduranceLabel, posYCharacsEnduranceLabel, "Endurance", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsEndurance, posYCharacsEndurance, String.valueOf(primaryCharacteristics.getEndurance()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsIntelligenceLabel, posYCharacsIntelligenceLabel, "Intelligence", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsIntelligence, posYCharacsIntelligence, String.valueOf(primaryCharacteristics.getIntelligence()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsWillLabel, posYCharacsWillLabel, "Will", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsWill, posYCharacsWill, String.valueOf(primaryCharacteristics.getWill()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsAgilityLabel, posYCharacsAgilityLabel, "Agility", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsAgility, posYCharacsAgility, String.valueOf(primaryCharacteristics.getAgility()), Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsMoveLabel, posYCharacsMoveLabel, "Movement", Color.white);
-        FontManager.getInstance().drawString(FONT, posXCharacsMove, posYCharacsMove, String.valueOf(primaryCharacteristics.getMovement()), Color.white);
+        fontManager.drawString(FONT, posXCharacsStrengthLabel, posYCharacsStrengthLabel, "Strength", Color.white);
+        fontManager.drawString(FONT, posXCharacsStrength, posYCharacsStrength, String.valueOf(primaryCharacteristics.getStrength()), Color.white);
+        fontManager.drawString(FONT, posXCharacsEnduranceLabel, posYCharacsEnduranceLabel, "Endurance", Color.white);
+        fontManager.drawString(FONT, posXCharacsEndurance, posYCharacsEndurance, String.valueOf(primaryCharacteristics.getEndurance()), Color.white);
+        fontManager.drawString(FONT, posXCharacsIntelligenceLabel, posYCharacsIntelligenceLabel, "Intelligence", Color.white);
+        fontManager.drawString(FONT, posXCharacsIntelligence, posYCharacsIntelligence, String.valueOf(primaryCharacteristics.getIntelligence()), Color.white);
+        fontManager.drawString(FONT, posXCharacsWillLabel, posYCharacsWillLabel, "Will", Color.white);
+        fontManager.drawString(FONT, posXCharacsWill, posYCharacsWill, String.valueOf(primaryCharacteristics.getWill()), Color.white);
+        fontManager.drawString(FONT, posXCharacsAgilityLabel, posYCharacsAgilityLabel, "Agility", Color.white);
+        fontManager.drawString(FONT, posXCharacsAgility, posYCharacsAgility, String.valueOf(primaryCharacteristics.getAgility()), Color.white);
+        fontManager.drawString(FONT, posXCharacsMoveLabel, posYCharacsMoveLabel, "Movement", Color.white);
+        fontManager.drawString(FONT, posXCharacsMove, posYCharacsMove, String.valueOf(primaryCharacteristics.getMovement()), Color.white);
     }
 }

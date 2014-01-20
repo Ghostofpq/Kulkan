@@ -6,12 +6,15 @@ import com.ghostofpq.kulkan.client.utils.TextureManager;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class Button extends HUDElement {
     private final String FONT = "optimus_princeps_16";
     protected String label;
     private TextureKey customTexture;
     private TextureKey customTextureFocus;
+    @Autowired
+    private FontManager fontManager;
 
     public Button(int posX, int posY, int width, int height, String label) {
         this.posX = posX;
@@ -60,10 +63,10 @@ public abstract class Button extends HUDElement {
         GL11.glEnd();
 
 
-        int posXText = posX + (width - FontManager.getInstance().getFontMap().get(FONT).getWidth(label)) / 2;
-        int posYText = posY + (height - FontManager.getInstance().getFontMap().get(FONT).getHeight(label)) / 2;
+        int posXText = posX + (width - fontManager.getFontMap().get(FONT).getWidth(label)) / 2;
+        int posYText = posY + (height - fontManager.getFontMap().get(FONT).getHeight(label)) / 2;
 
-        FontManager.getInstance().drawString(FONT, posXText, posYText, label, Color.white);
+        fontManager.drawString(FONT, posXText, posYText, label, Color.white);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 

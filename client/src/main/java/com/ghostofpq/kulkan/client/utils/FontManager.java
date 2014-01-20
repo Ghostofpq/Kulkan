@@ -8,13 +8,10 @@ import org.newdawn.slick.SlickException;
 import java.util.HashMap;
 
 public class FontManager {
-
-    private static FontManager instance = new FontManager();
     private HashMap<String, AngelCodeFont> fontMap;
 
     private FontManager() {
         fontMap = new HashMap<String, AngelCodeFont>();
-
         try {
             fontMap.put("arial_16", new AngelCodeFont("resources/HUD/font/Arial/arial_16_white.fnt", "resources/HUD/font/Arial/arial_16_white.png"));
             fontMap.put("arial_12", new AngelCodeFont("resources/HUD/font/Arial/arial_12_white.fnt", "resources/HUD/font/Arial/arial_12_white.png"));
@@ -22,17 +19,6 @@ public class FontManager {
         } catch (SlickException e) {
             e.printStackTrace();
         }
-    }
-
-    public static FontManager getInstance() {
-        if (instance == null) {
-            synchronized (FontManager.class) {
-                if (instance == null) {
-                    instance = new FontManager();
-                }
-            }
-        }
-        return instance;
     }
 
     public void drawString(String font, int x, int y, String str, Color color) {
@@ -54,7 +40,6 @@ public class FontManager {
     /**
      * Getters and Setters
      */
-
     public HashMap<String, AngelCodeFont> getFontMap() {
         return fontMap;
     }

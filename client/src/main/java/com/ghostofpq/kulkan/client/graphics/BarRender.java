@@ -4,19 +4,22 @@ import com.ghostofpq.kulkan.client.utils.FontManager;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class BarRender {
-    Color colorBack;
-    Color color;
-    float posXBegin;
-    float posYUp;
-    float posXEnd;
-    float posYDown;
-    float posXSeparation;
-    float posYSeparation;
-    float posX4;
-    float posY4;
-    String text;
+    private Color colorBack;
+    private Color color;
+    private float posXBegin;
+    private float posYUp;
+    private float posXEnd;
+    private float posYDown;
+    private float posXSeparation;
+    private float posYSeparation;
+    private float posX4;
+    private float posY4;
+    private String text;
+    @Autowired
+    private FontManager fontManager;
 
     public BarRender(float value, float maxValue, float posX, float posY, float width, float height, Color color, Color colorBack) {
         this.posXBegin = posX;
@@ -31,7 +34,7 @@ public class BarRender {
         builder.append((int) maxValue);
         text = builder.toString();
 
-        AngelCodeFont font = FontManager.getInstance().getFontMap().get("optimus_princeps_16");
+        AngelCodeFont font = fontManager.getFontMap().get("optimus_princeps_16");
 
         this.posX4 = posX + ((width - font.getWidth(text)) / 2);
         this.posY4 = posY + ((height - font.getHeight(text)) / 2);
@@ -62,6 +65,6 @@ public class BarRender {
         GL11.glVertex2f(posXSeparation, posYDown);
         GL11.glEnd();
 
-        FontManager.getInstance().drawString("optimus_princeps_16", (int) posX4, (int) posY4, text, Color.black);
+        fontManager.drawString("optimus_princeps_16", (int) posX4, (int) posY4, text, Color.black);
     }
 }

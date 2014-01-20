@@ -2,6 +2,7 @@ package com.ghostofpq.kulkan.client.graphics;
 
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import org.newdawn.slick.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class KeyValueRender extends HUDElement {
     private final String FONT = "optimus_princeps_16";
@@ -14,6 +15,9 @@ public class KeyValueRender extends HUDElement {
     private int posXValue;
     private int posYValue;
 
+    @Autowired
+    private FontManager fontManager;
+
     public KeyValueRender(int posX, int posY, int width, int height, String key, String value, int ratio) {
         this.posX = posX;
         this.posY = posY;
@@ -24,7 +28,7 @@ public class KeyValueRender extends HUDElement {
         this.value = value;
 
         int widthStep = width / 10;
-        int fontStep = (height - FontManager.getInstance().getFontMap().get(FONT).getHeight("Testouilles")) / 2;
+        int fontStep = (height - fontManager.getFontMap().get(FONT).getHeight("Testouilles")) / 2;
 
         posXKey = posX;
         posYKey = posY + fontStep;
@@ -35,8 +39,8 @@ public class KeyValueRender extends HUDElement {
 
     @Override
     public void draw() {
-        FontManager.getInstance().drawString(FONT, posXKey, posYKey, key, Color.white);
-        FontManager.getInstance().drawString(FONT, posXValue, posYValue, value, Color.white);
+        fontManager.drawString(FONT, posXKey, posYKey, key, Color.white);
+        fontManager.drawString(FONT, posXValue, posYValue, value, Color.white);
     }
 
     public void setValue(String value) {
