@@ -21,11 +21,9 @@ import java.util.List;
 public class LobbyManager implements Runnable {
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
-    private AuthenticationManager authenticationManager;
     private String hostIp;
     private Integer hostPort;
     private Connection connection;
-    private MatchmakingManager matchmakingManager;
     private List<String> connectedClients;
     private List<String> pongClients;
     private Channel channelOut;
@@ -36,6 +34,10 @@ public class LobbyManager implements Runnable {
     private boolean requestClose;
     @Autowired
     private UserController userController;
+    @Autowired
+    private MatchmakingManager matchmakingManager;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     private LobbyManager() {
         requestClose = false;

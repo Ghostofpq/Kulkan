@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
          http://www.springframework.org/schema/beans/spring-beans.xsd
          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
@@ -22,13 +22,7 @@
     <mongo:repositories base-package="com.ghostofpq.kulkan.server.database.repository"/>
 
 
-    <bean id="server"
-          class="com.ghostofpq.kulkan.server.Server">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="gameManager" ref="gameManager"/>
-        <property name="lobbyManager" ref="lobbyManager"/>
-        <property name="matchmakingManager" ref="matchmakingManager"/>
-    </bean>
+    <bean id="server" class="com.ghostofpq.kulkan.server.Server"/>
 
     <bean id="gameManager"
           class="com.ghostofpq.kulkan.server.game.GameManager">
@@ -52,17 +46,12 @@
 
     <bean id="lobbyManager"
           class="com.ghostofpq.kulkan.server.lobby.LobbyManager">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="matchmakingManager" ref="matchmakingManager"/>
         <property name="hostIp" value="${host.ip}"/>
         <property name="hostPort" value="${host.port}"/>
     </bean>
 
     <bean id="matchmakingManager"
           class="com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager">
-        <property name="authenticationManager" ref="authenticationManager"/>
-        <property name="gameManager" ref="gameManager"/>
-        <property name="lobbyManager" ref="lobbyManager"/>
         <property name="hostIp" value="${host.ip}"/>
         <property name="hostPort" value="${host.port}"/>
     </bean>

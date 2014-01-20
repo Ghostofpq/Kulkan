@@ -31,9 +31,6 @@ public class MatchmakingManager implements Runnable {
     private String hostIp;
     private Integer hostPort;
     private Connection connection;
-    private AuthenticationManager authenticationManager;
-    private LobbyManager lobbyManager;
-    private GameManager gameManager;
     private List<String> subscribedClients;
     private Map<String, Match> matchMap;
     private Channel channelOut;
@@ -42,6 +39,12 @@ public class MatchmakingManager implements Runnable {
     private int matchmapIncrementor;
     @Autowired
     private UserController userController;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private LobbyManager lobbyManager;
+    @Autowired
+    private GameManager gameManager;
     // THREAD ROUTINE
     private boolean requestClose;
 

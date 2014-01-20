@@ -5,7 +5,6 @@ import com.ghostofpq.kulkan.client.utils.FontManager;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +15,7 @@ public class TextArea extends HUDElement {
     private String fontName = "optimus_princeps_16";
     private int maxLength;
     private int numberOfLineToShow;
-    @Autowired
-    private FontManager fontManager;
+    private FontManager fontManager = FontManager.getInstance();
 
     public TextArea(int posX, int posY, int maxLength, int numberOfLineToShow) {
         this.posX = posX;

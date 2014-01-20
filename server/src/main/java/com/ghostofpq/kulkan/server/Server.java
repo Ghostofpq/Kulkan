@@ -25,9 +25,13 @@ public class Server {
     private Thread lobbyManagerThread;
     private Thread userServiceThread;
     private Thread matchmakingManagerThread;
+    @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
     private LobbyManager lobbyManager;
+    @Autowired
     private GameManager gameManager;
+    @Autowired
     private MatchmakingManager matchmakingManager;
     @Autowired
     private UserService userService;
