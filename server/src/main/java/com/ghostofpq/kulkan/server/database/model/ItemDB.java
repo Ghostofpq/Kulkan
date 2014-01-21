@@ -5,7 +5,6 @@ import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.utils.Range;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 @Document
-@Slf4j
 public class ItemDB {
     @Id
     private ObjectId id;
@@ -132,6 +130,78 @@ public class ItemDB {
                 break;
         }
         return result;
+    }
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
+    public ItemType getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(ItemType itemType) {
+        this.itemType = itemType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Map<CharacteristicName, Integer> getBonusCharacteristics() {
+        return bonusCharacteristics;
+    }
+
+    public void setBonusCharacteristics(Map<CharacteristicName, Integer> bonusCharacteristics) {
+        this.bonusCharacteristics = bonusCharacteristics;
+    }
+
+    public List<JobType> getAuthorizedJobs() {
+        return authorizedJobs;
+    }
+
+    public void setAuthorizedJobs(List<JobType> authorizedJobs) {
+        this.authorizedJobs = authorizedJobs;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public Range getRange() {
+        return range;
+    }
+
+    public void setRange(Range range) {
+        this.range = range;
+    }
+
+    public WeaponType getWeaponType() {
+        return weaponType;
+    }
+
+    public void setWeaponType(WeaponType weaponType) {
+        this.weaponType = weaponType;
     }
 
     public enum CharacteristicName {
