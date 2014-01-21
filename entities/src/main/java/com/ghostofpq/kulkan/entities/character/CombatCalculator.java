@@ -4,9 +4,6 @@ import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 @Slf4j
 public class CombatCalculator {
 
@@ -37,19 +34,12 @@ public class CombatCalculator {
         double estimatedDamageD = ratio * attackingChar.getAttackDamage() * 10;
         estimatedDamage = (int) Math.floor(estimatedDamageD);
 
-        BigDecimal applicableEscapeRate = targetedChar.getEscape().min(attackingChar.getPrecision());
-        applicableEscapeRate.setScale(0, RoundingMode.DOWN);
-        BigDecimal applicableCriticalChance = attackingChar.getCriticalStrike().min(targetedChar.getResilience());
-        applicableCriticalChance.setScale(0, RoundingMode.DOWN);
-        if (applicableEscapeRate.intValue() <= 0) {
-            applicableEscapeRate = new BigDecimal("0");
-        }
-        if (applicableCriticalChance.intValue() <= 0) {
-            applicableCriticalChance = new BigDecimal("0");
-        }
-        chanceToHit = 100 - applicableEscapeRate.intValue() + hitBonus;
+        int applicableEscapeRate = Math.max(targetedChar.getEscape() - attackingChar.getPrecision(), 0);
+        int applicableCriticalChance = Math.max(attackingChar.getCriticalStrike() - targetedChar.getResilience(), 0);
+
+        chanceToHit = 100 - (applicableEscapeRate / 100) + hitBonus;
         chanceToHit = Math.min(Math.max(chanceToHit, 0), 100);
-        chanceToCriticalHit = applicableCriticalChance.intValue() + critBonus;
+        chanceToCriticalHit = (applicableCriticalChance / 100) + critBonus;
         chanceToCriticalHit = Math.min(Math.max(chanceToCriticalHit, 0), 100);
     }
 
@@ -155,10 +145,6 @@ public class CombatCalculator {
         return result;
     }
 
-    public enum Facing {
-        FACE, FLANK, BACK
-    }
-
     public int getEstimatedDamage() {
         return estimatedDamage;
     }
@@ -169,5 +155,9 @@ public class CombatCalculator {
 
     public int getChanceToCriticalHit() {
         return chanceToCriticalHit;
+    }
+
+    public enum Facing {
+        FACE, FLANK, BACK
     }
 }

@@ -108,20 +108,4 @@ public class Server {
         SaveManager saveManager = SaveManager.getInstance();
         saveManager.saveMap(battlefield, "mapTest1");
     }
-
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
-    public void setLobbyManager(LobbyManager lobbyManager) {
-        this.lobbyManager = lobbyManager;
-    }
-
-    public void setGameManager(GameManager gameManager) {
-        this.gameManager = gameManager;
-    }
-
-    public void setMatchmakingManager(MatchmakingManager matchmakingManager) {
-        this.matchmakingManager = matchmakingManager;
-    }
 }

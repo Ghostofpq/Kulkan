@@ -1,8 +1,6 @@
 package com.ghostofpq.kulkan.entities.characteristics;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class SecondaryCharacteristics implements Serializable {
 
@@ -16,10 +14,10 @@ public class SecondaryCharacteristics implements Serializable {
     private int speed;
     private int lifeRegeneration;
     private int manaRegeneration;
-    private BigDecimal escape;
-    private BigDecimal criticalStrike;
-    private BigDecimal precision;
-    private BigDecimal resilience;
+    private int escape;
+    private int criticalStrike;
+    private int precision;
+    private int resilience;
 
     public SecondaryCharacteristics() {
         attackDamage = 0;
@@ -36,21 +34,17 @@ public class SecondaryCharacteristics implements Serializable {
         lifeRegeneration = 0;
         manaRegeneration = 0;
 
-        escape = new BigDecimal("0.00");
-        escape.setScale(2, RoundingMode.DOWN);
-        criticalStrike = new BigDecimal("0.00");
-        criticalStrike.setScale(2, RoundingMode.DOWN);
-        precision = new BigDecimal("0.00");
-        precision.setScale(2, RoundingMode.DOWN);
-        resilience = new BigDecimal("0.00");
-        resilience.setScale(2, RoundingMode.DOWN);
+        escape = 0;
+        criticalStrike = 0;
+        precision = 0;
+        resilience = 0;
     }
 
     public SecondaryCharacteristics(int attackDamage, int magicalDamage,
                                     int armor, int magicResist, int armorPenetration,
                                     int magicPenetration, int speed, int lifeRegeneration,
-                                    int manaRegeneration, BigDecimal escape, BigDecimal criticalStrike,
-                                    BigDecimal precision, BigDecimal resilience) {
+                                    int manaRegeneration, int escape, int criticalStrike,
+                                    int precision, int resilience) {
         this.attackDamage = attackDamage;
         this.magicalDamage = magicalDamage;
 
@@ -66,13 +60,9 @@ public class SecondaryCharacteristics implements Serializable {
         this.manaRegeneration = manaRegeneration;
 
         this.escape = escape;
-        this.escape.setScale(2, RoundingMode.DOWN);
         this.criticalStrike = criticalStrike;
-        this.criticalStrike.setScale(2, RoundingMode.DOWN);
         this.precision = precision;
-        this.precision.setScale(2, RoundingMode.DOWN);
         this.resilience = resilience;
-        this.resilience.setScale(2, RoundingMode.DOWN);
     }
 
     public SecondaryCharacteristics(PrimaryCharacteristics characteristics) {
@@ -90,20 +80,10 @@ public class SecondaryCharacteristics implements Serializable {
         lifeRegeneration = 0;
         manaRegeneration = 0;
 
-        double escapeD = characteristics.getAgility() / 1000;
-        escape = new BigDecimal(escapeD);
-        escape.setScale(2, RoundingMode.DOWN);
-        double criticalStrikeD = characteristics.getAgility() / 1000;
-        criticalStrike = new BigDecimal(criticalStrikeD);
-        criticalStrike.setScale(2, RoundingMode.DOWN);
-        double precisionD = Math.max(characteristics.getStrength(),
-                characteristics.getIntelligence()) / 1000;
-        precision = new BigDecimal(precisionD);
-        precision.setScale(2, RoundingMode.DOWN);
-        double resilienceD = Math.max(characteristics.getEndurance(),
-                characteristics.getWill()) / 1000;
-        resilience = new BigDecimal(resilienceD);
-        resilience.setScale(2, RoundingMode.DOWN);
+        escape = characteristics.getAgility() / 10;
+        criticalStrike = characteristics.getAgility() / 10;
+        precision = Math.max(characteristics.getStrength(), characteristics.getIntelligence()) / 10;
+        resilience = Math.max(characteristics.getEndurance(), characteristics.getWill()) / 10;
     }
 
     public void plus(SecondaryCharacteristics secondaryCharacteristics) {
@@ -121,10 +101,10 @@ public class SecondaryCharacteristics implements Serializable {
         lifeRegeneration += secondaryCharacteristics.getLifeRegeneration();
         manaRegeneration += secondaryCharacteristics.getManaRegeneration();
 
-        escape = escape.add(secondaryCharacteristics.getEscape());
-        criticalStrike = criticalStrike.add(secondaryCharacteristics.getCriticalStrike());
-        precision = precision.add(secondaryCharacteristics.getPrecision());
-        resilience = resilience.add(secondaryCharacteristics.getResilience());
+        escape += secondaryCharacteristics.getEscape();
+        criticalStrike += secondaryCharacteristics.getCriticalStrike();
+        precision += secondaryCharacteristics.getPrecision();
+        resilience += secondaryCharacteristics.getResilience();
     }
 
     /*
@@ -203,35 +183,35 @@ public class SecondaryCharacteristics implements Serializable {
         this.manaRegeneration = manaRegeneration;
     }
 
-    public BigDecimal getEscape() {
+    public int getEscape() {
         return escape;
     }
 
-    public void setEscape(BigDecimal escape) {
+    public void setEscape(int escape) {
         this.escape = escape;
     }
 
-    public BigDecimal getCriticalStrike() {
+    public int getCriticalStrike() {
         return criticalStrike;
     }
 
-    public void setCriticalStrike(BigDecimal criticalStrike) {
+    public void setCriticalStrike(int criticalStrike) {
         this.criticalStrike = criticalStrike;
     }
 
-    public BigDecimal getPrecision() {
+    public int getPrecision() {
         return precision;
     }
 
-    public void setPrecision(BigDecimal precision) {
+    public void setPrecision(int precision) {
         this.precision = precision;
     }
 
-    public BigDecimal getResilience() {
+    public int getResilience() {
         return resilience;
     }
 
-    public void setResilience(BigDecimal resilience) {
+    public void setResilience(int resilience) {
         this.resilience = resilience;
     }
 }

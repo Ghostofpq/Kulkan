@@ -18,7 +18,6 @@ import com.ghostofpq.kulkan.entities.utils.RangeType;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 public class GameCharacter implements Serializable {
     private static final long serialVersionUID = 1519266158170332774L;
@@ -464,19 +463,19 @@ public class GameCharacter implements Serializable {
         return getAggregatedSecondaryCharacteristics().getManaRegeneration();
     }
 
-    public BigDecimal getEscape() {
+    public int getEscape() {
         return getAggregatedSecondaryCharacteristics().getEscape();
     }
 
-    public BigDecimal getCriticalStrike() {
+    public int getCriticalStrike() {
         return getAggregatedSecondaryCharacteristics().getCriticalStrike();
     }
 
-    public BigDecimal getPrecision() {
+    public int getPrecision() {
         return getAggregatedSecondaryCharacteristics().getPrecision();
     }
 
-    public BigDecimal getResilience() {
+    public int getResilience() {
         return getAggregatedSecondaryCharacteristics().getResilience();
     }
 

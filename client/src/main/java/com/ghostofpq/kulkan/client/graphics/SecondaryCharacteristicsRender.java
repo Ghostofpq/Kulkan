@@ -156,15 +156,15 @@ public class SecondaryCharacteristicsRender extends HUDElement {
         fontManager.drawString(FONT, posXCharacsMagicPen, posYCharacsMagicPen, String.valueOf(secondaryCharacteristics.getMagicPenetration()), Color.white);
 
         fontManager.drawString(FONT, posXCharacsPrecisionLabel, posYCharacsPrecisionLabel, "Precision", Color.white);
-        fontManager.drawString(FONT, posXCharacsPrecision, posYCharacsPrecision, String.valueOf(secondaryCharacteristics.getPrecision()), Color.white);
+        fontManager.drawString(FONT, posXCharacsPrecision, posYCharacsPrecision, String.valueOf((float) (secondaryCharacteristics.getPrecision() / 100)), Color.white);
 
         fontManager.drawString(FONT, posXCharacsEscapeLabel, posYCharacsEscapeLabel, "Escape", Color.white);
-        fontManager.drawString(FONT, posXCharacsEscape, posYCharacsEscape, String.valueOf(secondaryCharacteristics.getEscape()), Color.white);
+        fontManager.drawString(FONT, posXCharacsEscape, posYCharacsEscape, String.valueOf((float) (secondaryCharacteristics.getEscape() / 100)), Color.white);
 
         fontManager.drawString(FONT, posXCharacsCriticalStrikeLabel, posYCharacsCriticalStrikeLabel, "Critical Strike", Color.white);
-        fontManager.drawString(FONT, posXCharacsCriticalStrike, posYCharacsCriticalStrike, String.valueOf(secondaryCharacteristics.getCriticalStrike()), Color.white);
+        fontManager.drawString(FONT, posXCharacsCriticalStrike, posYCharacsCriticalStrike, String.valueOf((float) (secondaryCharacteristics.getCriticalStrike() / 100)), Color.white);
 
         fontManager.drawString(FONT, posXCharacsResilienceLabel, posYCharacsResilienceLabel, "Resilience", Color.white);
-        fontManager.drawString(FONT, posXCharacsResilience, posYCharacsResilience, String.valueOf(secondaryCharacteristics.getResilience()), Color.white);
+        fontManager.drawString(FONT, posXCharacsResilience, posYCharacsResilience, String.valueOf((float) (secondaryCharacteristics.getResilience() / 100)), Color.white);
     }
 }
