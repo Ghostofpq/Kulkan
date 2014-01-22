@@ -1,16 +1,16 @@
 package com.ghostofpq.kulkan.server.database.repository;
 
-import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
+import com.ghostofpq.kulkan.server.database.model.ItemDB;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ItemRepository extends MongoRepository<Item, Long> {
-    public List<Item> findByName(String name);
+public interface ItemRepository extends MongoRepository<ItemDB, Long> {
+    public List<ItemDB> findByName(String name);
 
-    public List<Item> findByItemType(ItemType itemType);
+    public List<ItemDB> findByItemType(ItemType itemType);
 }
 
