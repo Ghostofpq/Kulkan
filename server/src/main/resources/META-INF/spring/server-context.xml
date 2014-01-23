@@ -21,7 +21,6 @@
 
     <mongo:repositories base-package="com.ghostofpq.kulkan.server.database.repository"/>
 
-
     <bean id="server" class="com.ghostofpq.kulkan.server.Server"/>
 
     <bean id="gameManager"
@@ -29,6 +28,7 @@
         <property name="hostIp" value="${host.ip}"/>
         <property name="hostPort" value="${host.port}"/>
     </bean>
+
     <bean id="authenticationManager"
           class="com.ghostofpq.kulkan.server.authentication.AuthenticationManager">
         <property name="hostIp" value="${host.ip}"/>
@@ -43,6 +43,11 @@
         <property name="authKeySize" value="${authentication.key.size}"/>
     </bean>
 
+    <bean id="itemService"
+          class="com.ghostofpq.kulkan.server.database.ItemService">
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
+    </bean>
 
     <bean id="lobbyManager"
           class="com.ghostofpq.kulkan.server.lobby.LobbyManager">

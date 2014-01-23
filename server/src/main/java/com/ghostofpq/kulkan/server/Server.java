@@ -5,8 +5,8 @@ import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
+import com.ghostofpq.kulkan.server.database.ItemService;
 import com.ghostofpq.kulkan.server.database.UserService;
-import com.ghostofpq.kulkan.server.database.controller.ItemController;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
@@ -25,6 +25,7 @@ public class Server {
     private Thread authThread;
     private Thread lobbyManagerThread;
     private Thread userServiceThread;
+    private Thread itemServiceThread;
     private Thread matchmakingManagerThread;
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -37,7 +38,7 @@ public class Server {
     @Autowired
     private UserService userService;
     @Autowired
-    private ItemController itemController;
+    private ItemService itemService;
 
     private Server() {
     }
@@ -66,8 +67,8 @@ public class Server {
         lobbyManagerThread = new Thread(lobbyManager);
         lobbyManagerThread.start();
         matchmakingManagerThread = new Thread(matchmakingManager);
-        matchmakingManagerThread.start();
-        itemController.populateItemRepository();
+        itemServiceThread = new Thread(itemService);
+        itemServiceThread.start();
     }
 
     public void shutDown() {
@@ -81,6 +82,8 @@ public class Server {
         lobbyManagerThread.interrupt();
         matchmakingManager.setRequestClose(true);
         matchmakingManagerThread.interrupt();
+        itemService.setRequestClose(true);
+        itemServiceThread.interrupt();
     }
 
     public void createMap() {
