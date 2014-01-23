@@ -34,7 +34,6 @@ public class ItemService implements Runnable {
     private boolean requestClose;
 
     private ItemService() {
-        itemController.populateItemRepository();
         requestClose = false;
     }
 

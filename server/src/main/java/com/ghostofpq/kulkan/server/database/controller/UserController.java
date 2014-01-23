@@ -2,7 +2,6 @@ package com.ghostofpq.kulkan.server.database.controller;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
-import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.job.Job;
@@ -23,6 +22,8 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ItemController itemController;
     private Integer tokenKeySize;
 
     public User generateTokenKeyForUser(User user) {
@@ -257,7 +258,7 @@ public class UserController {
     public User buyItem(String tokenKey, String itemId) {
         User user = getUserForTokenKey(tokenKey);
         if (null != user) {
-            Item itemToBuy = ItemFactory.createItem(itemId);
+            Item itemToBuy = itemController.getItemById(itemId);
             if (null != itemToBuy) {
                 if (itemToBuy.getPrice() <= user.getMoney()) {
                     log.debug("{} just bought a {}", user.getFirstName(), itemToBuy.getName());
@@ -284,8 +285,10 @@ public class UserController {
             allGameCharactersForUser.addAll(user.getStock());
             for (GameCharacterDB gameCharacter : allGameCharactersForUser) {
                 if (gameCharacter.getId().equals(gameCharId)) {
-                    user.equipItem(itemId, gameCharacter);
+                    Item item = itemController.getItemById(itemId);
+                    user.equipItem(item, gameCharacter);
                     user = userRepository.save(user);
+                    break;
                 }
             }
         }
@@ -302,6 +305,7 @@ public class UserController {
                 if (gameCharacter.getId().equals(gameCharId)) {
                     user.unequipItem(itemType, gameCharacter);
                     user = userRepository.save(user);
+                    break;
                 }
             }
         }

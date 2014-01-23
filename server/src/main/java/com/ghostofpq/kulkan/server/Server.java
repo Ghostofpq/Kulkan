@@ -7,6 +7,7 @@ import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.database.ItemService;
 import com.ghostofpq.kulkan.server.database.UserService;
+import com.ghostofpq.kulkan.server.database.controller.ItemController;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
@@ -39,6 +40,8 @@ public class Server {
     private UserService userService;
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private ItemController itemController;
 
     private Server() {
     }
@@ -55,6 +58,8 @@ public class Server {
         lobbyManager.initConnections();
         matchmakingManager.initConnections();
         userService.initConnection();
+        itemService.initConnection();
+        itemController.populateItemRepository();
     }
 
     public void start() throws IOException, InterruptedException {
@@ -67,6 +72,7 @@ public class Server {
         lobbyManagerThread = new Thread(lobbyManager);
         lobbyManagerThread.start();
         matchmakingManagerThread = new Thread(matchmakingManager);
+        matchmakingManagerThread.start();
         itemServiceThread = new Thread(itemService);
         itemServiceThread.start();
     }

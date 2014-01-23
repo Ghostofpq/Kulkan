@@ -3,7 +3,6 @@ package com.ghostofpq.kulkan.server.database.model;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.inventory.Inventory;
-import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.inventory.item.Weapon;
@@ -219,16 +218,15 @@ public class User {
         return this.getId().equals(obj.getId());
     }
 
-    public void equipItem(String itemId, GameCharacterDB gameCharacter) {
+    public void equipItem(Item item, GameCharacterDB gameCharacter) {
         try {
-            inventory.removeOne(itemId);
-            Item item= ItemFactory.createItem(itemId);
+            inventory.removeOne(item.getItemID());
             if(item.getItemType().equals(ItemType.WEAPON)){
                 if(((Weapon)item).getWeaponType().equals(WeaponType.TWO_HANDED)){
                     unequipItem(ItemType.HELD_ITEM,gameCharacter);
                 }
             }
-            gameCharacter.equipItem(item.getItemType(),itemId);
+            gameCharacter.equipItem(item.getItemType(), item.getItemID());
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
         }
