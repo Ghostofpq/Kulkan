@@ -60,4 +60,7 @@
           class="com.ghostofpq.kulkan.server.database.controller.UserController">
         <property name="tokenKeySize" value="${token.key.size}"/>
     </bean>
+
+    <bean id="itemController"
+          class="com.ghostofpq.kulkan.server.database.controller.ItemController"/>
 </beans>

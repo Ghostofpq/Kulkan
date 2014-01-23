@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.database.UserService;
+import com.ghostofpq.kulkan.server.database.controller.ItemController;
 import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.ghostofpq.kulkan.server.matchmaking.MatchmakingManager;
@@ -35,6 +36,8 @@ public class Server {
     private MatchmakingManager matchmakingManager;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ItemController itemController;
 
     private Server() {
     }
@@ -64,6 +67,7 @@ public class Server {
         lobbyManagerThread.start();
         matchmakingManagerThread = new Thread(matchmakingManager);
         matchmakingManagerThread.start();
+        itemController.populateItemRepository();
     }
 
     public void shutDown() {

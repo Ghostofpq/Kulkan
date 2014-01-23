@@ -9,8 +9,9 @@ import java.util.List;
 
 @Repository
 public interface ItemRepository extends MongoRepository<ItemDB, Long> {
-    public List<ItemDB> findByName(String name);
+    public List<ItemDB> findById(String id);
 
+    public List<ItemDB> findByName(String name);
     public List<ItemDB> findByItemType(ItemType itemType);
 }
 
