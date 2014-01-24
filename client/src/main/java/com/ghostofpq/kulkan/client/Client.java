@@ -214,7 +214,7 @@ public class Client {
     }
 
     public Player getPlayer() {
-        return clientContext.getPlayer();
+        return player;
     }
 
     public void setPlayer(Player player) {
@@ -226,7 +226,7 @@ public class Client {
     }
 
     public String getTokenKey() {
-        return clientContext.getTokenKey();
+        return tokenKey;
     }
 
     public void setTokenKey(String tokenKey) {

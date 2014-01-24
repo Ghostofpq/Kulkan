@@ -17,37 +17,38 @@ import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateAccountResponse;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class LoginScene implements Scene {
-    private static final Logger LOG = LoggerFactory.getLogger(LoginScene.class);
-    private final String AUTHENTICATION_QUEUE_NAME = "authentication";
-    private String authenticationReplyQueueName;
-    private Channel channelAuthenticating;
-    private List<HUDElement> hudElementList;
-    private int indexOnFocus;
-    private QueueingConsumer consumer;
-    private Background background;
+
     @Autowired
     private ClientContext clientContext;
+    // MESSAGING
+    private QueueingConsumer consumer;
+    private Channel channelAuthenticating;
+    private String authenticationReplyQueueName;
     // PSEUDO FIELD
     private TextField pseudoField;
     // PASSWORD FIELD
     private PasswordField passwordField;
     // CONNECT BUTTON
     private Button connectButton;
-    // CREATE ACCOUTN BUTTON   
+    // CREATE ACCOUNT BUTTON
     private Button createAccountButton;
     // QUIT BUTTON
     private Button quitButton;
+    // ELEMENT LIST
+    private List<HUDElement> hudElementList;
+    // BACKGROUND
+    private Background background;
 
     private LoginScene() {
     }
@@ -55,20 +56,23 @@ public class LoginScene implements Scene {
     @Override
     public void init() {
         pseudoField = new TextField(250, 200, 300, 50, 10);
+
         passwordField = new PasswordField(250, 300, 300, 50, 10);
-        connectButton = new Button(300, 400, 200, 50, "CONNECT") {
-            @Override
-            public void onClick() {
-                onClickButtonConnect();
-            }
-        };
+
+        connectButton = new
+                Button(300, 400, 200, 50, "CONNECT") {
+                    @Override
+                    public void onClick() {
+                        onClickButtonConnect();
+                    }
+                };
+
         quitButton = new
 
                 Button(300, 450, 200, 50, "QUIT") {
                     @Override
                     public void onClick() {
-                        LOG.debug("QUIT");
-                        Client.getInstance().quit();
+                        onClickButtonQuit();
                     }
                 };
 
@@ -78,36 +82,19 @@ public class LoginScene implements Scene {
                 Button(300, 500, 200, 50, "CREATE ACCOUNT") {
                     @Override
                     public void onClick() {
-                        try {
-                            MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudoField.getContent(), passwordField.getContent());
-                            Message result = requestServer(messageCreateAccount);
-                            if (null != result) {
-                                if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
-                                    MessageCreateAccountResponse response = (MessageCreateAccountResponse) result;
-                                    if (response.getErrorCode().equals(MessageErrorCode.OK)) {
-                                        LOG.debug("CREATE ACCOUT OK");
-                                    } else {
-                                        LOG.debug("CREATE ACCOUT KO : USER ALREADY USED");
-                                    }
-                                }
-                            } else {
-                                LOG.debug("SERVER DOWN");
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        onClickButtonCreateAccount();
                     }
                 };
+
         hudElementList = new ArrayList<HUDElement>();
+
         hudElementList.add(pseudoField);
         hudElementList.add(passwordField);
         hudElementList.add(connectButton);
         hudElementList.add(quitButton);
         hudElementList.add(createAccountButton);
-        indexOnFocus = 0;
-        setFocusOn(indexOnFocus);
+        setFocusOn(hudElementList.indexOf(pseudoField));
+
         background = new Background(TextureKey.LOGIN_BACKGROUND);
     }
 
@@ -119,16 +106,17 @@ public class LoginScene implements Scene {
                 if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
                     MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
                     if (response.getErrorCode().equals(MessageErrorCode.OK)) {
-                        LOG.debug("AUTH OK : key={}", response.getTokenKey());
+                        log.debug("AUTH OK : key={}", response.getTokenKey());
                         clientContext.setPlayer(response.getPlayer());
                         clientContext.setTokenKey(response.getTokenKey());
+                        Client.getInstance().setTokenKey(response.getTokenKey());
                         Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                     } else {
-                        LOG.debug("AUTH KO : BAD INFO");
+                        log.debug("AUTH KO : BAD INFO");
                     }
                 }
             } else {
-                LOG.debug("SERVER DOWN");
+                log.debug("SERVER DOWN");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -139,8 +127,43 @@ public class LoginScene implements Scene {
         }
     }
 
-    private Message requestServer(Message message) throws Exception {
-        LOG.debug("create account");
+    private void onClickButtonQuit() {
+        log.debug("QUIT");
+        Client.getInstance().quit();
+    }
+
+    private void onClickButtonCreateAccount() {
+        try {
+            MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudoField.getContent(), passwordField.getContent());
+            Message result = requestServer(messageCreateAccount);
+            if (null != result) {
+                if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
+                    MessageCreateAccountResponse response = (MessageCreateAccountResponse) result;
+                    if (response.getErrorCode().equals(MessageErrorCode.OK)) {
+                        log.debug("CREATE ACCOUT OK");
+                    } else {
+                        log.debug("CREATE ACCOUT KO : USER ALREADY USED");
+                    }
+                }
+            } else {
+                log.debug("SERVER DOWN");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Sends a {@link Message} as a request on the authentication channel. A response is expected.
+     *
+     * @param message the {@link Message} to send.
+     * @return a {@link Message} response.
+     * @throws Exception
+     */
+    private Message requestServer(Message message) throws IOException, InterruptedException {
+        log.debug("create account");
         Message response = null;
         String corrId = java.util.UUID.randomUUID().toString();
 
@@ -149,23 +172,28 @@ public class LoginScene implements Scene {
                 .correlationId(corrId)
                 .replyTo(authenticationReplyQueueName)
                 .build();
-        channelAuthenticating.basicPublish("", AUTHENTICATION_QUEUE_NAME, props, message.getBytes());
-        LOG.debug(" [x] Sent '{}'", message.getType());
+        channelAuthenticating.basicPublish("", clientContext.getAuthenticationQueueName(), props, message.getBytes());
+        log.debug(" [x] Sent '{}'", message.getType());
         QueueingConsumer.Delivery delivery = consumer.nextDelivery(1000);
         if (null != delivery) {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 response = Message.loadFromBytes(delivery.getBody());
-                LOG.debug(" [x] Received '{}'", response.getType());
+                log.debug(" [x] Received '{}'", response.getType());
             }
         }
         return response;
     }
 
-    private void setFocusOn(int i) {
+    /**
+     * Sets the focus on an element of the hudElementList.
+     *
+     * @param index of the element having the focus.
+     */
+    private void setFocusOn(int index) {
         for (HUDElement hudElement : hudElementList) {
             hudElement.setHasFocus(false);
         }
-        hudElementList.get(i).setHasFocus(true);
+        hudElementList.get(index).setHasFocus(true);
     }
 
     @Override
@@ -272,6 +300,6 @@ public class LoginScene implements Scene {
     @Override
     public void closeConnections() throws IOException {
         channelAuthenticating.close();
-        LOG.debug("channelAuthenticating closed");
+        log.debug("channelAuthenticating closed");
     }
 }
