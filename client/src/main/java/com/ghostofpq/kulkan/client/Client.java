@@ -15,6 +15,7 @@ import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -39,7 +40,10 @@ public class Client {
     private boolean requestClose;
     private QueueingConsumer consumer;
     private Connection connection;
-
+    @Autowired
+    private ClientContext clientContext;
+    @Autowired
+    private LoginScene loginScene;
 
     private Client() {
 
@@ -51,11 +55,9 @@ public class Client {
 
     public static void main(String[] argv) {
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
-        ApplicationContext context = new ClassPathXmlApplicationContext("client.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("client-context.xml");
         Client g = ((Client) context.getBean("client"));
-
         g.init();
-        g.setCurrentScene(LoginScene.getInstance());
         g.run();
     }
 
@@ -92,6 +94,8 @@ public class Client {
             e.printStackTrace();
             System.exit(0);
         }
+
+        setCurrentScene(loginScene);
     }
 
     private void initConnection() throws IOException {

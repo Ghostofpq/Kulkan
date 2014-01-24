@@ -12,7 +12,6 @@ import com.ghostofpq.kulkan.server.database.repository.UserRepository;
 import com.rabbitmq.client.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -71,15 +70,6 @@ public class AuthenticationManager implements Runnable {
         return user;
     }
 
-    private String generateKey() {
-        String result = RandomStringUtils.randomNumeric(authKeySize);
-        while (!userController.getNameForTokenKey(result).equals("")) {
-            log.error("Key [{}] is already in use", result);
-            result = RandomStringUtils.randomNumeric(authKeySize);
-        }
-        return result;
-    }
-
     private void receiveMessage() throws InterruptedException, IOException {
         QueueingConsumer.Delivery delivery = consumer.nextDelivery();
         if (null != delivery) {
@@ -115,7 +105,6 @@ public class AuthenticationManager implements Runnable {
             MessageErrorCode code = MessageErrorCode.OK;
             MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
                     authenticationRequest.getPseudo(),
-                    authenticationRequest.getPassword(),
                     user.getTokenKey(),
                     user.toPlayer(),
                     code);

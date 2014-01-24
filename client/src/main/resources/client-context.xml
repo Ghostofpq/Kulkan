@@ -13,9 +13,10 @@
     <context:annotation-config/>
 
     <bean id="client" class="com.ghostofpq.kulkan.client.Client">
-    <property name="hostIp" value="${hostIp.ip}"/>
+        <property name="hostIp" value="${hostIp.ip}"/>
         <property name="hostPort" value="${hostIp.hostPort}"/>
     </bean>
 
-
+    <bean id="clientContext" class="com.ghostofpq.kulkan.client.ClientContext"/>
+    <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
 </beans>

@@ -10,15 +10,13 @@ import java.io.Serializable;
 
 public class MessageAuthenticationResponse extends Message implements Serializable {
     private String pseudo;
-    private String password;
     private String tokenKey;
     private MessageErrorCode errorCode;
     private Player player;
 
-    public MessageAuthenticationResponse(String pseudo, String password, String tokenKey, Player player, MessageErrorCode errorCode) {
+    public MessageAuthenticationResponse(String pseudo, String tokenKey, Player player, MessageErrorCode errorCode) {
         this.type = MessageType.AUTHENTICATION_RESPONSE;
         this.pseudo = pseudo;
-        this.password = password;
         this.tokenKey = tokenKey;
         this.player = player;
         this.errorCode = errorCode;
@@ -26,10 +24,6 @@ public class MessageAuthenticationResponse extends Message implements Serializab
 
     public String getPseudo() {
         return pseudo;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getTokenKey() {

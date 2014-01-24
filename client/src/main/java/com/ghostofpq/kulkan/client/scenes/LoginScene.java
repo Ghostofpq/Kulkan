@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.graphics.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
@@ -20,6 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +29,6 @@ import java.util.List;
 
 public class LoginScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(LoginScene.class);
-    private static volatile LoginScene instance = null;
     private final String AUTHENTICATION_QUEUE_NAME = "authentication";
     private String authenticationReplyQueueName;
     private Channel channelAuthenticating;
@@ -40,19 +41,10 @@ public class LoginScene implements Scene {
     private Button quitButton;
     private Button createAccountButton;
     private Background background;
+    @Autowired
+    private ClientContext clientContext;
 
     private LoginScene() {
-    }
-
-    public static LoginScene getInstance() {
-        if (instance == null) {
-            synchronized (LoginScene.class) {
-                if (instance == null) {
-                    instance = new LoginScene();
-                }
-            }
-        }
-        return instance;
     }
 
     @Override
@@ -72,6 +64,8 @@ public class LoginScene implements Scene {
                                 LOG.debug("AUTH OK : key={}", response.getTokenKey());
                                 Client.getInstance().setPlayer(response.getPlayer());
                                 Client.getInstance().setTokenKey(response.getTokenKey());
+                                clientContext.setPlayer(response.getPlayer());
+                                clientContext.setTokenKey(response.getTokenKey());
                                 Client.getInstance().setCurrentScene(LobbyScene.getInstance());
                             } else {
                                 LOG.debug("AUTH KO : BAD INFO");
