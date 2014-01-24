@@ -12,7 +12,6 @@ public class MessageCreateAccount extends Message {
         this.type = MessageType.CREATE_ACCOUNT;
         this.userName = userName;
         this.password = DigestUtils.shaHex(password);
-        ;
     }
 
     public String getUserName() {
