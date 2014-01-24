@@ -1,5 +1,8 @@
 package com.ghostofpq.kulkan.client.graphics;
 
+import com.ghostofpq.kulkan.client.ClientContext;
+import org.lwjgl.input.Mouse;
+
 public abstract class HUDElement {
     protected boolean hasFocus;
     protected int posX;
@@ -21,6 +24,10 @@ public abstract class HUDElement {
             }
         }
         return result;
+    }
+
+    public boolean isClicked() {
+        return isClicked(Mouse.getX(), ClientContext.height - Mouse.getY());
     }
 
     public boolean isInstantRepetition() {

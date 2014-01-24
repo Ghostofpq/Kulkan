@@ -17,6 +17,10 @@
         <property name="hostPort" value="${hostIp.hostPort}"/>
     </bean>
 
-    <bean id="clientContext" class="com.ghostofpq.kulkan.client.ClientContext"/>
+    <bean id="clientContext" class="com.ghostofpq.kulkan.client.ClientContext">
+        <property name="height" value="${window.height}"/>
+        <property name="width" value="${window.width}"/>
+    </bean>
+
     <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
 </beans>

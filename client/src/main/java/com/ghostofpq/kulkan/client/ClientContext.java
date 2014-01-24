@@ -3,9 +3,28 @@ package com.ghostofpq.kulkan.client;
 import com.ghostofpq.kulkan.entities.character.Player;
 
 public class ClientContext {
+    // WINDOW
+    public static int height;
+    public static int width;
+    // USER INFO
     private Player player;
     private String tokenKey;
 
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
     public Player getPlayer() {
         return player;

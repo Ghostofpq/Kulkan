@@ -32,59 +32,36 @@ public class LoginScene implements Scene {
     private final String AUTHENTICATION_QUEUE_NAME = "authentication";
     private String authenticationReplyQueueName;
     private Channel channelAuthenticating;
-    private TextField pseudo;
-    private PasswordField password;
     private List<HUDElement> hudElementList;
-    private Button button;
     private int indexOnFocus;
     private QueueingConsumer consumer;
-    private Button quitButton;
-    private Button createAccountButton;
     private Background background;
     @Autowired
     private ClientContext clientContext;
+    // PSEUDO FIELD
+    private TextField pseudoField;
+    // PASSWORD FIELD
+    private PasswordField passwordField;
+    // CONNECT BUTTON
+    private Button connectButton;
+    // CREATE ACCOUTN BUTTON   
+    private Button createAccountButton;
+    // QUIT BUTTON
+    private Button quitButton;
 
     private LoginScene() {
     }
 
     @Override
     public void init() {
-        pseudo = new TextField(250, 200, 300, 50, 10);
-        password = new PasswordField(250, 300, 300, 50, 10);
-        button = new Button(300, 400, 200, 50, "CONNECT") {
+        pseudoField = new TextField(250, 200, 300, 50, 10);
+        passwordField = new PasswordField(250, 300, 300, 50, 10);
+        connectButton = new Button(300, 400, 200, 50, "CONNECT") {
             @Override
             public void onClick() {
-                try {
-                    MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudo.getContent(), password.getContent());
-                    Message result = requestServer(authenticationRequest);
-                    if (null != result) {
-                        if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
-                            MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
-                            if (response.getErrorCode().equals(MessageErrorCode.OK)) {
-                                LOG.debug("AUTH OK : key={}", response.getTokenKey());
-                                Client.getInstance().setPlayer(response.getPlayer());
-                                Client.getInstance().setTokenKey(response.getTokenKey());
-                                clientContext.setPlayer(response.getPlayer());
-                                clientContext.setTokenKey(response.getTokenKey());
-                                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
-                            } else {
-                                LOG.debug("AUTH KO : BAD INFO");
-                            }
-                        }
-                    } else {
-                        LOG.debug("SERVER DOWN");
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                onClickButtonConnect();
             }
         };
-
-
         quitButton = new
 
                 Button(300, 450, 200, 50, "QUIT") {
@@ -102,7 +79,7 @@ public class LoginScene implements Scene {
                     @Override
                     public void onClick() {
                         try {
-                            MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudo.getContent(), password.getContent());
+                            MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudoField.getContent(), passwordField.getContent());
                             Message result = requestServer(messageCreateAccount);
                             if (null != result) {
                                 if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
@@ -124,9 +101,9 @@ public class LoginScene implements Scene {
                     }
                 };
         hudElementList = new ArrayList<HUDElement>();
-        hudElementList.add(pseudo);
-        hudElementList.add(password);
-        hudElementList.add(button);
+        hudElementList.add(pseudoField);
+        hudElementList.add(passwordField);
+        hudElementList.add(connectButton);
         hudElementList.add(quitButton);
         hudElementList.add(createAccountButton);
         indexOnFocus = 0;
@@ -134,14 +111,35 @@ public class LoginScene implements Scene {
         background = new Background(TextureKey.LOGIN_BACKGROUND);
     }
 
-    public void initConnections() throws IOException {
-        channelAuthenticating = Client.getInstance().getConnection().createChannel();
-        authenticationReplyQueueName = channelAuthenticating.queueDeclare().getQueue();
-        consumer = new QueueingConsumer(channelAuthenticating);
-        channelAuthenticating.basicConsume(authenticationReplyQueueName, true, consumer);
+    private void onClickButtonConnect() {
+        try {
+            MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudoField.getContent(), passwordField.getContent());
+            Message result = requestServer(authenticationRequest);
+            if (null != result) {
+                if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
+                    MessageAuthenticationResponse response = (MessageAuthenticationResponse) result;
+                    if (response.getErrorCode().equals(MessageErrorCode.OK)) {
+                        LOG.debug("AUTH OK : key={}", response.getTokenKey());
+                        clientContext.setPlayer(response.getPlayer());
+                        clientContext.setTokenKey(response.getTokenKey());
+                        Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                    } else {
+                        LOG.debug("AUTH KO : BAD INFO");
+                    }
+                }
+            } else {
+                LOG.debug("SERVER DOWN");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public Message requestServer(Message message) throws Exception {
+    private Message requestServer(Message message) throws Exception {
         LOG.debug("create account");
         Message response = null;
         String corrId = java.util.UUID.randomUUID().toString();
@@ -163,7 +161,7 @@ public class LoginScene implements Scene {
         return response;
     }
 
-    public void setFocusOn(int i) {
+    private void setFocusOn(int i) {
         for (HUDElement hudElement : hudElementList) {
             hudElement.setHasFocus(false);
         }
@@ -191,21 +189,21 @@ public class LoginScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (pseudo.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    setFocusOn(hudElementList.indexOf(pseudo));
+                if (pseudoField.isClicked()) {
+                    setFocusOn(hudElementList.indexOf(pseudoField));
                 }
-                if (password.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    setFocusOn(hudElementList.indexOf(password));
+                if (passwordField.isClicked()) {
+                    setFocusOn(hudElementList.indexOf(passwordField));
                 }
-                if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    setFocusOn(hudElementList.indexOf(button));
-                    button.onClick();
+                if (connectButton.isClicked()) {
+                    setFocusOn(hudElementList.indexOf(connectButton));
+                    connectButton.onClick();
                 }
-                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quitButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(quitButton));
                     quitButton.onClick();
                 }
-                if (createAccountButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (createAccountButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(createAccountButton));
                     createAccountButton.onClick();
                 }
@@ -214,31 +212,64 @@ public class LoginScene implements Scene {
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
-                    if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
-                        if (pseudo.hasFocus()) {
-                            pseudo.deleteLastChar();
-                        } else if (password.hasFocus()) {
-                            password.deleteLastChar();
+                    if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.VALIDATE)) {
+                        if (pseudoField.hasFocus()) {
+                            setFocusOn(hudElementList.indexOf(passwordField));
+                        } else if (passwordField.hasFocus()) {
+                            setFocusOn(hudElementList.indexOf(connectButton));
+                            connectButton.onClick();
+                        } else if (connectButton.hasFocus()) {
+                            connectButton.onClick();
+                        } else if (quitButton.hasFocus()) {
+                            quitButton.onClick();
+                        } else if (createAccountButton.hasFocus()) {
+                            createAccountButton.onClick();
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.SWITCH)) {
+                        if (pseudoField.hasFocus()) {
+                            setFocusOn(hudElementList.indexOf(passwordField));
+                        } else if (passwordField.hasFocus()) {
+                            setFocusOn(hudElementList.indexOf(connectButton));
+                        } else if (connectButton.hasFocus()) {
+                            setFocusOn(hudElementList.indexOf(quitButton));
+                        } else if (quitButton.hasFocus()) {
+                            setFocusOn(hudElementList.indexOf(createAccountButton));
+                        } else if (createAccountButton.hasFocus()) {
+                            setFocusOn(hudElementList.indexOf(pseudoField));
+                        }
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
+                        if (pseudoField.hasFocus()) {
+                            pseudoField.deleteLastChar();
+                        } else if (passwordField.hasFocus()) {
+                            passwordField.deleteLastChar();
                         }
                     } else {
-                        if (pseudo.hasFocus()) {
-                            pseudo.writeChar(Keyboard.getEventCharacter());
-                        } else if (password.hasFocus()) {
-                            password.writeChar(Keyboard.getEventCharacter());
+                        if (pseudoField.hasFocus()) {
+                            pseudoField.writeChar(Keyboard.getEventCharacter());
+                        } else if (passwordField.hasFocus()) {
+                            passwordField.writeChar(Keyboard.getEventCharacter());
                         }
                     }
                 } else {
-                    if (pseudo.hasFocus()) {
-                        pseudo.writeChar(Keyboard.getEventCharacter());
-                    } else if (password.hasFocus()) {
-                        password.writeChar(Keyboard.getEventCharacter());
+                    if (pseudoField.hasFocus()) {
+                        pseudoField.writeChar(Keyboard.getEventCharacter());
+                    } else if (passwordField.hasFocus()) {
+                        passwordField.writeChar(Keyboard.getEventCharacter());
                     }
                 }
-
             }
         }
     }
 
+    @Override
+    public void initConnections() throws IOException {
+        channelAuthenticating = Client.getInstance().getConnection().createChannel();
+        authenticationReplyQueueName = channelAuthenticating.queueDeclare().getQueue();
+        consumer = new QueueingConsumer(channelAuthenticating);
+        channelAuthenticating.basicConsume(authenticationReplyQueueName, true, consumer);
+    }
+
+    @Override
     public void closeConnections() throws IOException {
         channelAuthenticating.close();
         LOG.debug("channelAuthenticating closed");

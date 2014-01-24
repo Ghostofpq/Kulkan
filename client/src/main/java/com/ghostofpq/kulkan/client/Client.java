@@ -58,14 +58,19 @@ public class Client {
         ApplicationContext context = new ClassPathXmlApplicationContext("client-context.xml");
         Client g = ((Client) context.getBean("client"));
         g.init();
-        g.run();
+        try {
+            g.run();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void init() {
         log.debug("HOST : {}", hostIp);
 
-        setHeight(600);
-        setWidth(800);
+        setHeight(clientContext.getHeight());
+        setWidth(clientContext.getWidth());
+
         if (instance == null) {
             instance = this;
         }
@@ -120,16 +125,15 @@ public class Client {
         return result;
     }
 
-    public void run() {
+    public void run() throws InterruptedException {
         while (!requestClose) {
             update(deltaTimeInMillis());
             currentScene.manageInput();
             currentScene.receiveMessage();
             render();
             lastTimeTick = Sys.getTime();
-            while (deltaTimeInMillis() <= 4) {
-                // waiting for at least 10 millis
-            }
+            Thread.sleep(1);
+
         }
         try {
             if (null != channelIn) {
@@ -210,7 +214,7 @@ public class Client {
     }
 
     public Player getPlayer() {
-        return player;
+        return clientContext.getPlayer();
     }
 
     public void setPlayer(Player player) {
@@ -222,7 +226,7 @@ public class Client {
     }
 
     public String getTokenKey() {
-        return tokenKey;
+        return clientContext.getTokenKey();
     }
 
     public void setTokenKey(String tokenKey) {
