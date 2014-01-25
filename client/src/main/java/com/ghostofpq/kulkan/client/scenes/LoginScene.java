@@ -172,7 +172,7 @@ public class LoginScene implements Scene {
                 .correlationId(corrId)
                 .replyTo(authenticationReplyQueueName)
                 .build();
-        channelAuthenticating.basicPublish("", clientContext.getAuthenticationQueueName(), props, message.getBytes());
+        channelAuthenticating.basicPublish("", "authentication", props, message.getBytes());
         log.debug(" [x] Sent '{}'", message.getType());
         QueueingConsumer.Delivery delivery = consumer.nextDelivery(1000);
         if (null != delivery) {

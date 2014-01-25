@@ -22,5 +22,10 @@
         <property name="width" value="${window.width}"/>
     </bean>
 
+    <bean id="clientMessenger" class="com.ghostofpq.kulkan.client.Client">
+        <property name="hostIp" value="${hostIp.ip}"/>
+        <property name="hostPort" value="${hostIp.hostPort}"/>
+    </bean>
+
     <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
 </beans>

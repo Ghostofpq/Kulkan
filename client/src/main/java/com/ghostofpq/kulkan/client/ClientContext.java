@@ -6,8 +6,6 @@ public class ClientContext {
     // WINDOW
     public static int height;
     public static int width;
-    //MESSAGING
-    private final String AUTHENTICATION_QUEUE_NAME = "authentication";
     // USER INFO
     private Player player;
     private String tokenKey;
@@ -44,7 +42,4 @@ public class ClientContext {
         this.tokenKey = tokenKey;
     }
 
-    public String getAuthenticationQueueName() {
-        return AUTHENTICATION_QUEUE_NAME;
-    }
 }
