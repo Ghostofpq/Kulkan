@@ -19,6 +19,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class Client {
@@ -70,11 +72,34 @@ public class Client {
         this.requestClose = false;
         this.lastTimeTick = Sys.getTime();
         try {
-            // DisplayMode[] displayModes = Display.getAvailableDisplayModes();
-            // for (int i = 0; i < displayModes.length; i++) {
-            //     log.debug("[{}]: {}x{} bbp:{} freq:{}  {}",i, displayModes[i].getHeight(), displayModes[i].getWidth()
-            //             , displayModes[i].getBitsPerPixel(), displayModes[i].getFrequency(), displayModes[i].isFullscreenCapable());
-            // }
+            List<DisplayMode> displayModes43 = new ArrayList<DisplayMode>();
+            List<DisplayMode> displayModes169 = new ArrayList<DisplayMode>();
+            DisplayMode[] availableDisplayModes = Display.getAvailableDisplayModes();
+
+            for (int i = 0; i < availableDisplayModes.length; i++) {
+                log.debug("[{}]: {}x{} bbp:{} freq:{}  {}", i, availableDisplayModes[i].getHeight(), availableDisplayModes[i].getWidth()
+                        , availableDisplayModes[i].getBitsPerPixel(), availableDisplayModes[i].getFrequency(), availableDisplayModes[i].isFullscreenCapable());
+                // 4:3
+                if (availableDisplayModes[i].getWidth() == 800 && availableDisplayModes[i].getHeight() == 600) {
+                    displayModes43.add(availableDisplayModes[i]);
+                } else if (availableDisplayModes[i].getWidth() == 1024 && availableDisplayModes[i].getHeight() == 768) {
+                    displayModes43.add(availableDisplayModes[i]);
+                } else if (availableDisplayModes[i].getWidth() == 1280 && availableDisplayModes[i].getHeight() == 960) {
+                    displayModes43.add(availableDisplayModes[i]);
+                    // 16:9
+                } else if (availableDisplayModes[i].getWidth() == 1024 && availableDisplayModes[i].getHeight() == 476) {
+                    displayModes169.add(availableDisplayModes[i]);
+                } else if (availableDisplayModes[i].getWidth() == 1280 && availableDisplayModes[i].getHeight() == 720) {
+                    displayModes169.add(availableDisplayModes[i]);
+                } else if (availableDisplayModes[i].getWidth() == 1600 && availableDisplayModes[i].getHeight() == 900) {
+                    displayModes169.add(availableDisplayModes[i]);
+                } else if (availableDisplayModes[i].getWidth() == 1920 && availableDisplayModes[i].getHeight() == 1080) {
+                    displayModes169.add(availableDisplayModes[i]);
+                }
+            }
+
+            clientContext.setDisplayModes43(displayModes43);
+            clientContext.setDisplayModes169(displayModes169);
 
             Display.setDisplayMode(new DisplayMode(800, 600));
             Display.setSwapInterval(1);
