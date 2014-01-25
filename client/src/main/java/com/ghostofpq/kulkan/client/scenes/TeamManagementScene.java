@@ -141,7 +141,7 @@ public class TeamManagementScene implements Scene {
         backButton = new Button(width, 0, Client.getInstance().getWidth() / 6, 50, "BACK") {
             @Override
             public void onClick() {
-                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                Client.getInstance().setCurrentScene(Client.getInstance().getLobbyScene());
             }
         };
 

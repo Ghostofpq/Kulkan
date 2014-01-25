@@ -167,24 +167,44 @@ public class ClientMessenger {
         return result;
     }
 
-    public void sendMessageToUserService(Message message) throws IOException {
-        log.debug("Publish on [{}] : {}", USER_SERVICE_QUEUE_NAME, message.toString());
-        channelUsers.basicPublish("", USER_SERVICE_QUEUE_NAME, null, message.getBytes());
+    public void sendMessageToUserService(Message message) {
+        try {
+            log.debug("Publish on [{}] : {}", USER_SERVICE_QUEUE_NAME, message.toString());
+            channelUsers.basicPublish("", USER_SERVICE_QUEUE_NAME, null, message.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Client.getInstance().quit();
+        }
     }
 
-    public void sendMessageToLobbyService(Message message) throws IOException {
-        log.debug("Publish on [{}] : {}", LOBBY_SERVER_QUEUE_NAME_BASE, message.toString());
-        channelLobby.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, message.getBytes());
+    public void sendMessageToLobbyService(Message message) {
+        try {
+            log.debug("Publish on [{}] : {}", LOBBY_SERVER_QUEUE_NAME_BASE, message.toString());
+            channelLobby.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, message.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Client.getInstance().quit();
+        }
     }
 
-    public void sendMessageToMatchmakingService(Message message) throws IOException {
-        log.debug("Publish on [{}] : {}", MATCHMAKING_SERVER_QUEUE_NAME_BASE, message.toString());
-        channelMatchmaking.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, message.getBytes());
+    public void sendMessageToMatchmakingService(Message message) {
+        try {
+            log.debug("Publish on [{}] : {}", MATCHMAKING_SERVER_QUEUE_NAME_BASE, message.toString());
+            channelMatchmaking.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, message.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Client.getInstance().quit();
+        }
     }
 
-    public void sendMessageToGameService(Message message) throws IOException {
-        log.debug("Publish on [{}] : {}", gameServerQueueName, message.toString());
-        channelGame.basicPublish("", gameServerQueueName, null, message.getBytes());
+    public void sendMessageToGameService(Message message) {
+        try {
+            log.debug("Publish on [{}] : {}", gameServerQueueName, message.toString());
+            channelGame.basicPublish("", gameServerQueueName, null, message.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Client.getInstance().quit();
+        }
     }
 
     public void setHostIp(String hostIp) {

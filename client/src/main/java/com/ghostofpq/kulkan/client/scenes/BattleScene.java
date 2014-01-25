@@ -463,7 +463,7 @@ public class BattleScene implements Scene {
                 GraphicsManager.getInstance().requestCenterPosition(cursor);
                 break;
             default:
-                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                Client.getInstance().setCurrentScene(Client.getInstance().getLobbyScene());
         }
     }
 
@@ -726,7 +726,7 @@ public class BattleScene implements Scene {
         gameOverButton = new Button(300, 400, 50, 50, buttonText) {
             @Override
             public void onClick() {
-                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                Client.getInstance().setCurrentScene(Client.getInstance().getLobbyScene());
             }
         };
         currentState = BattleSceneState.GAME_OVER;

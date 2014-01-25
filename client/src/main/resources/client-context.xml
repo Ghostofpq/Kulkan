@@ -25,4 +25,5 @@
     </bean>
 
     <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
+    <bean id="lobbyScene" class="com.ghostofpq.kulkan.client.scenes.LobbyScene"/>
 </beans>

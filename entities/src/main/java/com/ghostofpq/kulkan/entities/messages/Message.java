@@ -21,7 +21,7 @@ public abstract class Message implements Serializable {
     }
 
     public String toString() {
-        return new StringBuffer().append("Message Type :").append(type).toString();
+        return new StringBuffer().append("Message Type : ").append(type).toString();
     }
 
     ;

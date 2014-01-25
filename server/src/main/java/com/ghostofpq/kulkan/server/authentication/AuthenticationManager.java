@@ -116,14 +116,14 @@ public class AuthenticationManager implements Runnable {
     private void manageCreateAccountMessage(Message message, AMQP.BasicProperties props, AMQP.BasicProperties replyProps) throws IOException {
         MessageCreateAccount messageCreateAccount = (MessageCreateAccount) message;
         MessageErrorCode code;
-        if (userRepositoryRepository.findByUsername(messageCreateAccount.getUserName()).isEmpty()) {
-            User user = new User(messageCreateAccount.getUserName(), messageCreateAccount.getPassword());
+        if (userRepositoryRepository.findByUsername(messageCreateAccount.getPseudo()).isEmpty()) {
+            User user = new User(messageCreateAccount.getPseudo(), messageCreateAccount.getPassword());
             userRepositoryRepository.save(user);
             code = MessageErrorCode.OK;
             log.debug("user [{}] is created", user.getUsername());
         } else {
             code = MessageErrorCode.USER_NAME_ALREADY_USED;
-            log.error("user [{}] is already in base", messageCreateAccount.getUserName());
+            log.error("user [{}] is already in base", messageCreateAccount.getPseudo());
         }
 
         MessageCreateAccountResponse createAccountResponse = new MessageCreateAccountResponse(

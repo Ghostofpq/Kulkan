@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.ClientContext;
+import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
@@ -10,23 +12,17 @@ import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
-import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class LobbyScene implements Scene {
-    private static final Logger LOG = LoggerFactory.getLogger(LobbyScene.class);
-    private static volatile LobbyScene instance = null;
-    private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
-    private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
-    private Channel channelLobbyOut;
-    private Channel channelMatchmakingOut;
     private TextField inputText;
     private TextArea lobbyMessages;
     private Button postButton;
@@ -41,19 +37,12 @@ public class LobbyScene implements Scene {
     private List<HUDElement> hudElementList;
     private int indexOnFocus;
     private Background background;
+    @Autowired
+    private ClientContext clientContext;
+    @Autowired
+    private ClientMessenger clientMessenger;
 
-    private LobbyScene() {
-    }
-
-    public static LobbyScene getInstance() {
-        if (instance == null) {
-            synchronized (LoginScene.class) {
-                if (instance == null) {
-                    instance = new LobbyScene();
-                }
-            }
-        }
-        return instance;
+    public LobbyScene() {
     }
 
     @Override
@@ -76,46 +65,56 @@ public class LobbyScene implements Scene {
                     }
                 };
 
-        quitButton = new Button(550, 0, 50, 50, "QUIT") {
-            @Override
-            public void onClick() {
-                LOG.debug("QUIT");
-                Client.getInstance().quit();
-            }
-        };
+        quitButton = new
 
-        acceptButton = new Button(550, 100, 50, 50, "ACCEPT") {
-            @Override
-            public void onClick() {
-                LOG.debug("ACCEPT");
-                acceptMatch();
-            }
-        };
+                Button(550, 0, 50, 50, "QUIT") {
+                    @Override
+                    public void onClick() {
+                        log.debug("QUIT");
+                        Client.getInstance().quit();
+                    }
+                };
 
-        refuseButton = new Button(550, 150, 50, 50, "REFUSE") {
-            @Override
-            public void onClick() {
-                LOG.debug("REFUSE");
-                refuseMatch();
-            }
-        };
+        acceptButton = new
 
-        manageTeamButton = new Button(550, 200, 50, 50, "MANAGE TEAM") {
-            @Override
-            public void onClick() {
-                LOG.debug("MANAGE TEAM");
-                exitLobby();
-                Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-            }
-        };
-        shopButton = new Button(550, 250, 50, 50, "SHOP") {
-            @Override
-            public void onClick() {
-                LOG.debug("SHOP TEAM");
-                exitLobby();
-                Client.getInstance().setCurrentScene(ShopScene.getInstance());
-            }
-        };
+                Button(550, 100, 50, 50, "ACCEPT") {
+                    @Override
+                    public void onClick() {
+                        log.debug("ACCEPT");
+                        acceptMatch();
+                    }
+                };
+
+        refuseButton = new
+
+                Button(550, 150, 50, 50, "REFUSE") {
+                    @Override
+                    public void onClick() {
+                        log.debug("REFUSE");
+                        refuseMatch();
+                    }
+                };
+
+        manageTeamButton = new
+
+                Button(550, 200, 50, 50, "MANAGE TEAM") {
+                    @Override
+                    public void onClick() {
+                        log.debug("MANAGE TEAM");
+                        exitLobby();
+                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    }
+                };
+        shopButton = new
+
+                Button(550, 250, 50, 50, "SHOP") {
+                    @Override
+                    public void onClick() {
+                        log.debug("SHOP TEAM");
+                        exitLobby();
+                        Client.getInstance().setCurrentScene(ShopScene.getInstance());
+                    }
+                };
         hudElementList.add(inputText);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
@@ -128,17 +127,8 @@ public class LobbyScene implements Scene {
         matchFound = false;
         matchId = "";
         background = new Background(TextureKey.BACKGROUND_BASIC);
-    }
-
-    @Override
-    public void initConnections() throws IOException {
-        channelLobbyOut = Client.getInstance().getConnection().createChannel();
-        channelLobbyOut.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
-        channelMatchmakingOut = Client.getInstance().getConnection().createChannel();
-        channelMatchmakingOut.queueDeclare(MATCHMAKING_SERVER_QUEUE_NAME_BASE, false, false, false, null);
-
         MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(Client.getInstance().getTokenKey());
-        channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageSubscribeToLobby.getBytes());
+        clientMessenger.sendMessageToLobbyService(messageSubscribeToLobby);
     }
 
     public void setFocusOn(int i) {
@@ -149,25 +139,10 @@ public class LobbyScene implements Scene {
     }
 
     public void postMessage() {
-        try {
-            if (!inputText.getContent().isEmpty()) {
-                MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
-                channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageLobbyClient.getBytes());
-                LOG.debug(" [-] WRITE ON {} : [{}]", LOBBY_SERVER_QUEUE_NAME_BASE, messageLobbyClient.getLobbyMessage());
-                inputText.clear();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendLobbyPong() {
-        MessageLobbyPong pong = new MessageLobbyPong(Client.getInstance().getTokenKey());
-        try {
-            channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, pong.getBytes());
-            LOG.debug(" [-] PONG ON {}", LOBBY_SERVER_QUEUE_NAME_BASE);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!inputText.getContent().isEmpty()) {
+            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
+            clientMessenger.sendMessageToLobbyService(messageLobbyClient);
+            inputText.clear();
         }
     }
 
@@ -179,28 +154,24 @@ public class LobbyScene implements Scene {
                 case LOBBY_SERVER:
                     MessageLobbyServer receivedMessage = (MessageLobbyServer) message;
                     String receivedTextMessage = receivedMessage.getMessage();
-                    LOG.debug(" [x] Received Message : [{}]", receivedTextMessage);
+                    log.debug(" [x] Received Message : [{}]", receivedTextMessage);
                     if (!receivedTextMessage.isEmpty()) {
                         lobbyMessages.addLine(receivedTextMessage);
                     }
                     break;
-                case LOBBY_PING:
-                    LOG.debug(" [x] Received Ping");
-                    sendLobbyPong();
-                    break;
                 case MATCHMAKING_MATCH_FOUND:
-                    LOG.debug(" [x] MATCH FOUND");
+                    log.debug(" [x] MATCH FOUND");
                     MessageMatchFound messageMatchFound = (MessageMatchFound) message;
                     matchFound = true;
                     matchId = messageMatchFound.getMatchKey();
                     break;
                 case MATCHMAKING_MATCH_ABORT:
-                    LOG.debug(" [x] MATCH ABORT");
+                    log.debug(" [x] MATCH ABORT");
                     matchFound = false;
                     matchId = "";
                     break;
                 case GAME_START:
-                    LOG.debug(" [x] GAME START");
+                    log.debug(" [x] GAME START");
                     exitLobby();
                     MessageGameStart messageGameStart = (MessageGameStart) message;
                     Client.getInstance().setCurrentScene(BattleScene.getInstance());
@@ -208,12 +179,12 @@ public class LobbyScene implements Scene {
                     BattleScene.getInstance().setGameId(messageGameStart.getGameID());
                     break;
                 case PLAYER_UPDATE:
-                    LOG.debug(" [x] PLAYER_UPDATE");
+                    log.debug(" [x] PLAYER_UPDATE");
                     MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
                     Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
                     break;
                 default:
-                    LOG.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
+                    log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
 
             }
@@ -221,50 +192,31 @@ public class LobbyScene implements Scene {
     }
 
     private void exitLobby() {
-        try {
-            MessageUnsubscribeToLobby messageUnsubscribeToLobby = new MessageUnsubscribeToLobby(Client.getInstance().getTokenKey());
-            channelLobbyOut.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, messageUnsubscribeToLobby.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        MessageUnsubscribeToLobby messageUnsubscribeToLobby = new MessageUnsubscribeToLobby(Client.getInstance().getTokenKey());
+        clientMessenger.sendMessageToLobbyService(messageUnsubscribeToLobby);
     }
 
     public void acceptMatch() {
         if (null != matchId && !matchId.isEmpty()) {
             MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(Client.getInstance().getTokenKey(), matchId);
-            try {
-                channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingAccept.getBytes());
-                LOG.debug(" [-] ACCEPT MATCH");
-                matchFound = false;
-                matchId = "";
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            clientMessenger.sendMessageToMatchmakingService(messageMatchmakingAccept);
+            matchFound = false;
+            matchId = "";
         }
     }
 
     public void refuseMatch() {
         if (null != matchId && !matchId.isEmpty()) {
             MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(Client.getInstance().getTokenKey(), matchId);
-            try {
-                channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingRefuse.getBytes());
-                LOG.debug(" [-] REFUSE MATCH");
-                matchFound = false;
-                matchId = "";
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            clientMessenger.sendMessageToMatchmakingService(messageMatchmakingRefuse);
+            matchFound = false;
+            matchId = "";
         }
     }
 
     public void enterMatchmaking() {
         MessageMatchmakingSubscribe messageMatchmakingSubscribe = new MessageMatchmakingSubscribe(Client.getInstance().getTokenKey());
-        try {
-            channelMatchmakingOut.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, messageMatchmakingSubscribe.getBytes());
-            LOG.debug(" [-] SUBSCRIBE MATCHMAKING");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        clientMessenger.sendMessageToMatchmakingService(messageMatchmakingSubscribe);
     }
 
     @Override
@@ -327,10 +279,10 @@ public class LobbyScene implements Scene {
     }
 
     @Override
+    public void initConnections() throws IOException {
+    }
+
+    @Override
     public void closeConnections() throws IOException {
-        channelLobbyOut.close();
-        LOG.debug("channelLobbyOut closed");
-        channelMatchmakingOut.close();
-        LOG.debug("channelMatchmakingOut closed");
     }
 }

@@ -88,7 +88,7 @@ public class EquipItemScene implements Scene {
         quitButton = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 7 + 6 * heightStep, widthStep * 2, heightStep, "Back") {
             @Override
             public void onClick() {
-                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                Client.getInstance().setCurrentScene(Client.getInstance().getLobbyScene());
             }
         };
 

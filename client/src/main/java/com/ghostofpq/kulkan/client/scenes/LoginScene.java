@@ -31,6 +31,8 @@ public class LoginScene implements Scene {
     private ClientContext clientContext;
     @Autowired
     private ClientMessenger clientMessenger;
+    @Autowired
+    private LobbyScene lobbyScene;
     // PSEUDO FIELD
     private TextField pseudoField;
     // PASSWORD FIELD
@@ -107,7 +109,7 @@ public class LoginScene implements Scene {
                         clientContext.setTokenKey(response.getTokenKey());
                         clientMessenger.openChannelsAfterAuthentication(response.getTokenKey());
                         Client.getInstance().setTokenKey(response.getTokenKey());
-                        Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                        Client.getInstance().setCurrentScene(lobbyScene);
                     } else {
                         log.debug("AUTH KO : BAD INFO");
                     }

@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.client;
 
+import com.ghostofpq.kulkan.client.scenes.LobbyScene;
 import com.ghostofpq.kulkan.client.scenes.LoginScene;
 import com.ghostofpq.kulkan.client.scenes.Scene;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
@@ -36,6 +37,8 @@ public class Client {
     private ClientMessenger clientMessenger;
     @Autowired
     private LoginScene loginScene;
+    @Autowired
+    private LobbyScene lobbyScene;
 
     private Client() {
 
@@ -180,7 +183,7 @@ public class Client {
     }
 
     public Player getPlayer() {
-        return player;
+        return clientContext.getPlayer();
     }
 
     public void setPlayer(Player player) {
@@ -204,4 +207,7 @@ public class Client {
         }
     }
 
+    public LobbyScene getLobbyScene() {
+        return lobbyScene;
+    }
 }

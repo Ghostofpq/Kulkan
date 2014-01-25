@@ -4,7 +4,6 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.TextArea;
-import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.messages.Message;
@@ -73,7 +72,7 @@ public class ShopScene implements Scene {
         quitButton = new Button(widthSeparator + 3 * widthStep, heightSeparator * 7 + 6 * heightStep, widthStep * 2, heightStep, "Back") {
             @Override
             public void onClick() {
-                Client.getInstance().setCurrentScene(LobbyScene.getInstance());
+                Client.getInstance().setCurrentScene(Client.getInstance().getLobbyScene());
             }
         };
 
@@ -85,17 +84,17 @@ public class ShopScene implements Scene {
 
         // it will be images, but for now names should do great
         Map<String, String> itemNamesToId = new HashMap<String, String>();
-        itemNamesToId.put("000","Cloth armor");
-        itemNamesToId.put("001","Iron Helm");
-        itemNamesToId.put("002","Yew wand");
-        itemNamesToId.put("003","Stone club");
-        itemNamesToId.put("004","Sling");
-        itemNamesToId.put("005","Life Ring");
-        itemNamesToId.put("006","Strength Ring");
-        itemNamesToId.put("007","Will Necklace");
-        itemNamesToId.put("008","Agility Necklace");
-        itemNamesToId.put("009","Wooden Shield");
-        itemNamesToId.put("010","Two Handed Sword");
+        itemNamesToId.put("000", "Cloth armor");
+        itemNamesToId.put("001", "Iron Helm");
+        itemNamesToId.put("002", "Yew wand");
+        itemNamesToId.put("003", "Stone club");
+        itemNamesToId.put("004", "Sling");
+        itemNamesToId.put("005", "Life Ring");
+        itemNamesToId.put("006", "Strength Ring");
+        itemNamesToId.put("007", "Will Necklace");
+        itemNamesToId.put("008", "Agility Necklace");
+        itemNamesToId.put("009", "Wooden Shield");
+        itemNamesToId.put("010", "Two Handed Sword");
 
         int posX = widthSeparator;
         int posY = heightSeparator;
