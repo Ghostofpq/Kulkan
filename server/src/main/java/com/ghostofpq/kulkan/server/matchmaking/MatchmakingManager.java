@@ -26,8 +26,8 @@ import java.util.Map;
 
 @Slf4j
 public class MatchmakingManager implements Runnable {
-    private final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "/server/matchmaking";
+    private final String CLIENT_QUEUE_NAME_BASE = "client/";
+    private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "server/matchmaking";
     private String hostIp;
     private Integer hostPort;
     private Connection connection;

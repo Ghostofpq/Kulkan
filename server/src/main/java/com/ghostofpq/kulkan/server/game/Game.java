@@ -35,8 +35,8 @@ import java.util.Map;
 @Slf4j
 public class Game {
 
-    private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private static final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
+    private static final String CLIENT_QUEUE_NAME_BASE = "client/";
+    private static final String GAME_SERVER_QUEUE_NAME_BASE = "server/game/";
     private String hostIp;
     private Integer hostPort;
     private AuthenticationManager authenticationManager;

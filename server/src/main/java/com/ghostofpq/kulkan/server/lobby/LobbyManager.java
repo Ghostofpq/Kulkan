@@ -19,8 +19,8 @@ import java.util.List;
 
 @Slf4j
 public class LobbyManager implements Runnable {
-    private final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private final String LOBBY_SERVER_QUEUE_NAME_BASE = "/server/lobby";
+    private final String CLIENT_QUEUE_NAME_BASE = "client/";
+    private final String LOBBY_SERVER_QUEUE_NAME_BASE = "server/lobby";
     private String hostIp;
     private Integer hostPort;
     private Connection connection;

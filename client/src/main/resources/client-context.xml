@@ -12,17 +12,14 @@
             location="classpath:application.properties"/>
     <context:annotation-config/>
 
-    <bean id="client" class="com.ghostofpq.kulkan.client.Client">
-        <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.hostPort}"/>
-    </bean>
+    <bean id="client" class="com.ghostofpq.kulkan.client.Client"/>
 
     <bean id="clientContext" class="com.ghostofpq.kulkan.client.ClientContext">
         <property name="height" value="${window.height}"/>
         <property name="width" value="${window.width}"/>
     </bean>
 
-    <bean id="clientMessenger" class="com.ghostofpq.kulkan.client.Client">
+    <bean id="clientMessenger" class="com.ghostofpq.kulkan.client.ClientMessenger">
         <property name="hostIp" value="${hostIp.ip}"/>
         <property name="hostPort" value="${hostIp.hostPort}"/>
     </bean>

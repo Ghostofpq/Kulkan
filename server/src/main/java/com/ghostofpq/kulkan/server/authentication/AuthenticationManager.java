@@ -18,7 +18,7 @@ import java.io.IOException;
 
 @Slf4j
 public class AuthenticationManager implements Runnable {
-    private final String authenticationQueueName = "authentication";
+    private final String authenticationQueueName = "server/authentication";
     // PARAMETERS - SPRING
     private String hostIp;
     private Integer hostPort;

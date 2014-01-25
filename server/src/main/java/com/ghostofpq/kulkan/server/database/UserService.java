@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 @Slf4j
 public class UserService implements Runnable {
-    private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private final String serviceQueueName = "users";
+    private static final String CLIENT_QUEUE_NAME_BASE = "client/";
+    private final String serviceQueueName = "server/users";
     // PARAMETERS - SPRING
     private String hostIp;
     private Integer hostPort;

@@ -18,8 +18,8 @@ import java.util.List;
 
 @Slf4j
 public class ItemService implements Runnable {
-    private static final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private final String serviceQueueName = "items";
+    private static final String CLIENT_QUEUE_NAME_BASE = "client/";
+    private final String serviceQueueName = "server/items";
     // PARAMETERS - SPRING
     private String hostIp;
     private Integer hostPort;

@@ -5,10 +5,7 @@ import com.ghostofpq.kulkan.client.scenes.Scene;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
@@ -26,22 +23,17 @@ import java.io.IOException;
 public class Client {
     private static volatile Client instance = null;
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    //SPRING
-    private String hostIp;
-    private int hostPort;
     private int height;
     private int width;
-    private String clientQueueName;
-    private Channel channelIn;
     private Scene currentScene;
     private Player player;
     private String tokenKey;
     private long lastTimeTick;
     private boolean requestClose;
-    private QueueingConsumer consumer;
-    private Connection connection;
     @Autowired
     private ClientContext clientContext;
+    @Autowired
+    private ClientMessenger clientMessenger;
     @Autowired
     private LoginScene loginScene;
 
@@ -66,8 +58,6 @@ public class Client {
     }
 
     public void init() {
-        log.debug("HOST : {}", hostIp);
-
         setHeight(clientContext.getHeight());
         setWidth(clientContext.getWidth());
 
@@ -94,7 +84,7 @@ public class Client {
         GraphicsManager.getInstance().ready3D();
 
         try {
-            initConnection();
+            clientMessenger.initConnection();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
@@ -103,26 +93,8 @@ public class Client {
         setCurrentScene(loginScene);
     }
 
-    private void initConnection() throws IOException {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(hostIp);
-        factory.setPort(hostPort);
-        connection = factory.newConnection();
-    }
-
     public Message receiveMessage() {
-        Message result = null;
-        if (null != consumer) {
-            try {
-                QueueingConsumer.Delivery delivery = consumer.nextDelivery(0);
-                if (null != delivery) {
-                    result = Message.loadFromBytes(delivery.getBody());
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
+        return clientMessenger.receiveMessage();
     }
 
     public void run() throws InterruptedException {
@@ -133,15 +105,9 @@ public class Client {
             render();
             lastTimeTick = Sys.getTime();
             Thread.sleep(1);
-
         }
         try {
-            if (null != channelIn) {
-                channelIn.close();
-                log.debug("channelIn closed");
-            }
-            currentScene.closeConnections();
-            connection.close();
+            clientMessenger.closeConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -222,7 +188,7 @@ public class Client {
     }
 
     public Connection getConnection() {
-        return connection;
+        return clientMessenger.getConnection();
     }
 
     public String getTokenKey() {
@@ -232,21 +198,10 @@ public class Client {
     public void setTokenKey(String tokenKey) {
         this.tokenKey = tokenKey;
         try {
-            clientQueueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelIn = connection.createChannel();
-            channelIn.queueDeclare(clientQueueName, false, false, false, null);
-            consumer = new QueueingConsumer(channelIn);
-            channelIn.basicConsume(clientQueueName, true, consumer);
+            clientMessenger.openChannelsAfterAuthentication(tokenKey);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void setHostIp(String hostIp) {
-        this.hostIp = hostIp;
-    }
-
-    public void setHostPort(int hostPort) {
-        this.hostPort = hostPort;
-    }
 }
