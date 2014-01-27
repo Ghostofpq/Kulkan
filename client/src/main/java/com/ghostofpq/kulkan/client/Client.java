@@ -66,13 +66,11 @@ public class Client {
         }
 
         clientContext.init();
-        setHeight(clientContext.getHeight());
-        setWidth(clientContext.getWidth());
 
         this.requestClose = false;
         this.lastTimeTick = Sys.getTime();
         try {
-            Display.setDisplayMode(new DisplayMode(clientContext.getWidth(), clientContext.getHeight()));
+            Display.setDisplayMode(clientContext.getCurrentDisplayMode());
             Display.setSwapInterval(1);
             Display.sync(60);
             Display.create();
@@ -94,6 +92,10 @@ public class Client {
 
     public Message receiveMessage() {
         return clientMessenger.receiveMessage();
+    }
+
+    public void changeDisplayMode(DisplayMode displayMode) {
+
     }
 
     public void run() throws InterruptedException {
@@ -142,19 +144,11 @@ public class Client {
      */
 
     public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
+        return ClientContext.height;
     }
 
     public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
+        return ClientContext.width;
     }
 
     public Scene getCurrentScene() {

@@ -7,9 +7,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 public class ClientContext {
@@ -17,22 +15,14 @@ public class ClientContext {
     public static int height;
     public static int width;
     public static DisplayRatio displayRatio;
-    private Set<DisplayMode> displayModes43 = new HashSet<DisplayMode>();
-    private Set<DisplayMode> displayModes169 = new HashSet<DisplayMode>();
-    private DisplayMode currentDisplay;
+    private List<DisplayMode> displayModes43;
+    private List<DisplayMode> displayModes169;
+    private DisplayMode currentDisplayMode;
     private String pathOfClientPropertiesFile;
     // USER INFO
     private String pseudo;
     private Player player;
     private String tokenKey;
-
-    public static DisplayRatio getDisplayRatio() {
-        return displayRatio;
-    }
-
-    public static void setDisplayRatio(DisplayRatio displayRatio) {
-        ClientContext.displayRatio = displayRatio;
-    }
 
     public void init() {
         determineAvailableDisplayModes();
@@ -42,7 +32,7 @@ public class ClientContext {
     }
 
     private void selectDisplayMode() {
-        currentDisplay = null;
+        currentDisplayMode = null;
         if (null != displayRatio) {
             switch (displayRatio) {
                 case DISPLAY_RATIO_16_9:
@@ -50,10 +40,10 @@ public class ClientContext {
                         for (DisplayMode displayMode : displayModes169) {
                             if (displayMode.getWidth() == width && displayMode.getHeight() == height) {
                                 log.debug("Setting display {}x{} (16/9) from client preferences", width, height);
-                                setCurrentDisplay(displayMode);
+                                setCurrentDisplayMode(displayMode, DisplayRatio.DISPLAY_RATIO_16_9);
                             }
                         }
-                        if (null == currentDisplay) {
+                        if (null == currentDisplayMode) {
                             selectDefaultDisplayMode();
                         }
                     } else {
@@ -65,10 +55,10 @@ public class ClientContext {
                         for (DisplayMode displayMode : displayModes43) {
                             if (displayMode.getWidth() == width && displayMode.getHeight() == height) {
                                 log.debug("Setting display {}x{} (4/3) from client preferences", width, height);
-                                setCurrentDisplay(displayMode);
+                                setCurrentDisplayMode(displayMode, DisplayRatio.DISPLAY_RATIO_4_3);
                             }
                         }
-                        if (null == currentDisplay) {
+                        if (null == currentDisplayMode) {
                             selectDefaultDisplayMode();
                         }
                     } else {
@@ -88,31 +78,64 @@ public class ClientContext {
         try {
             DisplayMode[] availableDisplayModes = Display.getAvailableDisplayModes();
 
+            Set<DisplayMode> tempDisplayModes43 = new HashSet<DisplayMode>();
+            Set<DisplayMode> tempDisplayModes169 = new HashSet<DisplayMode>();
+
             for (int i = 0; i < availableDisplayModes.length; i++) {
                 // 4:3
                 if (availableDisplayModes[i].getWidth() == 800 && availableDisplayModes[i].getHeight() == 600) {
-                    displayModes43.add(new DisplayMode(800, 600));
+                    tempDisplayModes43.add(new DisplayMode(800, 600));
                 } else if (availableDisplayModes[i].getWidth() == 1024 && availableDisplayModes[i].getHeight() == 768) {
-                    displayModes43.add(new DisplayMode(1024, 768));
+                    tempDisplayModes43.add(new DisplayMode(1024, 768));
                 } else if (availableDisplayModes[i].getWidth() == 1280 && availableDisplayModes[i].getHeight() == 960) {
-                    displayModes43.add(new DisplayMode(1280, 960));
+                    tempDisplayModes43.add(new DisplayMode(1280, 960));
                     // 16:9
                 } else if (availableDisplayModes[i].getWidth() == 1024 && availableDisplayModes[i].getHeight() == 576) {
-                    displayModes169.add(new DisplayMode(1024, 576));
+                    tempDisplayModes169.add(new DisplayMode(1024, 576));
                 } else if (availableDisplayModes[i].getWidth() == 1280 && availableDisplayModes[i].getHeight() == 720) {
-                    displayModes169.add(new DisplayMode(1280, 720));
+                    tempDisplayModes169.add(new DisplayMode(1280, 720));
                 } else if (availableDisplayModes[i].getWidth() == 1600 && availableDisplayModes[i].getHeight() == 900) {
-                    displayModes169.add(new DisplayMode(1600, 900));
+                    tempDisplayModes169.add(new DisplayMode(1600, 900));
                 } else if (availableDisplayModes[i].getWidth() == 1920 && availableDisplayModes[i].getHeight() == 1080) {
-                    displayModes169.add(new DisplayMode(1920, 1080));
+                    tempDisplayModes169.add(new DisplayMode(1920, 1080));
                 }
             }
 
-            for (DisplayMode dm : displayModes43) {
-                log.debug("4/3 [{}]", dm);
+            displayModes43 = new ArrayList<DisplayMode>();
+            displayModes169 = new ArrayList<DisplayMode>();
+
+            for (DisplayMode dm : tempDisplayModes43) {
+                if (displayModes43.isEmpty()) {
+                    displayModes43.add(0, dm);
+                } else {
+                    for (int i = 0; i < displayModes43.size(); i++) {
+                        if (dm.getWidth() < displayModes43.get(i).getWidth()) {
+                            displayModes43.add(i, dm);
+                            break;
+                        }
+                    }
+                }
             }
-            for (DisplayMode dm : displayModes169) {
-                log.debug("16/9 [{}]", dm);
+
+            for (DisplayMode dm : tempDisplayModes169) {
+                if (displayModes169.isEmpty()) {
+                    displayModes169.add(0, dm);
+                } else {
+                    for (int i = 0; i < displayModes169.size(); i++) {
+                        if (dm.getWidth() < displayModes169.get(i).getWidth()) {
+                            displayModes169.add(i, dm);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < displayModes43.size(); i++) {
+                log.debug("[{}] 4/3 [{}]", i, displayModes43.get(i));
+            }
+
+            for (int i = 0; i < displayModes169.size(); i++) {
+                log.debug("[{}] 16/9 [{}]", i, displayModes169.get(i));
             }
         } catch (LWJGLException e) {
             e.printStackTrace();
@@ -121,13 +144,13 @@ public class ClientContext {
 
     private void selectDefaultDisplayMode() {
         if (!displayModes169.isEmpty()) {
-            setCurrentDisplay(getSmallestDisplay169());
+            setCurrentDisplayMode(getSmallestDisplay169(), DisplayRatio.DISPLAY_RATIO_16_9);
             displayRatio = DisplayRatio.DISPLAY_RATIO_16_9;
-            log.debug("Setting default display {}x{} (16/9)", currentDisplay.getWidth(), currentDisplay.getHeight());
+            log.debug("Setting default display {}x{} (16/9)", currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
         } else if (!displayModes43.isEmpty()) {
-            setCurrentDisplay(getSmallestDisplay43());
+            setCurrentDisplayMode(getSmallestDisplay43(), DisplayRatio.DISPLAY_RATIO_4_3);
             displayRatio = DisplayRatio.DISPLAY_RATIO_4_3;
-            log.debug("Setting default display {}x{} (4/3)", currentDisplay.getWidth(), currentDisplay.getHeight());
+            log.debug("Setting default display {}x{} (4/3)", currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
         }
     }
 
@@ -228,22 +251,6 @@ public class ClientContext {
         }
     }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public Player getPlayer() {
         return player;
     }
@@ -260,20 +267,8 @@ public class ClientContext {
         this.tokenKey = tokenKey;
     }
 
-    public Set<DisplayMode> getDisplayModes43() {
-        return displayModes43;
-    }
-
-    public void setDisplayModes43(Set<DisplayMode> displayModes43) {
-        this.displayModes43 = displayModes43;
-    }
-
-    public Set<DisplayMode> getDisplayModes169() {
-        return displayModes169;
-    }
-
-    public void setDisplayModes169(Set<DisplayMode> displayModes169) {
-        this.displayModes169 = displayModes169;
+    public DisplayMode getCurrentDisplayMode() {
+        return currentDisplayMode;
     }
 
     public String getPathOfClientPropertiesFile() {
@@ -284,15 +279,20 @@ public class ClientContext {
         this.pathOfClientPropertiesFile = pathOfClientPropertiesFile;
     }
 
-    public DisplayMode getCurrentDisplay() {
-        return currentDisplay;
+    public List<DisplayMode> getDisplayModes43() {
+        return displayModes43;
     }
 
-    public void setCurrentDisplay(DisplayMode currentDisplay) {
-        this.currentDisplay = currentDisplay;
-        width = currentDisplay.getWidth();
-        height = currentDisplay.getHeight();
-        log.debug("Setting display mode to {}x{}", currentDisplay.getWidth(), currentDisplay.getHeight());
+    public List<DisplayMode> getDisplayModes169() {
+        return displayModes169;
+    }
+
+    public void setCurrentDisplayMode(DisplayMode currentDisplayMode, DisplayRatio displayRatio) {
+        this.currentDisplayMode = currentDisplayMode;
+        ClientContext.width = currentDisplayMode.getWidth();
+        ClientContext.height = currentDisplayMode.getHeight();
+        ClientContext.displayRatio = displayRatio;
+        log.debug("Setting display mode to {}x{}", currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
     }
 
     public enum DisplayRatio {
