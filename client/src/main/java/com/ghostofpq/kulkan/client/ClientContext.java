@@ -251,6 +251,29 @@ public class ClientContext {
         }
     }
 
+    public void setFullscreen() {
+        DisplayMode desktopDisplayMode = Display.getDesktopDisplayMode();
+        log.debug("Setting fullscreen display mode to {}x{}   ({})", desktopDisplayMode.getWidth(), desktopDisplayMode.getHeight(), desktopDisplayMode);
+        boolean displayModeChanged = false;
+        for (DisplayMode availableDisplayMode : displayModes169) {
+            if (desktopDisplayMode.getHeight() == availableDisplayMode.getHeight() && desktopDisplayMode.getWidth() == availableDisplayMode.getWidth()) {
+                setCurrentDisplayMode(desktopDisplayMode, DisplayRatio.DISPLAY_RATIO_16_9);
+                displayModeChanged = true;
+            }
+        }
+        if (!displayModeChanged) {
+            for (DisplayMode availableDisplayMode : displayModes43) {
+                if (desktopDisplayMode.getHeight() == availableDisplayMode.getHeight() && desktopDisplayMode.getWidth() == availableDisplayMode.getWidth()) {
+                    setCurrentDisplayMode(desktopDisplayMode, DisplayRatio.DISPLAY_RATIO_4_3);
+                    displayModeChanged = true;
+                }
+            }
+            if (!displayModeChanged) {
+                log.error("Display mode to {}x{} is not available", desktopDisplayMode.getWidth(), desktopDisplayMode.getHeight());
+            }
+        }
+    }
+
     public Player getPlayer() {
         return player;
     }
@@ -287,8 +310,8 @@ public class ClientContext {
         return displayModes169;
     }
 
-    public void setCurrentDisplayMode(DisplayMode currentDisplayMode, DisplayRatio displayRatio) {
-        this.currentDisplayMode = currentDisplayMode;
+    public void setCurrentDisplayMode(DisplayMode displayMode, DisplayRatio displayRatio) {
+        this.currentDisplayMode = displayMode;
         ClientContext.width = currentDisplayMode.getWidth();
         ClientContext.height = currentDisplayMode.getHeight();
         ClientContext.displayRatio = displayRatio;

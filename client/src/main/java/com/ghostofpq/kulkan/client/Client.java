@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -69,6 +68,7 @@ public class Client {
 
         this.requestClose = false;
         this.lastTimeTick = Sys.getTime();
+
         try {
             Display.setDisplayMode(clientContext.getCurrentDisplayMode());
             Display.setSwapInterval(1);
@@ -78,6 +78,8 @@ public class Client {
             e.printStackTrace();
             System.exit(0);
         }
+
+
         GraphicsManager.getInstance().ready3D();
 
         try {
@@ -94,8 +96,17 @@ public class Client {
         return clientMessenger.receiveMessage();
     }
 
-    public void changeDisplayMode(DisplayMode displayMode) {
-
+    public void updateDisplayMode() {
+        try {
+            Display.destroy();
+            Display.setDisplayMode(clientContext.getCurrentDisplayMode());
+            Display.setSwapInterval(1);
+            Display.sync(60);
+            Display.create();
+        } catch (LWJGLException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
 
     public void run() throws InterruptedException {
