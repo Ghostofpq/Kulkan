@@ -15,9 +15,7 @@
     <bean id="client" class="com.ghostofpq.kulkan.client.Client"/>
 
     <bean id="clientContext" class="com.ghostofpq.kulkan.client.ClientContext">
-        <property name="height" value="${window.height}"/>
-        <property name="width" value="${window.width}"/>
-        <property name="displayRatio" value="${window.display.ratio}"/>
+        <property name="pathOfClientPropertiesFile" value="${path.of.client.properties.file}"/>
     </bean>
 
     <bean id="clientMessenger" class="com.ghostofpq.kulkan.client.ClientMessenger">
