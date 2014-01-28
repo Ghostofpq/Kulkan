@@ -62,4 +62,30 @@ public class Resolution implements Comparable<Resolution> {
         int otherNbPixels = o.getHeight() * o.getWidth();
         return Integer.compare(nbPixels, otherNbPixels);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Resolution that = (Resolution) o;
+
+        if (height != that.height) return false;
+        if (offsetX != that.offsetX) return false;
+        if (offsetY != that.offsetY) return false;
+        if (width != that.width) return false;
+        if (resolutionRatio != that.resolutionRatio) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = width;
+        result = 31 * result + height;
+        result = 31 * result + offsetX;
+        result = 31 * result + offsetY;
+        result = 31 * result + (resolutionRatio != null ? resolutionRatio.hashCode() : 0);
+        return result;
+    }
 }
