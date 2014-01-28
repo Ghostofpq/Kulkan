@@ -68,5 +68,9 @@ public abstract class Button extends HUDElement {
         GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public abstract void onClick();
 }

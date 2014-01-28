@@ -3,7 +3,9 @@ package com.ghostofpq.kulkan.client;
 import com.ghostofpq.kulkan.client.scenes.LobbyScene;
 import com.ghostofpq.kulkan.client.scenes.LoginScene;
 import com.ghostofpq.kulkan.client.scenes.Scene;
+import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
+import com.ghostofpq.kulkan.client.utils.TextureManager;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.rabbitmq.client.Connection;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -70,7 +73,7 @@ public class Client {
         this.lastTimeTick = Sys.getTime();
 
         try {
-            Display.setDisplayMode(clientContext.getCurrentDisplayMode());
+            Display.setDisplayMode(new DisplayMode(clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight()));
             Display.setSwapInterval(1);
             Display.sync(60);
             Display.create();
@@ -79,7 +82,7 @@ public class Client {
             System.exit(0);
         }
 
-        GraphicsManager.getInstance().ready3D();
+        initGL();
 
         try {
             clientMessenger.initConnection();
@@ -98,18 +101,19 @@ public class Client {
     private void updateDisplayMode() {
         requestUpdateDisplayMode = false;
         try {
-            Display.destroy();
-            Display.setDisplayMode(clientContext.getCurrentDisplayMode());
+            Display.setDisplayMode(new DisplayMode(clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight()));
             Display.setSwapInterval(1);
             Display.sync(60);
-            Display.create();
-            Display.makeCurrent();
+
+            TextureManager.getInstance().reload();
+            FontManager.getInstance().reload();
             initGL();
+            GraphicsManager.getInstance().ready3D();
+
         } catch (LWJGLException e) {
             e.printStackTrace();
             System.exit(0);
         }
-        //GraphicsManager.getInstance().ready3D();
     }
 
     public void run() throws InterruptedException {
@@ -141,9 +145,9 @@ public class Client {
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glLoadIdentity();
-        GL11.glViewport(0, 0, clientContext.width, clientContext.height);
+        GL11.glViewport(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight());
         GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glOrtho(0.0D, clientContext.width, 0.0D, clientContext.height, 1.0D, -1.0D);
+        GL11.glOrtho(0.0D, clientContext.getCurrentResolution().getWidth(), 0.0D, clientContext.getCurrentResolution().getHeight(), 1.0D, -1.0D);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
     }
 
@@ -180,11 +184,11 @@ public class Client {
      */
 
     public int getHeight() {
-        return ClientContext.height;
+        return Display.getHeight();
     }
 
     public int getWidth() {
-        return ClientContext.width;
+        return Display.getWidth();
     }
 
     public Scene getCurrentScene() {
@@ -232,6 +236,46 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    public void setDisplayMode(int width, int height, boolean fullscreen) {
+        if ((Display.getDisplayMode().getWidth() == width) &&
+                (Display.getDisplayMode().getHeight() == height) &&
+                (Display.isFullscreen() == fullscreen)) {
+            return;
+        }
+        try {
+            DisplayMode targetDisplayMode = null;
+            if (fullscreen) {
+                DisplayMode[] modes = Display.getAvailableDisplayModes();
+                int freq = 0;
+                for (int i = 0; i < modes.length; i++) {
+                    DisplayMode current = modes[i];
+                    if ((current.getWidth() == width) && (current.getHeight() == height)) {
+                        if (((targetDisplayMode == null) || (current.getFrequency() >= freq)) && (
+                                (targetDisplayMode == null) || (current.getBitsPerPixel() > targetDisplayMode.getBitsPerPixel()))) {
+                            targetDisplayMode = current;
+                            freq = targetDisplayMode.getFrequency();
+                        }
+                        if ((current.getBitsPerPixel() != Display.getDesktopDisplayMode().getBitsPerPixel()) ||
+                                (current.getFrequency() != Display.getDesktopDisplayMode().getFrequency())) continue;
+                        targetDisplayMode = current;
+                        break;
+                    }
+                }
+            } else {
+                targetDisplayMode = new DisplayMode(width, height);
+            }
+            if (targetDisplayMode == null) {
+                System.out.println("Failed to find value mode: " + width + "x" + height + " fs=" + fullscreen);
+                return;
+            }
+            Display.setDisplayMode(targetDisplayMode);
+            Display.setFullscreen(fullscreen);
+        } catch (LWJGLException e) {
+            System.out.println("Unable to setup mode " + width + "x" + height + " fullscreen=" + fullscreen + e);
+        }
+    }
+
 
     public LobbyScene getLobbyScene() {
         return lobbyScene;

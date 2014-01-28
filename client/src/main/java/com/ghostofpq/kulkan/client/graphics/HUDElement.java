@@ -27,7 +27,7 @@ public abstract class HUDElement {
     }
 
     public boolean isClicked() {
-        return isClicked(Mouse.getX(), ClientContext.height - Mouse.getY());
+        return isClicked(Mouse.getX(), ClientContext.currentResolution.getHeight() - Mouse.getY());
     }
 
     public boolean isInstantRepetition() {

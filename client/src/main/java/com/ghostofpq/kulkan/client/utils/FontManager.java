@@ -27,6 +27,10 @@ public class FontManager {
         return instance;
     }
 
+    public void reload() {
+        instance = new FontManager();
+    }
+
     private void init() {
         try {
             fontMap.put("arial_16", new AngelCodeFont("resources/HUD/font/Arial/arial_16_white.fnt", "resources/HUD/font/Arial/arial_16_white.png"));

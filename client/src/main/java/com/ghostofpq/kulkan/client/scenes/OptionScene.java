@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.graphics.Button;
 import com.ghostofpq.kulkan.client.graphics.TextZone;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
+import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class OptionScene implements Scene {
     private Button applyButton;
     private Button backButton;
     private int index;
-    private ClientContext.DisplayRatio displayRatio;
+    private ResolutionRatio resolutionRatio;
 
     public OptionScene() {
     }
@@ -34,8 +35,8 @@ public class OptionScene implements Scene {
     @Override
     public void init() {
         index = 0;
-        int widthStep = (clientContext.width / 10);
-        int heightStep = (clientContext.height / 6);
+        int widthStep = (clientContext.getCurrentResolution().getWidth() / 10);
+        int heightStep = (clientContext.getCurrentResolution().getHeight() / 6);
         int posXPrev = widthStep * 2;
         int posXRes = widthStep * 3;
         int posXNext = widthStep * 7;
@@ -43,7 +44,7 @@ public class OptionScene implements Scene {
         int posY = heightStep;
 
 
-        displayRatio = clientContext.displayRatio;
+        resolutionRatio = clientContext.getCurrentResolution().getResolutionRatio();
 
         prevButton = new Button(posXPrev, posY, widthStep, heightStep, "<") {
             @Override
@@ -62,15 +63,15 @@ public class OptionScene implements Scene {
                 Button(posXNext, posY, widthStep, heightStep, ">") {
                     @Override
                     public void onClick() {
-                        switch (displayRatio) {
-                            case DISPLAY_RATIO_4_3:
-                                if (index < clientContext.getDisplayModes43().size() - 1) {
+                        switch (resolutionRatio) {
+                            case RATIO_4_3:
+                                if (index < clientContext.getResolutions43().size() - 1) {
                                     index++;
                                     updateFields();
                                 }
                                 break;
-                            case DISPLAY_RATIO_16_9:
-                                if (index < clientContext.getDisplayModes169().size() - 1) {
+                            case RATIO_16_9:
+                                if (index < clientContext.getResolutions169().size() - 1) {
                                     index++;
                                     updateFields();
                                 }
@@ -82,19 +83,19 @@ public class OptionScene implements Scene {
 
         int posXSwitch = widthStep * 4;
         int posYSwitch = heightStep * 3;
-        if (clientContext.getDisplayModes43().size() != 0 && clientContext.getDisplayModes169().size() != 0) {
+        if (clientContext.getResolutions43().size() != 0 && clientContext.getResolutions169().size() != 0) {
             switchRatioButton = new
                     Button(posXSwitch, posYSwitch, widthStep * 2, heightStep, "") {
                         @Override
                         public void onClick() {
-                            switch (displayRatio) {
-                                case DISPLAY_RATIO_4_3:
-                                    displayRatio = ClientContext.DisplayRatio.DISPLAY_RATIO_16_9;
+                            switch (resolutionRatio) {
+                                case RATIO_4_3:
+                                    resolutionRatio = ResolutionRatio.RATIO_16_9;
                                     index = 0;
                                     updateFields();
                                     break;
-                                case DISPLAY_RATIO_16_9:
-                                    displayRatio = ClientContext.DisplayRatio.DISPLAY_RATIO_4_3;
+                                case RATIO_16_9:
+                                    resolutionRatio = ResolutionRatio.RATIO_4_3;
                                     index = 0;
                                     updateFields();
                                     break;
@@ -103,6 +104,7 @@ public class OptionScene implements Scene {
                     };
         }
 
+
         int posXApply = widthStep * 2;
         int posYApply = heightStep * 5;
         applyButton = new
@@ -110,13 +112,13 @@ public class OptionScene implements Scene {
                 Button(posXApply, posYApply, widthStep * 2, heightStep, "APPLY") {
                     @Override
                     public void onClick() {
-                        switch (displayRatio) {
-                            case DISPLAY_RATIO_4_3:
-                                clientContext.setCurrentDisplayMode(clientContext.getDisplayModes43().get(index), ClientContext.DisplayRatio.DISPLAY_RATIO_4_3);
+                        switch (resolutionRatio) {
+                            case RATIO_4_3:
+                                clientContext.setCurrentResolution(clientContext.getResolutions43().get(index));
                                 client.updateDisplay();
                                 break;
-                            case DISPLAY_RATIO_16_9:
-                                clientContext.setCurrentDisplayMode(clientContext.getDisplayModes43().get(index), ClientContext.DisplayRatio.DISPLAY_RATIO_16_9);
+                            case RATIO_16_9:
+                                clientContext.setCurrentResolution(clientContext.getResolutions169().get(index));
                                 client.updateDisplay();
                                 break;
                         }
@@ -138,18 +140,24 @@ public class OptionScene implements Scene {
 
     private void updateFields() {
         String text = "";
-        switch (displayRatio) {
-            case DISPLAY_RATIO_4_3:
-                text = new StringBuilder().append(clientContext.getDisplayModes43().get(index).getWidth())
+        switch (resolutionRatio) {
+            case RATIO_4_3:
+                text = new StringBuilder().append(clientContext.getResolutions43().get(index).getWidth())
                         .append("x")
-                        .append(clientContext.getDisplayModes43().get(index).getHeight())
+                        .append(clientContext.getResolutions43().get(index).getHeight())
                         .toString();
+                if (clientContext.getResolutions43().size() != 0 && clientContext.getResolutions169().size() != 0) {
+                    switchRatioButton.setLabel(ResolutionRatio.RATIO_16_9.toString());
+                }
                 break;
-            case DISPLAY_RATIO_16_9:
-                text = new StringBuilder().append(clientContext.getDisplayModes169().get(index).getWidth())
+            case RATIO_16_9:
+                text = new StringBuilder().append(clientContext.getResolutions169().get(index).getWidth())
                         .append("x")
-                        .append(clientContext.getDisplayModes169().get(index).getHeight())
+                        .append(clientContext.getResolutions169().get(index).getHeight())
                         .toString();
+                if (clientContext.getResolutions43().size() != 0 && clientContext.getResolutions169().size() != 0) {
+                    switchRatioButton.setLabel(ResolutionRatio.RATIO_4_3.toString());
+                }
                 break;
         }
         resolution.setText(text);

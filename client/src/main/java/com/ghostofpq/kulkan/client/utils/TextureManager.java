@@ -83,10 +83,13 @@ public class TextureManager {
             textureMap.put(TextureKey.EARTH_SIDE_02, earthSide02);
             textureMap.put(TextureKey.EARTH_SIDE_03, earthSide03);
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void reload() {
+        instance = new TextureManager();
     }
 
     public static TextureManager getInstance() {
