@@ -14,6 +14,8 @@ public class ClientContext {
     // WINDOW
     public static int height;
     public static int width;
+    public static int xOffset;
+    public static int yOffset;
     public static DisplayRatio displayRatio;
     private List<DisplayMode> displayModes43;
     private List<DisplayMode> displayModes169;
@@ -258,6 +260,8 @@ public class ClientContext {
         for (DisplayMode availableDisplayMode : displayModes169) {
             if (desktopDisplayMode.getHeight() == availableDisplayMode.getHeight() && desktopDisplayMode.getWidth() == availableDisplayMode.getWidth()) {
                 setCurrentDisplayMode(desktopDisplayMode, DisplayRatio.DISPLAY_RATIO_16_9);
+                xOffset = 0;
+                yOffset = 0;
                 displayModeChanged = true;
             }
         }
@@ -265,6 +269,8 @@ public class ClientContext {
             for (DisplayMode availableDisplayMode : displayModes43) {
                 if (desktopDisplayMode.getHeight() == availableDisplayMode.getHeight() && desktopDisplayMode.getWidth() == availableDisplayMode.getWidth()) {
                     setCurrentDisplayMode(desktopDisplayMode, DisplayRatio.DISPLAY_RATIO_4_3);
+                    xOffset = 0;
+                    yOffset = 0;
                     displayModeChanged = true;
                 }
             }
@@ -312,10 +318,52 @@ public class ClientContext {
 
     public void setCurrentDisplayMode(DisplayMode displayMode, DisplayRatio displayRatio) {
         this.currentDisplayMode = displayMode;
-        ClientContext.width = currentDisplayMode.getWidth();
-        ClientContext.height = currentDisplayMode.getHeight();
-        ClientContext.displayRatio = displayRatio;
-        log.debug("Setting display mode to {}x{}", currentDisplayMode.getWidth(), currentDisplayMode.getHeight());
+        width = currentDisplayMode.getWidth();
+        height = currentDisplayMode.getHeight();
+        this.displayRatio = displayRatio;
+        //setDisplayMode(width, height, false);
+        log.debug("width :{}", width);
+        log.debug("height :{}", height);
+        log.debug("displayRatio :{}", this.displayRatio);
+    }
+
+    public void setDisplayMode(int width, int height, boolean fullscreen) {
+        if ((Display.getDisplayMode().getWidth() == width) &&
+                (Display.getDisplayMode().getHeight() == height) &&
+                (Display.isFullscreen() == fullscreen)) {
+            return;
+        }
+        try {
+            DisplayMode targetDisplayMode = null;
+            if (fullscreen) {
+                DisplayMode[] modes = Display.getAvailableDisplayModes();
+                int freq = 0;
+                for (int i = 0; i < modes.length; i++) {
+                    DisplayMode current = modes[i];
+                    if ((current.getWidth() == width) && (current.getHeight() == height)) {
+                        if (((targetDisplayMode == null) || (current.getFrequency() >= freq)) && (
+                                (targetDisplayMode == null) || (current.getBitsPerPixel() > targetDisplayMode.getBitsPerPixel()))) {
+                            targetDisplayMode = current;
+                            freq = targetDisplayMode.getFrequency();
+                        }
+                        if ((current.getBitsPerPixel() != Display.getDesktopDisplayMode().getBitsPerPixel()) ||
+                                (current.getFrequency() != Display.getDesktopDisplayMode().getFrequency())) continue;
+                        targetDisplayMode = current;
+                        break;
+                    }
+                }
+            } else {
+                targetDisplayMode = new DisplayMode(width, height);
+            }
+            if (targetDisplayMode == null) {
+                System.out.println("Failed to find value mode: " + width + "x" + height + " fs=" + fullscreen);
+                return;
+            }
+            Display.setDisplayMode(targetDisplayMode);
+            Display.setFullscreen(fullscreen);
+        } catch (LWJGLException e) {
+            System.out.println("Unable to setup mode " + width + "x" + height + " fullscreen=" + fullscreen + e);
+        }
     }
 
     public enum DisplayRatio {

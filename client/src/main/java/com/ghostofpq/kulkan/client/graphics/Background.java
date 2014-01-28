@@ -15,6 +15,7 @@ public class Background {
     }
 
     public void draw() {
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glColor4f(1f, 1f, 1f, 1f);
         Texture texture = TextureManager.getInstance().getTexture(textureKey);
         texture.bind();
@@ -28,5 +29,6 @@ public class Background {
         GL11.glTexCoord2d(0, texture.getHeight());
         GL11.glVertex2f(0, Client.getInstance().getHeight());
         GL11.glEnd();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 }

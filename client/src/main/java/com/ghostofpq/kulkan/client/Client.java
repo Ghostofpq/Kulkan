@@ -23,13 +23,12 @@ import java.io.IOException;
 public class Client {
     private static volatile Client instance = null;
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
-    private int height;
-    private int width;
     private Scene currentScene;
     private Player player;
     private String tokenKey;
     private long lastTimeTick;
     private boolean requestClose;
+    private boolean requestUpdateDisplayMode;
     @Autowired
     private ClientContext clientContext;
     @Autowired
@@ -67,6 +66,7 @@ public class Client {
         clientContext.init();
 
         this.requestClose = false;
+        this.requestUpdateDisplayMode = false;
         this.lastTimeTick = Sys.getTime();
 
         try {
@@ -78,7 +78,6 @@ public class Client {
             e.printStackTrace();
             System.exit(0);
         }
-
 
         GraphicsManager.getInstance().ready3D();
 
@@ -96,21 +95,25 @@ public class Client {
         return clientMessenger.receiveMessage();
     }
 
-    public void updateDisplayMode() {
+    private void updateDisplayMode() {
+        requestUpdateDisplayMode = false;
         try {
             Display.destroy();
             Display.setDisplayMode(clientContext.getCurrentDisplayMode());
             Display.setSwapInterval(1);
             Display.sync(60);
             Display.create();
+            Display.makeCurrent();
+            initGL();
         } catch (LWJGLException e) {
             e.printStackTrace();
             System.exit(0);
         }
+        //GraphicsManager.getInstance().ready3D();
     }
 
     public void run() throws InterruptedException {
-        while (!requestClose) {
+        while (!requestClose && !requestUpdateDisplayMode) {
             update(deltaTimeInMillis());
             currentScene.manageInput();
             currentScene.receiveMessage();
@@ -118,12 +121,30 @@ public class Client {
             lastTimeTick = Sys.getTime();
             Thread.sleep(1);
         }
-        try {
-            clientMessenger.closeConnection();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (requestUpdateDisplayMode) {
+            updateDisplayMode();
+            setCurrentScene(currentScene);
+            run();
+        } else {
+            try {
+                clientMessenger.closeConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Display.destroy();
         }
-        Display.destroy();
+    }
+
+    private void initGL() {
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glLoadIdentity();
+        GL11.glViewport(0, 0, clientContext.width, clientContext.height);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glOrtho(0.0D, clientContext.width, 0.0D, clientContext.height, 1.0D, -1.0D);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
     }
 
     private long deltaTimeInMillis() {
@@ -148,6 +169,10 @@ public class Client {
 
     public void quit() {
         requestClose = true;
+    }
+
+    public void updateDisplay() {
+        requestUpdateDisplayMode = true;
     }
 
     /**

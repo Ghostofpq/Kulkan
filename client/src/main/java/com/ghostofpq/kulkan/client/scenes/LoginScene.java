@@ -26,19 +26,23 @@ import java.util.List;
 
 @Slf4j
 public class LoginScene implements Scene {
-
+    @Autowired
+    private Client client;
     @Autowired
     private ClientContext clientContext;
     @Autowired
     private ClientMessenger clientMessenger;
     @Autowired
     private LobbyScene lobbyScene;
+    @Autowired
+    private OptionScene optionScene;
     // PSEUDO FIELD
     private TextField pseudoField;
     // PASSWORD FIELD
     private PasswordField passwordField;
     // CONNECT BUTTON
     private Button connectButton;
+    private Button optionButton;
     // CREATE ACCOUNT BUTTON
     private Button createAccountButton;
     // QUIT BUTTON
@@ -73,7 +77,14 @@ public class LoginScene implements Scene {
                         actionQuit();
                     }
                 };
+        optionButton = new
 
+                Button(10, 10, 50, 50, "Opt.") {
+                    @Override
+                    public void onClick() {
+                        actionOption();
+                    }
+                };
 
         createAccountButton = new
 
@@ -90,6 +101,7 @@ public class LoginScene implements Scene {
         hudElementList.add(passwordField);
         hudElementList.add(connectButton);
         hudElementList.add(quitButton);
+        hudElementList.add(optionButton);
         hudElementList.add(createAccountButton);
         setFocusOn(hudElementList.indexOf(pseudoField));
 
@@ -129,6 +141,11 @@ public class LoginScene implements Scene {
     private void actionQuit() {
         log.debug("QUIT");
         Client.getInstance().quit();
+    }
+
+    private void actionOption() {
+        log.debug("OPTION");
+        client.setCurrentScene(optionScene);
     }
 
     private void actionCreateAccount() {
@@ -204,6 +221,10 @@ public class LoginScene implements Scene {
                 if (createAccountButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(createAccountButton));
                     createAccountButton.onClick();
+                }
+                if (optionButton.isClicked()) {
+                    setFocusOn(hudElementList.indexOf(optionButton));
+                    optionButton.onClick();
                 }
             }
         }
