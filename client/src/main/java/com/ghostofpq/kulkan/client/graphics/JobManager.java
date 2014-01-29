@@ -89,11 +89,11 @@ public class JobManager extends HUDElement {
         }
     }
 
-    public Capacity clickedCapacity(int mouseX, int mouseY) {
+    public Capacity clickedCapacity() {
         Capacity clickedCapacity = null;
 
         for (Capacity capacity : capacities.keySet()) {
-            if (capacities.get(capacity).isClicked(mouseX, mouseY)) {
+            if (capacities.get(capacity).isClicked()) {
                 clickedCapacity = capacity;
             }
         }

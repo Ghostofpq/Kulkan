@@ -366,40 +366,40 @@ public class NewGameCharacterScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (male.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (male.isClicked()) {
                     male.onClick();
                 }
-                if (female.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (female.isClicked()) {
                     female.onClick();
                 }
-                if (gorilla.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (gorilla.isClicked()) {
                     gorilla.onClick();
                 }
-                if (jaguar.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (jaguar.isClicked()) {
                     jaguar.onClick();
                 }
-                if (turtle.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (turtle.isClicked()) {
                     turtle.onClick();
                 }
-                if (monkey.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (monkey.isClicked()) {
                     monkey.onClick();
                 }
-                if (panther.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (panther.isClicked()) {
                     panther.onClick();
                 }
-                if (lizard.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (lizard.isClicked()) {
                     lizard.onClick();
                 }
-                if (ara.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (ara.isClicked()) {
                     ara.onClick();
                 }
-                if (eagle.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (eagle.isClicked()) {
                     eagle.onClick();
                 }
-                if (validate.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (validate.isClicked()) {
                     validate.onClick();
                 }
-                if (quit.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quit.isClicked()) {
                     quit.onClick();
                 }
             }

@@ -140,15 +140,15 @@ public class EquipItemScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quitButton.isClicked()) {
                     quitButton.onClick();
-                } else if (equipButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (equipButton.isClicked()) {
                     if (selectedItem != null) {
                         equipButton.onClick();
                     }
                 } else {
                     for (Button button : itemButtonList) {
-                        if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (button.isClicked()) {
                             button.onClick();
                         }
                     }

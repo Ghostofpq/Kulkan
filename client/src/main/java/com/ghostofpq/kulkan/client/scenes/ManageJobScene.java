@@ -122,14 +122,14 @@ public class ManageJobScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quitButton.isClicked()) {
                     quitButton.onClick();
-                } else if (unlockCapacity.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (unlockCapacity.isClicked()) {
                     if (null != selectedCapacity && selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
                         unlockCapacity.onClick();
                     }
-                } else if (jobManager.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
-                    Capacity capacity = jobManager.clickedCapacity(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY());
+                } else if (jobManager.isClicked()) {
+                    Capacity capacity = jobManager.clickedCapacity();
                     if (null != capacity) {
                         selectedCapacity = capacity;
                         selectedCapacityName.setValue(capacity.getName());

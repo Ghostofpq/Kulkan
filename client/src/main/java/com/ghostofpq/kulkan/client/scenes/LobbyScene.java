@@ -241,17 +241,17 @@ public class LobbyScene implements Scene {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
                 for (HUDElement hudElement : hudElementList) {
-                    if (hudElement.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    if (hudElement.isClicked()) {
                         setFocusOn(hudElementList.indexOf(hudElement));
                         if (hudElement instanceof Button) {
                             ((Button) hudElement).onClick();
                         }
                     }
                 }
-                if (acceptButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (acceptButton.isClicked()) {
                     acceptButton.onClick();
                 }
-                if (refuseButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (refuseButton.isClicked()) {
                     refuseButton.onClick();
                 }
             }

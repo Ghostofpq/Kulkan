@@ -169,13 +169,13 @@ public class ShopScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quitButton.isClicked()) {
                     quitButton.onClick();
-                } else if (buyItem.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (buyItem.isClicked()) {
                     buyItem.onClick();
                 } else {
                     for (Button button : buttons) {
-                        if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (button.isClicked()) {
                             button.onClick();
                         }
                     }

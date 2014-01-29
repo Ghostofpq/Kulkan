@@ -240,12 +240,12 @@ public class TeamManagementScene implements Scene {
             if (Mouse.isButtonDown(0)) {
                 if (view.equals(ManagementView.TEAM)) {
                     for (Button button : buttonsNewGameCharacter) {
-                        if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (button.isClicked()) {
                             button.onClick();
                         }
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : teamManagementCharacterRenderList) {
-                        if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
                             Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
@@ -254,12 +254,12 @@ public class TeamManagementScene implements Scene {
                 }
                 if (view.equals(ManagementView.STOCK_PAGE_1)) {
                     for (Button button : buttonsNewGameCharacterPage1) {
-                        if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (button.isClicked()) {
                             button.onClick();
                         }
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage1) {
-                        if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
                             Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
@@ -268,12 +268,12 @@ public class TeamManagementScene implements Scene {
                 }
                 if (view.equals(ManagementView.STOCK_PAGE_2)) {
                     for (Button button : buttonsNewGameCharacterPage2) {
-                        if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (button.isClicked()) {
                             button.onClick();
                         }
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage2) {
-                        if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
                             Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
@@ -282,12 +282,12 @@ public class TeamManagementScene implements Scene {
                 }
                 if (view.equals(ManagementView.STOCK_PAGE_3)) {
                     for (Button button : buttonsNewGameCharacterPage3) {
-                        if (button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (button.isClicked()) {
                             button.onClick();
                         }
                     }
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage3) {
-                        if (teamManagementCharacterRender.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
                             GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
                             Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
@@ -295,19 +295,19 @@ public class TeamManagementScene implements Scene {
                     }
                 }
 
-                if (backButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (backButton.isClicked()) {
                     backButton.onClick();
                 }
-                if (teamViewButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (teamViewButton.isClicked()) {
                     teamViewButton.onClick();
                 }
-                if (stockViewPage1Button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (stockViewPage1Button.isClicked()) {
                     stockViewPage1Button.onClick();
                 }
-                if (stockViewPage2Button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (stockViewPage2Button.isClicked()) {
                     stockViewPage2Button.onClick();
                 }
-                if (stockViewPage3Button.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (stockViewPage3Button.isClicked()) {
                     stockViewPage3Button.onClick();
                 }
             }

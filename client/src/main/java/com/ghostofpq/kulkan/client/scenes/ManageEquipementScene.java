@@ -282,53 +282,53 @@ public class ManageEquipementScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quitButton.isClicked()) {
                     quitButton.onClick();
-                } else if (unequipHelm.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (unequipHelm.isClicked()) {
                     if (null != gameCharacter.getEquipment().getHelm()) {
                         unequipHelm.onClick();
                     }
-                } else if (unequipArmor.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (unequipArmor.isClicked()) {
                     if (null != gameCharacter.getEquipment().getArmor()) {
                         unequipArmor.onClick();
                     }
-                } else if (unequipNecklace.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (unequipNecklace.isClicked()) {
                     if (null != gameCharacter.getEquipment().getNecklace()) {
                         unequipNecklace.onClick();
                     }
-                } else if (unequipRing.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (unequipRing.isClicked()) {
                     if (null != gameCharacter.getEquipment().getRing()) {
                         unequipRing.onClick();
                     }
-                } else if (unequipWeapon.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (unequipWeapon.isClicked()) {
                     if (null != gameCharacter.getEquipment().getWeapon()) {
                         unequipWeapon.onClick();
                     }
-                } else if (unequipHeldItem.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (unequipHeldItem.isClicked()) {
                     if (null != gameCharacter.getEquipment().getHeldItem()) {
                         unequipHeldItem.onClick();
                     }
-                } else if (equipHelm.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (equipHelm.isClicked()) {
                     if (null == gameCharacter.getEquipment().getHelm()) {
                         equipHelm.onClick();
                     }
-                } else if (equipArmor.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (equipArmor.isClicked()) {
                     if (null == gameCharacter.getEquipment().getArmor()) {
                         equipArmor.onClick();
                     }
-                } else if (equipNecklace.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (equipNecklace.isClicked()) {
                     if (null == gameCharacter.getEquipment().getNecklace()) {
                         equipNecklace.onClick();
                     }
-                } else if (equipRing.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (equipRing.isClicked()) {
                     if (null == gameCharacter.getEquipment().getRing()) {
                         equipRing.onClick();
                     }
-                } else if (equipWeapon.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (equipWeapon.isClicked()) {
                     if (null == gameCharacter.getEquipment().getWeapon()) {
                         equipWeapon.onClick();
                     }
-                } else if (equipHeldItem.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                } else if (equipHeldItem.isClicked()) {
                     if (null == gameCharacter.getEquipment().getHeldItem()) {
                         equipHeldItem.onClick();
                     }

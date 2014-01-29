@@ -212,28 +212,28 @@ public class GameCharacterManageScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (quitButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (quitButton.isClicked()) {
                     quitButton.onClick();
                 }
-                if (deleteGameCharButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (deleteGameCharButton.isClicked()) {
                     deleteGameCharButton.onClick();
                 }
-                if (manageEquipementButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (manageEquipementButton.isClicked()) {
                     manageEquipementButton.onClick();
                 }
-                if (manageJobButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (manageJobButton.isClicked()) {
                     manageJobButton.onClick();
                 }
                 if (isInTeam()) {
-                    if (putInStock.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    if (putInStock.isClicked()) {
                         putInStock.onClick();
                     }
                 } else {
-                    if (putInTeam.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                    if (putInTeam.isClicked()) {
                         putInTeam.onClick();
                     }
                 }
-                if (changeJobButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                if (changeJobButton.isClicked()) {
                     changeJobButton.onClick();
                 }
             }
