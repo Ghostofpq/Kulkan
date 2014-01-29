@@ -515,7 +515,7 @@ public class BattleScene implements Scene {
             while (Mouse.next()) {
                 if (Mouse.isButtonDown(0)) {
                     if (currentState.equals(BattleSceneState.GAME_OVER)) {
-                        if (gameOverButton.isClicked(Mouse.getX(), Client.getInstance().getHeight() - Mouse.getY())) {
+                        if (gameOverButton.isClicked()) {
                             gameOverButton.onClick();
                         }
                     }

@@ -61,21 +61,46 @@ public class LoginScene implements Scene {
 
     @Override
     public void init() {
-        pseudoField = new TextField(250, 200, 300, 50, 10);
+        int widthStep = clientContext.getCurrentResolution().getWidth() / 10;
+        int heightStep = clientContext.getCurrentResolution().getHeight() / 10;
+        int textFieldsWidth = 300;
+        int textFieldsHeight = 50;
+        int pseudoFieldPosX = (5 * widthStep) - (textFieldsWidth / 2);
+        int pseudoFieldPosY = (4 * heightStep) - (textFieldsHeight / 2);
+        int passwordFieldPosX = pseudoFieldPosX;
+        int passwordFieldPosY = pseudoFieldPosY + (textFieldsHeight * 3 / 2);
 
-        passwordField = new PasswordField(250, 300, 300, 50, 10);
+        int buttonsWidth = 200;
+        int buttonsHeight = 50;
+        int connectButtonPosX = (5 * widthStep) - (buttonsWidth / 2);
+        int connectButtonPosY = passwordFieldPosY + (buttonsHeight * 3 / 2);
+        int createAccountButtonPosX = connectButtonPosX;
+        int createAccountButtonPosY = connectButtonPosY + buttonsHeight;
+        int quitButtonPosX = connectButtonPosX;
+        int quitButtonPosY = createAccountButtonPosY + buttonsHeight;
+
+        pseudoField = new TextField(pseudoFieldPosX, pseudoFieldPosY, textFieldsWidth, textFieldsHeight, 10);
+
+        passwordField = new PasswordField(passwordFieldPosX, passwordFieldPosY, textFieldsWidth, textFieldsHeight, 10);
 
         connectButton = new
-                Button(300, 400, 200, 50, "CONNECT") {
+                Button(connectButtonPosX, connectButtonPosY, buttonsWidth, buttonsHeight, "CONNECT") {
                     @Override
                     public void onClick() {
                         actionConnect();
                     }
                 };
+        createAccountButton = new
 
+                Button(createAccountButtonPosX, createAccountButtonPosY, 200, 50, "CREATE ACCOUNT") {
+                    @Override
+                    public void onClick() {
+                        actionCreateAccount();
+                    }
+                };
         quitButton = new
 
-                Button(300, 450, 200, 50, "QUIT") {
+                Button(quitButtonPosX, quitButtonPosY, 200, 50, "QUIT") {
                     @Override
                     public void onClick() {
                         actionQuit();
@@ -90,14 +115,6 @@ public class LoginScene implements Scene {
                     }
                 };
 
-        createAccountButton = new
-
-                Button(300, 500, 200, 50, "CREATE ACCOUNT") {
-                    @Override
-                    public void onClick() {
-                        actionCreateAccount();
-                    }
-                };
 
         hudElementList = new ArrayList<HUDElement>();
 
