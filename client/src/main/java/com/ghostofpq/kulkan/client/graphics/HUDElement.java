@@ -14,20 +14,30 @@ public abstract class HUDElement {
 
     public abstract void draw();
 
-    public boolean isClicked(int mouseX, int mouseY) {
+    public boolean isHovered() {
+        return isHovered(Mouse.getX(), ClientContext.currentResolution.getHeight() - Mouse.getY());
+    }
+
+    private boolean isHovered(int mouseX, int mouseY) {
         boolean result = false;
-        if (!isInstantRepetition()) {
-            boolean okMouseX = (mouseX >= posX && mouseX <= posX + width);
-            boolean okMouseY = (mouseY >= posY && mouseY <= posY + height);
-            if (okMouseX && okMouseY) {
-                result = true;
-            }
+        boolean okMouseX = (mouseX >= posX && mouseX <= posX + width);
+        boolean okMouseY = (mouseY >= posY && mouseY <= posY + height);
+        if (okMouseX && okMouseY) {
+            result = true;
         }
         return result;
     }
 
     public boolean isClicked() {
         return isClicked(Mouse.getX(), ClientContext.currentResolution.getHeight() - Mouse.getY());
+    }
+
+    private boolean isClicked(int mouseX, int mouseY) {
+        boolean result = false;
+        if (!isInstantRepetition()) {
+            result = isHovered();
+        }
+        return result;
     }
 
     public boolean isInstantRepetition() {
