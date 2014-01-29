@@ -1,10 +1,10 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
-import com.ghostofpq.kulkan.client.graphics.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.TextArea;
 import com.ghostofpq.kulkan.client.graphics.JobManager;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
-import com.ghostofpq.kulkan.client.graphics.TextArea;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;

@@ -1,4 +1,4 @@
-package com.ghostofpq.kulkan.client.graphics;
+package com.ghostofpq.kulkan.client.graphics.HUD;
 
 import com.ghostofpq.kulkan.client.ClientContext;
 import org.lwjgl.input.Mouse;

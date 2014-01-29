@@ -2,8 +2,8 @@ package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
-import com.ghostofpq.kulkan.client.graphics.Button;
-import com.ghostofpq.kulkan.client.graphics.TextZone;
+import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.TextZone;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
 import lombok.extern.slf4j.Slf4j;

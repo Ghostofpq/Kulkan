@@ -2,6 +2,7 @@ package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.graphics.*;
+import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.HighlightColor;
 import com.ghostofpq.kulkan.client.utils.InputManager;

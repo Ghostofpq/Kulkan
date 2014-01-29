@@ -1,26 +1,28 @@
-package com.ghostofpq.kulkan.client.graphics;
+package com.ghostofpq.kulkan.client.graphics.HUD;
 
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.client.utils.TextureManager;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
-public class TextZone extends HUDElement {
+@Slf4j
+public class TextField extends HUDElement {
     private final String FONT = "optimus_princeps_16";
+    protected String content;
+    private int maxLength;
     private FontManager fontManager = FontManager.getInstance();
-    private String text;
-    private int posXText;
-    private int posYText;
 
-    public TextZone(int posX, int posY, int length, int height, String text) {
+    public TextField(int posX, int posY, int length, int height, int maxLength) {
         this.posX = posX;
         this.posY = posY;
         this.width = length;
         this.height = height;
+        this.maxLength = maxLength;
         this.hasFocus = false;
-        setText(text);
+        content = "";
     }
 
     @Override
@@ -46,17 +48,36 @@ public class TextZone extends HUDElement {
         GL11.glEnd();
 
 
-        fontManager.drawString(FONT, posXText, posYText, text, Color.white);
+        int posXText = posX + (width - fontManager.getFontMap().get(FONT).getWidth(getContentToPrint())) / 2;
+        int posYText = posY + (height - fontManager.getFontMap().get(FONT).getHeight(getContentToPrint())) / 2;
+
+        fontManager.drawString(FONT, posXText, posYText, getContentToPrint(), Color.white);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 
-    public String getText() {
-        return text;
+    public String getContent() {
+        return content;
     }
 
-    public void setText(String text) {
-        this.text = text;
-        posXText = posX + (width - fontManager.getFontMap().get(FONT).getWidth(text)) / 2;
-        posYText = posY + (height - fontManager.getFontMap().get(FONT).getHeight(text)) / 2;
+    public String getContentToPrint() {
+        return content;
+    }
+
+    public void writeChar(char c) {
+        if (Character.isLetterOrDigit(c) || Character.isSpaceChar(c)) {
+            if (content.length() < maxLength) {
+                content += c;
+            }
+        }
+    }
+
+    public void deleteLastChar() {
+        if (!content.isEmpty()) {
+            content = content.substring(0, content.length() - 1);
+        }
+    }
+
+    public void clear() {
+        content = "";
     }
 }

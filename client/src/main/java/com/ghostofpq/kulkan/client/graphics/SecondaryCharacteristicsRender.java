@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.client.graphics;
 
+import com.ghostofpq.kulkan.client.graphics.HUD.HUDElement;
 import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import org.newdawn.slick.Color;

@@ -1,8 +1,8 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
-import com.ghostofpq.kulkan.client.graphics.Button;
-import com.ghostofpq.kulkan.client.graphics.TextField;
+import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.entities.character.Gender;

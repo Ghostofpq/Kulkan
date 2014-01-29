@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.client.graphics;
 
 
+import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.HUDElement;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import lombok.extern.slf4j.Slf4j;
