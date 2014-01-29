@@ -13,10 +13,10 @@ import java.util.*;
 
 @Slf4j
 public class ClientContext {
+    public static Resolution currentResolution;
     // WINDOW
     private List<Resolution> resolutions43;
     private List<Resolution> resolutions169;
-    public static Resolution currentResolution;
     private String pathOfClientPropertiesFile;
     // USER INFO
     private String pseudo;
@@ -123,11 +123,11 @@ public class ClientContext {
 
     private void selectDefaultResolution() {
         if (!resolutions43.isEmpty()) {
-            setCurrentResolution(getSmallestResolution169());
-            log.debug("Setting default display {}x{} (16/9)", currentResolution.getWidth(), currentResolution.getHeight());
-        } else if (!resolutions169.isEmpty()) {
             setCurrentResolution(getSmallestResolution43());
             log.debug("Setting default display {}x{} (4/3)", currentResolution.getWidth(), currentResolution.getHeight());
+        } else if (!resolutions169.isEmpty()) {
+            setCurrentResolution(getSmallestResolution169());
+            log.debug("Setting default display {}x{} (16/9)", currentResolution.getWidth(), currentResolution.getHeight());
         }
     }
 
