@@ -282,6 +282,7 @@ public class ClientContext {
         log.debug("width :{}", resolution.getWidth());
         log.debug("height :{}", resolution.getHeight());
         log.debug("ratio :{}", resolution.getResolutionRatio());
+        saveClientProperties();
     }
 
     public List<Resolution> getResolutions43() {
