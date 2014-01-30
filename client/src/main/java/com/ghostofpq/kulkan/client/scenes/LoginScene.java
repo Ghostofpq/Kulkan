@@ -83,38 +83,32 @@ public class LoginScene implements Scene {
 
         passwordField = new PasswordField(passwordFieldPosX, passwordFieldPosY, textFieldsWidth, textFieldsHeight, 10);
 
-        connectButton = new
-                Button(connectButtonPosX, connectButtonPosY, buttonsWidth, buttonsHeight, "CONNECT") {
-                    @Override
-                    public void onClick() {
-                        actionConnect();
-                    }
-                };
-        createAccountButton = new
+        connectButton = new Button(connectButtonPosX, connectButtonPosY, buttonsWidth, buttonsHeight, "CONNECT") {
+            @Override
+            public void onClick() {
+                actionConnect();
+            }
+        };
 
-                Button(createAccountButtonPosX, createAccountButtonPosY, 200, 50, "CREATE ACCOUNT") {
-                    @Override
-                    public void onClick() {
-                        actionCreateAccount();
-                    }
-                };
-        quitButton = new
+        createAccountButton = new Button(createAccountButtonPosX, createAccountButtonPosY, buttonsWidth, buttonsHeight, "CREATE ACCOUNT") {
+            @Override
+            public void onClick() {
+                actionCreateAccount();
+            }
+        };
+        quitButton = new Button(quitButtonPosX, quitButtonPosY, buttonsWidth, buttonsHeight, "QUIT") {
+            @Override
+            public void onClick() {
+                actionQuit();
+            }
+        };
 
-                Button(quitButtonPosX, quitButtonPosY, 200, 50, "QUIT") {
-                    @Override
-                    public void onClick() {
-                        actionQuit();
-                    }
-                };
-        optionButton = new
-
-                Button(10, 10, 50, 50, "Opt.") {
-                    @Override
-                    public void onClick() {
-                        actionOption();
-                    }
-                };
-
+        optionButton = new Button(10, 10, 50, 50, "Opt.") {
+            @Override
+            public void onClick() {
+                actionOption();
+            }
+        };
 
         hudElementList = new ArrayList<HUDElement>();
 
