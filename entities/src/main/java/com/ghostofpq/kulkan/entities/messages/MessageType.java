@@ -68,6 +68,10 @@ public enum MessageType implements Serializable {
     BUY_ITEM_REQUEST,
     EQUIP_ITEM,
     UNEQUIP_ITEM,
-    PLAYER_UPDATE;
+    PLAYER_UPDATE,
+
+    PING,
+    PONG,
+    MAJONG;
 
 }
