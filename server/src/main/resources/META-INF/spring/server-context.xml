@@ -68,4 +68,10 @@
 
     <bean id="itemController"
           class="com.ghostofpq.kulkan.server.database.controller.ItemController"/>
+
+    <bean id="pingManager"
+          class="com.ghostofpq.kulkan.server.authentication.PingManager">
+        <property name="hostIp" value="${host.ip}"/>
+        <property name="hostPort" value="${host.port}"/>
+    </bean>
 </beans>

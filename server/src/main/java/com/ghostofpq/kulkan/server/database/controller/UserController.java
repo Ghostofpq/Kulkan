@@ -37,6 +37,12 @@ public class UserController {
         return user;
     }
 
+    public void removeTokenKey(String tokenKey) {
+        User user = getUserForTokenKey(tokenKey);
+        user.setTokenKey("");
+        user = userRepository.save(user);
+    }
+
     public String getTokenKeyForUsername(String username) {
         String user = getUserForUsername(username).getTokenKey();
         return user;

@@ -5,6 +5,8 @@ import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.battlefield.BattlefieldElement;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
+import com.ghostofpq.kulkan.server.authentication.PingManager;
+import com.ghostofpq.kulkan.server.authentication.PingWatchdog;
 import com.ghostofpq.kulkan.server.database.ItemService;
 import com.ghostofpq.kulkan.server.database.UserService;
 import com.ghostofpq.kulkan.server.database.controller.ItemController;
@@ -28,6 +30,8 @@ public class Server {
     private Thread userServiceThread;
     private Thread itemServiceThread;
     private Thread matchmakingManagerThread;
+    private Thread pingManagerThread;
+    private Thread watchdogThread;
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -42,6 +46,9 @@ public class Server {
     private ItemService itemService;
     @Autowired
     private ItemController itemController;
+    @Autowired
+    private PingManager pingManager;
+    private PingWatchdog watchdog;
 
     private Server() {
     }
@@ -59,6 +66,7 @@ public class Server {
         matchmakingManager.initConnections();
         userService.initConnection();
         itemService.initConnection();
+        pingManager.initConnection();
         itemController.populateItemRepository();
     }
 
@@ -75,6 +83,12 @@ public class Server {
         matchmakingManagerThread.start();
         itemServiceThread = new Thread(itemService);
         itemServiceThread.start();
+        pingManagerThread = new Thread(pingManager);
+        pingManagerThread.start();
+
+        watchdog = new PingWatchdog(pingManagerThread, 30000);
+        watchdogThread = new Thread(watchdog);
+        watchdogThread.start();
     }
 
     public void shutDown() {
@@ -90,6 +104,10 @@ public class Server {
         matchmakingManagerThread.interrupt();
         itemService.setRequestClose(true);
         itemServiceThread.interrupt();
+        pingManager.setRequestClose(true);
+        pingManagerThread.interrupt();
+        watchdog.stop();
+        watchdogThread.interrupt();
     }
 
     public void createMap() {
