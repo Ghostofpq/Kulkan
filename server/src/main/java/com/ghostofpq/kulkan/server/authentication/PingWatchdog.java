@@ -20,6 +20,7 @@ public class PingWatchdog implements Runnable {
             try {
                 Thread.sleep(time);
                 thread.interrupt();
+                log.debug("Watchdog activation");
             } catch (InterruptedException e) {
                 log.warn("Message Wait interrupted");
             }

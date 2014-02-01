@@ -39,8 +39,10 @@ public class UserController {
 
     public void removeTokenKey(String tokenKey) {
         User user = getUserForTokenKey(tokenKey);
-        user.setTokenKey("");
-        user = userRepository.save(user);
+        if (null != user) {
+            user.setTokenKey("");
+            user = userRepository.save(user);
+        }
     }
 
     public String getTokenKeyForUsername(String username) {
@@ -62,8 +64,12 @@ public class UserController {
     }
 
     public String getNameForTokenKey(String tokenKey) {
-        String user = getUserForTokenKey(tokenKey).getUsername();
-        return user;
+        String name = "";
+        User user = getUserForTokenKey(tokenKey);
+        if (null != user) {
+            name = user.getUsername();
+        }
+        return name;
     }
 
     public User getUserForTokenKey(String tokenKey) {

@@ -11,4 +11,8 @@ public class MessageMajong extends Message {
         this.type = MessageType.MAJONG;
         this.timestampClient = timestampClient;
     }
+
+    public long getTimestampClient() {
+        return timestampClient;
+    }
 }

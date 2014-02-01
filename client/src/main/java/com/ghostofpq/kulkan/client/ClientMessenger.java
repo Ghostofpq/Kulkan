@@ -1,8 +1,12 @@
 package com.ghostofpq.kulkan.client;
 
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.ping.MessageMajong;
+import com.ghostofpq.kulkan.entities.messages.ping.MessagePing;
+import com.ghostofpq.kulkan.entities.messages.ping.MessagePong;
 import com.rabbitmq.client.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
@@ -13,6 +17,7 @@ public class ClientMessenger {
     private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private final String LOBBY_SERVER_QUEUE_NAME_BASE = "server/lobby";
     private final String MATCHMAKING_SERVER_QUEUE_NAME_BASE = "server/matchmaking";
+    private final String PING_MANAGER_QUEUE_NAME = "server/ping";
     private final String CLIENT_QUEUE_NAME_BASE = "client/";
     private final String GAME_SERVER_QUEUE_NAME_BASE = "server/game/";
     private String gameServerQueueName;
@@ -25,12 +30,17 @@ public class ClientMessenger {
     private Channel channelMatchmaking;
     private Channel channelClientIn;
     private Channel channelGame;
+    private Channel channelPing;
     private QueueingConsumer channelClientConsumer;
     private QueueingConsumer channelAuthenticatingConsumer;
     private String authenticationReplyQueueName;
+    private long ping;
     // SERVER
     private String hostIp;
     private int hostPort;
+
+    @Autowired
+    private ClientContext clientContext;
 
     public ClientMessenger() {
     }
@@ -123,6 +133,14 @@ public class ClientMessenger {
         } else {
             log.warn("[{}] has already been opened", MATCHMAKING_SERVER_QUEUE_NAME_BASE);
         }
+
+        if (null == channelPing) {
+            channelPing = connection.createChannel();
+            log.debug("Opening ping service channel out : [{}]", PING_MANAGER_QUEUE_NAME);
+            channelPing.queueDeclare(PING_MANAGER_QUEUE_NAME, false, false, false, null);
+        } else {
+            log.warn("[{}] has already been opened", PING_MANAGER_QUEUE_NAME);
+        }
     }
 
     public void openChannelGame(String gameNumber) throws IOException {
@@ -148,6 +166,9 @@ public class ClientMessenger {
         if (null != channelGame) {
             channelGame.close();
         }
+        if (null != channelPing) {
+            channelPing.close();
+        }
         connection.close();
     }
 
@@ -159,6 +180,16 @@ public class ClientMessenger {
                 if (null != delivery) {
                     result = Message.loadFromBytes(delivery.getBody());
                     log.debug("Receive on [{}] : {}", clientQueueName, result.toString());
+                    switch (result.getType()) {
+                        case PING:
+                            manageMessagePing(result);
+                            result = null;
+                            break;
+                        case MAJONG:
+                            manageMessageMajong(result);
+                            result = null;
+                            break;
+                    }
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -166,6 +197,19 @@ public class ClientMessenger {
         }
         return result;
     }
+
+    private void manageMessagePing(Message message) {
+        MessagePing messagePing = (MessagePing) message;
+        MessagePong messagePong = new MessagePong(messagePing.getTimestampServer(), clientContext.getTokenKey());
+        sendMessageToPingService(messagePong);
+    }
+
+    private void manageMessageMajong(Message message) {
+        MessageMajong messageMajong = (MessageMajong) message;
+        this.ping = System.currentTimeMillis() - messageMajong.getTimestampClient();
+        log.debug("ping: {}", ping);
+    }
+
 
     public void sendMessageToUserService(Message message) {
         try {
@@ -201,6 +245,16 @@ public class ClientMessenger {
         try {
             log.debug("Publish on [{}] : {}", gameServerQueueName, message.toString());
             channelGame.basicPublish("", gameServerQueueName, null, message.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Client.getInstance().quit();
+        }
+    }
+
+    public void sendMessageToPingService(Message message) {
+        try {
+            log.debug("Publish on [{}] : {}", PING_MANAGER_QUEUE_NAME, message.toString());
+            channelPing.basicPublish("", PING_MANAGER_QUEUE_NAME, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
             Client.getInstance().quit();

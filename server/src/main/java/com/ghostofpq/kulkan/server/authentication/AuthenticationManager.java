@@ -28,6 +28,8 @@ public class AuthenticationManager implements Runnable {
     private UserRepository userRepositoryRepository;
     @Autowired
     private UserController userController;
+    @Autowired
+    private PingManager pingManager;
     // MESSAGING
     private QueueingConsumer consumer;
     private Connection connection;
@@ -59,6 +61,7 @@ public class AuthenticationManager implements Runnable {
             String hashedPassword = DigestUtils.shaHex(password + user.getPasswordSalt());
             if (user.getPassword().equals(hashedPassword)) {
                 user = userController.generateTokenKeyForUser(user);
+                pingManager.addPlayerInPingList(user.getTokenKey());
             } else {
                 log.warn("Invalid Password");
                 user = null;
