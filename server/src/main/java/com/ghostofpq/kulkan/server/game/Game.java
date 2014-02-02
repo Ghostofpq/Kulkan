@@ -4,7 +4,6 @@ import com.ghostofpq.kulkan.commons.Node;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
-import com.ghostofpq.kulkan.entities.battlefield.BattleSceneState;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.CombatCalculator;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
@@ -17,9 +16,6 @@ import com.ghostofpq.kulkan.entities.messages.game.capacity.MessageCapacityFireb
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
-import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
-import com.ghostofpq.kulkan.server.database.controller.UserController;
-import com.ghostofpq.kulkan.server.database.model.User;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -33,16 +29,13 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class Game {
+public class Game implements Runnable {
 
     private static final String CLIENT_QUEUE_NAME_BASE = "client/";
     private static final String GAME_SERVER_QUEUE_NAME_BASE = "server/game/";
     private String hostIp;
     private Integer hostPort;
-    private AuthenticationManager authenticationManager;
     private GameManager gameManager;
-    private UserController userController;
-    private BattleSceneState state;
     private Battlefield battlefield;
     private List<Player> playerList;
     private Map<Player, String> playerChannelMap;
@@ -56,13 +49,11 @@ public class Game {
     private GameCharacter currentCharToPlay;
     private Connection connection;
 
-    public Game(Battlefield battlefield, List<Player> playerList, String gameID, AuthenticationManager authenticationManager, UserController userController, GameManager gameManager, String hostIp, int hostPort) {
+    public Game(Battlefield battlefield, String gameID, Map<String, Player> keyTokenPlayerMap, GameManager gameManager, String hostIp, int hostPort) {
         this.battlefield = battlefield;
-        this.playerList = playerList;
+        this.playerList = new ArrayList<Player>();
 
-        this.authenticationManager = authenticationManager;
         this.gameManager = gameManager;
-        this.userController = userController;
 
         for (Player player : playerList) {
             for (GameCharacter gameCharacter : player.getTeam()) {
@@ -70,14 +61,12 @@ public class Game {
             }
         }
         this.gameID = gameID;
-        state = BattleSceneState.DEPLOY_POSITION;
-        keyTokenPlayerMap = new HashMap<String, Player>();
-        keyTokenPlayerNumberMap = new HashMap<String, Integer>();
-        playerChannelMap = new HashMap<Player, String>();
+        this.keyTokenPlayerMap = keyTokenPlayerMap;
+        this.keyTokenPlayerNumberMap = new HashMap<String, Integer>();
+        this.playerChannelMap = new HashMap<Player, String>();
         this.hostIp = hostIp;
         this.hostPort = hostPort;
         initConnections();
-        sendDeployMessage();
     }
 
     private void initConnections() {
@@ -97,13 +86,15 @@ public class Game {
                 delivery = gameConsumer.nextDelivery(1);
             }
             channelGameOut = connection.createChannel();
-            for (Player player : playerList) {
-                String playerKey = userController.getTokenKeyForUsername(player.getPseudo());
-                keyTokenPlayerMap.put(playerKey, player);
-                String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(playerKey).toString();
+            for (String keyToken : keyTokenPlayerMap.keySet()) {
+                Player player = keyTokenPlayerMap.get(keyToken);
+                playerList.add(player);
+
+                String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(keyToken).toString();
                 log.debug(" [-] OPENING QUEUE : {}", queueName);
                 channelGameOut.queueDeclare(queueName, false, false, false, null);
                 playerChannelMap.put(player, queueName);
+                keyTokenPlayerNumberMap.put(keyToken, playerList.indexOf(player));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -125,8 +116,6 @@ public class Game {
         for (Player player : playerList) {
             List<GameCharacter> characterList = player.getTeam();
             MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
-            String playerKey = userController.getTokenKeyForUsername(player.getPseudo());
-            keyTokenPlayerNumberMap.put(playerKey, playerList.indexOf(player));
             sendMessageToPlayer(player, messageDeploymentStart);
         }
     }
@@ -541,100 +530,49 @@ public class Game {
         }
     }
 
-    public void receiveMessage() {
-        try {
-            QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
-            if (null != delivery) {
-                Message rawMessage = Message.loadFromBytes(delivery.getBody());
-                ClientMessage message = (ClientMessage) rawMessage;
-                if (null != message) {
-                    log.debug("RECEIVED MESSAGE [{}]", message.getType());
-                    switch (message.getType()) {
-                        case FINISH_DEPLOYMENT:
-                            manageMessageFinishDeployment(message);
-                            break;
-                        case CHARACTER_POSITION_TO_MOVE_REQUEST:
-                            if (messageIsExpected(message)) {
-                                manageMessageCharRequestToMove(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-                        case CHARACTER_POSITION_TO_ATTACK_REQUEST:
-                            if (messageIsExpected(message)) {
-                                manageMessageCharRequestToAttack(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-                        case CHARACTER_POSITION_TO_USE_CAPACITY_REQUEST:
-                            if (messageIsExpected(message)) {
-                                manageMessageCharRequestToUseCapacity(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-                        case CHARACTER_CAPACITY_AOE_REQUEST: {
-                            if (messageIsExpected(message)) {
-                                manageMessageCapacityAOERequest(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-                        }
-                        case CHARACTER_ACTION_MOVE:
-                            if (messageIsExpected(message)) {
-                                manageMessageCharMoves(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-                        case CHARACTER_ACTION_ATTACK:
-                            if (messageIsExpected(message)) {
-                                manageMessageCharAttacks(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-                        case CHARACTER_ACTION_END_TURN:
-                            if (messageIsExpected(message)) {
-                                manageMessageCharEndTurn(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-
-                        case CHARACTER_ACTION_CAPACITY_USE:
-                            if (messageIsExpected(message)) {
-                                manageMessageCharCapacityUse(message);
-                            } else {
-                                log.error(" [X] UNEXPECTED PLAYER TO PLAY {}", message.getKeyToken());
-                            }
-                            break;
-                        default:
-                            log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
-                            break;
-                    }
+    public void receiveMessage() throws InterruptedException {
+        QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery();
+        if (null != delivery) {
+            Message rawMessage = Message.loadFromBytes(delivery.getBody());
+            ClientMessage message = (ClientMessage) rawMessage;
+            if (null != message) {
+                log.debug("RECEIVED MESSAGE [{}]", message.getType());
+                switch (message.getType()) {
+                    case FINISH_DEPLOYMENT:
+                        manageMessageFinishDeployment(message);
+                        break;
+                    case CHARACTER_POSITION_TO_MOVE_REQUEST:
+                        manageMessageCharRequestToMove(message);
+                        break;
+                    case CHARACTER_POSITION_TO_ATTACK_REQUEST:
+                        manageMessageCharRequestToAttack(message);
+                        break;
+                    case CHARACTER_POSITION_TO_USE_CAPACITY_REQUEST:
+                        manageMessageCharRequestToUseCapacity(message);
+                        break;
+                    case CHARACTER_CAPACITY_AOE_REQUEST:
+                        manageMessageCapacityAOERequest(message);
+                        break;
+                    case CHARACTER_ACTION_MOVE:
+                        manageMessageCharMoves(message);
+                        break;
+                    case CHARACTER_ACTION_ATTACK:
+                        manageMessageCharAttacks(message);
+                        break;
+                    case CHARACTER_ACTION_END_TURN:
+                        manageMessageCharEndTurn(message);
+                        break;
+                    case CHARACTER_ACTION_CAPACITY_USE:
+                        manageMessageCharCapacityUse(message);
+                        break;
+                    default:
+                        log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
+                        break;
                 }
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
-    private boolean messageIsExpected(ClientMessage message) {
-        boolean result;
-        int receivedPlayerNumber = keyTokenPlayerNumberMap.get(message.getKeyToken());
-        String playerKey = userController.getTokenKeyForUsername(playerToPlay.getPseudo());
-        int expectedPlayerNumber = keyTokenPlayerNumberMap.get(playerKey);
-        if (receivedPlayerNumber == expectedPlayerNumber) {
-            result = true;
-        } else {
-            log.warn("message from player n°{} , expecting from player n°{}", receivedPlayerNumber, expectedPlayerNumber);
-            result = false;
-        }
-        return result;
-    }
 
     private GameCharacter getGameCharacterAtPosition(Position position) {
         GameCharacter result = null;
@@ -691,42 +629,24 @@ public class Game {
     }
 
     private void newTurn() {
-        Player winnerPlayer = getWinnerPlayer();
-        if (null != winnerPlayer) {
-            for (Player player : playerList) {
-                if (winnerPlayer == player) {
-                    MessageGameEnd messageGameEnd = new MessageGameEnd(true);
-                    sendMessageToPlayer(player, messageGameEnd);
-                } else {
-                    MessageGameEnd messageGameEnd = new MessageGameEnd(false);
-                    sendMessageToPlayer(player, messageGameEnd);
-                }
-                User updatedUser = userController.updateGameCharacters(player);
-                MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(updatedUser.toPlayer());
-                sendMessageToPlayer(player, messagePlayerUpdate);
-            }
-            closeGame();
-        } else {
-            GameCharacter charToPlay = getNextCharToPlay();
-            Player playerToPlay = getPlayerForCharacter(charToPlay);
+        GameCharacter charToPlay = getNextCharToPlay();
+        Player playerToPlay = getPlayerForCharacter(charToPlay);
 
-            List<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
-            for (Player player : playerList) {
-                allGameCharacters.addAll(player.getTeam());
-            }
-            MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(allGameCharacters);
-
-            for (Player player : playerList) {
-                sendMessageToPlayer(player, messageUpdateCharacters);
-            }
-            Position footPositionOfChar = charToPlay.getPosition().plusYNew(-1);
-            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay, footPositionOfChar);
-            sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
-
-            this.playerToPlay = playerToPlay;
-            this.currentCharToPlay = charToPlay;
+        List<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
+        for (Player player : playerList) {
+            allGameCharacters.addAll(player.getTeam());
         }
+        MessageUpdateCharacters messageUpdateCharacters = new MessageUpdateCharacters(allGameCharacters);
 
+        for (Player player : playerList) {
+            sendMessageToPlayer(player, messageUpdateCharacters);
+        }
+        Position footPositionOfChar = charToPlay.getPosition().plusYNew(-1);
+        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(charToPlay, footPositionOfChar);
+        sendMessageToPlayer(playerToPlay, messageCharacterToPlay);
+
+        this.playerToPlay = playerToPlay;
+        this.currentCharToPlay = charToPlay;
     }
 
     private void closeGame() {
@@ -734,12 +654,19 @@ public class Game {
         closeConnections();
         gameManager.closeGame(this.gameID);
         this.battlefield = null;
-        this.playerList = null;
         this.gameID = null;
-        state = null;
+        playerList = null;
         keyTokenPlayerMap = null;
         keyTokenPlayerNumberMap = null;
         playerChannelMap = null;
+    }
+
+    public void setPlayerIsDisconnected(String tokenKey) {
+        Player player = keyTokenPlayerMap.get(tokenKey);
+        keyTokenPlayerMap.remove(tokenKey);
+        playerList.remove(player);
+        playerChannelMap.remove(player);
+        keyTokenPlayerNumberMap.remove(tokenKey);
     }
 
     private Player getWinnerPlayer() {
@@ -771,4 +698,36 @@ public class Game {
         }
         return result;
     }
+
+    public void run() {
+        sendDeployMessage();
+        Player winnerPlayer = getWinnerPlayer();
+        while (null == winnerPlayer) {
+            try {
+                receiveMessage();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            winnerPlayer = getWinnerPlayer();
+        }
+        for (Player player : playerList) {
+            if (winnerPlayer == player) {
+                MessageGameEnd messageGameEnd = new MessageGameEnd(true);
+                sendMessageToPlayer(player, messageGameEnd);
+            } else {
+                MessageGameEnd messageGameEnd = new MessageGameEnd(false);
+                sendMessageToPlayer(player, messageGameEnd);
+            }
+
+        }
+
+        List<Player> updatedPlayerList = gameManager.updatePlayers(playerList);
+        for (Player player : updatedPlayerList) {
+            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            sendMessageToPlayer(player, messagePlayerUpdate);
+        }
+
+        closeGame();
+    }
+
 }

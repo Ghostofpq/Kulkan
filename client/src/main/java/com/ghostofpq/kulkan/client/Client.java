@@ -149,6 +149,8 @@ public class Client {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glOrtho(0.0D, clientContext.getCurrentResolution().getWidth(), 0.0D, clientContext.getCurrentResolution().getHeight(), 1.0D, -1.0D);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
+        GraphicsManager.getInstance().ready3D();
     }
 
     private long deltaTimeInMillis() {

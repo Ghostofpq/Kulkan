@@ -158,11 +158,12 @@ public class MatchmakingManager implements Runnable {
                 case ACCEPT:
                     log.debug(" [-] GAME {} STARTS ", matchKey);
                     Battlefield battlefield = SaveManager.getInstance().loadMap("mapTest1");
+                    List<User> userList = new ArrayList<User>();
                     List<Player> playerList = new ArrayList<Player>();
                     for (String client : match.getAllClients()) {
                         User user = userController.getUserForTokenKey(client);
-                        Player player = user.toPlayer();
-                        playerList.add(player);
+                        playerList.add(user.toPlayer());
+                        userList.add(user);
                     }
                     MessageGameStart messageGameStart = new MessageGameStart(matchKey, battlefield, playerList);
                     for (String client : match.getAllClients()) {
@@ -175,7 +176,7 @@ public class MatchmakingManager implements Runnable {
                         }
                         lobbyManager.removeClient(client);
                     }
-                    gameManager.addGame(matchKey, battlefield, playerList);
+                    gameManager.addGame(matchKey, battlefield, userList);
                     matchesToRemove.add(matchKey);
                     break;
                 case REFUSE:

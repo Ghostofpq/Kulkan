@@ -116,7 +116,6 @@ public class BattleScene implements Scene {
         possiblePositionsToUseCapacity = new ArrayList<Position>();
         capacityAreaOfEffect = new ArrayList<Position>();
         selectedMove = null;
-
         GraphicsManager.getInstance().setupLights();
         GraphicsManager.getInstance().ready3D();
         GraphicsManager.getInstance().requestCenterPosition(cursor);
@@ -712,7 +711,6 @@ public class BattleScene implements Scene {
                 }
             }
         }
-
 
     }
 

@@ -4,6 +4,7 @@ import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.server.authentication.AuthenticationManager;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
+import com.ghostofpq.kulkan.server.database.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +20,9 @@ public class GameManager implements Runnable {
     @Autowired
     private UserController userController;
     private Map<String, Game> gameMap;
+    private Map<String, Thread> gameMapThread;
+    private Map<String, String> tokenKeyToGame;
+
     private List<String> toRemoveGames;
     private boolean requestClose;
     private String hostIp;
@@ -27,21 +31,29 @@ public class GameManager implements Runnable {
     private GameManager() {
         gameMap = new HashMap<String, Game>();
         toRemoveGames = new ArrayList<String>();
+        tokenKeyToGame = new HashMap<String, String>();
+        gameMapThread = new HashMap<String, Thread>();
         requestClose = false;
     }
 
-    public void addGame(String gameId, Battlefield battlefield, List<Player> playerList) {
+    public void addGame(String gameId, Battlefield battlefield, List<User> userList) {
         log.debug(" [-] ADDING GAME {} IN THE GAME MANAGER", gameId);
-        Game game = new Game(battlefield, playerList, gameId, authenticationManager, userController, this, hostIp, hostPort);
+        Map<String, Player> keyTokenPlayerMap = new HashMap<String, Player>();
+        for (User user : userList) {
+            tokenKeyToGame.put(user.getTokenKey(), gameId);
+            keyTokenPlayerMap.put(user.getTokenKey(), user.toPlayer());
+        }
+
+        Game game = new Game(battlefield, gameId, keyTokenPlayerMap, this, hostIp, hostPort);
         gameMap.put(gameId, game);
+
+        Thread gameThread = new Thread(game);
+        gameMapThread.put(gameId, gameThread);
+        gameThread.start();
     }
 
     public void closeGame(String gameId) {
         toRemoveGames.add(gameId);
-    }
-
-    public void getGame(String gameId) {
-        gameMap.get(gameId);
     }
 
     public void setRequestClose(boolean requestClose) {
@@ -55,11 +67,25 @@ public class GameManager implements Runnable {
                 gameMap.remove(gameId);
                 toRemoveGames.remove(gameId);
             }
-
-            for (Game game : gameMap.values()) {
-                game.receiveMessage();
-            }
         }
+    }
+
+    public void setPlayerIsDisconnected(String tokenKey) {
+        String concernedGameId = tokenKeyToGame.get(tokenKey);
+        Game concernedGame = gameMap.get(concernedGameId);
+        Thread concernedGameThread = gameMapThread.get(concernedGameId);
+
+        concernedGame.setPlayerIsDisconnected(tokenKey);
+        concernedGameThread.interrupt();
+    }
+
+    public List<Player> updatePlayers(List<Player> playerList) {
+        List<Player> updatedPlayerList = new ArrayList<Player>();
+        for (Player player : playerList) {
+            User updatedUser = userController.updateGameCharacters(player);
+            updatedPlayerList.add(updatedUser.toPlayer());
+        }
+        return updatedPlayerList;
     }
 
     public void setHostIp(String hostIp) {

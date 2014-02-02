@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.entities.messages.ping.MessageMajong;
 import com.ghostofpq.kulkan.entities.messages.ping.MessagePing;
 import com.ghostofpq.kulkan.entities.messages.ping.MessagePong;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
+import com.ghostofpq.kulkan.server.game.GameManager;
 import com.ghostofpq.kulkan.server.lobby.LobbyManager;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -41,6 +42,9 @@ public class PingManager implements Runnable {
     private UserController userController;
     @Autowired
     private LobbyManager lobbyManager;
+    @Autowired
+    private GameManager gameManager;
+
 
     private PingManager() {
         requestClose = false;
@@ -61,6 +65,7 @@ public class PingManager implements Runnable {
     public void whenRemovePlayerInPingList(String playerTokenKey) {
         userController.removeTokenKey(playerTokenKey);
         lobbyManager.removeClient(playerTokenKey);
+        gameManager.setPlayerIsDisconnected(playerTokenKey);
     }
 
     public void initConnection() throws IOException, InterruptedException {
