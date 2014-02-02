@@ -8,6 +8,7 @@ import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -192,20 +193,16 @@ public class OptionScene implements Scene {
             if (Mouse.isButtonDown(0)) {
                 if (nextButton.isClicked()) {
                     nextButton.onClick();
-                }
-                if (prevButton.isClicked()) {
+                } else if (prevButton.isClicked()) {
                     prevButton.onClick();
-                }
-                if (applyButton.isClicked()) {
+                } else if (applyButton.isClicked()) {
                     applyButton.onClick();
-                }
-                if (backButton.isClicked()) {
+                } else if (backButton.isClicked()) {
                     backButton.onClick();
-                }
-                if (null != switchRatioButton) {
-                    if (switchRatioButton.isClicked()) {
-                        switchRatioButton.onClick();
-                    }
+                } else if (null != switchRatioButton && switchRatioButton.isClicked()) {
+                    switchRatioButton.onClick();
+                } else {
+                    Display.setLocation(Display.getX() + Mouse.getDX(), Display.getY() - Mouse.getDY());
                 }
             }
         }

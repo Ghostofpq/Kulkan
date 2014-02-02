@@ -22,6 +22,7 @@ import com.ghostofpq.kulkan.entities.messages.auth.MessageCreateAccountResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -221,25 +222,22 @@ public class LoginScene implements Scene {
             if (Mouse.isButtonDown(0)) {
                 if (pseudoField.isClicked()) {
                     setFocusOn(hudElementList.indexOf(pseudoField));
-                }
-                if (passwordField.isClicked()) {
+                } else if (passwordField.isClicked()) {
                     setFocusOn(hudElementList.indexOf(passwordField));
-                }
-                if (connectButton.isClicked()) {
+                } else if (connectButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(connectButton));
                     connectButton.onClick();
-                }
-                if (quitButton.isClicked()) {
+                } else if (quitButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(quitButton));
                     quitButton.onClick();
-                }
-                if (createAccountButton.isClicked()) {
+                } else if (createAccountButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(createAccountButton));
                     createAccountButton.onClick();
-                }
-                if (optionButton.isClicked()) {
+                } else if (optionButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(optionButton));
                     optionButton.onClick();
+                } else {
+                    Display.setLocation(Display.getX() + Mouse.getDX(), Display.getY() - Mouse.getDY());
                 }
             }
         }
