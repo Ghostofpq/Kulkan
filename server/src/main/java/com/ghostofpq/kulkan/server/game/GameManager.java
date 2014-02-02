@@ -74,9 +74,10 @@ public class GameManager implements Runnable {
         String concernedGameId = tokenKeyToGame.get(tokenKey);
         Game concernedGame = gameMap.get(concernedGameId);
         Thread concernedGameThread = gameMapThread.get(concernedGameId);
-
-        concernedGame.setPlayerIsDisconnected(tokenKey);
-        concernedGameThread.interrupt();
+        if (null != concernedGameThread) {
+            concernedGame.setPlayerIsDisconnected(tokenKey);
+            concernedGameThread.interrupt();
+        }
     }
 
     public List<Player> updatePlayers(List<Player> playerList) {
