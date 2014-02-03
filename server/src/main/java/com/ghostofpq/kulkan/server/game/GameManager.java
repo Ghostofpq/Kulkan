@@ -8,6 +8,7 @@ import com.ghostofpq.kulkan.server.database.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,13 @@ public class GameManager implements Runnable {
         Game game = new Game(battlefield, gameId, keyTokenPlayerMap, this, hostIp, hostPort);
         gameMap.put(gameId, game);
 
+        try {
+            game.initConnections();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Thread gameThread = new Thread(game);
         gameMapThread.put(gameId, gameThread);
         gameThread.start();
@@ -64,8 +72,19 @@ public class GameManager implements Runnable {
         while (!requestClose) {
             while (!toRemoveGames.isEmpty()) {
                 String gameId = toRemoveGames.get(0);
+                try {
+                    gameMapThread.get(gameId).join();
+                    gameMapThread.remove(gameId);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 gameMap.remove(gameId);
                 toRemoveGames.remove(gameId);
+            }
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

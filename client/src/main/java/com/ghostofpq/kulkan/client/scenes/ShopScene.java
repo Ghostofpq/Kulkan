@@ -23,7 +23,7 @@ import java.util.Map;
 public class ShopScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(ShopScene.class);
     private static volatile ShopScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private Channel channelOut;
     private KeyValueRender money;
     private KeyValueRender selectedItemName;

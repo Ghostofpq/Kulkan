@@ -23,7 +23,7 @@ import java.util.List;
 public class EquipItemScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(EquipItemScene.class);
     private static volatile EquipItemScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private Channel channelOut;
     private ItemType filter;
     private KeyValueRender itemType;

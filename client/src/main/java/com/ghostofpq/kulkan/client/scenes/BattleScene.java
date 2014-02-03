@@ -32,7 +32,7 @@ import java.util.*;
 public class BattleScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(BattleScene.class);
     private static volatile BattleScene instance = null;
-    private final String GAME_SERVER_QUEUE_NAME_BASE = "/server/game/";
+    private final String GAME_SERVER_QUEUE_NAME_BASE = "server/game/";
     // COMMUNICATIONS
     private String gameQueueName;
     private Channel channelGameOut;

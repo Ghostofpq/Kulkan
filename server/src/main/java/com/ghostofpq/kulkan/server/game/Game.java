@@ -66,40 +66,37 @@ public class Game implements Runnable {
         this.playerChannelMap = new HashMap<Player, String>();
         this.hostIp = hostIp;
         this.hostPort = hostPort;
-        initConnections();
     }
 
-    private void initConnections() {
-        try {
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(hostIp);
-            factory.setPort(hostPort);
-            connection = factory.newConnection();
-            channelGameIn = connection.createChannel();
-            String queueNameIn = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameID).toString();
-            channelGameIn.queueDeclare(queueNameIn, false, false, false, null);
-            gameConsumer = new QueueingConsumer(channelGameIn);
-            channelGameIn.basicConsume(queueNameIn, true, gameConsumer);
-            log.debug(" [-] OPENING QUEUE : {}", queueNameIn);
-            QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(1);
-            while (null != delivery) {
-                delivery = gameConsumer.nextDelivery(1);
-            }
-            channelGameOut = connection.createChannel();
-            for (String keyToken : keyTokenPlayerMap.keySet()) {
-                Player player = keyTokenPlayerMap.get(keyToken);
-                playerList.add(player);
+    public void initConnections() throws IOException, InterruptedException {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(hostIp);
+        factory.setPort(hostPort);
+        log.debug("{}:{}", hostIp, hostPort);
+        String queueNameIn = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameID).toString();
 
-                String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(keyToken).toString();
-                log.debug(" [-] OPENING QUEUE : {}", queueName);
-                channelGameOut.queueDeclare(queueName, false, false, false, null);
-                playerChannelMap.put(player, queueName);
-                keyTokenPlayerNumberMap.put(keyToken, playerList.indexOf(player));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        connection = factory.newConnection();
+        channelGameIn = connection.createChannel();
+        channelGameIn.queueDeclare(queueNameIn, false, false, false, null);
+        channelGameIn.basicQos(1);
+        gameConsumer = new QueueingConsumer(channelGameIn);
+        channelGameIn.basicConsume(queueNameIn, true, gameConsumer);
+
+        QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(0);
+        while (null != delivery) {
+            delivery = gameConsumer.nextDelivery(0);
+        }
+
+        channelGameOut = connection.createChannel();
+        for (String keyToken : keyTokenPlayerMap.keySet()) {
+            Player player = keyTokenPlayerMap.get(keyToken);
+            playerList.add(player);
+
+            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(keyToken).toString();
+            log.debug(" [-] OPENING QUEUE : {}", queueName);
+            channelGameOut.queueDeclare(queueName, false, false, false, null);
+            playerChannelMap.put(player, queueName);
+            keyTokenPlayerNumberMap.put(keyToken, playerList.indexOf(player));
         }
     }
 
@@ -128,7 +125,7 @@ public class Game implements Runnable {
 
     private void sendMessageToPlayer(Player player, Message message) {
         try {
-            log.debug(" [S] SENDING {} TO {}", message.getType(), playerChannelMap.get(player));
+            log.debug(" [S] SENDING {} TO {}", message.toString(), playerChannelMap.get(player));
             channelGameOut.basicPublish("", playerChannelMap.get(player), null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -138,7 +135,7 @@ public class Game implements Runnable {
     private void sendMessageToChannel(String tokenKey, Message message) {
         try {
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            log.debug(" [S] SENDING {} TO {}", message.getType(), queueName);
+            log.debug(" [S] SENDING {} TO {}", message.toString(), queueName);
             channelGameOut.basicPublish("", queueName, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -531,12 +528,14 @@ public class Game implements Runnable {
     }
 
     public void receiveMessage() throws InterruptedException {
+        log.debug("Waiting for Message");
         QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery();
+        log.debug(" ! ");
         if (null != delivery) {
             Message rawMessage = Message.loadFromBytes(delivery.getBody());
             ClientMessage message = (ClientMessage) rawMessage;
             if (null != message) {
-                log.debug("RECEIVED MESSAGE [{}]", message.getType());
+                log.debug("RECEIVED MESSAGE [{}]", message.toString());
                 switch (message.getType()) {
                     case FINISH_DEPLOYMENT:
                         manageMessageFinishDeployment(message);
@@ -629,9 +628,11 @@ public class Game implements Runnable {
     }
 
     private void newTurn() {
+        log.debug("[New Turn]");
         GameCharacter charToPlay = getNextCharToPlay();
         Player playerToPlay = getPlayerForCharacter(charToPlay);
-
+        log.debug("charToPlay : {}", charToPlay);
+        log.debug("playerToPlay : {}", playerToPlay);
         List<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
         for (Player player : playerList) {
             allGameCharacters.addAll(player.getTeam());
@@ -652,13 +653,13 @@ public class Game implements Runnable {
     private void closeGame() {
         log.debug("[S] GAME IS OVER");
         closeConnections();
-        gameManager.closeGame(this.gameID);
         this.battlefield = null;
         this.gameID = null;
         playerList = null;
         keyTokenPlayerMap = null;
         keyTokenPlayerNumberMap = null;
         playerChannelMap = null;
+        gameManager.closeGame(this.gameID);
     }
 
     public void setPlayerIsDisconnected(String tokenKey) {
@@ -700,6 +701,10 @@ public class Game implements Runnable {
     }
 
     public void run() {
+        log.debug("keyTokenPlayerMap : {}", keyTokenPlayerMap);
+        log.debug("keyTokenPlayerNumberMap : {}", keyTokenPlayerNumberMap);
+        log.debug("playerChannelMap : {}", playerChannelMap);
+        log.debug("playerList : {}", playerList);
         sendDeployMessage();
         Player winnerPlayer = getWinnerPlayer();
         while (null == winnerPlayer) {
@@ -718,15 +723,12 @@ public class Game implements Runnable {
                 MessageGameEnd messageGameEnd = new MessageGameEnd(false);
                 sendMessageToPlayer(player, messageGameEnd);
             }
-
         }
-
         List<Player> updatedPlayerList = gameManager.updatePlayers(playerList);
         for (Player player : updatedPlayerList) {
             MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
             sendMessageToPlayer(player, messagePlayerUpdate);
         }
-
         closeGame();
     }
 

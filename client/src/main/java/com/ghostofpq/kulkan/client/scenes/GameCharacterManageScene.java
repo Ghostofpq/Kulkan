@@ -20,7 +20,7 @@ import java.io.IOException;
 public class GameCharacterManageScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(GameCharacterManageScene.class);
     private static volatile GameCharacterManageScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private Channel channelOut;
     private GameCharacter gameCharacter;
     private Button manageJobButton;

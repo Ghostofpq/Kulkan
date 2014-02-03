@@ -21,7 +21,7 @@ import java.io.IOException;
 public class ManageJobScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(ManageJobScene.class);
     private static volatile ManageJobScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private GameCharacter gameCharacter;
     private Channel channelOut;
     private JobManager jobManager;

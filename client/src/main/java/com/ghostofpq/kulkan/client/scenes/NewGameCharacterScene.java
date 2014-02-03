@@ -22,7 +22,7 @@ import java.io.IOException;
 public class NewGameCharacterScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(NewGameCharacterScene.class);
     private static volatile NewGameCharacterScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private Channel channelOut;
     private ClanType clanType;
     private Gender gender;

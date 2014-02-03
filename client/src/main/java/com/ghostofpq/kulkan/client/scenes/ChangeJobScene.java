@@ -17,7 +17,7 @@ import java.io.IOException;
 public class ChangeJobScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(ChangeJobScene.class);
     private static volatile ChangeJobScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private GameCharacter gameCharacter;
     private Channel channelOut;
     private Button warriorButton;

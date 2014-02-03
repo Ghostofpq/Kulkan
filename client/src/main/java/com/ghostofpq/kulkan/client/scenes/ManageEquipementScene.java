@@ -18,7 +18,7 @@ import java.io.IOException;
 public class ManageEquipementScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(ManageEquipementScene.class);
     private static volatile ManageEquipementScene instance;
-    private final String USER_SERVICE_QUEUE_NAME = "users";
+    private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private GameCharacter gameCharacter;
     private Channel channelOut;
     private KeyValueRender nameRender;
