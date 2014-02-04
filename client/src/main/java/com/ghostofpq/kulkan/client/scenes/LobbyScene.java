@@ -4,10 +4,7 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
-import com.ghostofpq.kulkan.client.graphics.HUD.Button;
-import com.ghostofpq.kulkan.client.graphics.HUD.HUDElement;
-import com.ghostofpq.kulkan.client.graphics.HUD.TextArea;
-import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
+import com.ghostofpq.kulkan.client.graphics.HUD.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
@@ -19,6 +16,7 @@ import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -41,6 +39,8 @@ public class LobbyScene implements Scene {
     private List<HUDElement> hudElementList;
     private int indexOnFocus;
     private Background background;
+    // FRAME
+    private Frame frame;
     @Autowired
     private ClientContext clientContext;
     @Autowired
@@ -119,6 +119,7 @@ public class LobbyScene implements Scene {
                         Client.getInstance().setCurrentScene(ShopScene.getInstance());
                     }
                 };
+
         hudElementList.add(inputText);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
@@ -130,7 +131,9 @@ public class LobbyScene implements Scene {
         setFocusOn(indexOnFocus);
         matchFound = false;
         matchId = "";
-        background = new Background(TextureKey.BACKGROUND_BASIC);
+        background = new Background(TextureKey.LOBBY_BACKGROUD_169);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 32, clientContext.getCurrentResolution().getWidth() / 32, TextureKey.LOBBY_EXT_FRAME);
+
         MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(Client.getInstance().getTokenKey());
         clientMessenger.sendMessageToLobbyService(messageSubscribeToLobby);
     }
@@ -238,6 +241,7 @@ public class LobbyScene implements Scene {
             acceptButton.draw();
             refuseButton.draw();
         }
+        frame.draw();
     }
 
     @Override
@@ -257,6 +261,9 @@ public class LobbyScene implements Scene {
                 }
                 if (refuseButton.isClicked()) {
                     refuseButton.onClick();
+                }
+                if (frame.isClicked()) {
+                    Display.setLocation(Display.getX() + Mouse.getDX() * 3, Display.getY() - Mouse.getDY() * 3);
                 }
             }
         }

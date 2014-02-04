@@ -35,6 +35,10 @@ public class TextureManager {
             Texture frameExt = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_ExtFrame.png"));
             textureMap.put(TextureKey.LOBBY_EXT_FRAME, frameExt);
 
+            Texture lobbyBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Background_169.jpg"));
+            textureMap.put(TextureKey.LOBBY_BACKGROUD_169, lobbyBackground);
+
+
             Texture earthTop00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_00.png"));
             Texture earthTop01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_01.png"));
             Texture earthTop02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_02.png"));

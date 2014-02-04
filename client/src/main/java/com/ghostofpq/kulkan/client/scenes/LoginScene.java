@@ -225,7 +225,6 @@ public class LoginScene implements Scene {
 
     @Override
     public void manageInput() {
-
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
                 if (pseudoField.isClicked()) {
