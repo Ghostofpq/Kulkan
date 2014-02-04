@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.HUD.HUDElement;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
 import com.ghostofpq.kulkan.client.graphics.PasswordField;
@@ -56,6 +57,7 @@ public class LoginScene implements Scene {
     private List<HUDElement> hudElementList;
     // BACKGROUND
     private Background background;
+    private Frame frame;
 
     private LoginScene() {
     }
@@ -111,6 +113,8 @@ public class LoginScene implements Scene {
             }
         };
 
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 32, clientContext.getCurrentResolution().getWidth() / 32, TextureKey.LOBBY_EXT_FRAME);
+
         hudElementList = new ArrayList<HUDElement>();
 
         hudElementList.add(pseudoField);
@@ -119,6 +123,8 @@ public class LoginScene implements Scene {
         hudElementList.add(quitButton);
         hudElementList.add(optionButton);
         hudElementList.add(createAccountButton);
+        hudElementList.add(frame);
+
         setFocusOn(hudElementList.indexOf(pseudoField));
 
         background = new Background(TextureKey.LOGIN_BACKGROUND);

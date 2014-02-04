@@ -18,7 +18,7 @@ public abstract class HUDElement {
         return isHovered(Mouse.getX(), ClientContext.currentResolution.getHeight() - Mouse.getY());
     }
 
-    private boolean isHovered(int mouseX, int mouseY) {
+    protected boolean isHovered(int mouseX, int mouseY) {
         boolean result = false;
         boolean okMouseX = (mouseX >= posX && mouseX <= posX + width);
         boolean okMouseY = (mouseY >= posY && mouseY <= posY + height);
@@ -40,7 +40,7 @@ public abstract class HUDElement {
         return result;
     }
 
-    public boolean isInstantRepetition() {
+    private boolean isInstantRepetition() {
         boolean isInstantRepetition;
         if (System.currentTimeMillis() - lastTimeWasClicked < deltaMillis) {
             isInstantRepetition = true;
