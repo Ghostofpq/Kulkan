@@ -59,6 +59,9 @@ public class LoginScene implements Scene {
     private Background background;
     // FRAME
     private Frame frame;
+    private int x;
+    private int y;
+    private boolean frameClicked;
 
     private LoginScene() {
     }
@@ -244,8 +247,16 @@ public class LoginScene implements Scene {
                     setFocusOn(hudElementList.indexOf(optionButton));
                     optionButton.onClick();
                 } else if (frame.isClicked()) {
-                    Display.setLocation(Display.getX() + Mouse.getDX() * 3, Display.getY() - Mouse.getDY() * 3);
+                    if (x == -1 && y == -1) {
+                        x = Mouse.getX();
+                        y = (Display.getHeight() - Mouse.getY());
+                        frameClicked = true;
+                    }
                 }
+            } else if (!Mouse.isButtonDown(0)) {
+                frameClicked = false;
+                x = -1;
+                y = -1;
             }
         }
         while (Keyboard.next()) {
@@ -297,6 +308,9 @@ public class LoginScene implements Scene {
                     }
                 }
             }
+        }
+        if (frameClicked) {
+            Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
     }
 
