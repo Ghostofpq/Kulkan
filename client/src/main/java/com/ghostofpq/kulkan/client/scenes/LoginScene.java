@@ -57,6 +57,7 @@ public class LoginScene implements Scene {
     private List<HUDElement> hudElementList;
     // BACKGROUND
     private Background background;
+    // FRAME
     private Frame frame;
 
     private LoginScene() {
@@ -224,6 +225,7 @@ public class LoginScene implements Scene {
 
     @Override
     public void manageInput() {
+
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
                 if (pseudoField.isClicked()) {
@@ -242,8 +244,8 @@ public class LoginScene implements Scene {
                 } else if (optionButton.isClicked()) {
                     setFocusOn(hudElementList.indexOf(optionButton));
                     optionButton.onClick();
-                } else {
-                    Display.setLocation(Display.getX() + Mouse.getDX(), Display.getY() - Mouse.getDY());
+                } else if (frame.isClicked()) {
+                    Display.setLocation(Display.getX() + Mouse.getDX() * 3, Display.getY() - Mouse.getDY() * 3);
                 }
             }
         }
