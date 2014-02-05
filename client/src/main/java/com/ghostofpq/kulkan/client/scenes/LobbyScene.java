@@ -41,6 +41,9 @@ public class LobbyScene implements Scene {
     private Background background;
     // FRAME
     private Frame frame;
+    private int x;
+    private int y;
+    private boolean frameClicked;
     @Autowired
     private ClientContext clientContext;
     @Autowired
@@ -248,23 +251,36 @@ public class LobbyScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
+                boolean hudElementIsClicked = false;
                 for (HUDElement hudElement : hudElementList) {
                     if (hudElement.isClicked()) {
+                        hudElementIsClicked = true;
                         setFocusOn(hudElementList.indexOf(hudElement));
                         if (hudElement instanceof Button) {
                             ((Button) hudElement).onClick();
                         }
+                        break;
                     }
                 }
-                if (acceptButton.isClicked()) {
+                if (!hudElementIsClicked && acceptButton.isClicked()) {
+                    hudElementIsClicked = true;
                     acceptButton.onClick();
                 }
-                if (refuseButton.isClicked()) {
+                if (!hudElementIsClicked && refuseButton.isClicked()) {
+                    hudElementIsClicked = true;
                     refuseButton.onClick();
                 }
-                if (frame.isClicked()) {
-                    Display.setLocation(Display.getX() + Mouse.getDX() * 3, Display.getY() - Mouse.getDY() * 3);
+                if (!hudElementIsClicked && frame.isClicked()) {
+                    if (x == -1 && y == -1) {
+                        x = Mouse.getX();
+                        y = (Display.getHeight() - Mouse.getY());
+                        frameClicked = true;
+                    }
                 }
+            } else if (!Mouse.isButtonDown(0)) {
+                frameClicked = false;
+                x = -1;
+                y = -1;
             }
         }
         while (Keyboard.next()) {
@@ -286,6 +302,9 @@ public class LobbyScene implements Scene {
                 }
 
             }
+        }
+        if (frameClicked) {
+            Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
     }
 

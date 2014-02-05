@@ -117,7 +117,6 @@ public class LoginScene implements Scene {
             }
         };
 
-        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 32, clientContext.getCurrentResolution().getWidth() / 32, TextureKey.LOBBY_EXT_FRAME);
 
         hudElementList = new ArrayList<HUDElement>();
 
@@ -127,10 +126,10 @@ public class LoginScene implements Scene {
         hudElementList.add(quitButton);
         hudElementList.add(optionButton);
         hudElementList.add(createAccountButton);
-        hudElementList.add(frame);
 
         setFocusOn(hudElementList.indexOf(pseudoField));
 
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 32, clientContext.getCurrentResolution().getWidth() / 32, TextureKey.LOBBY_EXT_FRAME);
         background = new Background(TextureKey.LOGIN_BACKGROUND);
     }
 
@@ -224,29 +223,25 @@ public class LoginScene implements Scene {
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
         }
+        frame.draw();
     }
 
     @Override
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (pseudoField.isClicked()) {
-                    setFocusOn(hudElementList.indexOf(pseudoField));
-                } else if (passwordField.isClicked()) {
-                    setFocusOn(hudElementList.indexOf(passwordField));
-                } else if (connectButton.isClicked()) {
-                    setFocusOn(hudElementList.indexOf(connectButton));
-                    connectButton.onClick();
-                } else if (quitButton.isClicked()) {
-                    setFocusOn(hudElementList.indexOf(quitButton));
-                    quitButton.onClick();
-                } else if (createAccountButton.isClicked()) {
-                    setFocusOn(hudElementList.indexOf(createAccountButton));
-                    createAccountButton.onClick();
-                } else if (optionButton.isClicked()) {
-                    setFocusOn(hudElementList.indexOf(optionButton));
-                    optionButton.onClick();
-                } else if (frame.isClicked()) {
+                boolean hudElementIsClicked = false;
+                for (HUDElement hudElement : hudElementList) {
+                    if (hudElement.isClicked()) {
+                        setFocusOn(hudElementList.indexOf(hudElement));
+                        hudElementIsClicked = true;
+                        if (hudElement instanceof Button) {
+                            ((Button) hudElement).onClick();
+                        }
+                        break;
+                    }
+                }
+                if (!hudElementIsClicked && frame.isClicked()) {
                     if (x == -1 && y == -1) {
                         x = Mouse.getX();
                         y = (Display.getHeight() - Mouse.getY());

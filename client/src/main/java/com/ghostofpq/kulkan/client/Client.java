@@ -154,6 +154,10 @@ public class Client {
     }
 
     private long deltaTimeInMillis() {
+        long delta = Sys.getTime() - lastTimeTick;
+        if (delta >= 50) {
+            log.warn("Delta time is long : {}", delta);
+        }
         return Sys.getTime() - lastTimeTick;
     }
 
