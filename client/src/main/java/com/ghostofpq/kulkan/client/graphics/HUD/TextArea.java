@@ -55,24 +55,24 @@ public class TextArea extends HUDElement {
                 input = "";
             } else {
                 int index = 0;
-                String[] inputTrimmed = input.split("\\s+");
 
                 StringBuilder buffer = new StringBuilder();
-                buffer.append(inputTrimmed[index]);
-                while (stringFits(buffer.toString()) && index < inputTrimmed.length) {
+                buffer.append(input.charAt(index));
+                while (stringFits(buffer.toString()) && index < input.length()) {
                     index++;
-                    buffer.append(" ");
-                    buffer.append(inputTrimmed[index]);
+                    buffer.append(input.charAt(index));
                 }
-
+                int mark = index;
                 if (!stringFits(buffer.toString())) {
-                    buffer = new StringBuilder();
-                    buffer.append(inputTrimmed[0]);
-                    for (int i = 1; i < index; i++) {
-                        buffer.append(" ");
-                        buffer.append(inputTrimmed[i]);
+                    while (input.charAt(index) != (' ') && index > 0) {
+                        index--;
+                        buffer.deleteCharAt(buffer.length() - 1);
+                    }
+                    if (index == 0) {
+                        buffer.append(input.substring(0, mark));
                     }
                 }
+
                 input = input.substring(buffer.toString().length(), input.length());
                 textInputs.add(buffer.toString());
             }
