@@ -25,8 +25,8 @@ import java.util.List;
 
 @Slf4j
 public class LobbyScene implements Scene {
-    private TextField inputText;
-    private TextArea lobbyMessages;
+    private TextField inputChat;
+    private TextArea chat;
     private Button postButton;
     private Button matchmakingButton;
     private Button shopButton;
@@ -55,8 +55,20 @@ public class LobbyScene implements Scene {
     @Override
     public void init() {
         hudElementList = new ArrayList<HUDElement>();
-        inputText = new TextField(100, 400, 300, 50, 120);
-        lobbyMessages = new TextArea(100, 100, 60, 10);
+
+        int chatPosX = clientContext.getCurrentResolution().getWidth() / 32;
+        int chatPosY = clientContext.getCurrentResolution().getHeight() * 5 / 8;
+        int chatWidth = clientContext.getCurrentResolution().getWidth() * 23 / 64;
+        int chatHeight = clientContext.getCurrentResolution().getHeight() * 5 / 18;
+        chat = new TextArea(chatPosX, chatPosY, chatWidth, chatHeight, "arial_12");
+
+        int inputChatPosX = chatPosX;
+        int inputChatPosY = chatPosY + chatHeight;
+        int inputChatWidth = clientContext.getCurrentResolution().getWidth() * 31 / 96;
+        int inputChatHeight = clientContext.getCurrentResolution().getHeight() / 24;
+        inputChat = new TextField(inputChatPosX, inputChatPosY, inputChatWidth, inputChatHeight, 120, "arial_12");
+
+
         postButton = new Button(450, 400, 50, 50, "POST") {
             @Override
             public void onClick() {
@@ -123,10 +135,10 @@ public class LobbyScene implements Scene {
                     }
                 };
 
-        hudElementList.add(inputText);
+        hudElementList.add(inputChat);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
-        hudElementList.add(lobbyMessages);
+        hudElementList.add(chat);
         hudElementList.add(quitButton);
         hudElementList.add(manageTeamButton);
         hudElementList.add(shopButton);
@@ -135,7 +147,7 @@ public class LobbyScene implements Scene {
         matchFound = false;
         matchId = "";
         background = new Background(TextureKey.LOBBY_BACKGROUD_169);
-        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 32, clientContext.getCurrentResolution().getWidth() / 32, TextureKey.LOBBY_EXT_FRAME);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.LOBBY_EXT_FRAME);
 
         MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(Client.getInstance().getTokenKey());
         clientMessenger.sendMessageToLobbyService(messageSubscribeToLobby);
@@ -149,10 +161,10 @@ public class LobbyScene implements Scene {
     }
 
     public void postMessage() {
-        if (!inputText.getContent().isEmpty()) {
-            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputText.getContent());
+        if (!inputChat.getContent().isEmpty()) {
+            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputChat.getContent());
             clientMessenger.sendMessageToLobbyService(messageLobbyClient);
-            inputText.clear();
+            inputChat.clear();
         }
     }
 
@@ -166,7 +178,7 @@ public class LobbyScene implements Scene {
                     String receivedTextMessage = receivedMessage.getMessage();
                     log.debug(" [x] Received Message : [{}]", receivedTextMessage);
                     if (!receivedTextMessage.isEmpty()) {
-                        lobbyMessages.addLine(receivedTextMessage);
+                        chat.addLine(receivedTextMessage);
                     }
                     break;
                 case MATCHMAKING_MATCH_FOUND:
@@ -287,17 +299,17 @@ public class LobbyScene implements Scene {
             if (Keyboard.getEventKeyState()) {
                 if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
                     if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
-                        if (inputText.hasFocus()) {
-                            inputText.deleteLastChar();
+                        if (inputChat.hasFocus()) {
+                            inputChat.deleteLastChar();
                         }
                     } else {
-                        if (inputText.hasFocus()) {
-                            inputText.writeChar(Keyboard.getEventCharacter());
+                        if (inputChat.hasFocus()) {
+                            inputChat.writeChar(Keyboard.getEventCharacter());
                         }
                     }
                 } else {
-                    if (inputText.hasFocus()) {
-                        inputText.writeChar(Keyboard.getEventCharacter());
+                    if (inputChat.hasFocus()) {
+                        inputChat.writeChar(Keyboard.getEventCharacter());
                     }
                 }
 

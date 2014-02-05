@@ -34,6 +34,7 @@ public class TextArea extends HUDElement {
         this.hasFocus = false;
         this.numberOfLineToShow = height / (fontManager.getFontMap().get(fontName).getHeight("A"));
         this.fontName = fontName;
+        log.debug("New Text Area : {},{} {}x{} maxLength {} numberOfLineToShow {}", this.posX, this.posY, width, height, maxLength, numberOfLineToShow);
         textInputs = new ArrayList<String>();
     }
 

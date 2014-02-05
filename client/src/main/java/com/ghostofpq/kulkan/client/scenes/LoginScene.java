@@ -87,9 +87,9 @@ public class LoginScene implements Scene {
         int quitButtonPosY = createAccountButtonPosY + buttonsHeight;
 
         pseudoField = new TextField(pseudoFieldPosX, pseudoFieldPosY, textFieldsWidth, textFieldsHeight, 10);
-
+        pseudoField.setAlignement(TextField.Alignement.CENTER);
         passwordField = new PasswordField(passwordFieldPosX, passwordFieldPosY, textFieldsWidth, textFieldsHeight, 10);
-
+        passwordField.setAlignement(TextField.Alignement.CENTER);
         connectButton = new Button(connectButtonPosX, connectButtonPosY, buttonsWidth, buttonsHeight, "CONNECT") {
             @Override
             public void onClick() {
@@ -129,7 +129,7 @@ public class LoginScene implements Scene {
 
         setFocusOn(hudElementList.indexOf(pseudoField));
 
-        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 32, clientContext.getCurrentResolution().getWidth() / 32, TextureKey.LOBBY_EXT_FRAME);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.LOBBY_EXT_FRAME);
         background = new Background(TextureKey.LOGIN_BACKGROUND);
     }
 
