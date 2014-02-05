@@ -62,7 +62,7 @@ public class TextArea extends HUDElement {
                     index++;
                     buffer.append(input.charAt(index));
                 }
-                int mark = index;
+                int mark = index - 1;
                 if (!stringFits(buffer.toString())) {
                     while (input.charAt(index) != (' ') && index > 0) {
                         index--;
