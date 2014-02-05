@@ -17,19 +17,11 @@ public class TextArea extends HUDElement {
     private int numberOfLineToShow;
     private FontManager fontManager = FontManager.getInstance();
 
-    public TextArea(int posX, int posY, int maxLength, int numberOfLineToShow) {
-        this.posX = posX;
-        this.posY = posY;
-        this.maxLength = maxLength;
-        this.hasFocus = false;
-        this.numberOfLineToShow = numberOfLineToShow;
-        this.fontName = "optimus_princeps_16";
-        textInputs = new ArrayList<String>();
-    }
-
     public TextArea(int posX, int posY, int width, int height, String fontName) {
         this.posX = posX;
         this.posY = posY;
+        this.width = width;
+        this.height = height;
         this.maxLength = width / (fontManager.getFontMap().get(fontName).getWidth("a"));
         this.hasFocus = false;
         this.numberOfLineToShow = height / (fontManager.getFontMap().get(fontName).getHeight("A"));
@@ -58,12 +50,39 @@ public class TextArea extends HUDElement {
 
     public void addLine(String input) {
         while (!input.isEmpty()) {
-            int nextIndex = Math.min(input.length(), maxLength);
-            String buffer = input.substring(0, nextIndex);
-            input = input.substring(nextIndex);
-            textInputs.add(buffer);
+            if (stringFits(input)) {
+                textInputs.add(input);
+                input = "";
+            } else {
+                int index = 0;
+                String[] inputTrimmed = input.split("\\s+");
+
+                StringBuilder buffer = new StringBuilder();
+                buffer.append(inputTrimmed[index]);
+                while (stringFits(buffer.toString()) && index < inputTrimmed.length) {
+                    index++;
+                    buffer.append(" ");
+                    buffer.append(inputTrimmed[index]);
+                }
+
+                if (!stringFits(buffer.toString())) {
+                    buffer = new StringBuilder();
+                    buffer.append(inputTrimmed[0]);
+                    for (int i = 1; i < index; i++) {
+                        buffer.append(" ");
+                        buffer.append(inputTrimmed[i]);
+                    }
+                }
+                input = input.substring(buffer.toString().length(), input.length());
+                textInputs.add(buffer.toString());
+            }
         }
     }
+
+    private boolean stringFits(String string) {
+        return ((fontManager.getFontMap().get(fontName).getWidth(string)) < width);
+    }
+
 
     public void clear() {
         textInputs = new ArrayList<String>();
