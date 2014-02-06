@@ -4,11 +4,7 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
-import com.ghostofpq.kulkan.client.graphics.HUD.Button;
-import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
-import com.ghostofpq.kulkan.client.graphics.HUD.HUDElement;
-import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
-import com.ghostofpq.kulkan.client.graphics.PasswordField;
+import com.ghostofpq.kulkan.client.graphics.HUD.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
@@ -87,9 +83,9 @@ public class LoginScene implements Scene {
         int quitButtonPosY = createAccountButtonPosY + buttonsHeight;
 
         pseudoField = new TextField(pseudoFieldPosX, pseudoFieldPosY, textFieldsWidth, textFieldsHeight, 10);
-        pseudoField.setAlignement(TextField.Alignement.CENTER);
+        pseudoField.setAlignment(TextAlignment.CENTER);
         passwordField = new PasswordField(passwordFieldPosX, passwordFieldPosY, textFieldsWidth, textFieldsHeight, 10);
-        passwordField.setAlignement(TextField.Alignement.CENTER);
+        passwordField.setAlignment(TextAlignment.CENTER);
         connectButton = new Button(connectButtonPosX, connectButtonPosY, buttonsWidth, buttonsHeight, "CONNECT") {
             @Override
             public void onClick() {
@@ -135,7 +131,7 @@ public class LoginScene implements Scene {
 
     private void actionConnect() {
         try {
-            MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudoField.getContent(), passwordField.getContent());
+            MessageAuthenticationRequest authenticationRequest = new MessageAuthenticationRequest(pseudoField.getLabel(), passwordField.getLabel());
             Message result = clientMessenger.requestOnAuthenticationChannel(authenticationRequest);
             if (null != result) {
                 if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {
@@ -175,7 +171,7 @@ public class LoginScene implements Scene {
 
     private void actionCreateAccount() {
         try {
-            MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudoField.getContent(), passwordField.getContent());
+            MessageCreateAccount messageCreateAccount = new MessageCreateAccount(pseudoField.getLabel(), passwordField.getLabel());
             Message result = clientMessenger.requestOnAuthenticationChannel(messageCreateAccount);
             if (null != result) {
                 if (result.getType().equals(MessageType.AUTHENTICATION_RESPONSE)) {

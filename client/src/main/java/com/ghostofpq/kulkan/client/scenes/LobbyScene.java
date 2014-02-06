@@ -161,8 +161,8 @@ public class LobbyScene implements Scene {
     }
 
     public void postMessage() {
-        if (!inputChat.getContent().isEmpty()) {
-            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputChat.getContent());
+        if (!inputChat.getLabel().isEmpty()) {
+            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputChat.getLabel());
             clientMessenger.sendMessageToLobbyService(messageLobbyClient);
             inputChat.clear();
         }

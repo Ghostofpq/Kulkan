@@ -209,7 +209,7 @@ public class NewGameCharacterScene implements Scene {
                         try {
                             LOG.debug("Sending ");
                             Player player = Client.getInstance().getPlayer();
-                            MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getContent());
+                            MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
                             channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageCreateNewGameCharacter.getBytes());
                         } catch (IOException e) {
                             e.printStackTrace();
