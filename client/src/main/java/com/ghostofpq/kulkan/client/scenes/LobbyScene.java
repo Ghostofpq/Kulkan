@@ -205,7 +205,7 @@ public class LobbyScene implements Scene {
         setFocusOn(indexOnFocus);
         matchFound = false;
         matchId = "";
-        background = new Background(TextureKey.LOBBY_BACKGROUD_169);
+        background = new Background(TextureKey.LOBBY_BACKGROUND_169);
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.LOBBY_EXT_FRAME);
 
         MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(Client.getInstance().getTokenKey());

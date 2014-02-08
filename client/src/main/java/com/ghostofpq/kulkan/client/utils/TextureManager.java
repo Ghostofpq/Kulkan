@@ -36,7 +36,7 @@ public class TextureManager {
             textureMap.put(TextureKey.LOBBY_EXT_FRAME, frameExt);
 
             Texture lobbyBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Background_169.jpg"));
-            textureMap.put(TextureKey.LOBBY_BACKGROUD_169, lobbyBackground);
+            textureMap.put(TextureKey.LOBBY_BACKGROUND_169, lobbyBackground);
 
             Texture lobbyChatOverlay = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Chat-overlay.png"));
             textureMap.put(TextureKey.LOBBY_CHAT_OVERLAY, lobbyChatOverlay);
@@ -44,6 +44,8 @@ public class TextureManager {
             Texture lobbyNewsOverlay = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_News-overlay.png"));
             textureMap.put(TextureKey.LOBBY_NEWS_OVERLAY, lobbyNewsOverlay);
 
+            Texture charShadow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Character-shadow.png"));
+            textureMap.put(TextureKey.LOBBY_CHAR_SHADOW, charShadow);
 
             Texture earthTop00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_00.png"));
             Texture earthTop01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_01.png"));
