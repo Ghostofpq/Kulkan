@@ -166,6 +166,7 @@ public class LoginScene implements Scene {
 
     private void actionOption() {
         log.debug("OPTION");
+        optionScene.setLastScene(this);
         client.setCurrentScene(optionScene);
     }
 

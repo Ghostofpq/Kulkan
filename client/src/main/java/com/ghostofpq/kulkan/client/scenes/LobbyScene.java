@@ -27,9 +27,11 @@ import java.util.List;
 public class LobbyScene implements Scene {
     private TextField inputChat;
     private TextArea chat;
+    private TextArea news;
     private Button postButton;
     private Button matchmakingButton;
     private Button shopButton;
+    private Button optionButton;
     private Button quitButton;
     private Button acceptButton;
     private Button refuseButton;
@@ -39,15 +41,21 @@ public class LobbyScene implements Scene {
     private List<HUDElement> hudElementList;
     private int indexOnFocus;
     private Background background;
+    private HUDTexturedElement chatOverlay;
+    private HUDTexturedElement newsOverlay;
     // FRAME
     private Frame frame;
     private int x;
     private int y;
     private boolean frameClicked;
     @Autowired
+    private Client client;
+    @Autowired
     private ClientContext clientContext;
     @Autowired
     private ClientMessenger clientMessenger;
+    @Autowired
+    private OptionScene optionScene;
 
     public LobbyScene() {
     }
@@ -56,43 +64,100 @@ public class LobbyScene implements Scene {
     public void init() {
         hudElementList = new ArrayList<HUDElement>();
 
+        // PADDING TO AVOID HAVING TEXT RIGHT NEXT TO THE BORDER
+        int padding = 10;
+
         int chatPosX = clientContext.getCurrentResolution().getWidth() / 32;
         int chatPosY = clientContext.getCurrentResolution().getHeight() * 5 / 8;
         int chatWidth = clientContext.getCurrentResolution().getWidth() * 23 / 64;
         int chatHeight = clientContext.getCurrentResolution().getHeight() * 5 / 18;
-        chat = new TextArea(chatPosX, chatPosY, chatWidth, chatHeight, "arial_12");
+        chat = new TextArea(chatPosX + padding, chatPosY + padding, chatWidth - 2 * padding, chatHeight - 2 * padding, "arial_12");
 
         int inputChatPosX = chatPosX;
         int inputChatPosY = chatPosY + chatHeight;
         int inputChatWidth = clientContext.getCurrentResolution().getWidth() * 31 / 96;
         int inputChatHeight = clientContext.getCurrentResolution().getHeight() / 24;
-        inputChat = new TextField(inputChatPosX, inputChatPosY, inputChatWidth, inputChatHeight, 120, "arial_12");
+        inputChat = new TextField(inputChatPosX + padding, inputChatPosY, inputChatWidth - 2 * padding, inputChatHeight, 120, "arial_12");
 
-
-        postButton = new Button(450, 400, 50, 50, "POST") {
+        int postButtonPosX = chatPosX + inputChatWidth;
+        int postButtonPosY = inputChatPosY;
+        int postButtonWidth = chatWidth - inputChatWidth;
+        int postButtonHeight = inputChatHeight;
+        postButton = new Button(postButtonPosX, postButtonPosY, postButtonWidth, postButtonHeight, "P", null, null) {
             @Override
             public void onClick() {
-                postMessage();
+                actionPostMessage();
             }
         };
-        matchmakingButton = new
 
-                Button(550, 400, 50, 50, "GAME") {
-                    @Override
-                    public void onClick() {
-                        enterMatchmaking();
-                    }
-                };
+        int chatOverlayPosX = chatPosX;
+        int chatOverlayPosY = chatPosY;
+        int chatOverlayWidth = chatWidth;
+        int chatOverlayHeight = chatHeight + inputChatHeight;
+        chatOverlay = new HUDTexturedElement(chatOverlayPosX, chatOverlayPosY, chatOverlayWidth, chatOverlayHeight, TextureKey.LOBBY_CHAT_OVERLAY, TextureKey.LOBBY_CHAT_OVERLAY);
 
-        quitButton = new
 
-                Button(550, 0, 50, 50, "QUIT") {
-                    @Override
-                    public void onClick() {
-                        log.debug("QUIT");
-                        Client.getInstance().quit();
-                    }
-                };
+        int matchmakingButtonPosX = clientContext.getCurrentResolution().getWidth() * 5 / 12;
+        int matchmakingButtonPosY = chatPosY;
+        int matchmakingButtonWidth = clientContext.getCurrentResolution().getWidth() / 6;
+        int matchmakingButtonHeight = clientContext.getCurrentResolution().getHeight() / 18;
+        matchmakingButton = new Button(matchmakingButtonPosX, matchmakingButtonPosY, matchmakingButtonWidth, matchmakingButtonHeight, "GAME", null, null) {
+            @Override
+            public void onClick() {
+                enterMatchmaking();
+            }
+        };
+
+        int shopButtonPosX = matchmakingButtonPosX;
+        int shopButtonPosY = matchmakingButtonPosY + matchmakingButtonHeight + clientContext.getCurrentResolution().getHeight() / 36;
+        int shopButtonWidth = matchmakingButtonWidth;
+        int shopButtonHeight = matchmakingButtonHeight;
+        shopButton = new Button(shopButtonPosX, shopButtonPosY, shopButtonWidth, shopButtonHeight, "SHOP", null, null) {
+            @Override
+            public void onClick() {
+                log.debug("SHOP TEAM");
+                exitLobby();
+                Client.getInstance().setCurrentScene(ShopScene.getInstance());
+            }
+        };
+
+        int optionButtonPosX = matchmakingButtonPosX;
+        int optionButtonPosY = shopButtonPosY + shopButtonHeight;
+        int optionButtonWidth = matchmakingButtonWidth;
+        int optionButtonHeight = matchmakingButtonHeight;
+        optionButton = new Button(optionButtonPosX, optionButtonPosY, optionButtonWidth, optionButtonHeight, "OPTION", null, null) {
+            @Override
+            public void onClick() {
+                log.debug("OPTION");
+                actionOption();
+            }
+        };
+
+        int quitButtonPosX = matchmakingButtonPosX;
+        int quitButtonPosY = optionButtonPosY + optionButtonHeight;
+        int quitButtonWidth = matchmakingButtonWidth;
+        int quitButtonHeight = matchmakingButtonHeight;
+        quitButton = new Button(quitButtonPosX, quitButtonPosY, quitButtonWidth, quitButtonHeight, "QUIT", null, null) {
+            @Override
+            public void onClick() {
+                log.debug("QUIT");
+                Client.getInstance().quit();
+            }
+        };
+
+        int newsPosX = clientContext.getCurrentResolution().getWidth() * 39 / 64;
+        int newsPosY = chatPosY;
+        int newsWidth = chatWidth;
+        int newsHeight = chatHeight + inputChatHeight;
+        news = new TextArea(newsPosX + padding, newsPosY + padding, newsWidth - 2 * padding, newsHeight - 2 * padding, "arial_12");
+
+
+        int newsOverlayPosX = newsPosX;
+        int newsOverlayPosY = newsPosY;
+        int newsOverlayWidth = newsWidth;
+        int newsOverlayHeight = newsHeight;
+        newsOverlay = new HUDTexturedElement(newsOverlayPosX, newsOverlayPosY, newsOverlayWidth, newsOverlayHeight, TextureKey.LOBBY_NEWS_OVERLAY, TextureKey.LOBBY_NEWS_OVERLAY);
+
 
         acceptButton = new
 
@@ -124,16 +189,7 @@ public class LobbyScene implements Scene {
                         Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
                     }
                 };
-        shopButton = new
 
-                Button(550, 250, 50, 50, "SHOP") {
-                    @Override
-                    public void onClick() {
-                        log.debug("SHOP TEAM");
-                        exitLobby();
-                        Client.getInstance().setCurrentScene(ShopScene.getInstance());
-                    }
-                };
 
         hudElementList.add(inputChat);
         hudElementList.add(postButton);
@@ -142,6 +198,9 @@ public class LobbyScene implements Scene {
         hudElementList.add(quitButton);
         hudElementList.add(manageTeamButton);
         hudElementList.add(shopButton);
+        hudElementList.add(optionButton);
+        hudElementList.add(news);
+
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
         matchFound = false;
@@ -153,6 +212,12 @@ public class LobbyScene implements Scene {
         clientMessenger.sendMessageToLobbyService(messageSubscribeToLobby);
     }
 
+    private void actionOption() {
+        log.debug("OPTION");
+        optionScene.setLastScene(this);
+        client.setCurrentScene(optionScene);
+    }
+
     public void setFocusOn(int i) {
         for (HUDElement hudElement : hudElementList) {
             hudElement.setHasFocus(false);
@@ -160,7 +225,7 @@ public class LobbyScene implements Scene {
         hudElementList.get(i).setHasFocus(true);
     }
 
-    public void postMessage() {
+    public void actionPostMessage() {
         if (!inputChat.getLabel().isEmpty()) {
             MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputChat.getLabel());
             clientMessenger.sendMessageToLobbyService(messageLobbyClient);
@@ -256,6 +321,8 @@ public class LobbyScene implements Scene {
             acceptButton.draw();
             refuseButton.draw();
         }
+        chatOverlay.draw();
+        newsOverlay.draw();
         frame.draw();
     }
 
@@ -299,20 +366,15 @@ public class LobbyScene implements Scene {
             if (Keyboard.getEventKeyState()) {
                 if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
                     if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
-                        if (inputChat.hasFocus()) {
-                            inputChat.deleteLastChar();
-                        }
+                        inputChat.deleteLastChar();
+                    } else if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.VALIDATE)) {
+                        actionPostMessage();
                     } else {
-                        if (inputChat.hasFocus()) {
-                            inputChat.writeChar(Keyboard.getEventCharacter());
-                        }
-                    }
-                } else {
-                    if (inputChat.hasFocus()) {
                         inputChat.writeChar(Keyboard.getEventCharacter());
                     }
+                } else {
+                    inputChat.writeChar(Keyboard.getEventCharacter());
                 }
-
             }
         }
         if (frameClicked) {

@@ -39,6 +39,10 @@ public abstract class HUDLabelledElement extends HUDElement {
         fontManager.drawString(fontName, posXText, posYText, label, Color.white);
     }
 
+    public void drawLabel(Color color) {
+        fontManager.drawString(fontName, posXText, posYText, label, color);
+    }
+
     protected void updateTextPosition() {
         switch (alignment) {
             case CENTER:

@@ -19,8 +19,7 @@ public class OptionScene implements Scene {
     private ClientContext clientContext;
     @Autowired
     private Client client;
-    @Autowired
-    private LoginScene loginScene;
+    private Scene lastScene;
     private TextZone resolution;
     private Button nextButton;
     private Button prevButton;
@@ -29,6 +28,10 @@ public class OptionScene implements Scene {
     private Button backButton;
     private int index;
     private ResolutionRatio resolutionRatio;
+
+    public void setLastScene(Scene lastScene) {
+        this.lastScene = lastScene;
+    }
 
     public OptionScene() {
     }
@@ -133,7 +136,7 @@ public class OptionScene implements Scene {
                 Button(posXQuit, posYQuit, widthStep * 2, heightStep, "BACK") {
                     @Override
                     public void onClick() {
-                        client.setCurrentScene(loginScene);
+                        client.setCurrentScene(lastScene);
                     }
                 };
         updateFields();

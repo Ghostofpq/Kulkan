@@ -38,7 +38,7 @@ public class TextField extends HUDLabelledElement {
     }
 
     public void writeChar(char c) {
-        if (Character.isLetterOrDigit(c) || Character.isSpaceChar(c)) {
+        if (Character.isDefined(c)) {
             if (label.length() < maxLength) {
                 label += c;
                 updateTextPosition();

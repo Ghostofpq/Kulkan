@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.client.graphics.HUD;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.client.utils.TextureManager;
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 
 public abstract class Button extends HUDLabelledElement {
@@ -23,6 +24,20 @@ public abstract class Button extends HUDLabelledElement {
         updateTextPosition();
     }
 
+    public Button(int posX, int posY, int width, int height, String label, TextureKey customTexture, TextureKey customTextureFocus) {
+        this.posX = posX;
+        this.posY = posY;
+        this.width = width;
+        this.height = height;
+        this.hasFocus = false;
+        this.fontName = "optimus_princeps_16";
+        this.label = label;
+        this.alignment = TextAlignment.CENTER;
+        this.customTexture = customTexture;
+        this.customTextureFocus = customTextureFocus;
+        updateTextPosition();
+    }
+
     public void setCustomTexture(TextureKey customTexture) {
         this.customTexture = customTexture;
     }
@@ -35,7 +50,7 @@ public abstract class Button extends HUDLabelledElement {
         if (customTexture != null || customTextureFocus != null) {
             Texture texture = null;
 
-            if (hasFocus() && customTextureFocus != null) {
+            if (isHovered() && customTextureFocus != null) {
                 texture = TextureManager.getInstance().getTexture(customTextureFocus);
             } else if (customTexture != null) {
                 texture = TextureManager.getInstance().getTexture(customTexture);
@@ -58,7 +73,13 @@ public abstract class Button extends HUDLabelledElement {
                 GL11.glDisable(GL11.GL_TEXTURE_2D);
             }
         }
-        drawLabel();
+
+        if (isHovered()) {
+            drawLabel(Color.red);
+        } else {
+            drawLabel();
+        }
+
     }
 
 
