@@ -32,8 +32,11 @@ public class TextureManager {
             Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/login_background.jpg"));
             Texture backgroundBasic = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/background_basic.jpg"));
 
-            Texture frameExt = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_ExtFrame.png"));
-            textureMap.put(TextureKey.LOBBY_EXT_FRAME, frameExt);
+            Texture frameExt = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_ExtFrame.png"));
+            textureMap.put(TextureKey.COMMON_EXT_FRAME, frameExt);
+            Texture background = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_Background.jpg"));
+            textureMap.put(TextureKey.COMMON_BACKGROUND_BASIC, background);
+
 
             Texture lobbyBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Background_169.jpg"));
             textureMap.put(TextureKey.LOBBY_BACKGROUND_169, lobbyBackground);

@@ -5,7 +5,6 @@ import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.*;
-import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
@@ -25,30 +24,38 @@ import java.util.List;
 
 @Slf4j
 public class LobbyScene implements Scene {
-    private TextField inputChat;
-    private TextArea chat;
-    private TextArea news;
-    private Button postButton;
+
     private Button matchmakingButton;
-    private Button shopButton;
-    private Button optionButton;
-    private Button quitButton;
+
     private Button acceptButton;
     private Button refuseButton;
     private Button manageTeamButton;
 
+
+    private boolean matchFound;
+    private String matchId;
+    private int indexOnFocus;
+
+    private List<HUDElement> hudElementList;
+    // MENU
+    private Button shopButton;
+    private Button optionButton;
+    private Button quitButton;
+    // CHAT & NEWS
+    private TextField inputChat;
+    private Button postButton;
+    private TextArea chat;
+    private TextArea news;
+    // OVERLAYS
+    private HUDTexturedElement chatOverlay;
+    private HUDTexturedElement newsOverlay;
+    // TEAM
     private Button teamCharacter1;
     private Button teamCharacter2;
     private Button teamCharacter3;
     private Button teamCharacter4;
-
-    private boolean matchFound;
-    private String matchId;
-    private List<HUDElement> hudElementList;
-    private int indexOnFocus;
+    // BACKGROUND
     private Background background;
-    private HUDTexturedElement chatOverlay;
-    private HUDTexturedElement newsOverlay;
     // FRAME
     private Frame frame;
     private int x;
@@ -309,7 +316,7 @@ public class LobbyScene implements Scene {
         matchFound = false;
         matchId = "";
         background = new Background(TextureKey.LOBBY_BACKGROUND_169);
-        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.LOBBY_EXT_FRAME);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
         MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(Client.getInstance().getTokenKey());
         clientMessenger.sendMessageToLobbyService(messageSubscribeToLobby);
@@ -318,6 +325,11 @@ public class LobbyScene implements Scene {
     private void actionOption() {
         log.debug("OPTION");
         optionScene.setLastScene(this);
+        client.setCurrentScene(optionScene);
+    }
+
+    private void actionNewPlayer() {
+        log.debug("Action : New Player");
         client.setCurrentScene(optionScene);
     }
 
@@ -415,7 +427,6 @@ public class LobbyScene implements Scene {
 
     @Override
     public void render() {
-        GraphicsManager.getInstance().make2D();
         background.draw();
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
@@ -480,7 +491,7 @@ public class LobbyScene implements Scene {
                 }
             }
         }
-        if (frameClicked) {
+        if (frameClicked && !clientContext.isFullscreen()) {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
     }

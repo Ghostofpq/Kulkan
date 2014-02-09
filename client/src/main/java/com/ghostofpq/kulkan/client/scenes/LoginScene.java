@@ -5,7 +5,6 @@ import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.*;
-import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
@@ -79,8 +78,10 @@ public class LoginScene implements Scene {
         int connectButtonPosY = passwordFieldPosY + (buttonsHeight * 3 / 2);
         int createAccountButtonPosX = connectButtonPosX;
         int createAccountButtonPosY = connectButtonPosY + buttonsHeight;
+        int optionButtonPosX = connectButtonPosX;
+        int optionButtonPosY = createAccountButtonPosY + buttonsHeight;
         int quitButtonPosX = connectButtonPosX;
-        int quitButtonPosY = createAccountButtonPosY + buttonsHeight;
+        int quitButtonPosY = optionButtonPosY + buttonsHeight;
 
         pseudoField = new TextField(pseudoFieldPosX, pseudoFieldPosY, textFieldsWidth, textFieldsHeight, 10);
         pseudoField.setAlignment(TextAlignment.CENTER);
@@ -99,17 +100,18 @@ public class LoginScene implements Scene {
                 actionCreateAccount();
             }
         };
+
+        optionButton = new Button(optionButtonPosX, optionButtonPosY, buttonsWidth, buttonsHeight, "OPTIONS") {
+            @Override
+            public void onClick() {
+                actionOption();
+            }
+        };
+
         quitButton = new Button(quitButtonPosX, quitButtonPosY, buttonsWidth, buttonsHeight, "QUIT") {
             @Override
             public void onClick() {
                 actionQuit();
-            }
-        };
-
-        optionButton = new Button(10, 10, 50, 50, "Opt.") {
-            @Override
-            public void onClick() {
-                actionOption();
             }
         };
 
@@ -125,7 +127,7 @@ public class LoginScene implements Scene {
 
         setFocusOn(hudElementList.indexOf(pseudoField));
 
-        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.LOBBY_EXT_FRAME);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
         background = new Background(TextureKey.LOGIN_BACKGROUND);
     }
 
@@ -215,7 +217,6 @@ public class LoginScene implements Scene {
 
     @Override
     public void render() {
-        GraphicsManager.getInstance().make2D();
         background.draw();
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
@@ -301,7 +302,7 @@ public class LoginScene implements Scene {
                 }
             }
         }
-        if (frameClicked) {
+        if (frameClicked && !clientContext.isFullscreen()) {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
     }

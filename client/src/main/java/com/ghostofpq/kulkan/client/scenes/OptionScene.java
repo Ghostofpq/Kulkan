@@ -2,10 +2,12 @@ package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
+import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextZone;
-import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
+import com.ghostofpq.kulkan.client.utils.TextureKey;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -20,14 +22,25 @@ public class OptionScene implements Scene {
     @Autowired
     private Client client;
     private Scene lastScene;
-    private TextZone resolution;
-    private Button nextButton;
-    private Button prevButton;
-    private Button switchRatioButton;
     private Button applyButton;
     private Button backButton;
     private int index;
     private ResolutionRatio resolutionRatio;
+    private boolean fullscreen;
+
+    // RESOLUTION CHOICE
+    private TextZone resolution;
+    private Button nextButton;
+    private Button prevButton;
+    private Button switchRatioButton;
+    //private Button switchFullscreenButton;
+    // BACKGROUND
+    private Background background;
+    // FRAME
+    private Frame frame;
+    private int x;
+    private int y;
+    private boolean frameClicked;
 
     public void setLastScene(Scene lastScene) {
         this.lastScene = lastScene;
@@ -38,19 +51,25 @@ public class OptionScene implements Scene {
 
     @Override
     public void init() {
+        background = new Background(TextureKey.BACKGROUND_BASIC);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
+        fullscreen = Display.isFullscreen();
         index = 0;
-        int widthStep = (clientContext.getCurrentResolution().getWidth() / 10);
-        int heightStep = (clientContext.getCurrentResolution().getHeight() / 6);
-        int posXPrev = widthStep * 2;
-        int posXRes = widthStep * 3;
-        int posXNext = widthStep * 7;
 
-        int posY = heightStep;
+        int widthStep = clientContext.getCurrentResolution().getWidth() / 10;
+        int heightStep = clientContext.getCurrentResolution().getHeight() / 10;
 
+        int posXPrev = clientContext.getCurrentResolution().getWidth() / 2 - 200;
+        int posXRes = clientContext.getCurrentResolution().getWidth() / 2 - 150;
+        int posXNext = clientContext.getCurrentResolution().getWidth() / 2 + 150;
 
+        int posY = heightStep * 2;
+        int buttonHeight = 50;
+        int buttonPrevNextWidth = 50;
+        int buttonResolutionWidth = 300;
         resolutionRatio = clientContext.getCurrentResolution().getResolutionRatio();
 
-        prevButton = new Button(posXPrev, posY, widthStep, heightStep, "<") {
+        prevButton = new Button(posXPrev, posY, buttonPrevNextWidth, buttonHeight, "<") {
             @Override
             public void onClick() {
                 if (index > 0) {
@@ -60,36 +79,35 @@ public class OptionScene implements Scene {
             }
         };
 
-        resolution = new TextZone(posXRes, posY, widthStep * 4, heightStep, "");
+        resolution = new TextZone(posXRes, posY, buttonResolutionWidth, buttonHeight, "");
 
-        nextButton = new
-
-                Button(posXNext, posY, widthStep, heightStep, ">") {
-                    @Override
-                    public void onClick() {
-                        switch (resolutionRatio) {
-                            case RATIO_4_3:
-                                if (index < clientContext.getResolutions43().size() - 1) {
-                                    index++;
-                                    updateFields();
-                                }
-                                break;
-                            case RATIO_16_9:
-                                if (index < clientContext.getResolutions169().size() - 1) {
-                                    index++;
-                                    updateFields();
-                                }
-                                break;
+        nextButton = new Button(posXNext, posY, buttonPrevNextWidth, buttonHeight, ">") {
+            @Override
+            public void onClick() {
+                switch (resolutionRatio) {
+                    case RATIO_4_3:
+                        if (index < clientContext.getResolutions43().size() - 1) {
+                            index++;
+                            updateFields();
                         }
-                    }
-                };
+                        break;
+                    case RATIO_16_9:
+                        if (index < clientContext.getResolutions169().size() - 1) {
+                            index++;
+                            updateFields();
+                        }
+                        break;
+                }
+            }
+        };
 
 
-        int posXSwitch = widthStep * 4;
-        int posYSwitch = heightStep * 3;
+        int posXSwitchRatio = clientContext.getCurrentResolution().getWidth() / 2 - 50;
+        int posYSwitchRatio = heightStep * 3;
+        int buttonWidth = 100;
         if (clientContext.getResolutions43().size() != 0 && clientContext.getResolutions169().size() != 0) {
             switchRatioButton = new
-                    Button(posXSwitch, posYSwitch, widthStep * 2, heightStep, "") {
+                    Button(posXSwitchRatio, posYSwitchRatio, buttonWidth, buttonHeight, "") {
                         @Override
                         public void onClick() {
                             switch (resolutionRatio) {
@@ -108,27 +126,35 @@ public class OptionScene implements Scene {
                     };
         }
 
+        //int posXSwitchFullscreen = clientContext.getCurrentResolution().getWidth() / 2 - 50;
+        //int posYSwitchFullscreen = heightStep * 4;
+        //switchFullscreenButton = new Button(posXSwitchFullscreen, posYSwitchFullscreen, buttonWidth, buttonHeight, "") {
+        //    @Override
+        //    public void onClick() {
+        //        fullscreen = !fullscreen;
+        //        updateFields();
+        //    }
+        //};
 
         int posXApply = widthStep * 2;
         int posYApply = heightStep * 5;
-        applyButton = new
-
-                Button(posXApply, posYApply, widthStep * 2, heightStep, "APPLY") {
-                    @Override
-                    public void onClick() {
-                        switch (resolutionRatio) {
-                            case RATIO_4_3:
-                                clientContext.setCurrentResolution(clientContext.getResolutions43().get(index));
-                                client.updateDisplay();
-                                break;
-                            case RATIO_16_9:
-                                clientContext.setCurrentResolution(clientContext.getResolutions169().get(index));
-                                client.updateDisplay();
-                                break;
-                        }
-                        updateFields();
-                    }
-                };
+        applyButton = new Button(posXApply, posYApply, widthStep * 2, heightStep, "APPLY") {
+            @Override
+            public void onClick() {
+                clientContext.setFullscreen(fullscreen);
+                switch (resolutionRatio) {
+                    case RATIO_4_3:
+                        clientContext.setCurrentResolution(clientContext.getResolutions43().get(index));
+                        client.updateDisplay();
+                        break;
+                    case RATIO_16_9:
+                        clientContext.setCurrentResolution(clientContext.getResolutions169().get(index));
+                        client.updateDisplay();
+                        break;
+                }
+                updateFields();
+            }
+        };
         int posXQuit = widthStep * 7;
         int posYQuit = heightStep * 5;
         backButton = new
@@ -151,7 +177,7 @@ public class OptionScene implements Scene {
                         .append(clientContext.getResolutions43().get(index).getHeight())
                         .toString();
                 if (clientContext.getResolutions43().size() != 0 && clientContext.getResolutions169().size() != 0) {
-                    switchRatioButton.setLabel(ResolutionRatio.RATIO_16_9.toString());
+                    switchRatioButton.setLabel("4:3");
                 }
                 break;
             case RATIO_16_9:
@@ -160,11 +186,18 @@ public class OptionScene implements Scene {
                         .append(clientContext.getResolutions169().get(index).getHeight())
                         .toString();
                 if (clientContext.getResolutions43().size() != 0 && clientContext.getResolutions169().size() != 0) {
-                    switchRatioButton.setLabel(ResolutionRatio.RATIO_4_3.toString());
+                    switchRatioButton.setLabel("16:9");
                 }
                 break;
         }
         resolution.setText(text);
+
+        //if (fullscreen) {
+        //    switchFullscreenButton.setLabel("FULLSCREEN");
+        //} else {
+        //    switchFullscreenButton.setLabel("NOT FULLSCREEN");
+        //}
+
     }
 
     @Override
@@ -179,15 +212,17 @@ public class OptionScene implements Scene {
 
     @Override
     public void render() {
-        GraphicsManager.getInstance().make2D();
+        background.draw();
         prevButton.draw();
         nextButton.draw();
         resolution.draw();
         if (null != switchRatioButton) {
             switchRatioButton.draw();
         }
+        //switchFullscreenButton.draw();
         applyButton.draw();
         backButton.draw();
+        frame.draw();
     }
 
     @Override
@@ -204,12 +239,26 @@ public class OptionScene implements Scene {
                     backButton.onClick();
                 } else if (null != switchRatioButton && switchRatioButton.isClicked()) {
                     switchRatioButton.onClick();
-                } else {
-                    Display.setLocation(Display.getX() + Mouse.getDX(), Display.getY() - Mouse.getDY());
+                    //} else if (switchFullscreenButton.isClicked()) {
+                    //    switchFullscreenButton.onClick();
+                } else if (frame.isClicked()) {
+                    if (x == -1 && y == -1) {
+                        x = Mouse.getX();
+                        y = (Display.getHeight() - Mouse.getY());
+                        frameClicked = true;
+                    }
                 }
+            } else if (!Mouse.isButtonDown(0)) {
+                frameClicked = false;
+                x = -1;
+                y = -1;
             }
         }
+        if (frameClicked && !clientContext.isFullscreen()) {
+            Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
+        }
     }
+
 
     @Override
     public void closeConnections() throws IOException {

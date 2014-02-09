@@ -14,6 +14,7 @@ import java.util.*;
 @Slf4j
 public class ClientContext {
     public static Resolution currentResolution;
+    private boolean fullscreen;
     // WINDOW
     private List<Resolution> resolutions43;
     private List<Resolution> resolutions169;
@@ -28,6 +29,14 @@ public class ClientContext {
         loadClientProperties();
         selectDisplayMode();
         saveClientProperties();
+    }
+
+    public boolean isFullscreen() {
+        return fullscreen;
+    }
+
+    public void setFullscreen(boolean fullscreen) {
+        this.fullscreen = fullscreen;
     }
 
     private void selectDisplayMode() {

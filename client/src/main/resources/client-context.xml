@@ -25,5 +25,6 @@
 
     <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
     <bean id="lobbyScene" class="com.ghostofpq.kulkan.client.scenes.LobbyScene"/>
+    <bean id="createGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.CreateGameCharacterScene"/>
     <bean id="optionScene" class="com.ghostofpq.kulkan.client.scenes.OptionScene"/>
 </beans>

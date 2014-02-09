@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class NewGameCharacterScene implements Scene {
-    private static final Logger LOG = LoggerFactory.getLogger(NewGameCharacterScene.class);
-    private static volatile NewGameCharacterScene instance = null;
+public class CreateGameCharacterScene implements Scene {
+    private static final Logger LOG = LoggerFactory.getLogger(CreateGameCharacterScene.class);
+    private static volatile CreateGameCharacterScene instance = null;
     private final String USER_SERVICE_QUEUE_NAME = "server/users";
     private Channel channelOut;
     private ClanType clanType;
@@ -45,14 +45,14 @@ public class NewGameCharacterScene implements Scene {
     private int heightSeparator = 50;
     private int heightStep;
 
-    private NewGameCharacterScene() {
+    private CreateGameCharacterScene() {
     }
 
-    public static NewGameCharacterScene getInstance() {
+    public static CreateGameCharacterScene getInstance() {
         if (instance == null) {
-            synchronized (NewGameCharacterScene.class) {
+            synchronized (CreateGameCharacterScene.class) {
                 if (instance == null) {
-                    instance = new NewGameCharacterScene();
+                    instance = new CreateGameCharacterScene();
                 }
             }
         }

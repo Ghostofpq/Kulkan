@@ -84,7 +84,7 @@ public class TeamManagementScene implements Scene {
                 buttonsNewGameCharacter.add(new Button(posXs[i], posYs[i], width / 2, height / 2, "HIRE NEW WARRIOR") {
                     @Override
                     public void onClick() {
-                        Client.getInstance().setCurrentScene(NewGameCharacterScene.getInstance());
+                        Client.getInstance().setCurrentScene(CreateGameCharacterScene.getInstance());
                     }
                 });
             }
@@ -100,7 +100,7 @@ public class TeamManagementScene implements Scene {
                 buttonsNewGameCharacterPage1.add(new Button(posXs[i], posYs[i], width / 2, height / 2, "HIRE NEW WARRIOR") {
                     @Override
                     public void onClick() {
-                        Client.getInstance().setCurrentScene(NewGameCharacterScene.getInstance());
+                        Client.getInstance().setCurrentScene(CreateGameCharacterScene.getInstance());
                     }
                 });
             }
@@ -116,7 +116,7 @@ public class TeamManagementScene implements Scene {
                 buttonsNewGameCharacterPage2.add(new Button(posXs[i - 4], posYs[i - 4], width / 2, height / 2, "HIRE NEW WARRIOR") {
                     @Override
                     public void onClick() {
-                        Client.getInstance().setCurrentScene(NewGameCharacterScene.getInstance());
+                        Client.getInstance().setCurrentScene(CreateGameCharacterScene.getInstance());
                     }
                 });
             }
@@ -132,7 +132,7 @@ public class TeamManagementScene implements Scene {
                 buttonsNewGameCharacterPage3.add(new Button(posXs[i - 8], posYs[i - 8], width / 2, height / 2, "HIRE NEW WARRIOR") {
                     @Override
                     public void onClick() {
-                        Client.getInstance().setCurrentScene(NewGameCharacterScene.getInstance());
+                        Client.getInstance().setCurrentScene(CreateGameCharacterScene.getInstance());
                     }
                 });
             }

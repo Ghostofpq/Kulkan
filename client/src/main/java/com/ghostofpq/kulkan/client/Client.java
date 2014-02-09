@@ -77,6 +77,7 @@ public class Client {
             Display.setSwapInterval(1);
             Display.sync(60);
             Display.create();
+            clientContext.setFullscreen(Display.isFullscreen());
         } catch (LWJGLException e) {
             e.printStackTrace();
             System.exit(0);
@@ -109,7 +110,7 @@ public class Client {
             FontManager.getInstance().reload();
             initGL();
             GraphicsManager.getInstance().ready3D();
-
+            clientContext.setFullscreen(Display.isFullscreen());
         } catch (LWJGLException e) {
             e.printStackTrace();
             System.exit(0);
@@ -171,6 +172,7 @@ public class Client {
     public void render() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
+        GraphicsManager.getInstance().make2D();
         currentScene.render();
 
         Display.update();
