@@ -36,6 +36,12 @@ public class LobbyScene implements Scene {
     private Button acceptButton;
     private Button refuseButton;
     private Button manageTeamButton;
+
+    private Button teamCharacter1;
+    private Button teamCharacter2;
+    private Button teamCharacter3;
+    private Button teamCharacter4;
+
     private boolean matchFound;
     private String matchId;
     private List<HUDElement> hudElementList;
@@ -67,6 +73,7 @@ public class LobbyScene implements Scene {
         // PADDING TO AVOID HAVING TEXT RIGHT NEXT TO THE BORDER
         int padding = 10;
 
+        // CHAT
         int chatPosX = clientContext.getCurrentResolution().getWidth() / 32;
         int chatPosY = clientContext.getCurrentResolution().getHeight() * 5 / 8;
         int chatWidth = clientContext.getCurrentResolution().getWidth() * 23 / 64;
@@ -96,7 +103,21 @@ public class LobbyScene implements Scene {
         int chatOverlayHeight = chatHeight + inputChatHeight;
         chatOverlay = new HUDTexturedElement(chatOverlayPosX, chatOverlayPosY, chatOverlayWidth, chatOverlayHeight, TextureKey.LOBBY_CHAT_OVERLAY, TextureKey.LOBBY_CHAT_OVERLAY);
 
+        //NEWS
+        int newsPosX = clientContext.getCurrentResolution().getWidth() * 39 / 64;
+        int newsPosY = chatPosY;
+        int newsWidth = chatWidth;
+        int newsHeight = chatHeight + inputChatHeight;
+        news = new TextArea(newsPosX + padding, newsPosY + padding, newsWidth - 2 * padding, newsHeight - 2 * padding, "arial_12");
 
+        int newsOverlayPosX = newsPosX;
+        int newsOverlayPosY = newsPosY;
+        int newsOverlayWidth = newsWidth;
+        int newsOverlayHeight = newsHeight;
+        newsOverlay = new HUDTexturedElement(newsOverlayPosX, newsOverlayPosY, newsOverlayWidth, newsOverlayHeight, TextureKey.LOBBY_NEWS_OVERLAY, TextureKey.LOBBY_NEWS_OVERLAY);
+
+
+        // MENU
         int matchmakingButtonPosX = clientContext.getCurrentResolution().getWidth() * 5 / 12;
         int matchmakingButtonPosY = chatPosY;
         int matchmakingButtonWidth = clientContext.getCurrentResolution().getWidth() / 6;
@@ -145,18 +166,97 @@ public class LobbyScene implements Scene {
             }
         };
 
-        int newsPosX = clientContext.getCurrentResolution().getWidth() * 39 / 64;
-        int newsPosY = chatPosY;
-        int newsWidth = chatWidth;
-        int newsHeight = chatHeight + inputChatHeight;
-        news = new TextArea(newsPosX + padding, newsPosY + padding, newsWidth - 2 * padding, newsHeight - 2 * padding, "arial_12");
+        // TEAM  teamCharacter1
+        int teamCharacter1PosX = clientContext.getCurrentResolution().getWidth() * 3 / 16;
+        int teamCharacter1PosY = clientContext.getCurrentResolution().getHeight() * 7 / 27;
+        int teamCharacter1Width = clientContext.getCurrentResolution().getWidth() / 10;
+        int teamCharacter1Height = clientContext.getCurrentResolution().getHeight() / 3;
+        if (null != clientContext.getPlayer().getTeam().get(0)) {
+            teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, clientContext.getPlayer().getTeam().get(0).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        } else {
+            teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, "HIRE NEW WARRIOR", null, null) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        }
 
+        // TEAM  teamCharacter2
+        int teamCharacter2PosX = teamCharacter1PosX + teamCharacter1Width + (clientContext.getCurrentResolution().getWidth() * 13 / 960);
+        int teamCharacter2PosY = teamCharacter1PosY;
+        int teamCharacter2Width = teamCharacter1Width;
+        int teamCharacter2Height = teamCharacter1Height;
+        if (clientContext.getPlayer().getTeam().size() > 1 && null != clientContext.getPlayer().getTeam().get(1)) {
+            teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, clientContext.getPlayer().getTeam().get(1).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        } else {
+            teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, "HIRE NEW WARRIOR", null, null) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        }
 
-        int newsOverlayPosX = newsPosX;
-        int newsOverlayPosY = newsPosY;
-        int newsOverlayWidth = newsWidth;
-        int newsOverlayHeight = newsHeight;
-        newsOverlay = new HUDTexturedElement(newsOverlayPosX, newsOverlayPosY, newsOverlayWidth, newsOverlayHeight, TextureKey.LOBBY_NEWS_OVERLAY, TextureKey.LOBBY_NEWS_OVERLAY);
+        // TEAM  teamCharacter3
+        int teamCharacter3PosX = teamCharacter2PosX + teamCharacter1Width + (clientContext.getCurrentResolution().getWidth() * 19 / 96);
+        int teamCharacter3PosY = teamCharacter1PosY;
+        int teamCharacter3Width = teamCharacter1Width;
+        int teamCharacter3Height = teamCharacter1Height;
+        if (clientContext.getPlayer().getTeam().size() > 2 && null != clientContext.getPlayer().getTeam().get(2)) {
+            teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, clientContext.getPlayer().getTeam().get(2).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        } else {
+            teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, "HIRE NEW", null, null) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        }
+
+        // TEAM  teamCharacter1
+        int teamCharacter4PosX = teamCharacter3PosX + teamCharacter1Width + (clientContext.getCurrentResolution().getWidth() * 13 / 960);
+        int teamCharacter4PosY = teamCharacter1PosY;
+        int teamCharacter4Width = teamCharacter1Width;
+        int teamCharacter4Height = teamCharacter1Height;
+        if (clientContext.getPlayer().getTeam().size() > 3 && null != clientContext.getPlayer().getTeam().get(3)) {
+            teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, clientContext.getPlayer().getTeam().get(3).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        } else {
+            teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, "HIRE NEW", null, null) {
+                @Override
+                public void onClick() {
+                    log.debug("QUIT");
+                    Client.getInstance().quit();
+                }
+            };
+        }
 
 
         acceptButton = new
@@ -200,7 +300,10 @@ public class LobbyScene implements Scene {
         hudElementList.add(shopButton);
         hudElementList.add(optionButton);
         hudElementList.add(news);
-
+        hudElementList.add(teamCharacter1);
+        hudElementList.add(teamCharacter2);
+        hudElementList.add(teamCharacter3);
+        hudElementList.add(teamCharacter4);
         indexOnFocus = 0;
         setFocusOn(indexOnFocus);
         matchFound = false;
