@@ -69,6 +69,8 @@ public class LobbyScene implements Scene {
     private ClientMessenger clientMessenger;
     @Autowired
     private OptionScene optionScene;
+    @Autowired
+    private CreateGameCharacterScene createGameCharacterScene;
 
     public LobbyScene() {
     }
@@ -168,8 +170,7 @@ public class LobbyScene implements Scene {
         quitButton = new Button(quitButtonPosX, quitButtonPosY, quitButtonWidth, quitButtonHeight, "QUIT", null, null) {
             @Override
             public void onClick() {
-                log.debug("QUIT");
-                Client.getInstance().quit();
+                actionQuit();
             }
         };
 
@@ -182,16 +183,14 @@ public class LobbyScene implements Scene {
             teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, clientContext.getPlayer().getTeam().get(0).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionQuit();
                 }
             };
         } else {
             teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, "HIRE NEW WARRIOR", null, null) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionCreateCharacter();
                 }
             };
         }
@@ -205,16 +204,14 @@ public class LobbyScene implements Scene {
             teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, clientContext.getPlayer().getTeam().get(1).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionQuit();
                 }
             };
         } else {
             teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, "HIRE NEW WARRIOR", null, null) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionCreateCharacter();
                 }
             };
         }
@@ -228,16 +225,14 @@ public class LobbyScene implements Scene {
             teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, clientContext.getPlayer().getTeam().get(2).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionQuit();
                 }
             };
         } else {
             teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, "HIRE NEW", null, null) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionCreateCharacter();
                 }
             };
         }
@@ -251,51 +246,43 @@ public class LobbyScene implements Scene {
             teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, clientContext.getPlayer().getTeam().get(3).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionQuit();
                 }
             };
         } else {
             teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, "HIRE NEW", null, null) {
                 @Override
                 public void onClick() {
-                    log.debug("QUIT");
-                    Client.getInstance().quit();
+                    actionCreateCharacter();
                 }
             };
         }
 
 
-        acceptButton = new
+        acceptButton = new Button(550, 100, 50, 50, "ACCEPT") {
+            @Override
+            public void onClick() {
+                log.debug("ACCEPT");
+                acceptMatch();
+            }
+        };
 
-                Button(550, 100, 50, 50, "ACCEPT") {
-                    @Override
-                    public void onClick() {
-                        log.debug("ACCEPT");
-                        acceptMatch();
-                    }
-                };
+        refuseButton = new Button(550, 150, 50, 50, "REFUSE") {
+            @Override
+            public void onClick() {
+                log.debug("REFUSE");
+                refuseMatch();
+            }
+        };
 
-        refuseButton = new
-
-                Button(550, 150, 50, 50, "REFUSE") {
-                    @Override
-                    public void onClick() {
-                        log.debug("REFUSE");
-                        refuseMatch();
-                    }
-                };
-
-        manageTeamButton = new
-
-                Button(550, 200, 50, 50, "MANAGE TEAM") {
-                    @Override
-                    public void onClick() {
-                        log.debug("MANAGE TEAM");
-                        exitLobby();
-                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-                    }
-                };
+        manageTeamButton = new Button(550, 200, 50, 50, "MANAGE TEAM") {
+            @Override
+            public void onClick() {
+                log.debug("MANAGE TEAM");
+                exitLobby();
+                Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+            }
+        };
 
 
         hudElementList.add(inputChat);
@@ -326,6 +313,16 @@ public class LobbyScene implements Scene {
         log.debug("OPTION");
         optionScene.setLastScene(this);
         client.setCurrentScene(optionScene);
+    }
+
+    private void actionQuit() {
+        log.debug("QUIT");
+        exitLobby();
+        Client.getInstance().quit();
+    }
+
+    private void actionCreateCharacter() {
+        client.setCurrentScene(createGameCharacterScene);
     }
 
     private void actionNewPlayer() {

@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.ClientContext;
+import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
 import com.ghostofpq.kulkan.client.utils.InputManager;
@@ -11,19 +13,16 @@ import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageCreateNewGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
-import com.rabbitmq.client.Channel;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 public class CreateGameCharacterScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(CreateGameCharacterScene.class);
-    private static volatile CreateGameCharacterScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "server/users";
-    private Channel channelOut;
     private ClanType clanType;
     private Gender gender;
     private TextField name;
@@ -44,19 +43,18 @@ public class CreateGameCharacterScene implements Scene {
     private int widthStepClan;
     private int heightSeparator = 50;
     private int heightStep;
+    @Autowired
+    private Client client;
+    @Autowired
+    private ClientContext clientContext;
+    @Autowired
+    private ClientMessenger clientMessenger;
+    @Autowired
+    private OptionScene optionScene;
+    @Autowired
+    private LobbyScene lobbyScene;
 
-    private CreateGameCharacterScene() {
-    }
-
-    public static CreateGameCharacterScene getInstance() {
-        if (instance == null) {
-            synchronized (CreateGameCharacterScene.class) {
-                if (instance == null) {
-                    instance = new CreateGameCharacterScene();
-                }
-            }
-        }
-        return instance;
+    public CreateGameCharacterScene() {
     }
 
     @Override
@@ -118,76 +116,60 @@ public class CreateGameCharacterScene implements Scene {
         int eaglePosX = araPosX + widthStepClan;
         int eaglePosY = gorillaPosY;
 
-        gorilla = new
+        gorilla = new Button(gorillaPosX, gorillaPosY, widthStepClan, heightStep, "gorilla") {
+            @Override
+            public void onClick() {
+                gorillaHasFocus();
+            }
+        };
 
-                Button(gorillaPosX, gorillaPosY, widthStepClan, heightStep, "gorilla") {
-                    @Override
-                    public void onClick() {
-                        gorillaHasFocus();
-                    }
-                };
+        jaguar = new Button(jaguarPosX, jaguarPosY, widthStepClan, heightStep, "jaguar") {
+            @Override
+            public void onClick() {
+                jaguarHasFocus();
+            }
+        };
 
-        jaguar = new
+        turtle = new Button(turtlePosX, turtlePosY, widthStepClan, heightStep, "turtle") {
+            @Override
+            public void onClick() {
+                turtleHasFocus();
+            }
+        };
+        monkey = new Button(monkeyPosX, monkeyPosY, widthStepClan, heightStep, "monkey") {
+            @Override
+            public void onClick() {
+                monkeyHasFocus();
+            }
+        };
 
-                Button(jaguarPosX, jaguarPosY, widthStepClan, heightStep, "jaguar") {
-                    @Override
-                    public void onClick() {
-                        jaguarHasFocus();
-                    }
-                };
+        panther = new Button(pantherPosX, pantherPosY, widthStepClan, heightStep, "panther") {
+            @Override
+            public void onClick() {
+                pantherHasFocus();
+            }
+        };
 
-        turtle = new
+        lizard = new Button(lizardPosX, lizardPosY, widthStepClan, heightStep, "lizard") {
+            @Override
+            public void onClick() {
+                lizardHasFocus();
+            }
+        };
 
-                Button(turtlePosX, turtlePosY, widthStepClan, heightStep, "turtle") {
-                    @Override
-                    public void onClick() {
-                        turtleHasFocus();
-                    }
-                };
-        monkey = new
+        ara = new Button(araPosX, araPosY, widthStepClan, heightStep, "ara") {
+            @Override
+            public void onClick() {
+                araHasFocus();
+            }
+        };
 
-                Button(monkeyPosX, monkeyPosY, widthStepClan, heightStep, "monkey") {
-                    @Override
-                    public void onClick() {
-                        monkeyHasFocus();
-                    }
-                };
-
-        panther = new
-
-                Button(pantherPosX, pantherPosY, widthStepClan, heightStep, "panther") {
-                    @Override
-                    public void onClick() {
-                        pantherHasFocus();
-                    }
-                };
-
-        lizard = new
-
-                Button(lizardPosX, lizardPosY, widthStepClan, heightStep, "lizard") {
-                    @Override
-                    public void onClick() {
-                        lizardHasFocus();
-                    }
-                };
-
-        ara = new
-
-                Button(araPosX, araPosY, widthStepClan, heightStep, "ara") {
-                    @Override
-                    public void onClick() {
-                        araHasFocus();
-                    }
-                };
-
-        eagle = new
-
-                Button(eaglePosX, eaglePosY, widthStepClan, heightStep, "eagle") {
-                    @Override
-                    public void onClick() {
-                        eagleHasFocus();
-                    }
-                };
+        eagle = new Button(eaglePosX, eaglePosY, widthStepClan, heightStep, "eagle") {
+            @Override
+            public void onClick() {
+                eagleHasFocus();
+            }
+        };
 
         int widthDesc = (Client.getInstance().getWidth() - 4 * widthSeparator) / 7;
 
@@ -197,36 +179,26 @@ public class CreateGameCharacterScene implements Scene {
         int quitPosX = validatePosX;
         int quitPosY = 3 * heightSeparator + 4 * heightStep;
 
-        validate = new
+        validate = new Button(validatePosX, validatePosY, widthDesc, heightStep, "validate") {
+            @Override
+            public void onClick() {
+                LOG.debug("Sending a CreateGameCharacterRequest");
+                LOG.debug("Name : '{}'", name);
+                LOG.debug("Gender : '{}'", gender);
+                LOG.debug("ClanType : '{}'", clanType);
+                LOG.debug("Sending ");
+                Player player = Client.getInstance().getPlayer();
+                MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
+                clientMessenger.sendMessageToUserService(messageCreateNewGameCharacter);
+            }
+        };
 
-                Button(validatePosX, validatePosY, widthDesc, heightStep, "validate") {
-                    @Override
-                    public void onClick() {
-                        LOG.debug("Sending a CreateGameCharacterRequest");
-                        LOG.debug("Name : '{}'", name);
-                        LOG.debug("Gender : '{}'", gender);
-                        LOG.debug("ClanType : '{}'", clanType);
-                        try {
-                            LOG.debug("Sending ");
-                            Player player = Client.getInstance().getPlayer();
-                            MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
-                            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageCreateNewGameCharacter.getBytes());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-
-        quit = new
-
-                Button(quitPosX, quitPosY, widthDesc, heightStep, "back") {
-                    @Override
-                    public void onClick() {
-                        Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
-                    }
-                };
+        quit = new Button(quitPosX, quitPosY, widthDesc, heightStep, "back") {
+            @Override
+            public void onClick() {
+                client.setCurrentScene(lobbyScene);
+            }
+        };
 
         maleHasFocus();
         gorillaHasFocus();
@@ -421,14 +393,10 @@ public class CreateGameCharacterScene implements Scene {
 
     @Override
     public void initConnections() throws IOException {
-        channelOut = Client.getInstance().getConnection().createChannel();
-        channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
     }
 
     @Override
     public void closeConnections() throws IOException {
-        channelOut.close();
-        LOG.debug("channelOut closed");
     }
 
     @Override
@@ -440,8 +408,8 @@ public class CreateGameCharacterScene implements Scene {
                     LOG.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     LOG.debug("CREATE OK");
-                    Client.getInstance().setPlayer(response.getPlayer());
-                    Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                    clientContext.setPlayer(response.getPlayer());
+                    client.setCurrentScene(lobbyScene);
                     break;
             }
         }
