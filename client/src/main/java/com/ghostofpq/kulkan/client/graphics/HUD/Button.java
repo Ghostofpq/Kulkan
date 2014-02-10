@@ -50,7 +50,7 @@ public abstract class Button extends HUDLabelledElement {
         if (customTexture != null || customTextureFocus != null) {
             Texture texture = null;
 
-            if (isHovered() && customTextureFocus != null) {
+            if ((isHovered() || hasFocus()) && customTextureFocus != null) {
                 texture = TextureManager.getInstance().getTexture(customTextureFocus);
             } else if (customTexture != null) {
                 texture = TextureManager.getInstance().getTexture(customTexture);
