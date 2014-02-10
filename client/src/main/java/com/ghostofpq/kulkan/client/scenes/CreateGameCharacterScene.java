@@ -403,10 +403,14 @@ public class CreateGameCharacterScene implements Scene {
                     if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
                         name.deleteLastChar();
                     } else {
-                        name.writeChar(Keyboard.getEventCharacter());
+                        if (Character.isLetterOrDigit(Keyboard.getEventCharacter())) {
+                            name.writeChar(Keyboard.getEventCharacter());
+                        }
                     }
                 } else {
-                    name.writeChar(Keyboard.getEventCharacter());
+                    if (Character.isLetterOrDigit(Keyboard.getEventCharacter())) {
+                        name.writeChar(Keyboard.getEventCharacter());
+                    }
                 }
             }
         }
