@@ -7,6 +7,7 @@ import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
+import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
@@ -333,6 +334,7 @@ public class CreateGameCharacterScene implements Scene {
 
     @Override
     public void render() {
+        GraphicsManager.getInstance().make2D();
         background.draw();
         male.draw();
         female.draw();

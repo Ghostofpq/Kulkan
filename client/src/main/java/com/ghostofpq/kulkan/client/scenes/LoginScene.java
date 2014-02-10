@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.*;
+import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
@@ -217,6 +218,7 @@ public class LoginScene implements Scene {
 
     @Override
     public void render() {
+        GraphicsManager.getInstance().make2D();
         background.draw();
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();

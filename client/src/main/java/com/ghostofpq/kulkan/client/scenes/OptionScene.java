@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextZone;
+import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import lombok.extern.slf4j.Slf4j;
@@ -191,6 +192,7 @@ public class OptionScene implements Scene {
 
     @Override
     public void render() {
+        GraphicsManager.getInstance().make2D();
         background.draw();
         prevButton.draw();
         nextButton.draw();

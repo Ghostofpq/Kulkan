@@ -172,7 +172,6 @@ public class Client {
     public void render() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-        GraphicsManager.getInstance().make2D();
         currentScene.render();
 
         Display.update();
