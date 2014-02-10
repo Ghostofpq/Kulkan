@@ -3,10 +3,13 @@ package com.ghostofpq.kulkan.client.scenes;
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
+import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
 import com.ghostofpq.kulkan.client.utils.InputManager;
 import com.ghostofpq.kulkan.client.utils.InputMap;
+import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
@@ -15,6 +18,7 @@ import com.ghostofpq.kulkan.entities.messages.user.MessageCreateNewGameCharacter
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +47,13 @@ public class CreateGameCharacterScene implements Scene {
     private int widthStepClan;
     private int heightSeparator = 50;
     private int heightStep;
+    // BACKGROUND
+    private Background background;
+    // FRAME
+    private Frame frame;
+    private int x;
+    private int y;
+    private boolean frameClicked;
     @Autowired
     private Client client;
     @Autowired
@@ -59,6 +70,9 @@ public class CreateGameCharacterScene implements Scene {
 
     @Override
     public void init() {
+        background = new Background(TextureKey.BACKGROUND_BASIC);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
+
         widthSeparator = Client.getInstance().getWidth() / 20;
         heightSeparator = Client.getInstance().getHeight() / 20;
 
@@ -319,6 +333,7 @@ public class CreateGameCharacterScene implements Scene {
 
     @Override
     public void render() {
+        background.draw();
         male.draw();
         female.draw();
         gorilla.draw();
@@ -332,6 +347,7 @@ public class CreateGameCharacterScene implements Scene {
         name.draw();
         validate.draw();
         quit.draw();
+        frame.draw();
     }
 
     @Override
@@ -340,42 +356,45 @@ public class CreateGameCharacterScene implements Scene {
             if (Mouse.isButtonDown(0)) {
                 if (male.isClicked()) {
                     male.onClick();
-                }
-                if (female.isClicked()) {
+                } else if (female.isClicked()) {
                     female.onClick();
-                }
-                if (gorilla.isClicked()) {
+                } else if (gorilla.isClicked()) {
                     gorilla.onClick();
-                }
-                if (jaguar.isClicked()) {
+                } else if (jaguar.isClicked()) {
                     jaguar.onClick();
-                }
-                if (turtle.isClicked()) {
+                } else if (turtle.isClicked()) {
                     turtle.onClick();
-                }
-                if (monkey.isClicked()) {
+                } else if (monkey.isClicked()) {
                     monkey.onClick();
-                }
-                if (panther.isClicked()) {
+                } else if (panther.isClicked()) {
                     panther.onClick();
-                }
-                if (lizard.isClicked()) {
+                } else if (lizard.isClicked()) {
                     lizard.onClick();
-                }
-                if (ara.isClicked()) {
+                } else if (ara.isClicked()) {
                     ara.onClick();
-                }
-                if (eagle.isClicked()) {
+                } else if (eagle.isClicked()) {
                     eagle.onClick();
-                }
-                if (validate.isClicked()) {
+                } else if (validate.isClicked()) {
                     validate.onClick();
-                }
-                if (quit.isClicked()) {
+                } else if (quit.isClicked()) {
                     quit.onClick();
+                } else if (frame.isClicked()) {
+                    if (x == -1 && y == -1) {
+                        x = Mouse.getX();
+                        y = (Display.getHeight() - Mouse.getY());
+                        frameClicked = true;
+                    }
                 }
+            } else if (!Mouse.isButtonDown(0)) {
+                frameClicked = false;
+                x = -1;
+                y = -1;
             }
         }
+        if (frameClicked && !clientContext.isFullscreen()) {
+            Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
+        }
+
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
@@ -389,6 +408,7 @@ public class CreateGameCharacterScene implements Scene {
                 }
             }
         }
+
     }
 
     @Override

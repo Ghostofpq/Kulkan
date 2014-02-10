@@ -26,7 +26,6 @@ public class OptionScene implements Scene {
     private Button backButton;
     private int index;
     private ResolutionRatio resolutionRatio;
-    private boolean fullscreen;
 
     // RESOLUTION CHOICE
     private TextZone resolution;
@@ -52,7 +51,6 @@ public class OptionScene implements Scene {
     public void init() {
         background = new Background(TextureKey.BACKGROUND_BASIC);
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
-        fullscreen = Display.isFullscreen();
         index = 0;
 
         int widthStep = clientContext.getCurrentResolution().getWidth() / 10;
@@ -130,7 +128,6 @@ public class OptionScene implements Scene {
         applyButton = new Button(posXApply, posYApply, buttonWidth, buttonHeight, "APPLY") {
             @Override
             public void onClick() {
-                clientContext.setFullscreen(fullscreen);
                 switch (resolutionRatio) {
                     case RATIO_4_3:
                         clientContext.setCurrentResolution(clientContext.getResolutions43().get(index));
