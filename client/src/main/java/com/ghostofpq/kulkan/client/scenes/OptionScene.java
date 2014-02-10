@@ -59,14 +59,14 @@ public class OptionScene implements Scene {
         int widthStep = clientContext.getCurrentResolution().getWidth() / 10;
         int heightStep = clientContext.getCurrentResolution().getHeight() / 10;
 
-        int posXPrev = clientContext.getCurrentResolution().getWidth() / 2 - 200;
-        int posXRes = clientContext.getCurrentResolution().getWidth() / 2 - 150;
-        int posXNext = clientContext.getCurrentResolution().getWidth() / 2 + 150;
+        int buttonPrevNextWidth = 50;
+        int buttonResolutionWidth = 300;
+        int posXPrev = clientContext.getCurrentResolution().getWidth() / 2 - (buttonResolutionWidth / 2) - buttonPrevNextWidth;
+        int posXRes = clientContext.getCurrentResolution().getWidth() / 2 - (buttonResolutionWidth / 2);
+        int posXNext = clientContext.getCurrentResolution().getWidth() / 2 + (buttonResolutionWidth / 2);
 
         int posY = heightStep * 2;
         int buttonHeight = 50;
-        int buttonPrevNextWidth = 50;
-        int buttonResolutionWidth = 300;
         resolutionRatio = clientContext.getCurrentResolution().getResolutionRatio();
 
         prevButton = new Button(posXPrev, posY, buttonPrevNextWidth, buttonHeight, "<") {
@@ -101,10 +101,10 @@ public class OptionScene implements Scene {
             }
         };
 
-
-        int posXSwitchRatio = clientContext.getCurrentResolution().getWidth() / 2 - 50;
-        int posYSwitchRatio = heightStep * 3;
         int buttonWidth = 100;
+        int posXSwitchRatio = clientContext.getCurrentResolution().getWidth() / 2 - (buttonWidth / 2);
+        int posYSwitchRatio = heightStep * 3;
+
         if (clientContext.getResolutions43().size() != 0 && clientContext.getResolutions169().size() != 0) {
             switchRatioButton = new
                     Button(posXSwitchRatio, posYSwitchRatio, buttonWidth, buttonHeight, "") {
@@ -136,9 +136,9 @@ public class OptionScene implements Scene {
         //    }
         //};
 
-        int posXApply = widthStep * 2;
+        int posXApply = clientContext.getCurrentResolution().getWidth() / 2 - (3 * buttonWidth / 2);
         int posYApply = heightStep * 5;
-        applyButton = new Button(posXApply, posYApply, widthStep * 2, heightStep, "APPLY") {
+        applyButton = new Button(posXApply, posYApply, buttonWidth, buttonHeight, "APPLY") {
             @Override
             public void onClick() {
                 clientContext.setFullscreen(fullscreen);
@@ -155,16 +155,15 @@ public class OptionScene implements Scene {
                 updateFields();
             }
         };
-        int posXQuit = widthStep * 7;
-        int posYQuit = heightStep * 5;
-        backButton = new
 
-                Button(posXQuit, posYQuit, widthStep * 2, heightStep, "BACK") {
-                    @Override
-                    public void onClick() {
-                        client.setCurrentScene(lastScene);
-                    }
-                };
+        int posXBackButton = clientContext.getCurrentResolution().getWidth() / 2 + (buttonWidth / 2);
+        int posYBackButton = heightStep * 5;
+        backButton = new Button(posXBackButton, posYBackButton, buttonWidth, buttonHeight, "BACK") {
+            @Override
+            public void onClick() {
+                client.setCurrentScene(lastScene);
+            }
+        };
         updateFields();
     }
 
