@@ -33,7 +33,6 @@ public class OptionScene implements Scene {
     private Button nextButton;
     private Button prevButton;
     private Button switchRatioButton;
-    //private Button switchFullscreenButton;
     // BACKGROUND
     private Background background;
     // FRAME
@@ -126,16 +125,6 @@ public class OptionScene implements Scene {
                     };
         }
 
-        //int posXSwitchFullscreen = clientContext.getCurrentResolution().getWidth() / 2 - 50;
-        //int posYSwitchFullscreen = heightStep * 4;
-        //switchFullscreenButton = new Button(posXSwitchFullscreen, posYSwitchFullscreen, buttonWidth, buttonHeight, "") {
-        //    @Override
-        //    public void onClick() {
-        //        fullscreen = !fullscreen;
-        //        updateFields();
-        //    }
-        //};
-
         int posXApply = clientContext.getCurrentResolution().getWidth() / 2 - (3 * buttonWidth / 2);
         int posYApply = heightStep * 5;
         applyButton = new Button(posXApply, posYApply, buttonWidth, buttonHeight, "APPLY") {
@@ -191,12 +180,6 @@ public class OptionScene implements Scene {
         }
         resolution.setText(text);
 
-        //if (fullscreen) {
-        //    switchFullscreenButton.setLabel("FULLSCREEN");
-        //} else {
-        //    switchFullscreenButton.setLabel("NOT FULLSCREEN");
-        //}
-
     }
 
     @Override
@@ -238,8 +221,6 @@ public class OptionScene implements Scene {
                     backButton.onClick();
                 } else if (null != switchRatioButton && switchRatioButton.isClicked()) {
                     switchRatioButton.onClick();
-                    //} else if (switchFullscreenButton.isClicked()) {
-                    //    switchFullscreenButton.onClick();
                 } else if (frame.isClicked()) {
                     if (x == -1 && y == -1) {
                         x = Mouse.getX();
