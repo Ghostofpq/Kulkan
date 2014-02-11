@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.JobType;
 
 public class Monkey extends Clan {
 
@@ -17,14 +18,15 @@ public class Monkey extends Clan {
     public Monkey() {
         this.setName(MONKEY_NAME);
         this.setDescription(MONKEY_DESCRIPTION);
-        this.setRace(ClanType.MONKEY);
-        this.setBaseCaracteristics(new PrimaryCharacteristics(
+        this.setClan(ClanType.MONKEY);
+        this.setBaseCharacteristics(new PrimaryCharacteristics(
                 BASE_STRENGTH, BASE_ENDURANCE,
                 BASE_INTELLIGENCE, BASE_WILL, BASE_AGILITY,
                 BASE_MOVEMENT));
-        this.setLevelUpCaracteristics(new PrimaryCharacteristics(
+        this.setLevelUpCharacteristics(new PrimaryCharacteristics(
                 MONKEY_LVL_STRENGTH, MONKEY_LVL_ENDURANCE,
                 MONKEY_LVL_INTELLIGENCE, MONKEY_LVL_WILL, MONKEY_LVL_AGILITY,
                 MONKEY_LVL_MOVEMENT));
+        this.setBaseJob(JobType.WARRIOR);
     }
 }

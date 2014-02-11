@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.JobType;
 
 public class Lizard extends Clan {
 
@@ -17,14 +18,15 @@ public class Lizard extends Clan {
     public Lizard() {
         this.setName(LIZARD_NAME);
         this.setDescription(LIZARD_DESCRIPTION);
-        this.setRace(ClanType.LIZARD);
-        this.setBaseCaracteristics(new PrimaryCharacteristics(
+        this.setClan(ClanType.LIZARD);
+        this.setBaseCharacteristics(new PrimaryCharacteristics(
                 BASE_STRENGTH, BASE_ENDURANCE,
                 BASE_INTELLIGENCE, BASE_WILL, BASE_AGILITY,
                 BASE_MOVEMENT));
-        this.setLevelUpCaracteristics(new PrimaryCharacteristics(
+        this.setLevelUpCharacteristics(new PrimaryCharacteristics(
                 LIZARD_LVL_STRENGTH, LIZARD_LVL_ENDURANCE,
                 LIZARD_LVL_INTELLIGENCE, LIZARD_LVL_WILL, LIZARD_LVL_AGILITY,
                 LIZARD_LVL_MOVEMENT));
+        this.setBaseJob(JobType.WARRIOR);
     }
 }

@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.JobType;
 
 public class Turtle extends Clan {
 
@@ -17,14 +18,15 @@ public class Turtle extends Clan {
     public Turtle() {
         this.setName(TURTLE_NAME);
         this.setDescription(TURTLE_DESCRIPTION);
-        this.setRace(ClanType.TURTLE);
-        this.setBaseCaracteristics(new PrimaryCharacteristics(
+        this.setClan(ClanType.TURTLE);
+        this.setBaseCharacteristics(new PrimaryCharacteristics(
                 BASE_STRENGTH, BASE_ENDURANCE,
                 BASE_INTELLIGENCE, BASE_WILL, BASE_AGILITY,
                 BASE_MOVEMENT));
-        this.setLevelUpCaracteristics(new PrimaryCharacteristics(
+        this.setLevelUpCharacteristics(new PrimaryCharacteristics(
                 TURTLE_LVL_STRENGTH, TURTLE_LVL_ENDURANCE,
                 TURTLE_LVL_INTELLIGENCE, TURTLE_LVL_WILL, TURTLE_LVL_AGILITY,
                 TURTLE_LVL_MOVEMENT));
+        this.setBaseJob(JobType.WARRIOR);
     }
 }

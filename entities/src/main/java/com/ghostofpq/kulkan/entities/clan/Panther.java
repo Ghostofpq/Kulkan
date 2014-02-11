@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.JobType;
 
 public class Panther extends Clan {
 
@@ -17,14 +18,15 @@ public class Panther extends Clan {
     public Panther() {
         this.setName(PANTHER_NAME);
         this.setDescription(PANTHER_DESCRIPTION);
-        this.setRace(ClanType.PANTHER);
-        this.setBaseCaracteristics(new PrimaryCharacteristics(
+        this.setClan(ClanType.PANTHER);
+        this.setBaseCharacteristics(new PrimaryCharacteristics(
                 BASE_STRENGTH, BASE_ENDURANCE,
                 BASE_INTELLIGENCE, BASE_WILL, BASE_AGILITY,
                 BASE_MOVEMENT));
-        this.setLevelUpCaracteristics(new PrimaryCharacteristics(
+        this.setLevelUpCharacteristics(new PrimaryCharacteristics(
                 PANTHER_LVL_STRENGTH, PANTHER_LVL_ENDURANCE,
                 PANTHER_LVL_INTELLIGENCE, PANTHER_LVL_WILL, PANTHER_LVL_AGILITY,
                 PANTHER_LVL_MOVEMENT));
+        this.setBaseJob(JobType.WARRIOR);
     }
 }

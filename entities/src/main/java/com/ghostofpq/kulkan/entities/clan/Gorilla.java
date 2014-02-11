@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.JobType;
 
 public class Gorilla extends Clan {
 
@@ -19,14 +20,15 @@ public class Gorilla extends Clan {
     public Gorilla() {
         this.setName(GORILLA_NAME);
         this.setDescription(GORILLA_DESCRIPTION);
-        this.setRace(ClanType.GORILLA);
-        this.setBaseCaracteristics(new PrimaryCharacteristics(
+        this.setClan(ClanType.GORILLA);
+        this.setBaseCharacteristics(new PrimaryCharacteristics(
                 BASE_STRENGTH, BASE_ENDURANCE,
                 BASE_INTELLIGENCE, BASE_WILL, BASE_AGILITY,
                 BASE_MOVEMENT));
-        this.setLevelUpCaracteristics(new PrimaryCharacteristics(
+        this.setLevelUpCharacteristics(new PrimaryCharacteristics(
                 GORILLA_LVL_STRENGTH, GORILLA_LVL_ENDURANCE,
                 GORILLA_LVL_INTELLIGENCE, GORILLA_LVL_WILL, GORILLA_LVL_AGILITY,
                 GORILLA_LVL_MOVEMENT));
+        this.setBaseJob(JobType.WARRIOR);
     }
 }

@@ -11,20 +11,18 @@ import com.ghostofpq.kulkan.entities.inventory.Equipment;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
-import com.ghostofpq.kulkan.entities.job.Mage;
-import com.ghostofpq.kulkan.entities.job.Warrior;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameCharacter implements Serializable {
     private static final long serialVersionUID = 1519266158170332774L;
-    // Evolution
-    private final int DEFAULT_START_LEVEL = 1;
-    private final int DEFAULT_START_XP = 0;
-    private final int DEFAULT_START_NEXT_LEVEL = 100;
+    private final double LEVEL_COEF = 1.5;
+    private final int LEVEL_BASE = 100;
     private ObjectId id;
     /**
      * Owner
@@ -64,11 +62,8 @@ public class GameCharacter implements Serializable {
      * Current {@link com.ghostofpq.kulkan.entities.job.JobType} of the character
      */
     private JobType currentJob;
-    /**
-     * {@link com.ghostofpq.kulkan.entities.job.Warrior} path of the character
-     */
-    private Warrior jobWarrior;
-    private Mage jobMage;
+
+    private List<Job> jobs;
 
     // Caracteristics
     /**
@@ -114,49 +109,48 @@ public class GameCharacter implements Serializable {
     private boolean isReadyToPlay;
     private Equipment equipment;
 
-    /**
-     * Creates a new Character level 1 Warrior.
-     *
-     * @param name   name of the character
-     * @param race   {@link com.ghostofpq.kulkan.entities.clan.ClanType} of the character
-     * @param gender {@link Gender} of the character
-     */
-    public GameCharacter(ObjectId id, Player player, String name, ClanType race, Gender gender) {
+    public GameCharacter(String name, ClanType clan, Gender gender) {
         // Identity
-        this.id = id;
         this.name = name;
-        this.clan = Clan.Clan(race);
+        this.clan = Clan.Clan(clan);
         this.gender = gender;
-        this.player = player;
 
         // XP
-        level = DEFAULT_START_LEVEL;
-        experience = DEFAULT_START_XP;
-        nextLevel = DEFAULT_START_NEXT_LEVEL;
+        this.level = 0;
+        this.experience = 0;
+        calculateNextLevel();
 
         // Jobs
-        jobWarrior = new Warrior();
-        jobMage = new Mage();
-        currentJob = JobType.WARRIOR;
-        equipment = new Equipment();
+        this.jobs = new ArrayList<Job>();
+        this.currentJob = this.clan.getBaseJob();
+        this.jobs.add(Job.Job(this.currentJob));
+
+        this.equipment = new Equipment();
 
         // Caracteristics
-        characteristics = getClan().getBaseCaracteristics();
+        this.characteristics = getClan().getBaseCharacteristics();
         for (int i = 0; i < level; i++) {
-            characteristics.plus(getClan().getLevelUpCaracteristics());
+            this.characteristics.plus(getClan().getLevelUpCharacteristics());
         }
-        secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
+        this.secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
 
         updateLifeAndManaPoint();
-
         initChar();
     }
 
-    public GameCharacter(ObjectId id, Player player, String name, ClanType race, Gender gender, int level, int experience) {
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public GameCharacter(ObjectId id, Player player, String name, ClanType clan, Gender gender, int level, int experience, JobType currentJob, List<Job> jobs, Equipment equipment) {
         // Identity
         this.id = id;
         this.name = name;
-        this.clan = Clan.Clan(race);
+        this.clan = Clan.Clan(clan);
         this.gender = gender;
         this.player = player;
 
@@ -166,20 +160,18 @@ public class GameCharacter implements Serializable {
         calculateNextLevel();
 
         // Jobs
-        jobWarrior = new Warrior();
-        jobMage = new Mage();
-        currentJob = JobType.WARRIOR;
-        equipment = new Equipment();
+        this.currentJob = currentJob;
+        this.jobs = jobs;
+        this.equipment = equipment;
 
         // Caracteristics
-        characteristics = getClan().getBaseCaracteristics();
+        this.characteristics = getClan().getBaseCharacteristics();
         for (int i = 0; i < level; i++) {
-            characteristics.plus(getClan().getLevelUpCaracteristics());
+            this.characteristics.plus(getClan().getLevelUpCharacteristics());
         }
-        secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
+        this.secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
 
         updateLifeAndManaPoint();
-
         initChar();
     }
 
@@ -193,7 +185,6 @@ public class GameCharacter implements Serializable {
     public void gainXp(double experience) {
         this.experience += experience;
         while (canLevelUp()) {
-            this.experience -= nextLevel;
             levelUp();
         }
     }
@@ -209,19 +200,13 @@ public class GameCharacter implements Serializable {
     public void levelUp() {
         level++;
         calculateNextLevel();
-        characteristics.plus(getClan().getLevelUpCaracteristics());
+        characteristics.plus(getClan().getLevelUpCharacteristics());
 
         updateLifeAndManaPoint();
     }
 
     private void calculateNextLevel() {
-        nextLevel = DEFAULT_START_NEXT_LEVEL;
-        if (level != DEFAULT_START_LEVEL) {
-            for (int i = DEFAULT_START_LEVEL; i < level; i++) {
-                double coef = (Math.sqrt(level));
-                nextLevel = (int) Math.floor(coef * nextLevel) + nextLevel;
-            }
-        }
+        nextLevel = (int) (LEVEL_BASE * Math.pow(level, LEVEL_COEF));
     }
 
     private void updateLifeAndManaPoint() {
@@ -232,11 +217,17 @@ public class GameCharacter implements Serializable {
 
     public void calculateAggregatedCharacteristics() {
         this.aggregatedCharacteristics = new PrimaryCharacteristics();
+
         this.aggregatedCharacteristics.plus(characteristics);
-        this.aggregatedCharacteristics.plus(getJob(this.currentJob).getAggregatedCharacteristics());
+        for (Job job : jobs) {
+            this.aggregatedCharacteristics.plus(job.getAggregatedCharacteristics());
+        }
         this.aggregatedCharacteristics.plus(equipment.getPrimaryCharacteristics());
 
         this.aggregatedSecondaryCharacteristics = new SecondaryCharacteristics(aggregatedCharacteristics);
+        for (Job job : jobs) {
+            this.aggregatedSecondaryCharacteristics.plus(job.getAggregatedSecondaryCharacteristics());
+        }
         this.aggregatedSecondaryCharacteristics.plus(equipment.getSecondaryCharacteristics());
     }
 
@@ -280,14 +271,12 @@ public class GameCharacter implements Serializable {
     }
 
     public Job getJob(JobType jobType) {
-        switch (jobType) {
-            case WARRIOR:
-                return jobWarrior;
-            case MAGE:
-                return jobMage;
-            default:
-                return null;
+        for (Job job : jobs) {
+            if (jobType.equals(job.getJobType())) {
+                return job;
+            }
         }
+        return null;
     }
 
     /*
@@ -333,22 +322,6 @@ public class GameCharacter implements Serializable {
     public void setCurrentJob(JobType currentJob) {
         this.currentJob = currentJob;
         updateLifeAndManaPoint();
-    }
-
-    public Warrior getJobWarrior() {
-        return jobWarrior;
-    }
-
-    public void setJobWarrior(Warrior jobWarrior) {
-        this.jobWarrior = jobWarrior;
-    }
-
-    public Mage getJobMage() {
-        return jobMage;
-    }
-
-    public void setJobMage(Mage jobMage) {
-        this.jobMage = jobMage;
     }
 
     public PrimaryCharacteristics getCharacteristics() {
@@ -609,6 +582,10 @@ public class GameCharacter implements Serializable {
         if (null != itemToRemove) {
             player.getInventory().addOne(itemToRemove.getItemID());
         }
+    }
+
+    public List<Job> getJobs() {
+        return jobs;
     }
 
     public Equipment getEquipment() {

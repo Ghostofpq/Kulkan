@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.JobType;
 
 public class Human extends Clan {
 
@@ -17,13 +18,14 @@ public class Human extends Clan {
     public Human() {
         this.setName(HUMAN_NAME);
         this.setDescription(HUMAN_DESCRIPTION);
-        this.setRace(ClanType.HUMAN);
-        this.setBaseCaracteristics(new PrimaryCharacteristics(
+        this.setClan(ClanType.HUMAN);
+        this.setBaseCharacteristics(new PrimaryCharacteristics(
                 BASE_STRENGTH, BASE_ENDURANCE,
                 BASE_INTELLIGENCE, BASE_WILL, BASE_AGILITY,
                 BASE_MOVEMENT));
-        this.setLevelUpCaracteristics(new PrimaryCharacteristics(HUMAN_LVL_STRENGTH,
+        this.setLevelUpCharacteristics(new PrimaryCharacteristics(HUMAN_LVL_STRENGTH,
                 HUMAN_LVL_ENDURANCE, HUMAN_LVL_INTELLIGENCE, HUMAN_LVL_WILL,
                 HUMAN_LVL_AGILITY, HUMAN_LVL_MOVEMENT));
+        this.setBaseJob(JobType.WARRIOR);
     }
 }

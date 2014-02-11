@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.clan;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.JobType;
 
 import java.io.Serializable;
 
@@ -13,14 +14,15 @@ public abstract class Clan implements Serializable {
     protected final int BASE_WILL = 10;
     protected final int BASE_AGILITY = 10;
     protected final int BASE_MOVEMENT = 2;
-    private ClanType race;
-    private PrimaryCharacteristics baseCaracteristics;
-    private PrimaryCharacteristics levelUpCaracteristics;
+    private ClanType clan;
+    private PrimaryCharacteristics baseCharacteristics;
+    private PrimaryCharacteristics levelUpCharacteristics;
     private String description;
     private String name;
+    private JobType baseJob;
 
-    public static Clan Clan(ClanType race) {
-        switch (race) {
+    public static Clan Clan(ClanType clan) {
+        switch (clan) {
             case ELVE:
                 return new Elve();
             case HUMAN:
@@ -52,43 +54,51 @@ public abstract class Clan implements Serializable {
      * Getters and Setters
      */
 
-    public ClanType getRaceType() {
-        return race;
+    public ClanType getClanType() {
+        return clan;
     }
 
-    public void setRace(ClanType race) {
-        this.race = race;
+    public PrimaryCharacteristics getBaseCharacteristics() {
+        return baseCharacteristics;
     }
 
-    public PrimaryCharacteristics getBaseCaracteristics() {
-        return baseCaracteristics;
-    }
-
-    public void setBaseCaracteristics(PrimaryCharacteristics baseCaracteristics) {
-        this.baseCaracteristics = baseCaracteristics;
-    }
-
-    public PrimaryCharacteristics getLevelUpCaracteristics() {
-        return levelUpCaracteristics;
-    }
-
-    public void setLevelUpCaracteristics(PrimaryCharacteristics levelUpCaracteristics) {
-        this.levelUpCaracteristics = levelUpCaracteristics;
+    public PrimaryCharacteristics getLevelUpCharacteristics() {
+        return levelUpCharacteristics;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public JobType getBaseJob() {
+        return baseJob;
+    }
+
+    protected void setClan(ClanType clan) {
+        this.clan = clan;
+    }
+
+    protected void setBaseCharacteristics(PrimaryCharacteristics baseCharacteristics) {
+        this.baseCharacteristics = baseCharacteristics;
+    }
+
+    protected void setLevelUpCharacteristics(PrimaryCharacteristics levelUpCharacteristics) {
+        this.levelUpCharacteristics = levelUpCharacteristics;
+    }
+
+    protected void setDescription(String description) {
+        this.description = description;
+    }
+
+    protected void setName(String name) {
         this.name = name;
+    }
+
+    protected void setBaseJob(JobType baseJob) {
+        this.baseJob = baseJob;
     }
 }

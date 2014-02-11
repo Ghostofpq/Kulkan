@@ -4,12 +4,11 @@ import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
+import com.ghostofpq.kulkan.entities.inventory.Equipment;
 import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
-import com.ghostofpq.kulkan.entities.job.Mage;
-import com.ghostofpq.kulkan.entities.job.Warrior;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
@@ -36,23 +35,6 @@ public class GameCharacterDB {
     public GameCharacterDB() {
     }
 
-    public GameCharacterDB(String name, Gender gender, ClanType clanType, Integer lvl, Integer currentXp, JobType currentJob, List<JobStatusDB> jobStatusDBs) {
-        this.id = new ObjectId();
-        this.name = name;
-        this.gender = gender;
-        this.clanType = clanType;
-        this.lvl = lvl;
-        this.currentXp = currentXp;
-        this.currentJob = currentJob;
-        this.jobStatusDBs = jobStatusDBs;
-        this.armor = null;
-        this.weapon = null;
-        this.heldItem = null;
-        this.necklace = null;
-        this.ring = null;
-        this.helm = null;
-    }
-
     public GameCharacterDB(GameCharacter gameCharacter) {
         if (null != gameCharacter.getId()) {
             this.id = gameCharacter.getId();
@@ -61,14 +43,14 @@ public class GameCharacterDB {
         }
         this.name = gameCharacter.getName();
         this.gender = gameCharacter.getGender();
-        this.clanType = gameCharacter.getClan().getRaceType();
+        this.clanType = gameCharacter.getClan().getClanType();
         this.lvl = gameCharacter.getLevel();
         this.currentXp = gameCharacter.getExperience();
         this.currentJob = gameCharacter.getCurrentJob();
         this.jobStatusDBs = new ArrayList<JobStatusDB>();
-        jobStatusDBs.add(new JobStatusDB(gameCharacter.getJobWarrior()));
-        jobStatusDBs.add(new JobStatusDB(gameCharacter.getJobMage()));
-
+        for (Job job : gameCharacter.getJobs()) {
+            jobStatusDBs.add(new JobStatusDB(job));
+        }
         this.armor = null;
         this.weapon = null;
         this.heldItem = null;
@@ -97,6 +79,38 @@ public class GameCharacterDB {
     }
 
     public GameCharacter toGameCharacter(Player player) {
+        List<Job> jobs = new ArrayList<Job>();
+        if (null != getJobStatusDBs()) {
+            for (JobStatusDB jobStatusDB : getJobStatusDBs()) {
+                Job job = jobStatusDB.toJob();
+                jobs.add(job);
+            }
+        }
+        Equipment equipment = new Equipment();
+        if (null != getHelm()) {
+            Helm helm = (Helm) ItemFactory.createItem(getHelm());
+            equipment.setHelm(helm);
+        }
+        if (null != getArmor()) {
+            Armor armor = (Armor) ItemFactory.createItem(getArmor());
+            equipment.setArmor(armor);
+        }
+        if (null != getWeapon()) {
+            Weapon weapon = (Weapon) ItemFactory.createItem(getWeapon());
+            equipment.setWeapon(weapon);
+        }
+        if (null != getHeldItem()) {
+            HeldItem heldItem = (HeldItem) ItemFactory.createItem(getHeldItem());
+            equipment.setHeldItem(heldItem);
+        }
+        if (null != getNecklace()) {
+            Necklace necklace = (Necklace) ItemFactory.createItem(getNecklace());
+            equipment.setNecklace(necklace);
+        }
+        if (null != getRing()) {
+            Ring ring = (Ring) ItemFactory.createItem(getRing());
+            equipment.setRing(ring);
+        }
         GameCharacter gameCharacter = new GameCharacter(
                 getId(),
                 player,
@@ -104,46 +118,11 @@ public class GameCharacterDB {
                 getClanType(),
                 getGender(),
                 getLvl(),
-                getCurrentXp()
+                getCurrentXp(),
+                getCurrentJob(),
+                jobs,
+                equipment
         );
-        if (null != getJobStatusDBs()) {
-            for (JobStatusDB jobStatusDB : getJobStatusDBs()) {
-                Job job = jobStatusDB.toJob();
-                switch (job.getJobType()) {
-                    case WARRIOR:
-                        gameCharacter.setJobWarrior((Warrior) job);
-                        break;
-                    case MAGE:
-                        gameCharacter.setJobMage((Mage) job);
-                        break;
-                }
-            }
-        }
-        if (null != getHelm()) {
-            Helm helm = (Helm) ItemFactory.createItem(getHelm());
-            gameCharacter.getEquipment().setHelm(helm);
-        }
-        if (null != getArmor()) {
-            Armor armor = (Armor) ItemFactory.createItem(getArmor());
-            gameCharacter.getEquipment().setArmor(armor);
-        }
-        if (null != getWeapon()) {
-            Weapon weapon = (Weapon) ItemFactory.createItem(getWeapon());
-            gameCharacter.getEquipment().setWeapon(weapon);
-        }
-        if (null != getHeldItem()) {
-            HeldItem heldItem = (HeldItem) ItemFactory.createItem(getHeldItem());
-            gameCharacter.getEquipment().setHeldItem(heldItem);
-        }
-        if (null != getNecklace()) {
-            Necklace necklace = (Necklace) ItemFactory.createItem(getNecklace());
-            gameCharacter.getEquipment().setNecklace(necklace);
-        }
-        if (null != getRing()) {
-            Ring ring = (Ring) ItemFactory.createItem(getRing());
-            gameCharacter.getEquipment().setRing(ring);
-        }
-        gameCharacter.setCurrentJob(getCurrentJob());
         gameCharacter.calculateAggregatedCharacteristics();
         return gameCharacter;
     }
@@ -256,7 +235,7 @@ public class GameCharacterDB {
         this.helm = helm;
     }
 
-    public void equipItem(ItemType itemType,String itemId) {
+    public void equipItem(ItemType itemType, String itemId) {
         switch (itemType) {
             case WEAPON:
                 setWeapon(itemId);

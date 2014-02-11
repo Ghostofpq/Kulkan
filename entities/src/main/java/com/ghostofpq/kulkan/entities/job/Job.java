@@ -1,6 +1,7 @@
 package com.ghostofpq.kulkan.entities.job;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
@@ -24,6 +25,17 @@ public abstract class Job implements Serializable {
     private List<Capacity> skillTree;
     private List<Move> unlockedMoves;
     private List<AmeliorationPrimary> unlockedAmeliorationPrimaries;
+
+    public static Job Job(JobType jobType) {
+        switch (jobType) {
+            case WARRIOR:
+                return new Warrior();
+            case MAGE:
+                return new Mage();
+            default:
+                return null;
+        }
+    }
 
     protected Job(String name, String description) {
         this.name = name;
@@ -95,13 +107,16 @@ public abstract class Job implements Serializable {
     }
 
     public PrimaryCharacteristics getAggregatedCharacteristics() {
-        PrimaryCharacteristics result = new PrimaryCharacteristics(0, 0, 0, 0,
-                0, 0);
-
+        PrimaryCharacteristics result = new PrimaryCharacteristics();
         for (AmeliorationPrimary ameliorationPrimary : unlockedAmeliorationPrimaries) {
             result.plus(ameliorationPrimary.getCaracteristics());
         }
 
+        return result;
+    }
+
+    public SecondaryCharacteristics getAggregatedSecondaryCharacteristics() {
+        SecondaryCharacteristics result = new SecondaryCharacteristics();
         return result;
     }
 

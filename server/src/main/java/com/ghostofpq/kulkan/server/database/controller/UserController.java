@@ -1,7 +1,9 @@
 package com.ghostofpq.kulkan.server.database.controller;
 
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
+import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.job.Job;
@@ -109,18 +111,14 @@ public class UserController {
         return user;
     }
 
-    public User addGameCharToUser(String username, String tokenKey, GameCharacterDB gameCharacterDB) {
+    public User createGameChar(String username, String tokenKey, String name, ClanType clanType, Gender gender) {
         User user = getUserForUsername(username);
+        GameCharacter gameCharacter = new GameCharacter(name, clanType, gender);
+        GameCharacterDB gameCharacterDB = new GameCharacterDB(gameCharacter);
         if (tokenKey.equals(user.getTokenKey())) {
-            log.debug("addGameCharToUser : {}", username);
+            log.debug("createGameChar : {}", username);
             if (user.getTeam().size() >= 4) {
-                log.warn("TEAM IS COMPLETE");
-                if (user.getStock().size() >= 12) {
-                    log.error("STOCK IS COMPLETE");
-                } else {
-                    user.addGameCharToStock(gameCharacterDB);
-                    user = userRepository.save(user);
-                }
+                log.error("TEAM IS COMPLETE");
             } else {
                 user.addGameCharToTeam(gameCharacterDB);
                 user = userRepository.save(user);
@@ -155,7 +153,7 @@ public class UserController {
     public User removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) {
         User user = getUserForUsername(username);
         if (tokenKey.equals(user.getTokenKey())) {
-            log.debug("addGameCharToUser : {}", username);
+            log.debug("removeGameCharFromStock : {}", username);
             GameCharacterDB gameCharacterDB = null;
             for (GameCharacterDB stockMember : user.getStock()) {
                 if (stockMember.getId().equals(gameCharacterId)) {
@@ -179,7 +177,7 @@ public class UserController {
             log.error("STOCK IS COMPLETE");
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
-                log.debug("addGameCharToUser : {}", username);
+                log.debug("putGameCharFromTeamToStock : {}", username);
                 GameCharacterDB gameCharacterDB = null;
                 for (GameCharacterDB teamMember : user.getTeam()) {
                     if (teamMember.getId().equals(gameCharacterId)) {
@@ -205,7 +203,7 @@ public class UserController {
             log.error("TEAM IS COMPLETE");
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
-                log.debug("addGameCharToUser : {}", username);
+                log.debug("putGameCharFromStockToTeam : {}", username);
                 GameCharacterDB gameCharacterDB = null;
                 for (GameCharacterDB stockMember : user.getStock()) {
                     if (stockMember.getId().equals(gameCharacterId)) {

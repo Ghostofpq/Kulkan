@@ -8,8 +8,6 @@ import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
-import com.ghostofpq.kulkan.server.database.model.GameCharacterDB;
-import com.ghostofpq.kulkan.server.database.model.JobStatusDB;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -20,7 +18,6 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 @Slf4j
 public class UserService implements Runnable {
@@ -295,9 +292,7 @@ public class UserService implements Runnable {
             log.debug("Name : '{}'", name);
             log.debug("Gender : '{}'", gender);
             log.debug("ClanType : '{}'", clanType);
-
-            GameCharacterDB gameCharacterDB = new GameCharacterDB(name, gender, clanType, 1, 0, currentJob, new ArrayList<JobStatusDB>());
-            User user = userController.addGameCharToUser(messageCreateNewGameCharacter.getUsername(), tokenKey, gameCharacterDB);
+            User user = userController.createGameChar(messageCreateNewGameCharacter.getUsername(), tokenKey, name, clanType, gender);
             Player player = user.toPlayer();
 
             MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);

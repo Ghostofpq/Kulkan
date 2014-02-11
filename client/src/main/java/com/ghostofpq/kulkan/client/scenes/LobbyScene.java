@@ -180,7 +180,7 @@ public class LobbyScene implements Scene {
         int teamCharacter1PosY = clientContext.getCurrentResolution().getHeight() * 7 / 27;
         int teamCharacter1Width = clientContext.getCurrentResolution().getWidth() / 10;
         int teamCharacter1Height = clientContext.getCurrentResolution().getHeight() / 3;
-        if (null != clientContext.getPlayer().getTeam().get(0)) {
+        if (clientContext.getPlayer().getTeam().size() > 0 && null != clientContext.getPlayer().getTeam().get(0)) {
             teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, clientContext.getPlayer().getTeam().get(0).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
