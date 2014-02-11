@@ -1,12 +1,17 @@
 package com.ghostofpq.kulkan.client;
 
+import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipmentScene;
+import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterJobScene;
+import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterScene;
 import com.ghostofpq.kulkan.client.utils.Resolution;
 import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
+import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.util.*;
@@ -23,12 +28,25 @@ public class ClientContext {
     private String pseudo;
     private Player player;
     private String tokenKey;
+    @Autowired
+    private ManageGameCharacterScene manageGameCharacterScene;
+    @Autowired
+    private ManageGameCharacterEquipmentScene manageGameCharacterEquipmentScene;
+    @Autowired
+    private ManageGameCharacterJobScene manageGameCharacterJobScene;
+
 
     public void init() {
         determineAvailableDisplayModes();
         loadClientProperties();
         selectDisplayMode();
         saveClientProperties();
+    }
+
+    public void setSelectedGameCharacter(GameCharacter gameCharacter) {
+        manageGameCharacterScene.setGameCharacter(gameCharacter);
+        manageGameCharacterEquipmentScene.setGameCharacter(gameCharacter);
+        manageGameCharacterJobScene.setGameCharacter(gameCharacter);
     }
 
     public boolean isFullscreen() {

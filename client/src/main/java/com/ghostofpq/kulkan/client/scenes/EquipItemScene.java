@@ -1,6 +1,8 @@
 package com.ghostofpq.kulkan.client.scenes;
 
 import com.ghostofpq.kulkan.client.Client;
+import com.ghostofpq.kulkan.client.ClientContext;
+import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextArea;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
@@ -10,21 +12,17 @@ import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageEquipItemOnGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
-import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.lwjgl.input.Mouse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class EquipItemScene implements Scene {
-    private static final Logger LOG = LoggerFactory.getLogger(EquipItemScene.class);
-    private static volatile EquipItemScene instance = null;
-    private final String USER_SERVICE_QUEUE_NAME = "server/users";
-    private Channel channelOut;
     private ItemType filter;
     private KeyValueRender itemType;
     private ObjectId gameCharId;
@@ -33,32 +31,30 @@ public class EquipItemScene implements Scene {
     private Item selectedItem;
     private TextArea itemDescription;
     private KeyValueRender selectedItemName;
-    private int widthSeparator = Client.getInstance().getWidth() / 20;
-    private int heightSeparator = Client.getInstance().getHeight() / 20;
     private List<Button> itemButtonList;
+    @Autowired
+    private Client client;
+    @Autowired
+    private ClientContext clientContext;
+    @Autowired
+    private ClientMessenger clientMessenger;
+    @Autowired
+    private ManageGameCharacterEquipmentScene manageGameCharacterEquipmentScene;
 
-    private EquipItemScene() {
+    public EquipItemScene() {
     }
 
-    public static EquipItemScene getInstance() {
-        if (instance == null) {
-            synchronized (EquipItemScene.class) {
-                if (instance == null) {
-                    instance = new EquipItemScene();
-                }
-            }
-        }
-        return instance;
-    }
 
     @Override
     public void init() {
-        int widthStep = (Client.getInstance().getWidth() - 5 * widthSeparator) / 5;
-        int heightStep = (Client.getInstance().getHeight() - 8 * heightSeparator) / 7;
+        int widthSeparator = client.getWidth() / 20;
+        int heightSeparator = client.getHeight() / 20;
+        int widthStep = (client.getWidth() - 5 * widthSeparator) / 5;
+        int heightStep = (client.getHeight() - 8 * heightSeparator) / 7;
 
         itemType = new KeyValueRender(widthSeparator, heightSeparator, widthStep * 2, heightStep, "Type", "0", 5);
 
-        List<Item> itemList = Client.getInstance().getPlayer().getInventory().getItemsByType(filter);
+        List<Item> itemList = client.getPlayer().getInventory().getItemsByType(filter);
 
         itemButtonList = new ArrayList<Button>();
 
@@ -88,21 +84,15 @@ public class EquipItemScene implements Scene {
         quitButton = new Button(widthSeparator * 4 + 3 * widthStep, heightSeparator * 7 + 6 * heightStep, widthStep * 2, heightStep, "Back") {
             @Override
             public void onClick() {
-                Client.getInstance().setCurrentScene(Client.getInstance().getLobbyScene());
+                client.setCurrentScene(manageGameCharacterEquipmentScene);
             }
         };
 
     }
 
     public void equipItem(Item item) {
-        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = new MessageEquipItemOnGameCharacter(Client.getInstance().getTokenKey(), gameCharId, item.getItemID());
-        try {
-            channelOut.basicPublish("", USER_SERVICE_QUEUE_NAME, null, messageEquipItemOnGameCharacter.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = new MessageEquipItemOnGameCharacter(client.getTokenKey(), gameCharId, item.getItemID());
+        clientMessenger.sendMessageToUserService(messageEquipItemOnGameCharacter);
     }
 
     public void selectItem(Item item) {
@@ -114,8 +104,6 @@ public class EquipItemScene implements Scene {
 
     @Override
     public void initConnections() throws IOException {
-        channelOut = Client.getInstance().getConnection().createChannel();
-        channelOut.queueDeclare(USER_SERVICE_QUEUE_NAME, false, false, false, null);
     }
 
     @Override
@@ -159,23 +147,20 @@ public class EquipItemScene implements Scene {
 
     @Override
     public void closeConnections() throws IOException {
-        channelOut.close();
-        LOG.debug("channelOut closed");
     }
 
     @Override
     public void receiveMessage() {
-        Message message = Client.getInstance().receiveMessage();
+        Message message = client.receiveMessage();
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
-                    LOG.debug("PLAYER_UPDATE");
+                    log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    Client.getInstance().setPlayer(response.getPlayer());
+                    client.setPlayer(response.getPlayer());
                     GameCharacter gameCharacter = response.getPlayer().getGameCharWithId(gameCharId);
-                    ManageEquipementScene.getInstance().setGameCharacter(gameCharacter);
-                    GameCharacterManageScene.getInstance().setGameCharacter(gameCharacter);
-                    Client.getInstance().setCurrentScene(ManageEquipementScene.getInstance());
+                    clientContext.setSelectedGameCharacter(gameCharacter);
+                    client.setCurrentScene(manageGameCharacterEquipmentScene);
                     break;
             }
         }

@@ -243,8 +243,8 @@ public class TeamManagementScene implements Scene {
                     for (TeamManagementCharacterRender teamManagementCharacterRender : teamManagementCharacterRenderList) {
                         if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
-                            GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            //     ManageGameCharacterScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            //    Client.getInstance().setCurrentScene(ManageGameCharacterScene.getInstance());
                         }
                     }
                 }
@@ -257,8 +257,8 @@ public class TeamManagementScene implements Scene {
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage1) {
                         if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
-                            GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            //   ManageGameCharacterScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            //  Client.getInstance().setCurrentScene(ManageGameCharacterScene.getInstance());
                         }
                     }
                 }
@@ -271,8 +271,8 @@ public class TeamManagementScene implements Scene {
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage2) {
                         if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
-                            GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            //   ManageGameCharacterScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            //   Client.getInstance().setCurrentScene(ManageGameCharacterScene.getInstance());
                         }
                     }
                 }
@@ -285,8 +285,8 @@ public class TeamManagementScene implements Scene {
                     for (TeamManagementCharacterRender teamManagementCharacterRender : stockManagementCharacterRenderListPage3) {
                         if (teamManagementCharacterRender.isClicked()) {
                             LOG.debug(teamManagementCharacterRender.getCharacter().getName());
-                            GameCharacterManageScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
-                            Client.getInstance().setCurrentScene(GameCharacterManageScene.getInstance());
+                            //   ManageGameCharacterScene.getInstance().setGameCharacter(teamManagementCharacterRender.getCharacter());
+                            //   Client.getInstance().setCurrentScene(ManageGameCharacterScene.getInstance());
                         }
                     }
                 }

@@ -72,6 +72,8 @@ public class LobbyScene implements Scene {
     private OptionScene optionScene;
     @Autowired
     private CreateGameCharacterScene createGameCharacterScene;
+    @Autowired
+    private ManageGameCharacterScene manageGameCharacterScene;
 
     public LobbyScene() {
     }
@@ -148,7 +150,7 @@ public class LobbyScene implements Scene {
             public void onClick() {
                 log.debug("SHOP TEAM");
                 exitLobby();
-                Client.getInstance().setCurrentScene(ShopScene.getInstance());
+                client.setCurrentScene(ShopScene.getInstance());
             }
         };
 
@@ -184,7 +186,7 @@ public class LobbyScene implements Scene {
             teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, clientContext.getPlayer().getTeam().get(0).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    actionQuit();
+                    manageCharacter1();
                 }
             };
         } else {
@@ -205,7 +207,7 @@ public class LobbyScene implements Scene {
             teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, clientContext.getPlayer().getTeam().get(1).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    actionQuit();
+                    manageCharacter2();
                 }
             };
         } else {
@@ -226,7 +228,7 @@ public class LobbyScene implements Scene {
             teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, clientContext.getPlayer().getTeam().get(2).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    actionQuit();
+                    manageCharacter3();
                 }
             };
         } else {
@@ -247,7 +249,7 @@ public class LobbyScene implements Scene {
             teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, clientContext.getPlayer().getTeam().get(3).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
-                    actionQuit();
+                    manageCharacter4();
                 }
             };
         } else {
@@ -281,7 +283,7 @@ public class LobbyScene implements Scene {
             public void onClick() {
                 log.debug("MANAGE TEAM");
                 exitLobby();
-                Client.getInstance().setCurrentScene(TeamManagementScene.getInstance());
+                client.setCurrentScene(TeamManagementScene.getInstance());
             }
         };
 
@@ -306,9 +308,30 @@ public class LobbyScene implements Scene {
         background = new Background(TextureKey.LOBBY_BACKGROUND_169);
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
-        MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(Client.getInstance().getTokenKey());
+        MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(client.getTokenKey());
         clientMessenger.sendMessageToLobbyService(messageSubscribeToLobby);
     }
+
+    private void manageCharacter1() {
+        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(0));
+        client.setCurrentScene(manageGameCharacterScene);
+    }
+
+    private void manageCharacter2() {
+        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(1));
+        client.setCurrentScene(manageGameCharacterScene);
+    }
+
+    private void manageCharacter3() {
+        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(2));
+        client.setCurrentScene(manageGameCharacterScene);
+    }
+
+    private void manageCharacter4() {
+        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(3));
+        client.setCurrentScene(manageGameCharacterScene);
+    }
+
 
     private void actionOption() {
         log.debug("OPTION");
@@ -319,7 +342,7 @@ public class LobbyScene implements Scene {
     private void actionQuit() {
         log.debug("QUIT");
         exitLobby();
-        Client.getInstance().quit();
+        client.quit();
     }
 
     private void actionCreateCharacter() {
@@ -340,7 +363,7 @@ public class LobbyScene implements Scene {
 
     public void actionPostMessage() {
         if (!inputChat.getLabel().isEmpty()) {
-            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(Client.getInstance().getTokenKey(), inputChat.getLabel());
+            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(client.getTokenKey(), inputChat.getLabel());
             clientMessenger.sendMessageToLobbyService(messageLobbyClient);
             inputChat.clear();
         }
@@ -348,7 +371,7 @@ public class LobbyScene implements Scene {
 
     @Override
     public void receiveMessage() {
-        Message message = Client.getInstance().receiveMessage();
+        Message message = client.receiveMessage();
         if (null != message) {
             switch (message.getType()) {
                 case LOBBY_SERVER:
@@ -374,14 +397,14 @@ public class LobbyScene implements Scene {
                     log.debug(" [x] GAME START");
                     exitLobby();
                     MessageGameStart messageGameStart = (MessageGameStart) message;
-                    Client.getInstance().setCurrentScene(BattleScene.getInstance());
+                    client.setCurrentScene(BattleScene.getInstance());
                     BattleScene.getInstance().setBattlefield(messageGameStart.getBattlefield());
                     BattleScene.getInstance().setGameId(messageGameStart.getGameID());
                     break;
                 case PLAYER_UPDATE:
                     log.debug(" [x] PLAYER_UPDATE");
                     MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
-                    Client.getInstance().setPlayer(messagePlayerUpdate.getPlayer());
+                    client.setPlayer(messagePlayerUpdate.getPlayer());
                     break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
@@ -392,13 +415,13 @@ public class LobbyScene implements Scene {
     }
 
     private void exitLobby() {
-        MessageUnsubscribeToLobby messageUnsubscribeToLobby = new MessageUnsubscribeToLobby(Client.getInstance().getTokenKey());
+        MessageUnsubscribeToLobby messageUnsubscribeToLobby = new MessageUnsubscribeToLobby(client.getTokenKey());
         clientMessenger.sendMessageToLobbyService(messageUnsubscribeToLobby);
     }
 
     public void acceptMatch() {
         if (null != matchId && !matchId.isEmpty()) {
-            MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(Client.getInstance().getTokenKey(), matchId);
+            MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(client.getTokenKey(), matchId);
             clientMessenger.sendMessageToMatchmakingService(messageMatchmakingAccept);
             matchFound = false;
             matchId = "";
@@ -407,7 +430,7 @@ public class LobbyScene implements Scene {
 
     public void refuseMatch() {
         if (null != matchId && !matchId.isEmpty()) {
-            MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(Client.getInstance().getTokenKey(), matchId);
+            MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(client.getTokenKey(), matchId);
             clientMessenger.sendMessageToMatchmakingService(messageMatchmakingRefuse);
             matchFound = false;
             matchId = "";
@@ -415,7 +438,7 @@ public class LobbyScene implements Scene {
     }
 
     public void enterMatchmaking() {
-        MessageMatchmakingSubscribe messageMatchmakingSubscribe = new MessageMatchmakingSubscribe(Client.getInstance().getTokenKey());
+        MessageMatchmakingSubscribe messageMatchmakingSubscribe = new MessageMatchmakingSubscribe(client.getTokenKey());
         clientMessenger.sendMessageToMatchmakingService(messageMatchmakingSubscribe);
     }
 

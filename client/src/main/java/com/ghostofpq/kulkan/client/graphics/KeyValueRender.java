@@ -27,7 +27,7 @@ public class KeyValueRender extends HUDElement {
         this.value = value;
 
         int widthStep = width / 10;
-        int fontStep = (height - fontManager.getFontMap().get(FONT).getHeight("Testouilles")) / 2;
+        int fontStep = (height - fontManager.getFontMap().get(FONT).getHeight(value)) / 2;
 
         posXKey = posX;
         posYKey = posY + fontStep;

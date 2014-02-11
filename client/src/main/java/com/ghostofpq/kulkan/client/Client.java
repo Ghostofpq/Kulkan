@@ -225,6 +225,7 @@ public class Client {
 
     public void setPlayer(Player player) {
         this.player = player;
+        clientContext.setPlayer(player);
     }
 
     public Connection getConnection() {
