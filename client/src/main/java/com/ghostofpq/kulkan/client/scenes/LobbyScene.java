@@ -40,6 +40,7 @@ public class LobbyScene implements Scene {
     private List<HUDElement> hudElementList;
     // MENU
     private Button shopButton;
+    private Button stockButton;
     private Button optionButton;
     private Button quitButton;
     // CHAT & NEWS
@@ -148,14 +149,27 @@ public class LobbyScene implements Scene {
         shopButton = new Button(shopButtonPosX, shopButtonPosY, shopButtonWidth, shopButtonHeight, "SHOP", null, null) {
             @Override
             public void onClick() {
-                log.debug("SHOP TEAM");
+                log.debug("SHOP");
+                exitLobby();
+                client.setCurrentScene(ShopScene.getInstance());
+            }
+        };
+
+        int stockButtonPosX = matchmakingButtonPosX;
+        int stockButtonPosY = shopButtonPosY + shopButtonHeight;
+        int stockButtonWidth = matchmakingButtonWidth;
+        int stockButtonHeight = matchmakingButtonHeight;
+        stockButton = new Button(stockButtonPosX, stockButtonPosY, stockButtonWidth, stockButtonHeight, "STOCK", null, null) {
+            @Override
+            public void onClick() {
+                log.debug("STOCK");
                 exitLobby();
                 client.setCurrentScene(ShopScene.getInstance());
             }
         };
 
         int optionButtonPosX = matchmakingButtonPosX;
-        int optionButtonPosY = shopButtonPosY + shopButtonHeight;
+        int optionButtonPosY = stockButtonPosY + stockButtonHeight;
         int optionButtonWidth = matchmakingButtonWidth;
         int optionButtonHeight = matchmakingButtonHeight;
         optionButton = new Button(optionButtonPosX, optionButtonPosY, optionButtonWidth, optionButtonHeight, "OPTION", null, null) {
@@ -190,7 +204,7 @@ public class LobbyScene implements Scene {
                 }
             };
         } else {
-            teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, "HIRE NEW WARRIOR", null, null) {
+            teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, "NEW", null, null) {
                 @Override
                 public void onClick() {
                     actionCreateCharacter();
@@ -211,7 +225,7 @@ public class LobbyScene implements Scene {
                 }
             };
         } else {
-            teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, "HIRE NEW WARRIOR", null, null) {
+            teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, "NEW", null, null) {
                 @Override
                 public void onClick() {
                     actionCreateCharacter();
@@ -232,7 +246,7 @@ public class LobbyScene implements Scene {
                 }
             };
         } else {
-            teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, "HIRE NEW", null, null) {
+            teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, "NEW", null, null) {
                 @Override
                 public void onClick() {
                     actionCreateCharacter();
@@ -253,7 +267,7 @@ public class LobbyScene implements Scene {
                 }
             };
         } else {
-            teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, "HIRE NEW", null, null) {
+            teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, "NEW", null, null) {
                 @Override
                 public void onClick() {
                     actionCreateCharacter();
@@ -295,6 +309,7 @@ public class LobbyScene implements Scene {
         hudElementList.add(quitButton);
         hudElementList.add(manageTeamButton);
         hudElementList.add(shopButton);
+        hudElementList.add(stockButton);
         hudElementList.add(optionButton);
         hudElementList.add(news);
         hudElementList.add(teamCharacter1);
