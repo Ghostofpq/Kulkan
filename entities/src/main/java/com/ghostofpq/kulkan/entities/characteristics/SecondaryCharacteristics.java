@@ -107,6 +107,50 @@ public class SecondaryCharacteristics implements Serializable {
         resilience += secondaryCharacteristics.getResilience();
     }
 
+    public void plus(fields field, int value) {
+        switch (field) {
+            case ARMOR:
+                armor += value;
+                break;
+            case MAGIC_RESIST:
+                magicResist += value;
+                break;
+            case ATTACK_DAMAGE:
+                attackDamage += value;
+                break;
+            case MAGICAL_DAMAGE:
+                magicalDamage += value;
+                break;
+            case ARMOR_PENETRATION:
+                armorPenetration += value;
+                break;
+            case MAGIC_PENETRATION:
+                magicPenetration += value;
+                break;
+            case LIFE_REGENERATION:
+                lifeRegeneration += value;
+                break;
+            case MANA_REGENERATION:
+                manaRegeneration += value;
+                break;
+            case ESCAPE:
+                escape += value;
+                break;
+            case CRITICAL_STRIKE:
+                criticalStrike += value;
+                break;
+            case PRECISION:
+                precision += value;
+                break;
+            case RESILIENCE:
+                resilience += value;
+                break;
+            case SPEED:
+                speed += value;
+                break;
+        }
+    }
+
     /*
      * GETTERS
      */
@@ -213,5 +257,10 @@ public class SecondaryCharacteristics implements Serializable {
 
     public void setResilience(int resilience) {
         this.resilience = resilience;
+    }
+
+    public enum fields {
+        ATTACK_DAMAGE, MAGICAL_DAMAGE, ARMOR, MAGIC_RESIST, ARMOR_PENETRATION, MAGIC_PENETRATION,
+        SPEED, LIFE_REGENERATION, MANA_REGENERATION, ESCAPE, CRITICAL_STRIKE, PRECISION, RESILIENCE;
     }
 }

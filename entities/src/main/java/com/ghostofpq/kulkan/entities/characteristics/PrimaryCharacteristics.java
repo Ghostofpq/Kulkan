@@ -3,7 +3,6 @@ package com.ghostofpq.kulkan.entities.characteristics;
 import java.io.Serializable;
 
 public class PrimaryCharacteristics implements Serializable {
-
     private static final long serialVersionUID = 6681761667504505940L;
     private int strength;
     private int endurance;
@@ -23,33 +22,62 @@ public class PrimaryCharacteristics implements Serializable {
 
     public PrimaryCharacteristics(int strength, int endurance,
                                   int intelligence, int will, int agility, int movement) {
-        this.strength = strength;
-        this.endurance = endurance;
-        this.intelligence = intelligence;
-        this.will = will;
-        this.agility = agility;
-        this.movement = movement;
+        setStrength(strength);
+        setEndurance(endurance);
+        setIntelligence(intelligence);
+        setWill(will);
+        setAgility(agility);
+        setMovement(movement);
     }
 
     public void plus(PrimaryCharacteristics characteristics) {
-        strength += characteristics.getStrength();
-        endurance += characteristics.getEndurance();
-        intelligence += characteristics.getIntelligence();
-        will += characteristics.getWill();
-        agility += characteristics.getAgility();
-        movement += characteristics.getMovement();
+        setStrength(strength + characteristics.getStrength());
+        setEndurance(endurance + characteristics.getEndurance());
+        setIntelligence(intelligence + characteristics.getIntelligence());
+        setWill(will + characteristics.getWill());
+        setAgility(agility + characteristics.getAgility());
+        setMovement(movement + characteristics.getMovement());
     }
 
-    /*
-     * GETTERS
-     */
+    public void plus(fields field, int value) {
+        switch (field) {
+            case STRENGTH:
+                setStrength(strength + value);
+                break;
+            case ENDURANCE:
+                setEndurance(endurance + value);
+                break;
+            case INTELLIGENCE:
+                setIntelligence(intelligence + value);
+                break;
+            case WILL:
+                setWill(will + value);
+                break;
+            case AGILITY:
+                setAgility(agility + value);
+                break;
+            case MOVEMENT:
+                setMovement(movement + value);
+                break;
+        }
+    }
+
+    private int validateValue(int value) {
+        if (value < 0) {
+            return 0;
+        } else if (value > 255) {
+            return 255;
+        } else {
+            return value;
+        }
+    }
 
     public int getStrength() {
         return strength;
     }
 
     public void setStrength(int strength) {
-        this.strength = strength;
+        this.strength = validateValue(strength);
     }
 
     public int getEndurance() {
@@ -57,7 +85,7 @@ public class PrimaryCharacteristics implements Serializable {
     }
 
     public void setEndurance(int endurance) {
-        this.endurance = endurance;
+        this.endurance = validateValue(endurance);
     }
 
     public int getIntelligence() {
@@ -65,7 +93,7 @@ public class PrimaryCharacteristics implements Serializable {
     }
 
     public void setIntelligence(int intelligence) {
-        this.intelligence = intelligence;
+        this.intelligence = validateValue(intelligence);
     }
 
     public int getWill() {
@@ -73,7 +101,7 @@ public class PrimaryCharacteristics implements Serializable {
     }
 
     public void setWill(int will) {
-        this.will = will;
+        this.will = validateValue(will);
     }
 
     public int getAgility() {
@@ -81,7 +109,7 @@ public class PrimaryCharacteristics implements Serializable {
     }
 
     public void setAgility(int agility) {
-        this.agility = agility;
+        this.agility = validateValue(agility);
     }
 
     public int getMovement() {
@@ -90,5 +118,9 @@ public class PrimaryCharacteristics implements Serializable {
 
     public void setMovement(int movement) {
         this.movement = movement;
+    }
+
+    public enum fields {
+        STRENGTH, ENDURANCE, INTELLIGENCE, WILL, AGILITY, MOVEMENT
     }
 }
