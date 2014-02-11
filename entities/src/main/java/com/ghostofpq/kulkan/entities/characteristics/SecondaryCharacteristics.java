@@ -75,7 +75,7 @@ public class SecondaryCharacteristics implements Serializable {
         armorPenetration = 0;
         magicPenetration = 0;
 
-        speed = 0;
+        speed = characteristics.getAgility() / 10;
 
         lifeRegeneration = 0;
         manaRegeneration = 0;

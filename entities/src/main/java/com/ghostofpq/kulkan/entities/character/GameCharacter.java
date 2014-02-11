@@ -212,7 +212,7 @@ public class GameCharacter implements Serializable {
     private void updateLifeAndManaPoint() {
         calculateAggregatedCharacteristics();
         maxHealthPoint = getEndurance() * 10;
-        maxManaPoint = getIntelligence() * 10;
+        maxManaPoint = getWill() * 10;
     }
 
     public void calculateAggregatedCharacteristics() {
@@ -255,7 +255,7 @@ public class GameCharacter implements Serializable {
 
     public void tickHourglass() {
         if (isAlive()) {
-            hourglass -= getAgility();
+            hourglass -= getSpeed();
             // log.debug("{} : {}", getCharacter().getName(), hourglass);
             if (hourglass <= 0) {
                 int delta = Math.abs(hourglass);
