@@ -7,7 +7,6 @@ import com.ghostofpq.kulkan.client.utils.FontManager;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.TextureManager;
 import com.ghostofpq.kulkan.entities.character.Player;
-import com.ghostofpq.kulkan.entities.messages.Message;
 import com.rabbitmq.client.Connection;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.LWJGLException;
@@ -86,10 +85,6 @@ public class Client {
         }
 
         setCurrentScene(loginScene);
-    }
-
-    public Message receiveMessage() {
-        return clientMessenger.receiveMessage();
     }
 
     private void updateDisplayMode() {

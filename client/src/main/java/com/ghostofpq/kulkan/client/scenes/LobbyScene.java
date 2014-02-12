@@ -378,7 +378,7 @@ public class LobbyScene implements Scene {
 
     @Override
     public void receiveMessage() {
-        Message message = client.receiveMessage();
+        Message message = clientMessenger.receiveMessage();
         if (null != message) {
             switch (message.getType()) {
                 case LOBBY_SERVER:

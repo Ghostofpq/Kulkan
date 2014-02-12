@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,10 +127,6 @@ public class ShopScene implements Scene {
     }
 
     @Override
-    public void initConnections() throws IOException {
-    }
-
-    @Override
     public void update(long deltaTime) {
     }
 
@@ -172,12 +167,8 @@ public class ShopScene implements Scene {
     }
 
     @Override
-    public void closeConnections() throws IOException {
-    }
-
-    @Override
     public void receiveMessage() {
-        Message message = client.receiveMessage();
+        Message message = clientMessenger.receiveMessage();
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:

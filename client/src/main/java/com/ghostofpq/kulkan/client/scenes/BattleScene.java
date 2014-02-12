@@ -708,7 +708,7 @@ public class BattleScene implements Scene {
     @Override
     public void receiveMessage() {
         if (!engineIsBusy()) {
-            Message message = client.receiveMessage();
+            Message message = clientMessenger.receiveMessage();
             if (null != message) {
                 log.debug("RECEIVED");
                 log.debug(message.toString());

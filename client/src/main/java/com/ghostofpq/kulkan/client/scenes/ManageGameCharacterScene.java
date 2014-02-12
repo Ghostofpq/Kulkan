@@ -207,7 +207,7 @@ public class ManageGameCharacterScene implements Scene {
 
     @Override
     public void receiveMessage() {
-        Message message = client.receiveMessage();
+        Message message = clientMessenger.receiveMessage();
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
