@@ -320,22 +320,22 @@ public class LobbyScene implements Scene {
     }
 
     private void manageCharacter1() {
-        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(0));
+        clientContext.setSelectedCharacterId(clientContext.getPlayer().getTeam().get(0).getId());
         client.setCurrentScene(manageGameCharacterScene);
     }
 
     private void manageCharacter2() {
-        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(1));
+        clientContext.setSelectedCharacterId(clientContext.getPlayer().getTeam().get(1).getId());
         client.setCurrentScene(manageGameCharacterScene);
     }
 
     private void manageCharacter3() {
-        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(2));
+        clientContext.setSelectedCharacterId(clientContext.getPlayer().getTeam().get(2).getId());
         client.setCurrentScene(manageGameCharacterScene);
     }
 
     private void manageCharacter4() {
-        clientContext.setSelectedGameCharacter(clientContext.getPlayer().getTeam().get(3));
+        clientContext.setSelectedCharacterId(clientContext.getPlayer().getTeam().get(3).getId());
         client.setCurrentScene(manageGameCharacterScene);
     }
 

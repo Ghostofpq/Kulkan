@@ -6,14 +6,12 @@ import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextArea;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
-import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageEquipItemOnGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,7 +22,6 @@ import java.util.List;
 public class ManageGameCharacterEquipItemScene implements Scene {
     private ItemType filter;
     private KeyValueRender itemType;
-    private ObjectId gameCharId;
     private Button quitButton;
     private Button equipButton;
     private Item selectedItem;
@@ -90,7 +87,7 @@ public class ManageGameCharacterEquipItemScene implements Scene {
     }
 
     public void equipItem(Item item) {
-        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = new MessageEquipItemOnGameCharacter(client.getTokenKey(), gameCharId, item.getItemID());
+        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = new MessageEquipItemOnGameCharacter(client.getTokenKey(), clientContext.getSelectedCharacterId(), item.getItemID());
         clientMessenger.sendMessageToUserService(messageEquipItemOnGameCharacter);
     }
 
@@ -149,8 +146,6 @@ public class ManageGameCharacterEquipItemScene implements Scene {
                     ManageGameCharacterEquipItemScene.log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     client.setPlayer(response.getPlayer());
-                    GameCharacter gameCharacter = response.getPlayer().getGameCharWithId(gameCharId);
-                    clientContext.setSelectedGameCharacter(gameCharacter);
                     client.setCurrentScene(manageGameCharacterEquipmentScene);
                     break;
             }
@@ -159,9 +154,5 @@ public class ManageGameCharacterEquipItemScene implements Scene {
 
     public void setFilter(ItemType filter) {
         this.filter = filter;
-    }
-
-    public void setGameCharId(ObjectId gameCharId) {
-        this.gameCharId = gameCharId;
     }
 }

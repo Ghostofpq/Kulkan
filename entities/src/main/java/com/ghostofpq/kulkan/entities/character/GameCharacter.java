@@ -279,6 +279,10 @@ public class GameCharacter implements Serializable {
         return null;
     }
 
+    public Job getActiveJob() {
+        return getJob(currentJob);
+    }
+
     /*
      * GETTERS & SETTERS
      */

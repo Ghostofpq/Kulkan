@@ -9,6 +9,7 @@ import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -29,6 +30,8 @@ public class ClientContext {
     private String pseudo;
     private Player player;
     private String tokenKey;
+    private ObjectId selectedCharacterId;
+
     @Autowired
     private ManageGameCharacterScene manageGameCharacterScene;
     @Autowired
@@ -45,11 +48,16 @@ public class ClientContext {
         saveClientProperties();
     }
 
-    public void setSelectedGameCharacter(GameCharacter gameCharacter) {
-        manageGameCharacterScene.setGameCharacter(gameCharacter);
-        manageGameCharacterEquipmentScene.setGameCharacter(gameCharacter);
-        manageGameCharacterJobScene.setGameCharacter(gameCharacter);
-        manageGameCharacterChangeJobScene.setGameCharacter(gameCharacter);
+    public void setSelectedCharacterId(ObjectId selectedCharacterId) {
+        this.selectedCharacterId = selectedCharacterId;
+    }
+
+    public ObjectId getSelectedCharacterId() {
+        return selectedCharacterId;
+    }
+
+    public GameCharacter getSelectedGameCharacter() {
+        return getPlayer().getGameCharWithId(selectedCharacterId);
     }
 
     public boolean isFullscreen() {

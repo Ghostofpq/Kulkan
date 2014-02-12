@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class ManageGameCharacterJobScene implements Scene {
-    private GameCharacter gameCharacter;
     private JobManager jobManager;
     private KeyValueRender jobType;
     private KeyValueRender jobPoints;
@@ -48,20 +47,17 @@ public class ManageGameCharacterJobScene implements Scene {
     }
 
 
-    public void setGameCharacter(GameCharacter gameCharacter) {
-        int widthStep = (client.getWidth() - 3 * widthSeparator) / 5;
-        int heightStep = (client.getHeight() - 3 * heightSeparator) / 8;
-        this.gameCharacter = gameCharacter;
-        jobManager = new JobManager(widthSeparator, heightStep + 2 * heightSeparator, (3 * widthStep), 7 * heightStep, gameCharacter.getJob(gameCharacter.getCurrentJob()));
-    }
-
     @Override
     public void init() {
+        GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
+        int widthStep = (client.getWidth() - 3 * widthSeparator) / 5;
+        int heightStep = (client.getHeight() - 3 * heightSeparator) / 8;
+        jobManager = new JobManager(widthSeparator, heightStep + 2 * heightSeparator, (3 * widthStep), 7 * heightStep, gameCharacter.getJob(gameCharacter.getCurrentJob()));
         widthSeparator = client.getWidth() / 20;
         heightSeparator = client.getHeight() / 20;
         selectedCapacity = null;
-        int widthStep = (client.getWidth() - 5 * widthSeparator) / 5;
-        int heightStep = (client.getHeight() - 6 * heightSeparator) / 8;
+        widthStep = (client.getWidth() - 5 * widthSeparator) / 5;
+        heightStep = (client.getHeight() - 6 * heightSeparator) / 8;
         jobType = new KeyValueRender(widthSeparator, heightSeparator, widthStep, heightStep, "JOB", String.valueOf(gameCharacter.getCurrentJob()), 3);
         jobPoints = new KeyValueRender(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 7);
         cumulatedJobPoints = new KeyValueRender(widthSeparator * 3 + 2 * widthStep, heightSeparator, widthStep, heightStep, "TOTAL", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getCumulativeJobPoints()), 7);
@@ -105,7 +101,7 @@ public class ManageGameCharacterJobScene implements Scene {
             capacityPrice.draw();
             selectedCapacityName.draw();
             capacityDescription.draw();
-            if (selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
+            if (selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getActiveJob().getJobPoints())) {
                 unlockCapacity.draw();
             }
         }
@@ -118,7 +114,7 @@ public class ManageGameCharacterJobScene implements Scene {
                 if (quitButton.isClicked()) {
                     quitButton.onClick();
                 } else if (unlockCapacity.isClicked()) {
-                    if (null != selectedCapacity && selectedCapacity.canBeUnlock(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints())) {
+                    if (null != selectedCapacity && selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getActiveJob().getJobPoints())) {
                         unlockCapacity.onClick();
                     }
                 } else if (jobManager.isClicked()) {
@@ -137,7 +133,7 @@ public class ManageGameCharacterJobScene implements Scene {
 
     public void unlockSelectedCapacity() {
         if (null != selectedCapacity) {
-            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(client.getTokenKey(), gameCharacter.getId(), JobType.WARRIOR, selectedCapacity.getName());
+            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(client.getTokenKey(), clientContext.getSelectedCharacterId(), JobType.WARRIOR, selectedCapacity.getName());
             clientMessenger.sendMessageToUserService(messageUnlockCapacity);
         }
     }
@@ -152,8 +148,6 @@ public class ManageGameCharacterJobScene implements Scene {
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     log.debug("CREATE OK");
                     client.setPlayer(response.getPlayer());
-                    GameCharacter updatedGameCharacter = response.getPlayer().getGameCharWithId(gameCharacter.getId());
-                    clientContext.setSelectedGameCharacter(updatedGameCharacter);
                     init();
                     break;
             }

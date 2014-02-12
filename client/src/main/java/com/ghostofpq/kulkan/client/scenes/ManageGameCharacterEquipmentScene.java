@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class ManageGameCharacterEquipmentScene implements Scene {
-    private GameCharacter gameCharacter;
     private KeyValueRender nameRender;
     private KeyValueRender helm;
     private Button equipHelm;
@@ -53,10 +52,6 @@ public class ManageGameCharacterEquipmentScene implements Scene {
 
     }
 
-    public void setGameCharacter(GameCharacter gameCharacter) {
-        this.gameCharacter = gameCharacter;
-    }
-
     @Override
     public void init() {
         int widthSeparator = client.getWidth() / 20;
@@ -64,6 +59,8 @@ public class ManageGameCharacterEquipmentScene implements Scene {
 
         int widthStep = (client.getWidth() - 4 * widthSeparator) / 5;
         int heightStep = (client.getHeight() - 9 * heightSeparator) / 8;
+
+        GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
 
         nameRender = new KeyValueRender(widthSeparator, heightSeparator, widthStep, heightStep, "Char Name", gameCharacter.getName(), 5);
 
@@ -182,12 +179,11 @@ public class ManageGameCharacterEquipmentScene implements Scene {
 
     public void changeToSceneEquipItem(ItemType itemType) {
         manageGameCharacterEquipItemScene.setFilter(itemType);
-        manageGameCharacterEquipItemScene.setGameCharId(gameCharacter.getId());
         client.setCurrentScene(manageGameCharacterEquipItemScene);
     }
 
     public void unequipItemType(ItemType itemType) {
-        MessageUnequipItemOnGameCharacter messageUnequipItemOnGameCharacter = new MessageUnequipItemOnGameCharacter(client.getTokenKey(), gameCharacter.getId(), itemType);
+        MessageUnequipItemOnGameCharacter messageUnequipItemOnGameCharacter = new MessageUnequipItemOnGameCharacter(client.getTokenKey(), clientContext.getSelectedCharacterId(), itemType);
         clientMessenger.sendMessageToUserService(messageUnequipItemOnGameCharacter);
     }
 
@@ -205,6 +201,8 @@ public class ManageGameCharacterEquipmentScene implements Scene {
         weapon.draw();
         heldItem.draw();
         quitButton.draw();
+
+        GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
 
         if (null != gameCharacter.getEquipment().getHelm()) {
             unequipHelm.draw();
@@ -246,50 +244,62 @@ public class ManageGameCharacterEquipmentScene implements Scene {
                 if (quitButton.isClicked()) {
                     quitButton.onClick();
                 } else if (unequipHelm.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null != gameCharacter.getEquipment().getHelm()) {
                         unequipHelm.onClick();
                     }
                 } else if (unequipArmor.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null != gameCharacter.getEquipment().getArmor()) {
                         unequipArmor.onClick();
                     }
                 } else if (unequipNecklace.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null != gameCharacter.getEquipment().getNecklace()) {
                         unequipNecklace.onClick();
                     }
                 } else if (unequipRing.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null != gameCharacter.getEquipment().getRing()) {
                         unequipRing.onClick();
                     }
                 } else if (unequipWeapon.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null != gameCharacter.getEquipment().getWeapon()) {
                         unequipWeapon.onClick();
                     }
                 } else if (unequipHeldItem.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null != gameCharacter.getEquipment().getHeldItem()) {
                         unequipHeldItem.onClick();
                     }
                 } else if (equipHelm.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null == gameCharacter.getEquipment().getHelm()) {
                         equipHelm.onClick();
                     }
                 } else if (equipArmor.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null == gameCharacter.getEquipment().getArmor()) {
                         equipArmor.onClick();
                     }
                 } else if (equipNecklace.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null == gameCharacter.getEquipment().getNecklace()) {
                         equipNecklace.onClick();
                     }
                 } else if (equipRing.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null == gameCharacter.getEquipment().getRing()) {
                         equipRing.onClick();
                     }
                 } else if (equipWeapon.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null == gameCharacter.getEquipment().getWeapon()) {
                         equipWeapon.onClick();
                     }
                 } else if (equipHeldItem.isClicked()) {
+                    GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
                     if (null == gameCharacter.getEquipment().getHeldItem()) {
                         equipHeldItem.onClick();
                     }
@@ -308,8 +318,6 @@ public class ManageGameCharacterEquipmentScene implements Scene {
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     ManageGameCharacterEquipmentScene.log.debug("CREATE OK");
                     client.setPlayer(response.getPlayer());
-                    GameCharacter updatedGameCharacter = response.getPlayer().getGameCharWithId(gameCharacter.getId());
-                    clientContext.setSelectedGameCharacter(updatedGameCharacter);
                     init();
                     break;
             }

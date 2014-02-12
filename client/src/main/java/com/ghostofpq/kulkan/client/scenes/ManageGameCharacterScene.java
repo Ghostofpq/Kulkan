@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class ManageGameCharacterScene implements Scene {
-    private GameCharacter gameCharacter;
     private Button manageJobButton;
     private Button manageEquipmentButton;
     private Button quitButton;
@@ -69,7 +68,7 @@ public class ManageGameCharacterScene implements Scene {
     public void init() {
         background = new Background(TextureKey.BACKGROUND_BASIC);
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
-
+        GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
 
         widthSeparator = client.getWidth() / 20;
         heightSeparator = client.getHeight() / 20;
@@ -96,7 +95,6 @@ public class ManageGameCharacterScene implements Scene {
         manageEquipmentButton = new Button(widthSeparator + 2 * widthStep, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Stuff") {
             @Override
             public void onClick() {
-                manageGameCharacterEquipmentScene.setGameCharacter(gameCharacter);
                 client.setCurrentScene(manageGameCharacterEquipmentScene);
             }
         };
@@ -129,6 +127,7 @@ public class ManageGameCharacterScene implements Scene {
 
     private void actionDelete() {
         Player player = client.getPlayer();
+        GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         if (player.getTeam().contains(gameCharacter)) {
             MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(client.getTokenKey(), player.getPseudo(), gameCharacter.getId());
             clientMessenger.sendMessageToUserService(messageDeleteGameCharacterFromTeam);
@@ -140,6 +139,7 @@ public class ManageGameCharacterScene implements Scene {
 
     private void actionStock() {
         Player player = client.getPlayer();
+        GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(client.getTokenKey(), player.getPseudo(), gameCharacter.getId());
         clientMessenger.sendMessageToUserService(putGameCharacterFromTeamToStock);
     }
@@ -213,16 +213,9 @@ public class ManageGameCharacterScene implements Scene {
                 case PLAYER_UPDATE:
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     client.setPlayer(response.getPlayer());
-                    GameCharacter updatedGameCharacter = response.getPlayer().getGameCharWithId(gameCharacter.getId());
-                    clientContext.setSelectedGameCharacter(updatedGameCharacter);
                     init();
                     break;
             }
         }
-    }
-
-    public void setGameCharacter(GameCharacter gameCharacter) {
-        this.gameCharacter = gameCharacter;
-        init();
     }
 }

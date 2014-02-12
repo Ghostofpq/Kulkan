@@ -4,20 +4,17 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
-import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageChangeJob;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class ManageGameCharacterChangeJobScene implements Scene {
 
-    private ObjectId gameCharId;
     private Button warriorButton;
     private Button mageButton;
     private Button quitButton;
@@ -33,10 +30,6 @@ public class ManageGameCharacterChangeJobScene implements Scene {
     public ManageGameCharacterChangeJobScene() {
     }
 
-    public void setGameCharacter(GameCharacter gameCharacter) {
-        this.gameCharId = gameCharacter.getId();
-    }
-
     @Override
     public void init() {
         int widthSeparator = client.getWidth() / 20;
@@ -49,7 +42,7 @@ public class ManageGameCharacterChangeJobScene implements Scene {
             @Override
             public void onClick() {
                 log.debug("Warrior");
-                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), gameCharId, JobType.WARRIOR);
+                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), clientContext.getSelectedCharacterId(), JobType.WARRIOR);
                 clientMessenger.sendMessageToUserService(messageChangeJob);
             }
         };
@@ -58,7 +51,7 @@ public class ManageGameCharacterChangeJobScene implements Scene {
             @Override
             public void onClick() {
                 ManageGameCharacterChangeJobScene.log.debug("Mage");
-                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), gameCharId, JobType.MAGE);
+                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), clientContext.getSelectedCharacterId(), JobType.MAGE);
                 clientMessenger.sendMessageToUserService(messageChangeJob);
             }
         };
@@ -111,8 +104,6 @@ public class ManageGameCharacterChangeJobScene implements Scene {
                     ManageGameCharacterChangeJobScene.log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     client.setPlayer(response.getPlayer());
-                    GameCharacter gameCharacter = response.getPlayer().getGameCharWithId(gameCharId);
-                    clientContext.setSelectedGameCharacter(gameCharacter);
                     client.setCurrentScene(manageGameCharacterScene);
                     break;
             }

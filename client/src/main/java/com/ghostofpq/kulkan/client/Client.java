@@ -23,7 +23,7 @@ import java.io.IOException;
 
 @Slf4j
 public class Client {
-    private final String CLIENT_QUEUE_NAME_BASE = "/client/";
+    private static volatile Client instance = null;
     private Scene currentScene;
     private Player player;
     private String tokenKey;
@@ -39,10 +39,20 @@ public class Client {
     @Autowired
     private LobbyScene lobbyScene;
 
-    public Client() {
+    private Client() {
 
     }
 
+    public static Client getInstance() {
+        if (instance == null) {
+            synchronized (Client.class) {
+                if (instance == null) {
+                    instance = new Client();
+                }
+            }
+        }
+        return instance;
+    }
 
     public static void main(String[] argv) {
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
