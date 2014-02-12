@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-
 @Slf4j
 public class ManageGameCharacterEquipmentScene implements Scene {
     private GameCharacter gameCharacter;
@@ -194,10 +192,6 @@ public class ManageGameCharacterEquipmentScene implements Scene {
     }
 
     @Override
-    public void initConnections() throws IOException {
-    }
-
-    @Override
     public void update(long deltaTime) {
     }
 
@@ -302,10 +296,6 @@ public class ManageGameCharacterEquipmentScene implements Scene {
                 }
             }
         }
-    }
-
-    @Override
-    public void closeConnections() throws IOException {
     }
 
     @Override

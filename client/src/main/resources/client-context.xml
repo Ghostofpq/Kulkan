@@ -23,13 +23,21 @@
         <property name="hostPort" value="${hostIp.hostPort}"/>
     </bean>
 
-    <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
-    <bean id="lobbyScene" class="com.ghostofpq.kulkan.client.scenes.LobbyScene"/>
     <bean id="createGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.CreateGameCharacterScene"/>
     <bean id="manageGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterScene"/>
     <bean id="manageGameCharacterJobScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterJobScene"/>
+    <bean id="manageGameCharacterChangeJobScene"
+          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterChangeJobScene"/>
     <bean id="manageGameCharacterEquipmentScene"
           class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipmentScene"/>
-    <bean id="equipItemScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipItemScene"/>
+    <bean id="manageGameCharacterEquipItemScene"
+          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipItemScene"/>
+
+    <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
+    <bean id="lobbyScene" class="com.ghostofpq.kulkan.client.scenes.LobbyScene"/>
     <bean id="optionScene" class="com.ghostofpq.kulkan.client.scenes.OptionScene"/>
+    <bean id="shopScene" class="com.ghostofpq.kulkan.client.scenes.ShopScene"/>
+    <bean id="stockScene" class="com.ghostofpq.kulkan.client.scenes.StockScene"/>
+
+    <bean id="battleScene" class="com.ghostofpq.kulkan.client.scenes.BattleScene"/>
 </beans>

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class ShopScene implements Scene {
+public class StockScene implements Scene {
     private KeyValueRender money;
     private KeyValueRender selectedItemName;
     private KeyValueRender itemPrice;
@@ -41,7 +41,7 @@ public class ShopScene implements Scene {
     @Autowired
     private ClientMessenger clientMessenger;
 
-    public ShopScene() {
+    public StockScene() {
     }
 
 

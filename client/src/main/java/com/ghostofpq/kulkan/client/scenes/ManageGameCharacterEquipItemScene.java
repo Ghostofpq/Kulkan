@@ -17,7 +17,6 @@ import org.bson.types.ObjectId;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,10 +102,6 @@ public class ManageGameCharacterEquipItemScene implements Scene {
     }
 
     @Override
-    public void initConnections() throws IOException {
-    }
-
-    @Override
     public void update(long deltaTime) {
     }
 
@@ -143,10 +138,6 @@ public class ManageGameCharacterEquipItemScene implements Scene {
                 }
             }
         }
-    }
-
-    @Override
-    public void closeConnections() throws IOException {
     }
 
     @Override

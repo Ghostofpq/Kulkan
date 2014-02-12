@@ -144,8 +144,8 @@ public class LoginScene implements Scene {
                         clientContext.setPlayer(response.getPlayer());
                         clientContext.setTokenKey(response.getTokenKey());
                         clientMessenger.openChannelsAfterAuthentication(response.getTokenKey());
-                        Client.getInstance().setTokenKey(response.getTokenKey());
-                        Client.getInstance().setCurrentScene(lobbyScene);
+                        client.setTokenKey(response.getTokenKey());
+                        client.setCurrentScene(lobbyScene);
                     } else {
                         log.debug("AUTH KO : BAD INFO");
                     }
@@ -164,7 +164,7 @@ public class LoginScene implements Scene {
 
     private void actionQuit() {
         log.debug("QUIT");
-        Client.getInstance().quit();
+        client.quit();
     }
 
     private void actionOption() {
@@ -307,13 +307,5 @@ public class LoginScene implements Scene {
         if (frameClicked && !clientContext.isFullscreen()) {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
-    }
-
-    @Override
-    public void initConnections() throws IOException {
-    }
-
-    @Override
-    public void closeConnections() throws IOException {
     }
 }

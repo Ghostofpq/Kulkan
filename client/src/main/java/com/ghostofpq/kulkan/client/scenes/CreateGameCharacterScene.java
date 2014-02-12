@@ -24,8 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-
 public class CreateGameCharacterScene implements Scene {
     private static final Logger LOG = LoggerFactory.getLogger(CreateGameCharacterScene.class);
     private ClanType clanType;
@@ -74,13 +72,13 @@ public class CreateGameCharacterScene implements Scene {
         background = new Background(TextureKey.BACKGROUND_BASIC);
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
-        widthSeparator = Client.getInstance().getWidth() / 20;
-        heightSeparator = Client.getInstance().getHeight() / 20;
+        widthSeparator = client.getWidth() / 20;
+        heightSeparator = client.getHeight() / 20;
 
-        widthStep = (Client.getInstance().getWidth() - 3 * widthSeparator) / 5;
-        widthStepClan = (Client.getInstance().getWidth() - 2 * widthSeparator) / 8;
+        widthStep = (client.getWidth() - 3 * widthSeparator) / 5;
+        widthStepClan = (client.getWidth() - 2 * widthSeparator) / 8;
 
-        heightStep = (Client.getInstance().getHeight() - 4 * heightSeparator) / 8;
+        heightStep = (client.getHeight() - 4 * heightSeparator) / 8;
 
         int malePosX = widthSeparator;
         int malePosY = heightSeparator;
@@ -186,7 +184,7 @@ public class CreateGameCharacterScene implements Scene {
             }
         };
 
-        int widthDesc = (Client.getInstance().getWidth() - 4 * widthSeparator) / 7;
+        int widthDesc = (client.getWidth() - 4 * widthSeparator) / 7;
 
         int validatePosX = 6 * widthDesc + 3 * widthSeparator;
         int validatePosY = 3 * heightSeparator + 2 * heightStep;
@@ -202,8 +200,8 @@ public class CreateGameCharacterScene implements Scene {
                 LOG.debug("Gender : '{}'", gender);
                 LOG.debug("ClanType : '{}'", clanType);
                 LOG.debug("Sending ");
-                Player player = Client.getInstance().getPlayer();
-                MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(Client.getInstance().getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
+                Player player = client.getPlayer();
+                MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(client.getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
                 clientMessenger.sendMessageToUserService(messageCreateNewGameCharacter);
             }
         };
@@ -418,16 +416,8 @@ public class CreateGameCharacterScene implements Scene {
     }
 
     @Override
-    public void initConnections() throws IOException {
-    }
-
-    @Override
-    public void closeConnections() throws IOException {
-    }
-
-    @Override
     public void receiveMessage() {
-        Message message = Client.getInstance().receiveMessage();
+        Message message = client.receiveMessage();
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:

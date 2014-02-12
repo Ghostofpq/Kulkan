@@ -38,7 +38,8 @@ public class ClientMessenger {
     // SERVER
     private String hostIp;
     private int hostPort;
-
+    @Autowired
+    private Client client;
     @Autowired
     private ClientContext clientContext;
 
@@ -57,7 +58,7 @@ public class ClientMessenger {
     }
 
     private void openAuthenticationChannel() throws IOException {
-        channelAuthentication = Client.getInstance().getConnection().createChannel();
+        channelAuthentication = client.getConnection().createChannel();
         authenticationReplyQueueName = channelAuthentication.queueDeclare().getQueue();
         channelAuthenticatingConsumer = new QueueingConsumer(channelAuthentication);
         channelAuthentication.basicConsume(authenticationReplyQueueName, true, channelAuthenticatingConsumer);
@@ -143,11 +144,16 @@ public class ClientMessenger {
         }
     }
 
-    public void openChannelGame(String gameNumber) throws IOException {
-        gameServerQueueName = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameNumber).toString();
-        channelGame = connection.createChannel();
-        log.debug("Opening game service channel out : [{}]", gameServerQueueName);
-        channelGame.queueDeclare(gameServerQueueName, false, false, false, null);
+    public void openChannelGame(String gameNumber) {
+        try {
+            gameServerQueueName = new StringBuilder().append(GAME_SERVER_QUEUE_NAME_BASE).append(gameNumber).toString();
+            channelGame = connection.createChannel();
+            log.debug("Opening game service channel out : [{}]", gameServerQueueName);
+            channelGame.queueDeclare(gameServerQueueName, false, false, false, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            client.quit();
+        }
     }
 
     public void closeConnection() throws IOException {
@@ -217,7 +223,7 @@ public class ClientMessenger {
             channelUsers.basicPublish("", USER_SERVICE_QUEUE_NAME, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-            Client.getInstance().quit();
+            client.quit();
         }
     }
 
@@ -227,7 +233,7 @@ public class ClientMessenger {
             channelLobby.basicPublish("", LOBBY_SERVER_QUEUE_NAME_BASE, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-            Client.getInstance().quit();
+            client.quit();
         }
     }
 
@@ -237,7 +243,7 @@ public class ClientMessenger {
             channelMatchmaking.basicPublish("", MATCHMAKING_SERVER_QUEUE_NAME_BASE, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-            Client.getInstance().quit();
+            client.quit();
         }
     }
 
@@ -247,7 +253,7 @@ public class ClientMessenger {
             channelGame.basicPublish("", gameServerQueueName, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-            Client.getInstance().quit();
+            client.quit();
         }
     }
 
@@ -257,7 +263,7 @@ public class ClientMessenger {
             channelPing.basicPublish("", PING_MANAGER_QUEUE_NAME, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-            Client.getInstance().quit();
+            client.quit();
         }
     }
 

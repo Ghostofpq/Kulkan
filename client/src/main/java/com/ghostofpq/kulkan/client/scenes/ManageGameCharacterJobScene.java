@@ -17,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-
 @Slf4j
 public class ManageGameCharacterJobScene implements Scene {
     private GameCharacter gameCharacter;
@@ -55,10 +53,6 @@ public class ManageGameCharacterJobScene implements Scene {
         int heightStep = (client.getHeight() - 3 * heightSeparator) / 8;
         this.gameCharacter = gameCharacter;
         jobManager = new JobManager(widthSeparator, heightStep + 2 * heightSeparator, (3 * widthStep), 7 * heightStep, gameCharacter.getJob(gameCharacter.getCurrentJob()));
-    }
-
-    @Override
-    public void initConnections() throws IOException {
     }
 
     @Override
@@ -146,10 +140,6 @@ public class ManageGameCharacterJobScene implements Scene {
             MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(client.getTokenKey(), gameCharacter.getId(), JobType.WARRIOR, selectedCapacity.getName());
             clientMessenger.sendMessageToUserService(messageUnlockCapacity);
         }
-    }
-
-    @Override
-    public void closeConnections() throws IOException {
     }
 
     @Override

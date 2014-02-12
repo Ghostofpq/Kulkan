@@ -24,7 +24,6 @@ import java.io.IOException;
 
 @Slf4j
 public class Client {
-    private static volatile Client instance = null;
     private final String CLIENT_QUEUE_NAME_BASE = "/client/";
     private Scene currentScene;
     private Player player;
@@ -41,13 +40,10 @@ public class Client {
     @Autowired
     private LobbyScene lobbyScene;
 
-    private Client() {
+    public Client() {
 
     }
 
-    public static Client getInstance() {
-        return instance;
-    }
 
     public static void main(String[] argv) {
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
@@ -62,9 +58,6 @@ public class Client {
     }
 
     public void init() {
-        if (instance == null) {
-            instance = this;
-        }
 
         clientContext.init();
 
@@ -203,20 +196,8 @@ public class Client {
     }
 
     public void setCurrentScene(Scene currentScene) {
-        if (null != this.currentScene) {
-            try {
-                this.currentScene.closeConnections();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         this.currentScene = currentScene;
         this.currentScene.init();
-        try {
-            this.currentScene.initConnections();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public Player getPlayer() {

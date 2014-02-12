@@ -24,8 +24,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-
 @Slf4j
 public class ManageGameCharacterScene implements Scene {
     private GameCharacter gameCharacter;
@@ -147,10 +145,6 @@ public class ManageGameCharacterScene implements Scene {
     }
 
     @Override
-    public void initConnections() throws IOException {
-    }
-
-    @Override
     public void update(long deltaTime) {
     }
 
@@ -209,10 +203,6 @@ public class ManageGameCharacterScene implements Scene {
         if (frameClicked && !clientContext.isFullscreen()) {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
-    }
-
-    @Override
-    public void closeConnections() throws IOException {
     }
 
     @Override

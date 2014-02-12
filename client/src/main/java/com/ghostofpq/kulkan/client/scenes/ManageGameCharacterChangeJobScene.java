@@ -14,8 +14,6 @@ import org.bson.types.ObjectId;
 import org.lwjgl.input.Mouse;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-
 @Slf4j
 public class ManageGameCharacterChangeJobScene implements Scene {
 
@@ -41,17 +39,17 @@ public class ManageGameCharacterChangeJobScene implements Scene {
 
     @Override
     public void init() {
-        int widthSeparator = Client.getInstance().getWidth() / 20;
-        int heightSeparator = Client.getInstance().getHeight() / 20;
+        int widthSeparator = client.getWidth() / 20;
+        int heightSeparator = client.getHeight() / 20;
 
-        int widthStep = (Client.getInstance().getWidth() - 5 * widthSeparator) / 4;
-        int heightStep = (Client.getInstance().getHeight() - 5 * heightSeparator) / 4;
+        int widthStep = (client.getWidth() - 5 * widthSeparator) / 4;
+        int heightStep = (client.getHeight() - 5 * heightSeparator) / 4;
 
         warriorButton = new Button(widthSeparator, heightSeparator, widthStep, heightStep, "Warrior") {
             @Override
             public void onClick() {
                 log.debug("Warrior");
-                MessageChangeJob messageChangeJob = new MessageChangeJob(Client.getInstance().getTokenKey(), gameCharId, JobType.WARRIOR);
+                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), gameCharId, JobType.WARRIOR);
                 clientMessenger.sendMessageToUserService(messageChangeJob);
             }
         };
@@ -60,7 +58,7 @@ public class ManageGameCharacterChangeJobScene implements Scene {
             @Override
             public void onClick() {
                 ManageGameCharacterChangeJobScene.log.debug("Mage");
-                MessageChangeJob messageChangeJob = new MessageChangeJob(Client.getInstance().getTokenKey(), gameCharId, JobType.MAGE);
+                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), gameCharId, JobType.MAGE);
                 clientMessenger.sendMessageToUserService(messageChangeJob);
             }
         };
@@ -74,9 +72,6 @@ public class ManageGameCharacterChangeJobScene implements Scene {
 
     }
 
-    @Override
-    public void initConnections() throws IOException {
-    }
 
     @Override
     public void update(long deltaTime) {
@@ -106,13 +101,10 @@ public class ManageGameCharacterChangeJobScene implements Scene {
         }
     }
 
-    @Override
-    public void closeConnections() throws IOException {
-    }
 
     @Override
     public void receiveMessage() {
-        Message message = Client.getInstance().receiveMessage();
+        Message message = client.receiveMessage();
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:

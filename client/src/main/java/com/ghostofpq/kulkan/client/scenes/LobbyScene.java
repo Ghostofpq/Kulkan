@@ -19,7 +19,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +29,6 @@ public class LobbyScene implements Scene {
 
     private Button acceptButton;
     private Button refuseButton;
-    private Button manageTeamButton;
-
 
     private boolean matchFound;
     private String matchId;
@@ -75,6 +72,12 @@ public class LobbyScene implements Scene {
     private CreateGameCharacterScene createGameCharacterScene;
     @Autowired
     private ManageGameCharacterScene manageGameCharacterScene;
+    @Autowired
+    private BattleScene battleScene;
+    @Autowired
+    private ShopScene shopScene;
+    @Autowired
+    private StockScene stockScene;
 
     public LobbyScene() {
     }
@@ -151,7 +154,7 @@ public class LobbyScene implements Scene {
             public void onClick() {
                 log.debug("SHOP");
                 exitLobby();
-                client.setCurrentScene(ShopScene.getInstance());
+                client.setCurrentScene(shopScene);
             }
         };
 
@@ -164,7 +167,7 @@ public class LobbyScene implements Scene {
             public void onClick() {
                 log.debug("STOCK");
                 exitLobby();
-                client.setCurrentScene(ShopScene.getInstance());
+                client.setCurrentScene(stockScene);
             }
         };
 
@@ -292,22 +295,11 @@ public class LobbyScene implements Scene {
             }
         };
 
-        manageTeamButton = new Button(550, 200, 50, 50, "MANAGE TEAM") {
-            @Override
-            public void onClick() {
-                log.debug("MANAGE TEAM");
-                exitLobby();
-                client.setCurrentScene(TeamManagementScene.getInstance());
-            }
-        };
-
-
         hudElementList.add(inputChat);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
         hudElementList.add(chat);
         hudElementList.add(quitButton);
-        hudElementList.add(manageTeamButton);
         hudElementList.add(shopButton);
         hudElementList.add(stockButton);
         hudElementList.add(optionButton);
@@ -412,9 +404,9 @@ public class LobbyScene implements Scene {
                     log.debug(" [x] GAME START");
                     exitLobby();
                     MessageGameStart messageGameStart = (MessageGameStart) message;
-                    client.setCurrentScene(BattleScene.getInstance());
-                    BattleScene.getInstance().setBattlefield(messageGameStart.getBattlefield());
-                    BattleScene.getInstance().setGameId(messageGameStart.getGameID());
+                    client.setCurrentScene(battleScene);
+                    battleScene.setBattlefield(messageGameStart.getBattlefield());
+                    battleScene.setGameId(messageGameStart.getGameID());
                     break;
                 case PLAYER_UPDATE:
                     log.debug(" [x] PLAYER_UPDATE");
@@ -531,13 +523,5 @@ public class LobbyScene implements Scene {
         if (frameClicked && !clientContext.isFullscreen()) {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
-    }
-
-    @Override
-    public void initConnections() throws IOException {
-    }
-
-    @Override
-    public void closeConnections() throws IOException {
     }
 }

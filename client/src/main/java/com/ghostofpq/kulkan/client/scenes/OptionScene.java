@@ -14,8 +14,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-
 @Slf4j
 public class OptionScene implements Scene {
     @Autowired
@@ -181,11 +179,6 @@ public class OptionScene implements Scene {
     }
 
     @Override
-    public void initConnections() throws IOException {
-
-    }
-
-    @Override
     public void update(long deltaTime) {
 
     }
@@ -238,11 +231,6 @@ public class OptionScene implements Scene {
         }
     }
 
-
-    @Override
-    public void closeConnections() throws IOException {
-
-    }
 
     @Override
     public void receiveMessage() {
