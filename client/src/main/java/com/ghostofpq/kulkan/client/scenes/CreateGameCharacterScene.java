@@ -17,15 +17,14 @@ import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageCreateNewGameCharacter;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
+import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Slf4j
 public class CreateGameCharacterScene implements Scene {
-    private static final Logger LOG = LoggerFactory.getLogger(CreateGameCharacterScene.class);
     private ClanType clanType;
     private Gender gender;
     private TextField name;
@@ -195,11 +194,11 @@ public class CreateGameCharacterScene implements Scene {
         validate = new Button(validatePosX, validatePosY, widthDesc, heightStep, "validate") {
             @Override
             public void onClick() {
-                LOG.debug("Sending a CreateGameCharacterRequest");
-                LOG.debug("Name : '{}'", name);
-                LOG.debug("Gender : '{}'", gender);
-                LOG.debug("ClanType : '{}'", clanType);
-                LOG.debug("Sending ");
+                log.debug("Sending a CreateGameCharacterRequest");
+                log.debug("Name : '{}'", name);
+                log.debug("Gender : '{}'", gender);
+                log.debug("ClanType : '{}'", clanType);
+                log.debug("Sending ");
                 Player player = client.getPlayer();
                 MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(client.getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
                 clientMessenger.sendMessageToUserService(messageCreateNewGameCharacter);
@@ -421,9 +420,9 @@ public class CreateGameCharacterScene implements Scene {
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
-                    LOG.debug("PLAYER_UPDATE");
+                    log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    LOG.debug("CREATE OK");
+                    log.debug("CREATE OK");
                     clientContext.setPlayer(response.getPlayer());
                     client.setCurrentScene(lobbyScene);
                     break;
