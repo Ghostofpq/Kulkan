@@ -49,7 +49,7 @@ public class ManageGameCharacterEquipmentScene implements Scene {
     @Autowired
     private ClientMessenger clientMessenger;
     @Autowired
-    private EquipItemScene equipItemScene;
+    private ManageGameCharacterEquipItemScene manageGameCharacterEquipItemScene;
 
     public ManageGameCharacterEquipmentScene() {
 
@@ -101,115 +101,91 @@ public class ManageGameCharacterEquipmentScene implements Scene {
                 changeToSceneEquipItem(ItemType.HELMET);
             }
         };
-        unequipHelm = new
-
-                Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 2 + heightStep, widthStep, heightStep, "Unequip") {
-                    @Override
-                    public void onClick() {
-                        unequipItemType(ItemType.HELMET);
-                    }
-                };
+        unequipHelm = new Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 2 + heightStep, widthStep, heightStep, "Unequip") {
+            @Override
+            public void onClick() {
+                unequipItemType(ItemType.HELMET);
+            }
+        };
         //ARMOR
-        equipArmor = new
-
-                Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 3 + heightStep * 2, widthStep, heightStep, "Equip") {
-                    @Override
-                    public void onClick() {
-                        changeToSceneEquipItem(ItemType.ARMOR);
-                    }
-                };
-        unequipArmor = new
-
-                Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 3 + heightStep * 2, widthStep, heightStep, "Unequip") {
-                    @Override
-                    public void onClick() {
-                        unequipItemType(ItemType.ARMOR);
-                    }
-                };
+        equipArmor = new Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 3 + heightStep * 2, widthStep, heightStep, "Equip") {
+            @Override
+            public void onClick() {
+                changeToSceneEquipItem(ItemType.ARMOR);
+            }
+        };
+        unequipArmor = new Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 3 + heightStep * 2, widthStep, heightStep, "Unequip") {
+            @Override
+            public void onClick() {
+                unequipItemType(ItemType.ARMOR);
+            }
+        };
         //NECKLACE
-        equipNecklace = new
-
-                Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 4 + heightStep * 3, widthStep, heightStep, "Equip") {
-                    @Override
-                    public void onClick() {
-                        changeToSceneEquipItem(ItemType.NECKLACE);
-                    }
-                };
-        unequipNecklace = new
-
-                Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 4 + heightStep * 3, widthStep, heightStep, "Unequip") {
-                    @Override
-                    public void onClick() {
-                        unequipItemType(ItemType.NECKLACE);
-                    }
-                };
+        equipNecklace = new Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 4 + heightStep * 3, widthStep, heightStep, "Equip") {
+            @Override
+            public void onClick() {
+                changeToSceneEquipItem(ItemType.NECKLACE);
+            }
+        };
+        unequipNecklace = new Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 4 + heightStep * 3, widthStep, heightStep, "Unequip") {
+            @Override
+            public void onClick() {
+                unequipItemType(ItemType.NECKLACE);
+            }
+        };
         //RING
-        equipRing = new
-
-                Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 5 + heightStep * 4, widthStep, heightStep, "Equip") {
-                    @Override
-                    public void onClick() {
-                        changeToSceneEquipItem(ItemType.RING);
-                    }
-                };
-        unequipRing = new
-
-                Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 5 + heightStep * 4, widthStep, heightStep, "Unequip") {
-                    @Override
-                    public void onClick() {
-                        unequipItemType(ItemType.RING);
-                    }
-                };
+        equipRing = new Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 5 + heightStep * 4, widthStep, heightStep, "Equip") {
+            @Override
+            public void onClick() {
+                changeToSceneEquipItem(ItemType.RING);
+            }
+        };
+        unequipRing = new Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 5 + heightStep * 4, widthStep, heightStep, "Unequip") {
+            @Override
+            public void onClick() {
+                unequipItemType(ItemType.RING);
+            }
+        };
         //WEAPON
-        equipWeapon = new
-
-                Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 6 + heightStep * 5, widthStep, heightStep, "Equip") {
-                    @Override
-                    public void onClick() {
-                        changeToSceneEquipItem(ItemType.WEAPON);
-                    }
-                };
-        unequipWeapon = new
-
-                Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 6 + heightStep * 5, widthStep, heightStep, "Unequip") {
-                    @Override
-                    public void onClick() {
-                        unequipItemType(ItemType.WEAPON);
-                    }
-                };
+        equipWeapon = new Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 6 + heightStep * 5, widthStep, heightStep, "Equip") {
+            @Override
+            public void onClick() {
+                changeToSceneEquipItem(ItemType.WEAPON);
+            }
+        };
+        unequipWeapon = new Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 6 + heightStep * 5, widthStep, heightStep, "Unequip") {
+            @Override
+            public void onClick() {
+                unequipItemType(ItemType.WEAPON);
+            }
+        };
         //HELD ITEM
-        equipHeldItem = new
+        equipHeldItem = new Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 7 + heightStep * 6, widthStep, heightStep, "Equip") {
+            @Override
+            public void onClick() {
+                changeToSceneEquipItem(ItemType.HELD_ITEM);
+            }
+        };
+        unequipHeldItem = new Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 7 + heightStep * 6, widthStep, heightStep, "Unequip") {
+            @Override
+            public void onClick() {
+                unequipItemType(ItemType.HELD_ITEM);
+            }
+        };
 
-                Button(widthSeparator * 2 + widthStep * 3, heightSeparator * 7 + heightStep * 6, widthStep, heightStep, "Equip") {
-                    @Override
-                    public void onClick() {
-                        changeToSceneEquipItem(ItemType.HELD_ITEM);
-                    }
-                };
-        unequipHeldItem = new
-
-                Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 7 + heightStep * 6, widthStep, heightStep, "Unequip") {
-                    @Override
-                    public void onClick() {
-                        unequipItemType(ItemType.HELD_ITEM);
-                    }
-                };
-
-        quitButton = new
-
-                Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 8 + heightStep * 7, widthStep, heightStep, "Back") {
-                    @Override
-                    public void onClick() {
-                        client.setCurrentScene(manageGameCharacterScene);
-                    }
-                };
+        quitButton = new Button(widthSeparator * 3 + widthStep * 4, heightSeparator * 8 + heightStep * 7, widthStep, heightStep, "Back") {
+            @Override
+            public void onClick() {
+                client.setCurrentScene(manageGameCharacterScene);
+            }
+        };
 
     }
 
     public void changeToSceneEquipItem(ItemType itemType) {
-        equipItemScene.setFilter(itemType);
-        equipItemScene.setGameCharId(gameCharacter.getId());
-        client.setCurrentScene(equipItemScene);
+        manageGameCharacterEquipItemScene.setFilter(itemType);
+        manageGameCharacterEquipItemScene.setGameCharId(gameCharacter.getId());
+        client.setCurrentScene(manageGameCharacterEquipItemScene);
     }
 
     public void unequipItemType(ItemType itemType) {

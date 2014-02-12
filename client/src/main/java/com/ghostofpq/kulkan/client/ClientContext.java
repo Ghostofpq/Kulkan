@@ -1,5 +1,6 @@
 package com.ghostofpq.kulkan.client;
 
+import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterChangeJobScene;
 import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipmentScene;
 import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterJobScene;
 import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterScene;
@@ -34,7 +35,8 @@ public class ClientContext {
     private ManageGameCharacterEquipmentScene manageGameCharacterEquipmentScene;
     @Autowired
     private ManageGameCharacterJobScene manageGameCharacterJobScene;
-
+    @Autowired
+    private ManageGameCharacterChangeJobScene manageGameCharacterChangeJobScene;
 
     public void init() {
         determineAvailableDisplayModes();
@@ -47,6 +49,7 @@ public class ClientContext {
         manageGameCharacterScene.setGameCharacter(gameCharacter);
         manageGameCharacterEquipmentScene.setGameCharacter(gameCharacter);
         manageGameCharacterJobScene.setGameCharacter(gameCharacter);
+        manageGameCharacterChangeJobScene.setGameCharacter(gameCharacter);
     }
 
     public boolean isFullscreen() {

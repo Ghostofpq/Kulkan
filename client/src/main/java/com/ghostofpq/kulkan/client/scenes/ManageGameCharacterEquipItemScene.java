@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class EquipItemScene implements Scene {
+public class ManageGameCharacterEquipItemScene implements Scene {
     private ItemType filter;
     private KeyValueRender itemType;
     private ObjectId gameCharId;
@@ -41,7 +41,7 @@ public class EquipItemScene implements Scene {
     @Autowired
     private ManageGameCharacterEquipmentScene manageGameCharacterEquipmentScene;
 
-    public EquipItemScene() {
+    public ManageGameCharacterEquipItemScene() {
     }
 
 
@@ -155,7 +155,7 @@ public class EquipItemScene implements Scene {
         if (null != message) {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
-                    log.debug("PLAYER_UPDATE");
+                    ManageGameCharacterEquipItemScene.log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     client.setPlayer(response.getPlayer());
                     GameCharacter gameCharacter = response.getPlayer().getGameCharWithId(gameCharId);
