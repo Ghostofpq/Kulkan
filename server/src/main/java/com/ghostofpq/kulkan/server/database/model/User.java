@@ -38,6 +38,8 @@ public class User {
     private Integer grade;
     private Integer money;
     private Inventory inventory;
+    private Integer bloodMoney;
+    private Integer numberOfStockSlots;
 
     public User() {
     }
@@ -52,6 +54,8 @@ public class User {
         this.grade = 0;
         this.money = 100;
         this.inventory = new Inventory();
+        this.bloodMoney = 0;
+        this.numberOfStockSlots = 2;
     }
 
     public ObjectId getId() {
@@ -130,6 +134,22 @@ public class User {
         this.grade = grade;
     }
 
+    public Integer getBloodMoney() {
+        return bloodMoney;
+    }
+
+    public void setBloodMoney(Integer bloodMoney) {
+        this.bloodMoney = bloodMoney;
+    }
+
+    public Integer getNumberOfStockSlots() {
+        return numberOfStockSlots;
+    }
+
+    public void setNumberOfStockSlots(Integer numberOfStockSlots) {
+        this.numberOfStockSlots = numberOfStockSlots;
+    }
+
     public void addGameCharToStock(GameCharacterDB gameCharacterDB) {
         stock.add(gameCharacterDB);
     }
@@ -189,6 +209,13 @@ public class User {
         if (null != money) {
             player.setMoney(money);
         }
+        if (null != bloodMoney) {
+            player.setBloodMoney(bloodMoney);
+        }
+        if (null != numberOfStockSlots) {
+            player.setNumberOfStockSlots(numberOfStockSlots);
+        }
+
         return player;
     }
 
@@ -221,9 +248,9 @@ public class User {
     public void equipItem(Item item, GameCharacterDB gameCharacter) {
         try {
             inventory.removeOne(item.getItemID());
-            if(item.getItemType().equals(ItemType.WEAPON)){
-                if(((Weapon)item).getWeaponType().equals(WeaponType.TWO_HANDED)){
-                    unequipItem(ItemType.HELD_ITEM,gameCharacter);
+            if (item.getItemType().equals(ItemType.WEAPON)) {
+                if (((Weapon) item).getWeaponType().equals(WeaponType.TWO_HANDED)) {
+                    unequipItem(ItemType.HELD_ITEM, gameCharacter);
                 }
             }
             gameCharacter.equipItem(item.getItemType(), item.getItemID());

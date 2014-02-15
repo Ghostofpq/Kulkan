@@ -108,11 +108,10 @@ public class StockScene implements Scene {
                 stockSlots.add(unlockSlotButton);
             }
         }
-
         int buttonWidth = 100;
         int buttonHeight = 50;
-        int posXBackButton = clientContext.getCurrentResolution().getWidth() / 2 + (buttonWidth / 2);
-        int posYBackButton = heightStep * 5;
+        int posXBackButton = clientContext.getCurrentResolution().getWidth() / 2 - (buttonWidth / 2);
+        int posYBackButton = clientContext.getCurrentResolution().getHeight() - (buttonHeight * 2);
         backButton = new Button(posXBackButton, posYBackButton, buttonWidth, buttonHeight, "BACK") {
             @Override
             public void onClick() {
@@ -180,11 +179,7 @@ public class StockScene implements Scene {
                     log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     clientContext.setPlayer(response.getPlayer());
-                    if (clientContext.getPlayer().getStock().size() == 0) {
-                        client.setCurrentScene(lobbyScene);
-                    } else {
-                        init();
-                    }
+                    init();
                     break;
             }
         }

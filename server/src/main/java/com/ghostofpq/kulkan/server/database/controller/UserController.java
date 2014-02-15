@@ -173,7 +173,7 @@ public class UserController {
 
     public User putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) {
         User user = getUserForUsername(username);
-        if (user.getStock().size() >= 12) {
+        if (user.getStock().size() + 1 > user.getNumberOfStockSlots()) {
             log.error("STOCK IS COMPLETE");
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
