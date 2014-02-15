@@ -103,7 +103,7 @@ public class ManageGameCharacterChangeJobScene implements Scene {
                 case PLAYER_UPDATE:
                     ManageGameCharacterChangeJobScene.log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    client.setPlayer(response.getPlayer());
+                    clientContext.setPlayer(response.getPlayer());
                     client.setCurrentScene(manageGameCharacterScene);
                     break;
             }

@@ -50,7 +50,7 @@ public class ManageGameCharacterEquipItemScene implements Scene {
 
         itemType = new KeyValueRender(widthSeparator, heightSeparator, widthStep * 2, heightStep, "Type", "0", 5);
 
-        List<Item> itemList = client.getPlayer().getInventory().getItemsByType(filter);
+        List<Item> itemList = clientContext.getPlayer().getInventory().getItemsByType(filter);
 
         itemButtonList = new ArrayList<Button>();
 
@@ -145,7 +145,7 @@ public class ManageGameCharacterEquipItemScene implements Scene {
                 case PLAYER_UPDATE:
                     ManageGameCharacterEquipItemScene.log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    client.setPlayer(response.getPlayer());
+                    clientContext.setPlayer(response.getPlayer());
                     client.setCurrentScene(manageGameCharacterEquipmentScene);
                     break;
             }

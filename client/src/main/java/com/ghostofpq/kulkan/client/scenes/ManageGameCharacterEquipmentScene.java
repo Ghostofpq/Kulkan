@@ -317,7 +317,7 @@ public class ManageGameCharacterEquipmentScene implements Scene {
                     ManageGameCharacterEquipmentScene.log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     ManageGameCharacterEquipmentScene.log.debug("CREATE OK");
-                    client.setPlayer(response.getPlayer());
+                    clientContext.setPlayer(response.getPlayer());
                     init();
                     break;
             }

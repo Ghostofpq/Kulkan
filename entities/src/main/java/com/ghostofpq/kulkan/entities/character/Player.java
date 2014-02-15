@@ -10,11 +10,13 @@ import java.util.List;
 public class Player implements Serializable {
     private static final long serialVersionUID = 3105715593359746378L;
     private String pseudo;
-    private int grade;
+    private Integer grade;
     private List<GameCharacter> team;
     private List<GameCharacter> stock;
     private Inventory inventory;
     private Integer money;
+    private Integer bloodMoney;
+    private Integer numberOfStockSlots;
 
     public Player(String pseudo) {
         this.pseudo = pseudo;
@@ -23,6 +25,8 @@ public class Player implements Serializable {
         stock = new ArrayList<GameCharacter>();
         inventory = new Inventory();
         money = 0;
+        bloodMoney = 0;
+        numberOfStockSlots = 2;
     }
 
     public GameCharacter getGameCharWithId(ObjectId id) {
@@ -56,11 +60,11 @@ public class Player implements Serializable {
         this.pseudo = pseudo;
     }
 
-    public int getGrade() {
+    public Integer getGrade() {
         return grade;
     }
 
-    public void setGrade(int grade) {
+    public void setGrade(Integer grade) {
         this.grade = grade;
     }
 
@@ -125,5 +129,21 @@ public class Player implements Serializable {
 
     public void setMoney(Integer money) {
         this.money = money;
+    }
+
+    public Integer getBloodMoney() {
+        return bloodMoney;
+    }
+
+    public void setBloodMoney(Integer bloodMoney) {
+        this.bloodMoney = bloodMoney;
+    }
+
+    public Integer getNumberOfStockSlots() {
+        return numberOfStockSlots;
+    }
+
+    public void setNumberOfStockSlots(Integer numberOfStockSlots) {
+        this.numberOfStockSlots = numberOfStockSlots;
     }
 }

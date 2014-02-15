@@ -126,7 +126,7 @@ public class ManageGameCharacterScene implements Scene {
     }
 
     private void actionDelete() {
-        Player player = client.getPlayer();
+        Player player = clientContext.getPlayer();
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         if (player.getTeam().contains(gameCharacter)) {
             MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(client.getTokenKey(), player.getPseudo(), gameCharacter.getId());
@@ -138,7 +138,7 @@ public class ManageGameCharacterScene implements Scene {
     }
 
     private void actionStock() {
-        Player player = client.getPlayer();
+        Player player = clientContext.getPlayer();
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(client.getTokenKey(), player.getPseudo(), gameCharacter.getId());
         clientMessenger.sendMessageToUserService(putGameCharacterFromTeamToStock);
@@ -212,8 +212,12 @@ public class ManageGameCharacterScene implements Scene {
             switch (message.getType()) {
                 case PLAYER_UPDATE:
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    client.setPlayer(response.getPlayer());
-                    init();
+                    clientContext.setPlayer(response.getPlayer());
+                    if (null == clientContext.getSelectedGameCharacter()) {
+                        client.setCurrentScene(lobbyScene);
+                    } else {
+                        init();
+                    }
                     break;
             }
         }

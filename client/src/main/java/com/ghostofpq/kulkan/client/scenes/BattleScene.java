@@ -751,7 +751,7 @@ public class BattleScene implements Scene {
                         break;
                     case PLAYER_UPDATE:
                         MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
-                        client.setPlayer(messagePlayerUpdate.getPlayer());
+                        clientContext.setPlayer(messagePlayerUpdate.getPlayer());
                         break;
                     case CAPACITY_FIREBALL:
                         manageCapacityFireball(message);

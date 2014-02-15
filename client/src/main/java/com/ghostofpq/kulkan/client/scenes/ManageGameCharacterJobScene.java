@@ -147,7 +147,7 @@ public class ManageGameCharacterJobScene implements Scene {
                     log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     log.debug("CREATE OK");
-                    client.setPlayer(response.getPlayer());
+                    clientContext.setPlayer(response.getPlayer());
                     init();
                     break;
             }

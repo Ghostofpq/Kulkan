@@ -3,42 +3,49 @@ package com.ghostofpq.kulkan.client.scenes;
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
+import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
-import com.ghostofpq.kulkan.client.graphics.HUD.TextArea;
+import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
-import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
-import com.ghostofpq.kulkan.entities.inventory.item.Item;
+import com.ghostofpq.kulkan.client.utils.GraphicsManager;
+import com.ghostofpq.kulkan.client.utils.TextureKey;
+import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.user.MessageBuyItem;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
+import com.ghostofpq.kulkan.entities.messages.user.MessagePutGameCharacterFromStockToTeam;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public class StockScene implements Scene {
-    private KeyValueRender money;
-    private KeyValueRender selectedItemName;
-    private KeyValueRender itemPrice;
-    private KeyValueRender itemStock;
-    private Button buyItem;
-    private Button quitButton;
-    private Item selectedItem;
-    private TextArea itemDescription;
+    private KeyValueRender bloodMoney;
+    private List<Button> stockSlots;
+
+    private Button backButton;
+
     private int widthSeparator;
     private int heightSeparator;
-    private List<Button> buttons;
     @Autowired
     private Client client;
     @Autowired
     private ClientContext clientContext;
     @Autowired
     private ClientMessenger clientMessenger;
+    @Autowired
+    private LobbyScene lobbyScene;
+    // BACKGROUND
+    private Background background;
+    // FRAME
+    private Frame frame;
+    private int x;
+    private int y;
+    private boolean frameClicked;
 
     public StockScene() {
     }
@@ -46,85 +53,79 @@ public class StockScene implements Scene {
 
     @Override
     public void init() {
-        widthSeparator = client.getWidth() / 20;
-        heightSeparator = client.getHeight() / 20;
-        buttons = new ArrayList<Button>();
-        selectedItem = null;
-        int widthStep = (client.getWidth() - widthSeparator) / 5;
-        int heightStep = (client.getHeight() - 8 * heightSeparator) / 7;
-        selectedItemName = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Item", "0", 5);
-        itemDescription = new TextArea(widthSeparator + 3 * widthStep, heightSeparator * 2 + 1 * heightStep, widthStep * 2, heightStep, "optimus_princeps_16");
-        itemPrice = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 3 + 2 * heightStep, widthStep * 2, heightStep, "Price", "0", 5);
-        money = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 4 + 3 * heightStep, widthStep * 2, heightStep, "Money", "0", 5);
-        itemStock = new KeyValueRender(widthSeparator + 3 * widthStep, heightSeparator * 5 + 4 * heightStep, widthStep * 2, heightStep, "Stock", "0", 5);
-        buyItem = new Button(widthSeparator + 3 * widthStep, heightSeparator * 6 + 5 * heightStep, widthStep * 2, heightStep, "Buy") {
-            @Override
-            public void onClick() {
-                buySelectedItem();
+        background = new Background(TextureKey.BACKGROUND_BASIC);
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
+
+        int widthStep = clientContext.getCurrentResolution().getWidth() / 10;
+        int heightStep = clientContext.getCurrentResolution().getHeight() / 10;
+        stockSlots = new ArrayList<Button>();
+        int numberOfCharPerLine = 5;
+
+        int stockCharacterWidth = clientContext.getCurrentResolution().getWidth() / 10;
+        int stockCharacterHeight = clientContext.getCurrentResolution().getHeight() / 3;
+        int startOfLinePoxX = clientContext.getCurrentResolution().getWidth() / 10;
+        int startOfLinePoxY = clientContext.getCurrentResolution().getHeight() / 12;
+        int paddingX = (clientContext.getCurrentResolution().getWidth() - numberOfCharPerLine * stockCharacterWidth - 2 * startOfLinePoxX) / numberOfCharPerLine;
+        int paddingY = clientContext.getCurrentResolution().getHeight() / 12;
+
+        for (int i = 0; i < 10; i++) {
+            int posX = (i % numberOfCharPerLine) * (paddingX + stockCharacterWidth) + startOfLinePoxX;
+            int posY;
+            if (i < numberOfCharPerLine) {
+                posY = startOfLinePoxY;
+            } else {
+                posY = startOfLinePoxY + paddingY + stockCharacterHeight;
             }
-        };
+            if (i < clientContext.getPlayer().getNumberOfStockSlots()) {
+                if (clientContext.getPlayer().getStock().size() > i && null != clientContext.getPlayer().getStock().get(i)) {
+                    GameCharacter gameCharacter = clientContext.getPlayer().getStock().get(i);
+                    String name = gameCharacter.getName();
+                    TextureKey textureKey = TextureKey.LOBBY_CHAR_SHADOW;
+                    final ObjectId id = gameCharacter.getId();
+                    Button stockCharacterButton = new Button(posX, posY, stockCharacterWidth, stockCharacterHeight, name, textureKey, textureKey) {
+                        @Override
+                        public void onClick() {
+                            actionReactivateCharacter(id);
+                        }
+                    };
+                    stockSlots.add(stockCharacterButton);
+                } else {
+                    Button emptySlotButton = new Button(posX, posY, stockCharacterWidth, stockCharacterHeight, "EMPTY", null, null) {
+                        @Override
+                        public void onClick() {
 
-        quitButton = new Button(widthSeparator + 3 * widthStep, heightSeparator * 7 + 6 * heightStep, widthStep * 2, heightStep, "Back") {
-            @Override
-            public void onClick() {
-                client.setCurrentScene(client.getLobbyScene());
-            }
-        };
-
-        int widthOfCanvas = 3 * widthStep;
-        int heightOfCanvas = client.getHeight();
-
-        int widthStepOfCanvas = (widthOfCanvas - 4 * widthSeparator) / 3;
-        int heightStepOfCanvas = (heightOfCanvas - 5 * heightSeparator) / 4;
-
-        // it will be images, but for now names should do great
-        Map<String, String> itemNamesToId = new HashMap<String, String>();
-        itemNamesToId.put("000", "Cloth armor");
-        itemNamesToId.put("001", "Iron Helm");
-        itemNamesToId.put("002", "Yew wand");
-        itemNamesToId.put("003", "Stone club");
-        itemNamesToId.put("004", "Sling");
-        itemNamesToId.put("005", "Life Ring");
-        itemNamesToId.put("006", "Strength Ring");
-        itemNamesToId.put("007", "Will Necklace");
-        itemNamesToId.put("008", "Agility Necklace");
-        itemNamesToId.put("009", "Wooden Shield");
-        itemNamesToId.put("010", "Two Handed Sword");
-
-        int posX = widthSeparator;
-        int posY = heightSeparator;
-        for (final String itemId : itemNamesToId.keySet()) {
-            final String itemName = itemNamesToId.get(itemId);
-            Button button = new Button(posX, posY, widthStepOfCanvas, heightStepOfCanvas, itemName) {
-                @Override
-                public void onClick() {
-                    setSelectedItem(itemId);
+                        }
+                    };
+                    stockSlots.add(emptySlotButton);
                 }
-            };
-            buttons.add(button);
+            } else {
+                Button unlockSlotButton = new Button(posX, posY, stockCharacterWidth, stockCharacterHeight, "UNLOCK", null, null) {
+                    @Override
+                    public void onClick() {
 
-            posX += widthStepOfCanvas + widthSeparator;
-            if (posX + widthStepOfCanvas >= widthOfCanvas) {
-                posX = widthSeparator;
-                posY += heightStepOfCanvas + heightSeparator;
+                    }
+                };
+                stockSlots.add(unlockSlotButton);
             }
         }
+
+        int buttonWidth = 100;
+        int buttonHeight = 50;
+        int posXBackButton = clientContext.getCurrentResolution().getWidth() / 2 + (buttonWidth / 2);
+        int posYBackButton = heightStep * 5;
+        backButton = new Button(posXBackButton, posYBackButton, buttonWidth, buttonHeight, "BACK") {
+            @Override
+            public void onClick() {
+                client.setCurrentScene(lobbyScene);
+            }
+        };
     }
 
-    private void setSelectedItem(String itemId) {
-        selectedItem = ItemFactory.createItem(itemId);
-        selectedItemName.setValue(selectedItem.getName());
-        itemDescription.clear();
-        itemDescription.addLine(selectedItem.getDescription());
-        itemPrice.setValue(String.valueOf(selectedItem.getPrice()));
-        itemStock.setValue(String.valueOf(client.getPlayer().getInventory().getNumberOf(itemId)));
-        money.setValue(String.valueOf(client.getPlayer().getMoney()));
+    private void actionReactivateCharacter(ObjectId gameCharacterId) {
+        MessagePutGameCharacterFromStockToTeam messagePutGameCharacterFromStockToTeam = new MessagePutGameCharacterFromStockToTeam(clientContext.getTokenKey(), clientContext.getPlayer().getPseudo(), gameCharacterId);
+        clientMessenger.sendMessageToUserService(messagePutGameCharacterFromStockToTeam);
     }
 
-    private void buySelectedItem() {
-        MessageBuyItem messageBuyItem = new MessageBuyItem(client.getTokenKey(), selectedItem.getItemID());
-        clientMessenger.sendMessageToUserService(messageBuyItem);
-    }
 
     @Override
     public void update(long deltaTime) {
@@ -132,37 +133,41 @@ public class StockScene implements Scene {
 
     @Override
     public void render() {
-        for (Button button : buttons) {
+        GraphicsManager.getInstance().make2D();
+        background.draw();
+        for (Button button : stockSlots) {
             button.draw();
         }
-
-        if (null != selectedItem) {
-            itemPrice.draw();
-            selectedItemName.draw();
-            itemDescription.draw();
-            itemStock.draw();
-            buyItem.draw();
-            money.draw();
-        }
-        quitButton.draw();
+        backButton.draw();
+        frame.draw();
     }
 
     @Override
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (quitButton.isClicked()) {
-                    quitButton.onClick();
-                } else if (buyItem.isClicked()) {
-                    buyItem.onClick();
-                } else {
-                    for (Button button : buttons) {
-                        if (button.isClicked()) {
-                            button.onClick();
-                        }
+                for (Button button : stockSlots) {
+                    if (button.isClicked()) {
+                        button.onClick();
                     }
                 }
+                if (backButton.isClicked()) {
+                    backButton.onClick();
+                } else if (frame.isClicked()) {
+                    if (x == -1 && y == -1) {
+                        x = Mouse.getX();
+                        y = (Display.getHeight() - Mouse.getY());
+                        frameClicked = true;
+                    }
+                }
+            } else if (!Mouse.isButtonDown(0)) {
+                frameClicked = false;
+                x = -1;
+                y = -1;
             }
+        }
+        if (frameClicked && !clientContext.isFullscreen()) {
+            Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
     }
 
@@ -174,9 +179,12 @@ public class StockScene implements Scene {
                 case PLAYER_UPDATE:
                     log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    client.setPlayer(response.getPlayer());
-                    itemStock.setValue(String.valueOf(client.getPlayer().getInventory().getNumberOf(selectedItem.getItemID())));
-                    money.setValue(String.valueOf(client.getPlayer().getMoney()));
+                    clientContext.setPlayer(response.getPlayer());
+                    if (clientContext.getPlayer().getStock().size() == 0) {
+                        client.setCurrentScene(lobbyScene);
+                    } else {
+                        init();
+                    }
                     break;
             }
         }

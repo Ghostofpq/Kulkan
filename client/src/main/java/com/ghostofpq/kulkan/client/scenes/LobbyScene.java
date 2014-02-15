@@ -411,7 +411,7 @@ public class LobbyScene implements Scene {
                 case PLAYER_UPDATE:
                     log.debug(" [x] PLAYER_UPDATE");
                     MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
-                    client.setPlayer(messagePlayerUpdate.getPlayer());
+                    clientContext.setPlayer(messagePlayerUpdate.getPlayer());
                     break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());

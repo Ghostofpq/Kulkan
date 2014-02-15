@@ -205,15 +205,6 @@ public class Client {
         this.currentScene.init();
     }
 
-    public Player getPlayer() {
-        return clientContext.getPlayer();
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-        clientContext.setPlayer(player);
-    }
-
     public Connection getConnection() {
         return clientMessenger.getConnection();
     }

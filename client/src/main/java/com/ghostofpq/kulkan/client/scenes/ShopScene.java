@@ -117,8 +117,8 @@ public class ShopScene implements Scene {
         itemDescription.clear();
         itemDescription.addLine(selectedItem.getDescription());
         itemPrice.setValue(String.valueOf(selectedItem.getPrice()));
-        itemStock.setValue(String.valueOf(client.getPlayer().getInventory().getNumberOf(itemId)));
-        money.setValue(String.valueOf(client.getPlayer().getMoney()));
+        itemStock.setValue(String.valueOf(clientContext.getPlayer().getInventory().getNumberOf(itemId)));
+        money.setValue(String.valueOf(clientContext.getPlayer().getMoney()));
     }
 
     private void buySelectedItem() {
@@ -174,9 +174,9 @@ public class ShopScene implements Scene {
                 case PLAYER_UPDATE:
                     log.debug("PLAYER_UPDATE");
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
-                    client.setPlayer(response.getPlayer());
-                    itemStock.setValue(String.valueOf(client.getPlayer().getInventory().getNumberOf(selectedItem.getItemID())));
-                    money.setValue(String.valueOf(client.getPlayer().getMoney()));
+                    clientContext.setPlayer(response.getPlayer());
+                    itemStock.setValue(String.valueOf(clientContext.getPlayer().getInventory().getNumberOf(selectedItem.getItemID())));
+                    money.setValue(String.valueOf(clientContext.getPlayer().getMoney()));
                     break;
             }
         }
