@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
+import com.ghostofpq.kulkan.entities.job.warrior.Warrior;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
@@ -64,10 +65,14 @@ public abstract class Job implements Serializable {
                 if (!skillTreeStatus.get(capacity.getName())) {
                     switch (capacity.getType()) {
                         case AMELIORATION:
-                            unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                            if (!unlockedAmeliorationPrimaries.contains((AmeliorationPrimary) capacity)) {
+                                unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                            }
                             break;
                         case MOVE:
-                            unlockedMoves.add((Move) capacity);
+                            if (!unlockedMoves.contains((Move) capacity)) {
+                                unlockedMoves.add((Move) capacity);
+                            }
                             break;
                     }
                 }

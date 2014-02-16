@@ -55,4 +55,24 @@ public class Move extends Capacity {
     public void setAreaOfEffect(Range areaOfEffect) {
         this.areaOfEffect = areaOfEffect;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Move move = (Move) o;
+
+        if (moveName != move.moveName) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (moveName != null ? moveName.hashCode() : 0);
+        return result;
+    }
 }

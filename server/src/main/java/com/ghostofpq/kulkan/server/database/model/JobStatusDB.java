@@ -4,7 +4,7 @@ package com.ghostofpq.kulkan.server.database.model;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.Mage;
-import com.ghostofpq.kulkan.entities.job.Warrior;
+import com.ghostofpq.kulkan.entities.job.warrior.Warrior;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;

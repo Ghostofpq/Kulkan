@@ -1,6 +1,8 @@
-package com.ghostofpq.kulkan.entities.job;
+package com.ghostofpq.kulkan.entities.job.warrior;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.job.Job;
+import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.capacity.*;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
@@ -30,39 +32,28 @@ public class Warrior extends Job {
 
         Move empower = new Move("Empower", "+10 Strength", 0, MoveRangeType.SELF, MoveName.EMPOWER, 20);
         skillTree.add(empower);
-        PrimaryCharacteristics strength1C = new PrimaryCharacteristics(5, 0, 0,
-                0, 0, 0);
-        AmeliorationPrimary strength1 = new AmeliorationPrimary("S1",
-                "Add 5 strength", strength1C, 10);
+
+        PrimaryCharacteristics strength1C = new PrimaryCharacteristics(5, 0, 0, 0, 0, 0);
+        AmeliorationPrimary strength1 = new AmeliorationPrimary("S1", "Add 5 strength", strength1C, 10);
         skillTree.add(strength1);
 
-        PrimaryCharacteristics strength2C = new PrimaryCharacteristics(10, 0,
-                0, 0, 0, 0);
-        AmeliorationPrimary strength2 = new AmeliorationPrimary("S2",
-                "Add 10 strength", strength2C, 150);
+        PrimaryCharacteristics strength2C = new PrimaryCharacteristics(10, 0, 0, 0, 0, 0);
+        AmeliorationPrimary strength2 = new AmeliorationPrimary("S2", "Add 10 strength", strength2C, 150);
         skillTree.add(strength2);
 
-        PrimaryCharacteristics strength3C = new PrimaryCharacteristics(20, 0,
-                0, 0, 0, 0);
-        AmeliorationPrimary strength3 = new AmeliorationPrimary("S3",
-                "Add 20 strength", strength3C, 500);
+        PrimaryCharacteristics strength3C = new PrimaryCharacteristics(20, 0, 0, 0, 0, 0);
+        AmeliorationPrimary strength3 = new AmeliorationPrimary("S3", "Add 20 strength", strength3C, 500);
         skillTree.add(strength3);
 
-        PrimaryCharacteristics endurance1C = new PrimaryCharacteristics(0, 5,
-                0, 0, 0, 0);
-        AmeliorationPrimary endurance1 = new AmeliorationPrimary("E1",
-                "Add 5 endurance", endurance1C, 50);
+        PrimaryCharacteristics endurance1C = new PrimaryCharacteristics(0, 5, 0, 0, 0, 0);
+        AmeliorationPrimary endurance1 = new AmeliorationPrimary("E1", "Add 5 endurance", endurance1C, 50);
         skillTree.add(endurance1);
 
-        PrimaryCharacteristics endurance2C = new PrimaryCharacteristics(0, 10,
-                0, 0, 0, 0);
-        AmeliorationPrimary endurance2 = new AmeliorationPrimary("E2",
-                "Add 10 endurance", endurance2C, 150);
+        PrimaryCharacteristics endurance2C = new PrimaryCharacteristics(0, 10, 0, 0, 0, 0);
+        AmeliorationPrimary endurance2 = new AmeliorationPrimary("E2", "Add 10 endurance", endurance2C, 150);
         skillTree.add(endurance2);
-        PrimaryCharacteristics endurance3C = new PrimaryCharacteristics(0, 20,
-                0, 0, 0, 0);
-        AmeliorationPrimary endurance3 = new AmeliorationPrimary("E3",
-                "Add 20 endurance", endurance3C, 500);
+        PrimaryCharacteristics endurance3C = new PrimaryCharacteristics(0, 20, 0, 0, 0, 0);
+        AmeliorationPrimary endurance3 = new AmeliorationPrimary("E3", "Add 20 endurance", endurance3C, 500);
         skillTree.add(endurance3);
 
         strength2.addPrerequisite(strength1);

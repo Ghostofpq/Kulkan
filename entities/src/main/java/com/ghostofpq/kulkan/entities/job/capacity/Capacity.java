@@ -105,4 +105,24 @@ public abstract class Capacity implements Serializable {
     public void setPrerequisites(List<Capacity> prerequisites) {
         this.prerequisites = prerequisites;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Capacity capacity = (Capacity) o;
+
+        if (name != null ? !name.equals(capacity.name) : capacity.name != null) return false;
+        if (type != capacity.type) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
+    }
 }

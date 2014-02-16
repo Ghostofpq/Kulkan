@@ -118,11 +118,11 @@ public class Client {
     public void run() throws InterruptedException {
         while (!requestClose && !requestUpdateDisplayMode) {
             update(deltaTimeInMillis());
+            lastTimeTick = Sys.getTime();
             currentScene.manageInput();
             currentScene.receiveMessage();
             render();
-            lastTimeTick = Sys.getTime();
-            Thread.sleep(1);
+            //Thread.sleep(1);
         }
         if (requestUpdateDisplayMode) {
             updateDisplayMode();
@@ -154,10 +154,10 @@ public class Client {
 
     private long deltaTimeInMillis() {
         long delta = Sys.getTime() - lastTimeTick;
-        if (delta >= 50) {
+        if (delta >= 60) {
             log.warn("Delta time is long : {}", delta);
         }
-        return Sys.getTime() - lastTimeTick;
+        return delta;
     }
 
     public void update(long deltaTime) {
