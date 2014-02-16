@@ -174,8 +174,7 @@ public class OptionScene implements Scene {
                 }
                 break;
         }
-        resolution.setText(text);
-
+        resolution.setLabel(text);
     }
 
     @Override

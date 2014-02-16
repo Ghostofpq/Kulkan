@@ -53,6 +53,8 @@ public class LoginScene implements Scene {
     private List<HUDElement> hudElementList;
     // BACKGROUND
     private Background background;
+    // POPUP
+    private PopUp popUp;
     // FRAME
     private Frame frame;
     private int x;
@@ -147,10 +149,16 @@ public class LoginScene implements Scene {
                         client.setTokenKey(response.getTokenKey());
                         client.setCurrentScene(lobbyScene);
                     } else {
+                        List<String> options = new ArrayList<String>();
+                        options.add("OK");
+                        popUp = new PopUp(options, "AUTH KO : BAD INFO");
                         log.debug("AUTH KO : BAD INFO");
                     }
                 }
             } else {
+                List<String> options = new ArrayList<String>();
+                options.add("OK");
+                popUp = new PopUp(options, "SERVER DOWN");
                 log.debug("SERVER DOWN");
             }
         } catch (InterruptedException e) {
@@ -223,6 +231,9 @@ public class LoginScene implements Scene {
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
         }
+        if (null != popUp) {
+            popUp.draw();
+        }
         frame.draw();
     }
 
@@ -231,14 +242,23 @@ public class LoginScene implements Scene {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
                 boolean hudElementIsClicked = false;
-                for (HUDElement hudElement : hudElementList) {
-                    if (hudElement.isClicked()) {
-                        setFocusOn(hudElementList.indexOf(hudElement));
-                        hudElementIsClicked = true;
-                        if (hudElement instanceof Button) {
-                            ((Button) hudElement).onClick();
+                if (null == popUp) {
+                    for (HUDElement hudElement : hudElementList) {
+                        if (hudElement.isClicked()) {
+                            setFocusOn(hudElementList.indexOf(hudElement));
+                            hudElementIsClicked = true;
+                            if (hudElement instanceof Button) {
+                                ((Button) hudElement).onClick();
+                            }
+                            break;
                         }
-                        break;
+                    }
+                } else if (popUp.isClicked()) {
+                    String onClick = popUp.onClick();
+                    if (null != onClick) {
+                        if (onClick.equals("OK")) {
+                            popUp = null;
+                        }
                     }
                 }
                 if (!hudElementIsClicked && frame.isClicked()) {

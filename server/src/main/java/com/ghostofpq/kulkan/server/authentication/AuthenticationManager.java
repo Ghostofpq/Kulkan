@@ -113,6 +113,14 @@ public class AuthenticationManager implements Runnable {
                     code);
 
             channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
+        } else {
+            MessageErrorCode code = MessageErrorCode.BAD_LOGIN_INFORMATIONS;
+            MessageAuthenticationResponse authenticationResponse = new MessageAuthenticationResponse(
+                    null,
+                    null,
+                    null,
+                    code);
+            channelAuthenticating.basicPublish("", props.getReplyTo(), replyProps, authenticationResponse.getBytes());
         }
     }
 
