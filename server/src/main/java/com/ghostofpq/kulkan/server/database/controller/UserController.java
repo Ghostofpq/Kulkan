@@ -111,22 +111,30 @@ public class UserController {
         return user;
     }
 
-    public User createGameChar(String username, String tokenKey, String name, ClanType clanType, Gender gender) {
-        User user = getUserForUsername(username);
-        GameCharacter gameCharacter = new GameCharacter(name, clanType, gender);
-        GameCharacterDB gameCharacterDB = new GameCharacterDB(gameCharacter);
-        if (tokenKey.equals(user.getTokenKey())) {
-            log.debug("createGameChar : {}", username);
-            if (user.getTeam().size() >= 4) {
-                log.error("TEAM IS COMPLETE");
-            } else {
-                user.addGameCharToTeam(gameCharacterDB);
-                user = userRepository.save(user);
-            }
+    public ErrorCode createGameChar(String username, String tokenKey, String name, ClanType clanType, Gender gender) {
+        ErrorCode result;
+        if (name.isEmpty()) {
+            result = ErrorCode.NAME_IS_EMPTY;
         } else {
-            log.error("verification failed");
+            User user = getUserForUsername(username);
+            GameCharacter gameCharacter = new GameCharacter(name, clanType, gender);
+            GameCharacterDB gameCharacterDB = new GameCharacterDB(gameCharacter);
+            if (tokenKey.equals(user.getTokenKey())) {
+                log.debug("createGameChar : {}", username);
+                if (user.getTeam().size() >= 4) {
+                    log.error("TEAM IS COMPLETE");
+                    result = ErrorCode.TEAM_IS_FULL;
+                } else {
+                    user.addGameCharToTeam(gameCharacterDB);
+                    user = userRepository.save(user);
+                    result = ErrorCode.OK;
+                }
+            } else {
+                log.error("verification failed");
+                result = ErrorCode.VERIFICATION_FAILED;
+            }
         }
-        return user;
+        return result;
     }
 
     public User removeGameCharFromTeam(String username, String tokenKey, ObjectId gameCharacterId) {
@@ -328,6 +336,14 @@ public class UserController {
         user.updateTeam(player.getTeam());
         user = userRepository.save(user);
         return user;
+    }
+
+    public enum ErrorCode {
+        OK,
+        VERIFICATION_FAILED,
+        NAME_IS_EMPTY,
+        TEAM_IS_FULL,
+        STOCK_IS_FULL;
     }
 
     public void setTokenKeySize(Integer tokenKeySize) {

@@ -6,6 +6,7 @@ import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
+import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.InputManager;
@@ -16,12 +17,16 @@ import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.MessageCreateNewGameCharacter;
+import com.ghostofpq.kulkan.entities.messages.user.MessageError;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class CreateGameCharacterScene implements Scene {
@@ -47,6 +52,8 @@ public class CreateGameCharacterScene implements Scene {
     private int heightStep;
     // BACKGROUND
     private Background background;
+    // POPUP
+    private PopUp popUp;
     // FRAME
     private Frame frame;
     private int x;
@@ -346,6 +353,11 @@ public class CreateGameCharacterScene implements Scene {
         name.draw();
         validate.draw();
         quit.draw();
+
+        if (null != popUp) {
+            popUp.draw();
+        }
+
         frame.draw();
     }
 
@@ -353,30 +365,40 @@ public class CreateGameCharacterScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (male.isClicked()) {
-                    male.onClick();
-                } else if (female.isClicked()) {
-                    female.onClick();
-                } else if (gorilla.isClicked()) {
-                    gorilla.onClick();
-                } else if (jaguar.isClicked()) {
-                    jaguar.onClick();
-                } else if (turtle.isClicked()) {
-                    turtle.onClick();
-                } else if (monkey.isClicked()) {
-                    monkey.onClick();
-                } else if (panther.isClicked()) {
-                    panther.onClick();
-                } else if (lizard.isClicked()) {
-                    lizard.onClick();
-                } else if (ara.isClicked()) {
-                    ara.onClick();
-                } else if (eagle.isClicked()) {
-                    eagle.onClick();
-                } else if (validate.isClicked()) {
-                    validate.onClick();
-                } else if (quit.isClicked()) {
-                    quit.onClick();
+                if (null == popUp) {
+                    if (male.isClicked()) {
+                        male.onClick();
+                    } else if (female.isClicked()) {
+                        female.onClick();
+                    } else if (gorilla.isClicked()) {
+                        gorilla.onClick();
+                    } else if (jaguar.isClicked()) {
+                        jaguar.onClick();
+                    } else if (turtle.isClicked()) {
+                        turtle.onClick();
+                    } else if (monkey.isClicked()) {
+                        monkey.onClick();
+                    } else if (panther.isClicked()) {
+                        panther.onClick();
+                    } else if (lizard.isClicked()) {
+                        lizard.onClick();
+                    } else if (ara.isClicked()) {
+                        ara.onClick();
+                    } else if (eagle.isClicked()) {
+                        eagle.onClick();
+                    } else if (validate.isClicked()) {
+                        validate.onClick();
+                    } else if (quit.isClicked()) {
+                        quit.onClick();
+                    }
+                } else if (popUp.isClicked()) {
+                    String onClick = popUp.onClick();
+                    if (null != onClick) {
+                        if (onClick.equals("OK")) {
+                            popUp = null;
+                        }
+                    }
+
                 } else if (frame.isClicked()) {
                     if (x == -1 && y == -1) {
                         x = Mouse.getX();
@@ -426,6 +448,11 @@ public class CreateGameCharacterScene implements Scene {
                     clientContext.setPlayer(response.getPlayer());
                     client.setCurrentScene(lobbyScene);
                     break;
+                case ERROR:
+                    List<String> options = new ArrayList<String>();
+                    options.add("OK");
+                    MessageError messageError = (MessageError) message;
+                    popUp = new PopUp(options, messageError.getError());
             }
         }
     }

@@ -8,6 +8,7 @@ import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
+import com.ghostofpq.kulkan.server.database.controller.UserController.ErrorCode;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -285,21 +286,35 @@ public class UserService implements Runnable {
         String name = messageCreateNewGameCharacter.getName();
         Gender gender = messageCreateNewGameCharacter.getGender();
         ClanType clanType = messageCreateNewGameCharacter.getClanType();
-        JobType currentJob = JobType.WARRIOR;
 
-        if (null != name && null != gender && null != clanType && !name.isEmpty()) {
+        if (null != name && null != gender && null != clanType) {
             log.debug("Received a CreateGameCharacterRequest from [{}]", tokenKey);
             log.debug("Name : '{}'", name);
             log.debug("Gender : '{}'", gender);
             log.debug("ClanType : '{}'", clanType);
-            User user = userController.createGameChar(messageCreateNewGameCharacter.getUsername(), tokenKey, name, clanType, gender);
-            Player player = user.toPlayer();
 
-            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+
+            ErrorCode result = userController.createGameChar(messageCreateNewGameCharacter.getUsername(), tokenKey, name, clanType, gender);
+
+            Message response;
+
+            if (result == ErrorCode.OK) {
+                User user = userController.getUserForUsername(messageCreateNewGameCharacter.getUsername());
+                Player player = user.toPlayer();
+                response = new MessagePlayerUpdate(player);
+            } else if (result == ErrorCode.NAME_IS_EMPTY) {
+                response = new MessageError("Please type in a name.");
+            } else if (result == ErrorCode.VERIFICATION_FAILED) {
+                response = new MessageError("Verification failed. Please restart the game.");
+            } else if (result == ErrorCode.TEAM_IS_FULL) {
+                response = new MessageError("Team is full. Put some of your characters into stock.");
+            } else {
+                response = new MessageError(new StringBuilder().append("Unexpected return for createGameChar : ").append(result).toString());
+            }
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
             channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
         } else {
             log.error("Received a bugged CreateGameCharacterRequest from [{}]", tokenKey);
             log.error("Name : '{}'", name);

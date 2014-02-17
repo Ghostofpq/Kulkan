@@ -69,6 +69,7 @@ public enum MessageType implements Serializable {
     EQUIP_ITEM,
     UNEQUIP_ITEM,
     PLAYER_UPDATE,
+    ERROR,
 
     PING,
     PONG,
