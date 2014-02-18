@@ -8,10 +8,12 @@ import org.bson.types.ObjectId;
 public class MessageChangeJob extends ClientMessage {
     private ObjectId gameCharId;
     private JobType newJob;
+    private String username;
 
-    public MessageChangeJob(String keyToken, ObjectId gameCharId, JobType newJob) {
+    public MessageChangeJob(String keyToken, String username, ObjectId gameCharId, JobType newJob) {
         this.type = MessageType.CHARACTER_CHANGE_JOB;
         this.keyToken = keyToken;
+        this.username = username;
         this.gameCharId = gameCharId;
         this.newJob = newJob;
     }
@@ -24,4 +26,7 @@ public class MessageChangeJob extends ClientMessage {
         return newJob;
     }
 
+    public String getUsername() {
+        return username;
+    }
 }

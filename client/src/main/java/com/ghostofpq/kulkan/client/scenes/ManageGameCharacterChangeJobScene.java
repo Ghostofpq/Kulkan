@@ -42,7 +42,7 @@ public class ManageGameCharacterChangeJobScene implements Scene {
             @Override
             public void onClick() {
                 log.debug("Warrior");
-                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), clientContext.getSelectedCharacterId(), JobType.WARRIOR);
+                MessageChangeJob messageChangeJob = new MessageChangeJob(clientContext.getTokenKey(), clientContext.getPlayer().getPseudo(), clientContext.getSelectedCharacterId(), JobType.WARRIOR);
                 clientMessenger.sendMessageToUserService(messageChangeJob);
             }
         };
@@ -51,7 +51,7 @@ public class ManageGameCharacterChangeJobScene implements Scene {
             @Override
             public void onClick() {
                 ManageGameCharacterChangeJobScene.log.debug("Mage");
-                MessageChangeJob messageChangeJob = new MessageChangeJob(client.getTokenKey(), clientContext.getSelectedCharacterId(), JobType.MAGE);
+                MessageChangeJob messageChangeJob = new MessageChangeJob(clientContext.getTokenKey(), clientContext.getPlayer().getPseudo(), clientContext.getSelectedCharacterId(), JobType.MAGE);
                 clientMessenger.sendMessageToUserService(messageChangeJob);
             }
         };

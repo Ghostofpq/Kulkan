@@ -124,28 +124,33 @@ public class UserController {
      * @param gameCharacterId the id of the GameCharacter to handle
      * @param newJob          the job to set to the GameCharacter
      * @return ErrorCode.OK if everything went well<br/>
-     * ErrorCode.VERIFICATION_FAILED if the tokenKey was not found<br/>
+     * ErrorCode.VERIFICATION_FAILED iif the tokenKey and the actual token of user are different<br/>
+     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
      * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
      */
-    public ErrorCode setNewJobForGameChar(String tokenKey, ObjectId gameCharacterId, JobType newJob) {
+    public ErrorCode setNewJobForGameChar(String username, String tokenKey, ObjectId gameCharacterId, JobType newJob) {
         ErrorCode result;
         // Get user for username
-        User user = getUserForTokenKey(tokenKey);
+        User user = getUserForUsername(tokenKey);
         if (null != user) {
             // Check if username and token key are ok
-            // Get the GameCharacterDB associated with gameCharacterId parameter
-            GameCharacterDB gameCharacterDB = getGameCharacterDB(user, gameCharacterId);
-            if (null != gameCharacterDB) {
-                // Set the new Job to the GameCharacterDB
-                gameCharacterDB.setCurrentJob(newJob);
-                // Save User
-                userRepository.save(user);
-                result = ErrorCode.OK;
+            if (tokenKey.equals(user.getTokenKey())) {
+                // Get the GameCharacterDB associated with gameCharacterId parameter
+                GameCharacterDB gameCharacterDB = getGameCharacterDB(user, gameCharacterId);
+                if (null != gameCharacterDB) {
+                    // Set the new Job to the GameCharacterDB
+                    gameCharacterDB.setCurrentJob(newJob);
+                    // Save User
+                    userRepository.save(user);
+                    result = ErrorCode.OK;
+                } else {
+                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                }
             } else {
-                result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                result = ErrorCode.VERIFICATION_FAILED;
             }
         } else {
-            result = ErrorCode.VERIFICATION_FAILED;
+            result = ErrorCode.USERNAME_INVALID;
         }
         return result;
     }

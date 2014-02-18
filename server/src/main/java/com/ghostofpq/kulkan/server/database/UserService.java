@@ -166,21 +166,25 @@ public class UserService implements Runnable {
         MessageChangeJob messageChangeJob = (MessageChangeJob) message;
 
         String tokenKey = messageChangeJob.getKeyToken();
+        String username = messageChangeJob.getUsername();
         ObjectId gameCharId = messageChangeJob.getGameCharId();
         JobType newJob = messageChangeJob.getNewJob();
 
         log.debug("Received a DeleteGameChararacterFromTeamRequest");
+        log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("NewJob : '{}'", newJob);
         if (null != tokenKey && null != gameCharId && null != newJob) {
-            ErrorCode result = userController.setNewJobForGameChar(tokenKey, gameCharId, newJob);
+            ErrorCode result = userController.setNewJobForGameChar(username, tokenKey, gameCharId, newJob);
             Message response;
 
             if (result == ErrorCode.OK) {
-                User user = userController.getUserForTokenKey(tokenKey);
+                User user = userController.getUserForUsername(tokenKey);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
+            } else if (result == ErrorCode.USERNAME_INVALID) {
+                response = new MessageError("Username was not found.");
             } else if (result == ErrorCode.VERIFICATION_FAILED) {
                 response = new MessageError("Verification failed. Please restart the game.");
             } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
@@ -216,6 +220,8 @@ public class UserService implements Runnable {
                 User user = userController.getUserForUsername(username);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
+            } else if (result == ErrorCode.USERNAME_INVALID) {
+                response = new MessageError("Username was not found.");
             } else if (result == ErrorCode.VERIFICATION_FAILED) {
                 response = new MessageError("Verification failed. Please restart the game.");
             } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
@@ -251,6 +257,8 @@ public class UserService implements Runnable {
                 User user = userController.getUserForUsername(username);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
+            } else if (result == ErrorCode.USERNAME_INVALID) {
+                response = new MessageError("Username was not found.");
             } else if (result == ErrorCode.VERIFICATION_FAILED) {
                 response = new MessageError("Verification failed. Please restart the game.");
             } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
@@ -286,6 +294,8 @@ public class UserService implements Runnable {
                 User user = userController.getUserForUsername(username);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
+            } else if (result == ErrorCode.USERNAME_INVALID) {
+                response = new MessageError("Username was not found.");
             } else if (result == ErrorCode.STOCK_IS_FULL) {
                 response = new MessageError("Stock is full. Please unlock some new slots.");
             } else if (result == ErrorCode.VERIFICATION_FAILED) {
@@ -323,6 +333,8 @@ public class UserService implements Runnable {
                 User user = userController.getUserForUsername(username);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
+            } else if (result == ErrorCode.USERNAME_INVALID) {
+                response = new MessageError("Username was not found.");
             } else if (result == ErrorCode.TEAM_IS_FULL) {
                 response = new MessageError("Team is full. Put some of your characters into stock.");
             } else if (result == ErrorCode.VERIFICATION_FAILED) {
