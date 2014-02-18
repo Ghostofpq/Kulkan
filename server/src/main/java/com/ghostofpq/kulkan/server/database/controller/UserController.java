@@ -117,31 +117,38 @@ public class UserController {
         return gameCharacterDB;
     }
 
-
-    public User setNewJobForGameCharacterWithId(String tokenKey, ObjectId gameCharId, JobType newJob) {
+    /**
+     * Removes the GameCharacter associated with the given gameCharacterId from team.
+     *
+     * @param tokenKey        the token key known by the user's client
+     * @param gameCharacterId the id of the GameCharacter to handle
+     * @param newJob          the job to set to the GameCharacter
+     * @return ErrorCode.OK if everything went well<br/>
+     * ErrorCode.VERIFICATION_FAILED if the tokenKey was not found<br/>
+     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     */
+    public ErrorCode setNewJobForGameChar(String tokenKey, ObjectId gameCharacterId, JobType newJob) {
+        ErrorCode result;
+        // Get user for username
         User user = getUserForTokenKey(tokenKey);
         if (null != user) {
-            GameCharacterDB gameCharacterDB = null;
-            for (GameCharacterDB teamMember : user.getTeam()) {
-                if (teamMember.getId().equals(gameCharId)) {
-                    gameCharacterDB = teamMember;
-                    break;
-                }
+            // Check if username and token key are ok
+            // Get the GameCharacterDB associated with gameCharacterId parameter
+            GameCharacterDB gameCharacterDB = getGameCharacterDB(user, gameCharacterId);
+            if (null != gameCharacterDB) {
+                // Set the new Job to the GameCharacterDB
+                gameCharacterDB.setCurrentJob(newJob);
+                // Save User
+                userRepository.save(user);
+                result = ErrorCode.OK;
+            } else {
+                result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
             }
-            if (null == gameCharacterDB) {
-                for (GameCharacterDB teamMember : user.getStock()) {
-                    if (teamMember.getId().equals(gameCharId)) {
-                        gameCharacterDB = teamMember;
-                        break;
-                    }
-                }
-            }
-            gameCharacterDB.setCurrentJob(newJob);
-            user = userRepository.save(user);
+        } else {
+            result = ErrorCode.VERIFICATION_FAILED;
         }
-        return user;
+        return result;
     }
-
 
     /**
      * Creates a new GameCharacter.

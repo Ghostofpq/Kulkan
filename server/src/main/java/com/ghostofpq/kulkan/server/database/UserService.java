@@ -174,12 +174,24 @@ public class UserService implements Runnable {
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("NewJob : '{}'", newJob);
         if (null != tokenKey && null != gameCharId && null != newJob) {
-            User user = userController.setNewJobForGameCharacterWithId(tokenKey, gameCharId, newJob);
-            Player player = user.toPlayer();
-            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
+            ErrorCode result = userController.setNewJobForGameChar(tokenKey, gameCharId, newJob);
+            Message response;
+
+            if (result == ErrorCode.OK) {
+                User user = userController.getUserForTokenKey(tokenKey);
+                Player player = user.toPlayer();
+                response = new MessagePlayerUpdate(player);
+            } else if (result == ErrorCode.VERIFICATION_FAILED) {
+                response = new MessageError("Verification failed. Please restart the game.");
+            } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
+                response = new MessageError("Game Character was not found.");
+            } else {
+                response = new MessageError(new StringBuilder().append("Unexpected return for putGameCharFromStockToTeam : ").append(result).toString());
+            }
+
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
             channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
         }
     }
 
