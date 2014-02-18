@@ -34,7 +34,7 @@ public class PopUp extends HUDElement {
         int buttonWidth = 100;
         int buttonHeight = 50;
         for (int i = 0; i < options.size(); i++) {
-            int buttonPosX = posX + (width / 2 - i * buttonWidth - buttonWidth / 2);
+            int buttonPosX = posX + (width / (options.size() + 1) * (i + 1)) - buttonWidth / 2;
             int buttonPosY = posY + (3 * height / 4) - buttonHeight / 2;
             Button button = new Button(buttonPosX, buttonPosY, buttonWidth, buttonHeight, options.get(i)) {
                 @Override

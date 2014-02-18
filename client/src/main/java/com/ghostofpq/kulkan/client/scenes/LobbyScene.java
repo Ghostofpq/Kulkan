@@ -28,9 +28,6 @@ public class LobbyScene implements Scene {
 
     private Button matchmakingButton;
 
-    private Button acceptButton;
-    private Button refuseButton;
-
     private boolean matchFound;
     private String matchId;
     private int indexOnFocus;
@@ -281,23 +278,6 @@ public class LobbyScene implements Scene {
             };
         }
 
-
-        acceptButton = new Button(550, 100, 50, 50, "ACCEPT") {
-            @Override
-            public void onClick() {
-                log.debug("ACCEPT");
-                acceptMatch();
-            }
-        };
-
-        refuseButton = new Button(550, 150, 50, 50, "REFUSE") {
-            @Override
-            public void onClick() {
-                log.debug("REFUSE");
-                refuseMatch();
-            }
-        };
-
         hudElementList.add(inputChat);
         hudElementList.add(postButton);
         hudElementList.add(matchmakingButton);
@@ -397,6 +377,10 @@ public class LobbyScene implements Scene {
                     MessageMatchFound messageMatchFound = (MessageMatchFound) message;
                     matchFound = true;
                     matchId = messageMatchFound.getMatchKey();
+                    List<String> popUpOptions = new ArrayList<String>();
+                    popUpOptions.add("ACCEPT");
+                    popUpOptions.add("REFUSE");
+                    popUp = new PopUp(popUpOptions, new StringBuilder().append("Match found : [").append(matchId).append("]").toString());
                     break;
                 case MATCHMAKING_MATCH_ABORT:
                     log.debug(" [x] MATCH ABORT");
@@ -469,10 +453,6 @@ public class LobbyScene implements Scene {
         for (HUDElement hudElement : hudElementList) {
             hudElement.draw();
         }
-        if (matchFound) {
-            acceptButton.draw();
-            refuseButton.draw();
-        }
         chatOverlay.draw();
         newsOverlay.draw();
         if (null != popUp) {
@@ -497,18 +477,16 @@ public class LobbyScene implements Scene {
                             break;
                         }
                     }
-                    if (!hudElementIsClicked && acceptButton.isClicked()) {
-                        hudElementIsClicked = true;
-                        acceptButton.onClick();
-                    }
-                    if (!hudElementIsClicked && refuseButton.isClicked()) {
-                        hudElementIsClicked = true;
-                        refuseButton.onClick();
-                    }
                 } else if (popUp.isClicked()) {
                     String onClick = popUp.onClick();
                     if (null != onClick) {
                         if (onClick.equals("OK")) {
+                            popUp = null;
+                        } else if (onClick.equals("ACCEPT")) {
+                            acceptMatch();
+                            popUp = null;
+                        } else if (onClick.equals("REFUSE")) {
+                            refuseMatch();
                             popUp = null;
                         }
                     }
