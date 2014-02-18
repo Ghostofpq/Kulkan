@@ -87,6 +87,37 @@ public class UserController {
         return user;
     }
 
+    private GameCharacterDB getGameCharacterDBFromTeam(User user, ObjectId gameCharacterId) {
+        GameCharacterDB gameCharacterDB = null;
+        for (GameCharacterDB teamMember : user.getTeam()) {
+            if (teamMember.getId().equals(gameCharacterId)) {
+                gameCharacterDB = teamMember;
+                break;
+            }
+        }
+        return gameCharacterDB;
+    }
+
+    private GameCharacterDB getGameCharacterDBFromStock(User user, ObjectId gameCharacterId) {
+        GameCharacterDB gameCharacterDB = null;
+        for (GameCharacterDB stockMember : user.getStock()) {
+            if (stockMember.getId().equals(gameCharacterId)) {
+                gameCharacterDB = stockMember;
+                break;
+            }
+        }
+        return gameCharacterDB;
+    }
+
+    public GameCharacterDB getGameCharacterDB(User user, ObjectId gameCharacterId) {
+        GameCharacterDB gameCharacterDB = getGameCharacterDBFromTeam(user, gameCharacterId);
+        if (null == gameCharacterDB) {
+            gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
+        }
+        return gameCharacterDB;
+    }
+
+
     public User setNewJobForGameCharacterWithId(String tokenKey, ObjectId gameCharId, JobType newJob) {
         User user = getUserForTokenKey(tokenKey);
         if (null != user) {
@@ -111,112 +142,171 @@ public class UserController {
         return user;
     }
 
+
+    /**
+     * Creates a new GameCharacter.
+     *
+     * @param username the user's username
+     * @param tokenKey the token key known by the user's client
+     * @param name     the name of the new character
+     * @param clanType the clan of the new character
+     * @param gender   the gender of the new character
+     * @return ErrorCode.OK if everything went well<br/>
+     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
+     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
+     * ErrorCode.NAME_IS_EMPTY if the name is empty<br/>
+     * ErrorCode.TEAM_IS_FULL if the team is full<br/>
+     */
     public ErrorCode createGameChar(String username, String tokenKey, String name, ClanType clanType, Gender gender) {
         ErrorCode result;
-        if (name.isEmpty()) {
-            result = ErrorCode.NAME_IS_EMPTY;
-        } else {
-            User user = getUserForUsername(username);
-            GameCharacter gameCharacter = new GameCharacter(name, clanType, gender);
-            GameCharacterDB gameCharacterDB = new GameCharacterDB(gameCharacter);
+        // Get user for username
+        User user = getUserForUsername(username);
+        if (null != user) {
+            // Check if username and token key are ok
             if (tokenKey.equals(user.getTokenKey())) {
-                log.debug("createGameChar : {}", username);
-                if (user.getTeam().size() >= 4) {
-                    log.error("TEAM IS COMPLETE");
-                    result = ErrorCode.TEAM_IS_FULL;
+                // Check the name
+                if (!name.isEmpty()) {
+                    // Check if Team is full
+                    if (user.getTeam().size() < 4) {
+                        // Create new game character
+                        GameCharacter gameCharacter = new GameCharacter(name, clanType, gender);
+                        GameCharacterDB gameCharacterDB = new GameCharacterDB(gameCharacter);
+                        user.addGameCharToTeam(gameCharacterDB);
+                        userRepository.save(user);
+                        result = ErrorCode.OK;
+                    } else {
+                        result = ErrorCode.TEAM_IS_FULL;
+                    }
                 } else {
-                    user.addGameCharToTeam(gameCharacterDB);
-                    user = userRepository.save(user);
-                    result = ErrorCode.OK;
+                    result = ErrorCode.NAME_IS_EMPTY;
                 }
             } else {
-                log.error("verification failed");
                 result = ErrorCode.VERIFICATION_FAILED;
             }
+        } else {
+            result = ErrorCode.USERNAME_INVALID;
         }
         return result;
     }
 
+    /**
+     * Removes the GameCharacter associated with the given gameCharacterId from team.
+     *
+     * @param username        the user's username
+     * @param tokenKey        the token key known by the user's client
+     * @param gameCharacterId the id of the GameCharacter to handle
+     * @return ErrorCode.OK if everything went well<br/>
+     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
+     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
+     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     */
     public ErrorCode removeGameCharFromTeam(String username, String tokenKey, ObjectId gameCharacterId) {
         ErrorCode result;
+        // Get user for username
         User user = getUserForUsername(username);
-        if (tokenKey.equals(user.getTokenKey())) {
-            log.debug("removeGameCharFromTeam : {}", username);
-            GameCharacterDB gameCharacterDB = null;
-            for (GameCharacterDB teamMember : user.getTeam()) {
-                if (teamMember.getId().equals(gameCharacterId)) {
-                    gameCharacterDB = teamMember;
-                    break;
-                }
-            }
-            if (null != gameCharacterDB) {
-                user.getTeam().remove(gameCharacterDB);
-                result = ErrorCode.OK;
-            } else {
-                result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
-            }
-            userRepository.save(user);
-        } else {
-            log.error("verification failed");
-            result = ErrorCode.VERIFICATION_FAILED;
-        }
-        return result;
-    }
-
-    public ErrorCode removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) {
-        ErrorCode result;
-        User user = getUserForUsername(username);
-        if (tokenKey.equals(user.getTokenKey())) {
-            log.debug("removeGameCharFromStock : {}", username);
-            GameCharacterDB gameCharacterDB = null;
-            for (GameCharacterDB stockMember : user.getStock()) {
-                if (stockMember.getId().equals(gameCharacterId)) {
-                    gameCharacterDB = stockMember;
-                    break;
-                }
-            }
-            if (null != gameCharacterDB) {
-                user.getStock().remove(gameCharacterDB);
-                result = ErrorCode.OK;
-            } else {
-                result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
-            }
-            userRepository.save(user);
-        } else {
-            log.error("verification failed");
-            result = ErrorCode.VERIFICATION_FAILED;
-        }
-        return result;
-    }
-
-    public ErrorCode putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) {
-        ErrorCode result;
-        User user = getUserForUsername(username);
-        if (user.getStock().size() + 1 > user.getNumberOfStockSlots()) {
-            log.error("STOCK IS COMPLETE");
-            result = ErrorCode.STOCK_IS_FULL;
-        } else {
+        if (null != user) {
+            // Check if username and token key are ok
             if (tokenKey.equals(user.getTokenKey())) {
-                log.debug("putGameCharFromTeamToStock : {}", username);
-                GameCharacterDB gameCharacterDB = null;
-                for (GameCharacterDB teamMember : user.getTeam()) {
-                    if (teamMember.getId().equals(gameCharacterId)) {
-                        gameCharacterDB = teamMember;
-                        break;
-                    }
-                }
+                // Get the GameCharacterDB associated with gameCharacterId parameter
+                GameCharacterDB gameCharacterDB = getGameCharacterDBFromTeam(user, gameCharacterId);
                 if (null != gameCharacterDB) {
+                    // remove GameCharacterDB from team
                     user.getTeam().remove(gameCharacterDB);
-                    user.getStock().add(gameCharacterDB);
+                    // Save User
+                    userRepository.save(user);
                     result = ErrorCode.OK;
                 } else {
                     result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
                 }
-                userRepository.save(user);
             } else {
-                log.error("verification failed");
                 result = ErrorCode.VERIFICATION_FAILED;
             }
+        } else {
+            result = ErrorCode.USERNAME_INVALID;
+        }
+        return result;
+    }
+
+    /**
+     * Removes the GameCharacter associated with the given gameCharacterId from stock.
+     *
+     * @param username        the user's username
+     * @param tokenKey        the token key known by the user's client
+     * @param gameCharacterId the id of the GameCharacter to handle
+     * @return ErrorCode.OK if everything went well<br/>
+     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
+     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
+     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     */
+    public ErrorCode removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) {
+        ErrorCode result;
+        // Get user for username
+        User user = getUserForUsername(username);
+        if (null != user) {
+            // Check if username and token key are ok
+            if (tokenKey.equals(user.getTokenKey())) {
+                // Get the GameCharacterDB associated with gameCharacterId parameter
+                GameCharacterDB gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
+                if (null != gameCharacterDB) {
+                    // remove GameCharacterDB from stock
+                    user.getTeam().remove(gameCharacterDB);
+                    // Save User
+                    userRepository.save(user);
+                    result = ErrorCode.OK;
+                } else {
+                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                }
+            } else {
+                result = ErrorCode.VERIFICATION_FAILED;
+            }
+        } else {
+            result = ErrorCode.USERNAME_INVALID;
+        }
+        return result;
+    }
+
+
+    /**
+     * Puts the GameCharacter associated with the given gameCharacterId from team into stock.
+     *
+     * @param username        the user's username
+     * @param tokenKey        the token key known by the user's client
+     * @param gameCharacterId the id of the GameCharacter to handle
+     * @return ErrorCode.OK if everything went well<br/>
+     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
+     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
+     * ErrorCode.STOCK_IS_FULL if stock is full<br/>
+     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     */
+    public ErrorCode putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) {
+        ErrorCode result;
+        // Get user for username
+        User user = getUserForUsername(username);
+        if (null != user) {
+            // Check if username and token key are ok
+            if (tokenKey.equals(user.getTokenKey())) {
+                // Check if Stock is full
+                if (user.getStock().size() + 1 <= user.getNumberOfStockSlots()) {
+                    // Get the GameCharacterDB associated with gameCharacterId parameter
+                    GameCharacterDB gameCharacterDB = getGameCharacterDBFromTeam(user, gameCharacterId);
+                    if (null != gameCharacterDB) {
+                        // Put GameCharacterDB from team to stock
+                        user.getTeam().remove(gameCharacterDB);
+                        user.getStock().add(gameCharacterDB);
+                        // Save User
+                        userRepository.save(user);
+                        result = ErrorCode.OK;
+                    } else {
+                        result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                    }
+                } else {
+                    result = ErrorCode.STOCK_IS_FULL;
+                }
+            } else {
+                result = ErrorCode.VERIFICATION_FAILED;
+            }
+        } else {
+            result = ErrorCode.USERNAME_INVALID;
         }
         return result;
     }
@@ -227,36 +317,41 @@ public class UserController {
      * @param username        the user's username
      * @param tokenKey        the token key known by the user's client
      * @param gameCharacterId the id of the GameCharacter to handle
-     * @return ErrorCode.OK if everything went well   <br/>
-     * ErrorCode.TEAM_IS_FULL if team is full <br/>
-     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId <br/>
-     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different <br/>
+     * @return ErrorCode.OK if everything went well<br/>
+     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
+     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
+     * ErrorCode.TEAM_IS_FULL if team is full<br/>
+     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
      */
     public ErrorCode putGameCharFromStockToTeam(String username, String tokenKey, ObjectId gameCharacterId) {
         ErrorCode result;
+        // Get user for username
         User user = getUserForUsername(username);
-        if (user.getTeam().size() >= 4) {
-            result = ErrorCode.TEAM_IS_FULL;
-        } else {
+        if (null != user) {
+            // Check if username and token key are ok
             if (tokenKey.equals(user.getTokenKey())) {
-                GameCharacterDB gameCharacterDB = null;
-                for (GameCharacterDB stockMember : user.getStock()) {
-                    if (stockMember.getId().equals(gameCharacterId)) {
-                        gameCharacterDB = stockMember;
-                        break;
+                // Check if Team is full
+                if (user.getTeam().size() <= 4) {
+                    // Get the GameCharacterDB associated with gameCharacterId parameter
+                    GameCharacterDB gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
+                    if (null != gameCharacterDB) {
+                        // Put GameCharacterDB from stock to team
+                        user.getStock().remove(gameCharacterDB);
+                        user.getTeam().add(gameCharacterDB);
+                        // Save User
+                        userRepository.save(user);
+                        result = ErrorCode.OK;
+                    } else {
+                        result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
                     }
-                }
-                if (null != gameCharacterDB) {
-                    user.getStock().remove(gameCharacterDB);
-                    user.getTeam().add(gameCharacterDB);
-                    result = ErrorCode.OK;
                 } else {
-                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                    result = ErrorCode.TEAM_IS_FULL;
                 }
-                userRepository.save(user);
             } else {
                 result = ErrorCode.VERIFICATION_FAILED;
             }
+        } else {
+            result = ErrorCode.USERNAME_INVALID;
         }
         return result;
     }
@@ -370,6 +465,7 @@ public class UserController {
 
     public enum ErrorCode {
         OK,
+        USERNAME_INVALID,
         VERIFICATION_FAILED,
         NAME_IS_EMPTY,
         GAME_CHARACTER_WAS_NOT_FOUND,
