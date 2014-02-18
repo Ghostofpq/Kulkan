@@ -6,11 +6,13 @@ import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
+import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.messages.Message;
+import com.ghostofpq.kulkan.entities.messages.user.MessageError;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePutGameCharacterFromStockToTeam;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,8 @@ public class StockScene implements Scene {
     private LobbyScene lobbyScene;
     // BACKGROUND
     private Background background;
+    // POPUP
+    private PopUp popUp;
     // FRAME
     private Frame frame;
     private int x;
@@ -138,6 +142,9 @@ public class StockScene implements Scene {
             button.draw();
         }
         backButton.draw();
+        if (null != popUp) {
+            popUp.draw();
+        }
         frame.draw();
     }
 
@@ -145,13 +152,22 @@ public class StockScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                for (Button button : stockSlots) {
-                    if (button.isClicked()) {
-                        button.onClick();
+                if (null == popUp) {
+                    for (Button button : stockSlots) {
+                        if (button.isClicked()) {
+                            button.onClick();
+                        }
                     }
-                }
-                if (backButton.isClicked()) {
-                    backButton.onClick();
+                    if (backButton.isClicked()) {
+                        backButton.onClick();
+                    }
+                } else if (popUp.isClicked()) {
+                    String onClick = popUp.onClick();
+                    if (null != onClick) {
+                        if (onClick.equals("OK")) {
+                            popUp = null;
+                        }
+                    }
                 } else if (frame.isClicked()) {
                     if (x == -1 && y == -1) {
                         x = Mouse.getX();
@@ -180,6 +196,12 @@ public class StockScene implements Scene {
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     clientContext.setPlayer(response.getPlayer());
                     init();
+                    break;
+                case ERROR:
+                    List<String> options = new ArrayList<String>();
+                    options.add("OK");
+                    MessageError messageError = (MessageError) message;
+                    popUp = new PopUp(options, messageError.getError());
                     break;
             }
         }

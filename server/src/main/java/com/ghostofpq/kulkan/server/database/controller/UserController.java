@@ -137,7 +137,8 @@ public class UserController {
         return result;
     }
 
-    public User removeGameCharFromTeam(String username, String tokenKey, ObjectId gameCharacterId) {
+    public ErrorCode removeGameCharFromTeam(String username, String tokenKey, ObjectId gameCharacterId) {
+        ErrorCode result;
         User user = getUserForUsername(username);
         if (tokenKey.equals(user.getTokenKey())) {
             log.debug("removeGameCharFromTeam : {}", username);
@@ -150,15 +151,20 @@ public class UserController {
             }
             if (null != gameCharacterDB) {
                 user.getTeam().remove(gameCharacterDB);
+                result = ErrorCode.OK;
+            } else {
+                result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
             }
-            user = userRepository.save(user);
+            userRepository.save(user);
         } else {
             log.error("verification failed");
+            result = ErrorCode.VERIFICATION_FAILED;
         }
-        return user;
+        return result;
     }
 
-    public User removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) {
+    public ErrorCode removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) {
+        ErrorCode result;
         User user = getUserForUsername(username);
         if (tokenKey.equals(user.getTokenKey())) {
             log.debug("removeGameCharFromStock : {}", username);
@@ -171,18 +177,24 @@ public class UserController {
             }
             if (null != gameCharacterDB) {
                 user.getStock().remove(gameCharacterDB);
+                result = ErrorCode.OK;
+            } else {
+                result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
             }
-            user = userRepository.save(user);
+            userRepository.save(user);
         } else {
             log.error("verification failed");
+            result = ErrorCode.VERIFICATION_FAILED;
         }
-        return user;
+        return result;
     }
 
-    public User putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) {
+    public ErrorCode putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) {
+        ErrorCode result;
         User user = getUserForUsername(username);
         if (user.getStock().size() + 1 > user.getNumberOfStockSlots()) {
             log.error("STOCK IS COMPLETE");
+            result = ErrorCode.STOCK_IS_FULL;
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
                 log.debug("putGameCharFromTeamToStock : {}", username);
@@ -196,22 +208,37 @@ public class UserController {
                 if (null != gameCharacterDB) {
                     user.getTeam().remove(gameCharacterDB);
                     user.getStock().add(gameCharacterDB);
+                    result = ErrorCode.OK;
+                } else {
+                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
                 }
-                user = userRepository.save(user);
+                userRepository.save(user);
             } else {
                 log.error("verification failed");
+                result = ErrorCode.VERIFICATION_FAILED;
             }
         }
-        return user;
+        return result;
     }
 
-    public User putGameCharFromStockToTeam(String username, String tokenKey, ObjectId gameCharacterId) {
+    /**
+     * Puts the GameCharacter associated with the given gameCharacterId from stock into team.
+     *
+     * @param username        the user's username
+     * @param tokenKey        the token key known by the user's client
+     * @param gameCharacterId the id of the GameCharacter to handle
+     * @return ErrorCode.OK if everything went well   <br/>
+     * ErrorCode.TEAM_IS_FULL if team is full <br/>
+     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId <br/>
+     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different <br/>
+     */
+    public ErrorCode putGameCharFromStockToTeam(String username, String tokenKey, ObjectId gameCharacterId) {
+        ErrorCode result;
         User user = getUserForUsername(username);
         if (user.getTeam().size() >= 4) {
-            log.error("TEAM IS COMPLETE");
+            result = ErrorCode.TEAM_IS_FULL;
         } else {
             if (tokenKey.equals(user.getTokenKey())) {
-                log.debug("putGameCharFromStockToTeam : {}", username);
                 GameCharacterDB gameCharacterDB = null;
                 for (GameCharacterDB stockMember : user.getStock()) {
                     if (stockMember.getId().equals(gameCharacterId)) {
@@ -222,13 +249,16 @@ public class UserController {
                 if (null != gameCharacterDB) {
                     user.getStock().remove(gameCharacterDB);
                     user.getTeam().add(gameCharacterDB);
+                    result = ErrorCode.OK;
+                } else {
+                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
                 }
-                user = userRepository.save(user);
+                userRepository.save(user);
             } else {
-                log.error("verification failed");
+                result = ErrorCode.VERIFICATION_FAILED;
             }
         }
-        return user;
+        return result;
     }
 
     public User unlockCapacityForJobForGameCharacter(String tokenKey, ObjectId gameCharacterId, JobType jobType, String capacityName) {
@@ -342,6 +372,7 @@ public class UserController {
         OK,
         VERIFICATION_FAILED,
         NAME_IS_EMPTY,
+        GAME_CHARACTER_WAS_NOT_FOUND,
         TEAM_IS_FULL,
         STOCK_IS_FULL;
     }

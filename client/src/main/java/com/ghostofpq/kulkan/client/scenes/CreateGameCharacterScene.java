@@ -453,6 +453,7 @@ public class CreateGameCharacterScene implements Scene {
                     options.add("OK");
                     MessageError messageError = (MessageError) message;
                     popUp = new PopUp(options, messageError.getError());
+                    break;
             }
         }
     }

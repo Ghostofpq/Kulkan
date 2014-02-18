@@ -7,6 +7,7 @@ import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
+import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.PrimaryCharacteristicsRender;
 import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
@@ -15,14 +16,14 @@ import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.messages.Message;
-import com.ghostofpq.kulkan.entities.messages.user.MessageDeleteGameCharacterFromStock;
-import com.ghostofpq.kulkan.entities.messages.user.MessageDeleteGameCharacterFromTeam;
-import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
-import com.ghostofpq.kulkan.entities.messages.user.MessagePutGameCharacterFromTeamToStock;
+import com.ghostofpq.kulkan.entities.messages.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class ManageGameCharacterScene implements Scene {
@@ -45,6 +46,8 @@ public class ManageGameCharacterScene implements Scene {
     private KeyValueRender jobPoints;
     // BACKGROUND
     private Background background;
+    // POPUP
+    private PopUp popUp;
     // FRAME
     private Frame frame;
     private int x;
@@ -165,6 +168,10 @@ public class ManageGameCharacterScene implements Scene {
         currentJobRender.draw();
         jobPoints.draw();
         putInStock.draw();
+
+        if (null != popUp) {
+            popUp.draw();
+        }
         frame.draw();
     }
 
@@ -172,22 +179,31 @@ public class ManageGameCharacterScene implements Scene {
     public void manageInput() {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
-                if (quitButton.isClicked()) {
-                    quitButton.onClick();
-                }
-                if (deleteGameCharButton.isClicked()) {
-                    deleteGameCharButton.onClick();
-                }
-                if (manageEquipmentButton.isClicked()) {
-                    manageEquipmentButton.onClick();
-                }
-                if (manageJobButton.isClicked()) {
-                    manageJobButton.onClick();
-                }
-                if (putInStock.isClicked()) {
-                    putInStock.onClick();
-                }
-                if (frame.isClicked()) {
+                if (null == popUp) {
+
+                    if (quitButton.isClicked()) {
+                        quitButton.onClick();
+                    }
+                    if (deleteGameCharButton.isClicked()) {
+                        deleteGameCharButton.onClick();
+                    }
+                    if (manageEquipmentButton.isClicked()) {
+                        manageEquipmentButton.onClick();
+                    }
+                    if (manageJobButton.isClicked()) {
+                        manageJobButton.onClick();
+                    }
+                    if (putInStock.isClicked()) {
+                        putInStock.onClick();
+                    }
+                } else if (popUp.isClicked()) {
+                    String onClick = popUp.onClick();
+                    if (null != onClick) {
+                        if (onClick.equals("OK")) {
+                            popUp = null;
+                        }
+                    }
+                } else if (frame.isClicked()) {
                     if (x == -1 && y == -1) {
                         x = Mouse.getX();
                         y = (Display.getHeight() - Mouse.getY());
@@ -218,6 +234,12 @@ public class ManageGameCharacterScene implements Scene {
                     } else {
                         init();
                     }
+                    break;
+                case ERROR:
+                    List<String> options = new ArrayList<String>();
+                    options.add("OK");
+                    MessageError messageError = (MessageError) message;
+                    popUp = new PopUp(options, messageError.getError());
                     break;
             }
         }

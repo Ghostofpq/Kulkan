@@ -12,6 +12,7 @@ import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.game.MessageGameStart;
 import com.ghostofpq.kulkan.entities.messages.lobby.*;
+import com.ghostofpq.kulkan.entities.messages.user.MessageError;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
@@ -55,6 +56,8 @@ public class LobbyScene implements Scene {
     private Button teamCharacter4;
     // BACKGROUND
     private Background background;
+    // POPUP
+    private PopUp popUp;
     // FRAME
     private Frame frame;
     private int x;
@@ -413,6 +416,12 @@ public class LobbyScene implements Scene {
                     MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
                     clientContext.setPlayer(messagePlayerUpdate.getPlayer());
                     break;
+                case ERROR:
+                    List<String> options = new ArrayList<String>();
+                    options.add("OK");
+                    MessageError messageError = (MessageError) message;
+                    popUp = new PopUp(options, messageError.getError());
+                    break;
                 default:
                     log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                     break;
@@ -466,6 +475,9 @@ public class LobbyScene implements Scene {
         }
         chatOverlay.draw();
         newsOverlay.draw();
+        if (null != popUp) {
+            popUp.draw();
+        }
         frame.draw();
     }
 
@@ -474,23 +486,32 @@ public class LobbyScene implements Scene {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
                 boolean hudElementIsClicked = false;
-                for (HUDElement hudElement : hudElementList) {
-                    if (hudElement.isClicked()) {
-                        hudElementIsClicked = true;
-                        setFocusOn(hudElementList.indexOf(hudElement));
-                        if (hudElement instanceof Button) {
-                            ((Button) hudElement).onClick();
+                if (null == popUp) {
+                    for (HUDElement hudElement : hudElementList) {
+                        if (hudElement.isClicked()) {
+                            hudElementIsClicked = true;
+                            setFocusOn(hudElementList.indexOf(hudElement));
+                            if (hudElement instanceof Button) {
+                                ((Button) hudElement).onClick();
+                            }
+                            break;
                         }
-                        break;
                     }
-                }
-                if (!hudElementIsClicked && acceptButton.isClicked()) {
-                    hudElementIsClicked = true;
-                    acceptButton.onClick();
-                }
-                if (!hudElementIsClicked && refuseButton.isClicked()) {
-                    hudElementIsClicked = true;
-                    refuseButton.onClick();
+                    if (!hudElementIsClicked && acceptButton.isClicked()) {
+                        hudElementIsClicked = true;
+                        acceptButton.onClick();
+                    }
+                    if (!hudElementIsClicked && refuseButton.isClicked()) {
+                        hudElementIsClicked = true;
+                        refuseButton.onClick();
+                    }
+                } else if (popUp.isClicked()) {
+                    String onClick = popUp.onClick();
+                    if (null != onClick) {
+                        if (onClick.equals("OK")) {
+                            popUp = null;
+                        }
+                    }
                 }
                 if (!hudElementIsClicked && frame.isClicked()) {
                     if (x == -1 && y == -1) {
