@@ -6,9 +6,10 @@ import com.ghostofpq.kulkan.entities.messages.MessageType;
 public class MessageBuyItem extends ClientMessage {
     private String itemId;
 
-    public MessageBuyItem(String keyToken, String itemId) {
+    public MessageBuyItem(String keyToken, String username, String itemId) {
         this.type = MessageType.BUY_ITEM_REQUEST;
         this.keyToken = keyToken;
+        this.username = username;
         this.itemId = itemId;
     }
 

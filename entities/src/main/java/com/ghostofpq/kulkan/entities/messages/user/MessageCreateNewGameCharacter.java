@@ -9,7 +9,6 @@ public class MessageCreateNewGameCharacter extends ClientMessage {
     private ClanType clanType;
     private Gender gender;
     private String name;
-    private String username;
 
     public MessageCreateNewGameCharacter(String keyToken, String username, ClanType clanType, Gender gender, String name) {
         type = MessageType.CREATE_NEW_GAME_CHARACTER_REQUEST;
@@ -30,9 +29,5 @@ public class MessageCreateNewGameCharacter extends ClientMessage {
 
     public String getName() {
         return name;
-    }
-
-    public String getUsername() {
-        return username;
     }
 }

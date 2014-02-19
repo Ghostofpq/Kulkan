@@ -1,6 +1,5 @@
 package com.ghostofpq.kulkan.entities.messages.user;
 
-
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.MessageType;
@@ -11,9 +10,10 @@ public class MessageUnlockCapacity extends ClientMessage {
     private JobType job;
     private String capacityName;
 
-    public MessageUnlockCapacity(String keyToken, ObjectId gameCharId, JobType job, String capacityName) {
+    public MessageUnlockCapacity(String keyToken, String username, ObjectId gameCharId, JobType job, String capacityName) {
         this.type = MessageType.CHARACTER_UNLOCK_CAPACITY;
         this.keyToken = keyToken;
+        this.username = username;
         this.gameCharId = gameCharId;
         this.job = job;
         this.capacityName = capacityName;

@@ -132,10 +132,10 @@ public class ManageGameCharacterScene implements Scene {
         Player player = clientContext.getPlayer();
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         if (player.getTeam().contains(gameCharacter)) {
-            MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(client.getTokenKey(), player.getPseudo(), gameCharacter.getId());
+            MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(clientContext.getTokenKey(), player.getPseudo(), gameCharacter.getId());
             clientMessenger.sendMessageToUserService(messageDeleteGameCharacterFromTeam);
         } else {
-            MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(client.getTokenKey(), player.getPseudo(), gameCharacter.getId());
+            MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(clientContext.getTokenKey(), player.getPseudo(), gameCharacter.getId());
             clientMessenger.sendMessageToUserService(messageDeleteGameCharacterFromStock);
         }
     }
@@ -143,7 +143,7 @@ public class ManageGameCharacterScene implements Scene {
     private void actionStock() {
         Player player = clientContext.getPlayer();
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
-        MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(client.getTokenKey(), player.getPseudo(), gameCharacter.getId());
+        MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(clientContext.getTokenKey(), player.getPseudo(), gameCharacter.getId());
         clientMessenger.sendMessageToUserService(putGameCharacterFromTeamToStock);
     }
 

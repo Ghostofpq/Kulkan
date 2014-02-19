@@ -896,42 +896,42 @@ public class BattleScene implements Scene {
     }
 
     private void sendPositionToMoveRequest() {
-        MessagePositionToMoveRequest messagePositionToMoveRequest = new MessagePositionToMoveRequest(client.getTokenKey(), currentGameCharacter);
+        MessagePositionToMoveRequest messagePositionToMoveRequest = new MessagePositionToMoveRequest(clientContext.getTokenKey(), currentGameCharacter);
         postMessage(messagePositionToMoveRequest);
     }
 
     private void sendActionMove() {
-        MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(client.getTokenKey(), playerNumber, currentGameCharacter, cursor);
+        MessageCharacterActionMove messageCharacterActionMove = new MessageCharacterActionMove(clientContext.getTokenKey(), playerNumber, currentGameCharacter, cursor);
         postMessage(messageCharacterActionMove);
     }
 
     private void sendPositionToAttackRequest() {
-        MessagePositionToAttackRequest messagePositionToAttackRequest = new MessagePositionToAttackRequest(client.getTokenKey(), currentGameCharacter);
+        MessagePositionToAttackRequest messagePositionToAttackRequest = new MessagePositionToAttackRequest(clientContext.getTokenKey(), currentGameCharacter);
         postMessage(messagePositionToAttackRequest);
     }
 
     private void sendActionAttack() {
-        MessageCharacterActionAttack messageCharacterActionAttack = new MessageCharacterActionAttack(client.getTokenKey(), currentGameCharacter, cursor);
+        MessageCharacterActionAttack messageCharacterActionAttack = new MessageCharacterActionAttack(clientContext.getTokenKey(), currentGameCharacter, cursor);
         postMessage(messageCharacterActionAttack);
     }
 
     private void sendPositionToUseCapacityRequest() {
-        MessageCharacterPositionToUseCapacityRequest messageCharacterPositionToUseCapacityRequest = new MessageCharacterPositionToUseCapacityRequest(client.getTokenKey(), currentGameCharacter, selectedMove);
+        MessageCharacterPositionToUseCapacityRequest messageCharacterPositionToUseCapacityRequest = new MessageCharacterPositionToUseCapacityRequest(clientContext.getTokenKey(), currentGameCharacter, selectedMove);
         postMessage(messageCharacterPositionToUseCapacityRequest);
     }
 
     private void sendCapacityAOERequest() {
-        MessageCapacityAOERequest messageCapacityAOERequest = new MessageCapacityAOERequest(client.getTokenKey(), currentGameCharacter, selectedMove, cursor);
+        MessageCapacityAOERequest messageCapacityAOERequest = new MessageCapacityAOERequest(clientContext.getTokenKey(), currentGameCharacter, selectedMove, cursor);
         postMessage(messageCapacityAOERequest);
     }
 
     private void sendActionCapacity() {
-        MessageCharacterActionCapacity messageCharacterUsesCapacity = new MessageCharacterActionCapacity(client.getTokenKey(), currentGameCharacter, cursor, selectedMove);
+        MessageCharacterActionCapacity messageCharacterUsesCapacity = new MessageCharacterActionCapacity(clientContext.getTokenKey(), currentGameCharacter, cursor, selectedMove);
         postMessage(messageCharacterUsesCapacity);
     }
 
     private void sendEndTurn() {
-        MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(client.getTokenKey(), playerNumber, currentGameCharacterRepresentation.getCharacter());
+        MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(clientContext.getTokenKey(), playerNumber, currentGameCharacterRepresentation.getCharacter());
         postMessage(messageCharacterEndturn);
     }
 
@@ -942,7 +942,7 @@ public class BattleScene implements Scene {
             gameCharacterList.add(gameCharacterRepresentation.getCharacter());
         }
 
-        MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(client.getTokenKey(), playerNumber, gameCharacterList);
+        MessageDeploymentFinishedForPlayer messageDeploymentFinishedForPlayer = new MessageDeploymentFinishedForPlayer(clientContext.getTokenKey(), playerNumber, gameCharacterList);
 
         log.debug(" [-] DEPLOYMENT FINISHED FOR {}", messageDeploymentFinishedForPlayer.getKeyToken());
         postMessage(messageDeploymentFinishedForPlayer);

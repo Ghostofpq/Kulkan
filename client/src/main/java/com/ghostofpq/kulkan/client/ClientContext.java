@@ -294,6 +294,11 @@ public class ClientContext {
         }
     }         */
 
+
+    public String getUsername() {
+        return player.getPseudo();
+    }
+
     public Player getPlayer() {
         return player;
     }

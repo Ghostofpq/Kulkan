@@ -102,11 +102,13 @@ public class UserService implements Runnable {
     private void manageEquipItem(Message message) throws IOException {
         MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = (MessageEquipItemOnGameCharacter) message;
 
+        String username = messageEquipItemOnGameCharacter.getUsername();
         String tokenKey = messageEquipItemOnGameCharacter.getKeyToken();
         ObjectId gameCharId = messageEquipItemOnGameCharacter.getGameCharId();
         String itemId = messageEquipItemOnGameCharacter.getItemId();
 
         log.debug("Received a EquipItem");
+        log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("ItemId : '{}'", itemId);
@@ -124,11 +126,13 @@ public class UserService implements Runnable {
     private void manageUnequipItem(Message message) throws IOException {
         MessageUnequipItemOnGameCharacter messageUnequipItemOnGameCharacter = (MessageUnequipItemOnGameCharacter) message;
 
+        String username = messageUnequipItemOnGameCharacter.getUsername();
         String tokenKey = messageUnequipItemOnGameCharacter.getKeyToken();
         ObjectId gameCharId = messageUnequipItemOnGameCharacter.getGameCharId();
         ItemType itemType = messageUnequipItemOnGameCharacter.getItemType();
 
         log.debug("Received a UnequipItemRequest");
+        log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("ItemType : '{}'", itemType);
@@ -145,14 +149,16 @@ public class UserService implements Runnable {
     private void manageBuyItem(Message message) throws IOException {
         MessageBuyItem messageBuyItem = (MessageBuyItem) message;
 
+        String username = messageBuyItem.getUsername();
         String tokenKey = messageBuyItem.getKeyToken();
         String itemId = messageBuyItem.getItemId();
 
         log.debug("Received a BuyItemRequest");
+        log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("ItemId : '{}'", itemId);
         if (null != tokenKey && null != itemId) {
-            User user = userController.buyItem(tokenKey, itemId);
+            User user = userController.buyItem(username, tokenKey, itemId);
             Player player = user.toPlayer();
             MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();

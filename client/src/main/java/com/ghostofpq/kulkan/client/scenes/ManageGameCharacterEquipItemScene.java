@@ -87,7 +87,7 @@ public class ManageGameCharacterEquipItemScene implements Scene {
     }
 
     public void equipItem(Item item) {
-        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = new MessageEquipItemOnGameCharacter(client.getTokenKey(), clientContext.getSelectedCharacterId(), item.getItemID());
+        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = new MessageEquipItemOnGameCharacter(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedCharacterId(), item.getItemID());
         clientMessenger.sendMessageToUserService(messageEquipItemOnGameCharacter);
     }
 

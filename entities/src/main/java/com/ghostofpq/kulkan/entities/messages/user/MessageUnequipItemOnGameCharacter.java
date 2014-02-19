@@ -9,9 +9,10 @@ public class MessageUnequipItemOnGameCharacter extends ClientMessage {
     private ObjectId gameCharId;
     private ItemType itemType;
 
-    public MessageUnequipItemOnGameCharacter(String keyToken, ObjectId gameCharId, ItemType itemType) {
+    public MessageUnequipItemOnGameCharacter(String keyToken, String username, ObjectId gameCharId, ItemType itemType) {
         this.type = MessageType.UNEQUIP_ITEM;
         this.keyToken = keyToken;
+        this.username = username;
         this.gameCharId = gameCharId;
         this.itemType = itemType;
     }

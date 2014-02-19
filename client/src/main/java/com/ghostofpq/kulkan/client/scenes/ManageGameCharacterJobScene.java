@@ -133,7 +133,7 @@ public class ManageGameCharacterJobScene implements Scene {
 
     public void unlockSelectedCapacity() {
         if (null != selectedCapacity) {
-            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(client.getTokenKey(), clientContext.getSelectedCharacterId(), JobType.WARRIOR, selectedCapacity.getName());
+            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedCharacterId(), JobType.WARRIOR, selectedCapacity.getName());
             clientMessenger.sendMessageToUserService(messageUnlockCapacity);
         }
     }

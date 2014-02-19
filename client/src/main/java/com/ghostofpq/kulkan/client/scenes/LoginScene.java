@@ -146,7 +146,6 @@ public class LoginScene implements Scene {
                         clientContext.setPlayer(response.getPlayer());
                         clientContext.setTokenKey(response.getTokenKey());
                         clientMessenger.openChannelsAfterAuthentication(response.getTokenKey());
-                        client.setTokenKey(response.getTokenKey());
                         client.setCurrentScene(lobbyScene);
                     } else {
                         List<String> options = new ArrayList<String>();

@@ -207,7 +207,7 @@ public class CreateGameCharacterScene implements Scene {
                 log.debug("ClanType : '{}'", clanType);
                 log.debug("Sending ");
                 Player player = clientContext.getPlayer();
-                MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(client.getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
+                MessageCreateNewGameCharacter messageCreateNewGameCharacter = new MessageCreateNewGameCharacter(clientContext.getTokenKey(), player.getPseudo(), clanType, gender, name.getLabel());
                 clientMessenger.sendMessageToUserService(messageCreateNewGameCharacter);
             }
         };

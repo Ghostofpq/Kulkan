@@ -87,35 +87,6 @@ public class UserController {
         return user;
     }
 
-    private GameCharacterDB getGameCharacterDBFromTeam(User user, ObjectId gameCharacterId) {
-        GameCharacterDB gameCharacterDB = null;
-        for (GameCharacterDB teamMember : user.getTeam()) {
-            if (teamMember.getId().equals(gameCharacterId)) {
-                gameCharacterDB = teamMember;
-                break;
-            }
-        }
-        return gameCharacterDB;
-    }
-
-    private GameCharacterDB getGameCharacterDBFromStock(User user, ObjectId gameCharacterId) {
-        GameCharacterDB gameCharacterDB = null;
-        for (GameCharacterDB stockMember : user.getStock()) {
-            if (stockMember.getId().equals(gameCharacterId)) {
-                gameCharacterDB = stockMember;
-                break;
-            }
-        }
-        return gameCharacterDB;
-    }
-
-    public GameCharacterDB getGameCharacterDB(User user, ObjectId gameCharacterId) {
-        GameCharacterDB gameCharacterDB = getGameCharacterDBFromTeam(user, gameCharacterId);
-        if (null == gameCharacterDB) {
-            gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
-        }
-        return gameCharacterDB;
-    }
 
     /**
      * Sets the new job to the GameCharacter associated with the given gameCharacterId.
@@ -395,29 +366,50 @@ public class UserController {
         return user;
     }
 
-    public User buyItem(String tokenKey, String itemId) {
-        User user = getUserForTokenKey(tokenKey);
+    /**
+     * Buys the Item associated with the given itemId for user
+     *
+     * @param username the user's username
+     * @param tokenKey the token key known by the user's client
+     * @param itemId   the id of the item to buy
+     * @return the updated user
+     * @throws InvalidUsernameException    if the username is not valid
+     * @throws VerificationFailedException if the tokenKey and the actual token of user are different
+     * @throws InvalidItemIdException      if no Item is associated to the itemId
+     * @throws NotEnoughMoneyException     if the user has not enough money to buy the item
+     */
+    public User buyItem(String username, String tokenKey, String itemId) throws InvalidUsernameException, VerificationFailedException, InvalidItemIdException, NotEnoughMoneyException {
+        // Get user for username
+        User user = getUserForUsername(username);
         if (null != user) {
-            Item itemToBuy = itemController.getItemById(itemId);
-            if (null != itemToBuy) {
-                if (itemToBuy.getPrice() <= user.getMoney()) {
-                    log.debug("{} just bought a {}", user.getFirstName(), itemToBuy.getName());
-                    user.setMoney(user.getMoney() - itemToBuy.getPrice());
-                    user.getInventory().addOne(itemId);
-                    user = userRepository.save(user);
+            // Check if username and token key are ok
+            if (tokenKey.equals(user.getTokenKey())) {
+                // Get item to Buy
+                Item itemToBuy = itemController.getItemById(itemId);
+                if (null != itemToBuy) {
+                    if (itemToBuy.getPrice() <= user.getMoney()) {
+                        // Update money
+                        user.setMoney(user.getMoney() - itemToBuy.getPrice());
+                        // Add item
+                        user.getInventory().addOne(itemId);
+                        // Save User
+                        return userRepository.save(user);
+                    } else {
+                        throw new NotEnoughMoneyException();
+                    }
                 } else {
-                    log.warn("{} can't buy a {}", user.getUsername(), itemToBuy.getName());
+                    throw new InvalidItemIdException();
                 }
             } else {
-                log.error("Item not found");
+                throw new VerificationFailedException();
             }
         } else {
-            log.error("User not found");
+            throw new InvalidUsernameException();
         }
-        return user;
     }
 
-    public User equipItem(String tokenKey, ObjectId gameCharId, String itemId) {
+
+    public User equipItem(String username, String tokenKey, ObjectId gameCharId, String itemId) {
         User user = getUserForTokenKey(tokenKey);
         if (null != user) {
             List<GameCharacterDB> allGameCharactersForUser = new ArrayList<GameCharacterDB>();
@@ -435,7 +427,7 @@ public class UserController {
         return user;
     }
 
-    public User unequipItem(String tokenKey, ObjectId gameCharId, ItemType itemType) {
+    public User unequipItem(String username, String tokenKey, ObjectId gameCharId, ItemType itemType) {
         User user = getUserForTokenKey(tokenKey);
         if (null != user) {
             List<GameCharacterDB> allGameCharactersForUser = new ArrayList<GameCharacterDB>();
@@ -460,21 +452,50 @@ public class UserController {
         return user;
     }
 
+
+    //GETTERS
+
+    private GameCharacterDB getGameCharacterDBFromTeam(User user, ObjectId gameCharacterId) {
+        GameCharacterDB gameCharacterDB = null;
+        for (GameCharacterDB teamMember : user.getTeam()) {
+            if (teamMember.getId().equals(gameCharacterId)) {
+                gameCharacterDB = teamMember;
+                break;
+            }
+        }
+        return gameCharacterDB;
+    }
+
+    private GameCharacterDB getGameCharacterDBFromStock(User user, ObjectId gameCharacterId) {
+        GameCharacterDB gameCharacterDB = null;
+        for (GameCharacterDB stockMember : user.getStock()) {
+            if (stockMember.getId().equals(gameCharacterId)) {
+                gameCharacterDB = stockMember;
+                break;
+            }
+        }
+        return gameCharacterDB;
+    }
+
+    private GameCharacterDB getGameCharacterDB(User user, ObjectId gameCharacterId) {
+        GameCharacterDB gameCharacterDB = getGameCharacterDBFromTeam(user, gameCharacterId);
+        if (null == gameCharacterDB) {
+            gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
+        }
+        return gameCharacterDB;
+    }
+
+    //SPRING
+
+    public void setTokenKeySize(Integer tokenKeySize) {
+        this.tokenKeySize = tokenKeySize;
+    }
+
+// EXCEPTIONS
+
     public class InvalidUsernameException extends Exception {
         public InvalidUsernameException() {
             super();
-        }
-
-        public InvalidUsernameException(String message) {
-            super(message);
-        }
-
-        public InvalidUsernameException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public InvalidUsernameException(Throwable cause) {
-            super(cause);
         }
     }
 
@@ -482,35 +503,11 @@ public class UserController {
         public VerificationFailedException() {
             super();
         }
-
-        public VerificationFailedException(String message) {
-            super(message);
-        }
-
-        public VerificationFailedException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public VerificationFailedException(Throwable cause) {
-            super(cause);
-        }
     }
 
     public class TeamIsFullException extends Exception {
         public TeamIsFullException() {
             super();
-        }
-
-        public TeamIsFullException(String message) {
-            super(message);
-        }
-
-        public TeamIsFullException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public TeamIsFullException(Throwable cause) {
-            super(cause);
         }
     }
 
@@ -518,35 +515,11 @@ public class UserController {
         public StockIsFullException() {
             super();
         }
-
-        public StockIsFullException(String message) {
-            super(message);
-        }
-
-        public StockIsFullException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public StockIsFullException(Throwable cause) {
-            super(cause);
-        }
     }
 
     public class InvalidGameCharacterIdException extends Exception {
         public InvalidGameCharacterIdException() {
             super();
-        }
-
-        public InvalidGameCharacterIdException(String message) {
-            super(message);
-        }
-
-        public InvalidGameCharacterIdException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public InvalidGameCharacterIdException(Throwable cause) {
-            super(cause);
         }
     }
 
@@ -554,21 +527,18 @@ public class UserController {
         public InvalidNameException() {
             super();
         }
+    }
 
-        public InvalidNameException(String message) {
-            super(message);
-        }
-
-        public InvalidNameException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public InvalidNameException(Throwable cause) {
-            super(cause);
+    public class InvalidItemIdException extends Exception {
+        public InvalidItemIdException() {
+            super();
         }
     }
 
-    public void setTokenKeySize(Integer tokenKeySize) {
-        this.tokenKeySize = tokenKeySize;
+    public class NotEnoughMoneyException extends Exception {
+        public NotEnoughMoneyException() {
+            super();
+        }
     }
+
 }

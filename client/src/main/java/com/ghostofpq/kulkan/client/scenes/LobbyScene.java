@@ -298,7 +298,7 @@ public class LobbyScene implements Scene {
         background = new Background(TextureKey.LOBBY_BACKGROUND_169);
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
-        MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(client.getTokenKey());
+        MessageSubscribeToLobby messageSubscribeToLobby = new MessageSubscribeToLobby(clientContext.getTokenKey());
         clientMessenger.sendMessageToLobbyService(messageSubscribeToLobby);
     }
 
@@ -353,7 +353,7 @@ public class LobbyScene implements Scene {
 
     public void actionPostMessage() {
         if (!inputChat.getLabel().isEmpty()) {
-            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(client.getTokenKey(), inputChat.getLabel());
+            MessageLobbyClient messageLobbyClient = new MessageLobbyClient(clientContext.getTokenKey(), inputChat.getLabel());
             clientMessenger.sendMessageToLobbyService(messageLobbyClient);
             inputChat.clear();
         }
@@ -415,13 +415,13 @@ public class LobbyScene implements Scene {
     }
 
     private void exitLobby() {
-        MessageUnsubscribeToLobby messageUnsubscribeToLobby = new MessageUnsubscribeToLobby(client.getTokenKey());
+        MessageUnsubscribeToLobby messageUnsubscribeToLobby = new MessageUnsubscribeToLobby(clientContext.getTokenKey());
         clientMessenger.sendMessageToLobbyService(messageUnsubscribeToLobby);
     }
 
     public void acceptMatch() {
         if (null != matchId && !matchId.isEmpty()) {
-            MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(client.getTokenKey(), matchId);
+            MessageMatchmakingAccept messageMatchmakingAccept = new MessageMatchmakingAccept(clientContext.getTokenKey(), matchId);
             clientMessenger.sendMessageToMatchmakingService(messageMatchmakingAccept);
             matchFound = false;
             matchId = "";
@@ -430,7 +430,7 @@ public class LobbyScene implements Scene {
 
     public void refuseMatch() {
         if (null != matchId && !matchId.isEmpty()) {
-            MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(client.getTokenKey(), matchId);
+            MessageMatchmakingRefuse messageMatchmakingRefuse = new MessageMatchmakingRefuse(clientContext.getTokenKey(), matchId);
             clientMessenger.sendMessageToMatchmakingService(messageMatchmakingRefuse);
             matchFound = false;
             matchId = "";
@@ -438,7 +438,7 @@ public class LobbyScene implements Scene {
     }
 
     public void enterMatchmaking() {
-        MessageMatchmakingSubscribe messageMatchmakingSubscribe = new MessageMatchmakingSubscribe(client.getTokenKey());
+        MessageMatchmakingSubscribe messageMatchmakingSubscribe = new MessageMatchmakingSubscribe(clientContext.getTokenKey());
         clientMessenger.sendMessageToMatchmakingService(messageMatchmakingSubscribe);
     }
 

@@ -8,9 +8,10 @@ public class MessageEquipItemOnGameCharacter extends ClientMessage {
     private ObjectId gameCharId;
     private String itemId;
 
-    public MessageEquipItemOnGameCharacter(String keyToken, ObjectId gameCharId, String itemId) {
+    public MessageEquipItemOnGameCharacter(String keyToken, String username, ObjectId gameCharId, String itemId) {
         this.type = MessageType.EQUIP_ITEM;
         this.keyToken = keyToken;
+        this.username = username;
         this.gameCharId = gameCharId;
         this.itemId = itemId;
     }

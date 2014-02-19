@@ -209,19 +209,6 @@ public class Client {
         return clientMessenger.getConnection();
     }
 
-    public String getTokenKey() {
-        return tokenKey;
-    }
-
-    public void setTokenKey(String tokenKey) {
-        this.tokenKey = tokenKey;
-        try {
-            clientMessenger.openChannelsAfterAuthentication(tokenKey);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void setDisplayMode(int width, int height, boolean fullscreen) {
         if ((Display.getDisplayMode().getWidth() == width) &&
                 (Display.getDisplayMode().getHeight() == height) &&

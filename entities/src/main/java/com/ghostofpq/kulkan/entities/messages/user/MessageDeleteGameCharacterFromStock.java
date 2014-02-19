@@ -6,7 +6,6 @@ import com.ghostofpq.kulkan.entities.messages.MessageType;
 import org.bson.types.ObjectId;
 
 public class MessageDeleteGameCharacterFromStock extends ClientMessage {
-    private String username;
     private ObjectId gameCharId;
 
     public MessageDeleteGameCharacterFromStock(String keyToken, String username, ObjectId gameCharId) {
@@ -14,10 +13,6 @@ public class MessageDeleteGameCharacterFromStock extends ClientMessage {
         this.keyToken = keyToken;
         this.username = username;
         this.gameCharId = gameCharId;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public ObjectId getGameCharId() {

@@ -183,7 +183,7 @@ public class ManageGameCharacterEquipmentScene implements Scene {
     }
 
     public void unequipItemType(ItemType itemType) {
-        MessageUnequipItemOnGameCharacter messageUnequipItemOnGameCharacter = new MessageUnequipItemOnGameCharacter(client.getTokenKey(), clientContext.getSelectedCharacterId(), itemType);
+        MessageUnequipItemOnGameCharacter messageUnequipItemOnGameCharacter = new MessageUnequipItemOnGameCharacter(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedCharacterId(), itemType);
         clientMessenger.sendMessageToUserService(messageUnequipItemOnGameCharacter);
     }
 

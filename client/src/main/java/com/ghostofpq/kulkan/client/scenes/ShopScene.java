@@ -122,7 +122,7 @@ public class ShopScene implements Scene {
     }
 
     private void buySelectedItem() {
-        MessageBuyItem messageBuyItem = new MessageBuyItem(client.getTokenKey(), selectedItem.getItemID());
+        MessageBuyItem messageBuyItem = new MessageBuyItem(clientContext.getTokenKey(), clientContext.getUsername(), selectedItem.getItemID());
         clientMessenger.sendMessageToUserService(messageBuyItem);
     }
 
