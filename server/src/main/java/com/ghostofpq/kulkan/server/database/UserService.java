@@ -8,7 +8,6 @@ import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
 import com.ghostofpq.kulkan.server.database.controller.UserController;
-import com.ghostofpq.kulkan.server.database.controller.UserController.ErrorCode;
 import com.ghostofpq.kulkan.server.database.model.User;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -176,21 +175,17 @@ public class UserService implements Runnable {
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("NewJob : '{}'", newJob);
         if (null != tokenKey && null != gameCharId && null != newJob) {
-            ErrorCode result = userController.setNewJobForGameChar(username, tokenKey, gameCharId, newJob);
             Message response;
-
-            if (result == ErrorCode.OK) {
-                User user = userController.getUserForUsername(tokenKey);
+            try {
+                User user = userController.setNewJobForGameChar(username, tokenKey, gameCharId, newJob);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } else if (result == ErrorCode.USERNAME_INVALID) {
+            } catch (UserController.InvalidUsernameException e) {
                 response = new MessageError("Username was not found.");
-            } else if (result == ErrorCode.VERIFICATION_FAILED) {
+            } catch (UserController.VerificationFailedException e) {
                 response = new MessageError("Verification failed. Please restart the game.");
-            } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
+            } catch (UserController.InvalidGameCharacterIdException e) {
                 response = new MessageError("Game Character was not found.");
-            } else {
-                response = new MessageError(new StringBuilder().append("Unexpected return for putGameCharFromStockToTeam : ").append(result).toString());
             }
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -212,22 +207,17 @@ public class UserService implements Runnable {
         log.debug("GameCharId : '{}'", gameCharId);
 
         if (null != tokenKey && null != username && null != gameCharId) {
-            ErrorCode result = userController.removeGameCharFromTeam(username, tokenKey, gameCharId);
-
             Message response;
-
-            if (result == ErrorCode.OK) {
-                User user = userController.getUserForUsername(username);
+            try {
+                User user = userController.removeGameCharFromTeam(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } else if (result == ErrorCode.USERNAME_INVALID) {
+            } catch (UserController.InvalidUsernameException e) {
                 response = new MessageError("Username was not found.");
-            } else if (result == ErrorCode.VERIFICATION_FAILED) {
+            } catch (UserController.VerificationFailedException e) {
                 response = new MessageError("Verification failed. Please restart the game.");
-            } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
+            } catch (UserController.InvalidGameCharacterIdException e) {
                 response = new MessageError("Game Character was not found.");
-            } else {
-                response = new MessageError(new StringBuilder().append("Unexpected return for putGameCharFromStockToTeam : ").append(result).toString());
             }
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -249,22 +239,17 @@ public class UserService implements Runnable {
         log.debug("GameCharName : '{}'", gameCharId);
 
         if (null != tokenKey && null != username && null != gameCharId) {
-            ErrorCode result = userController.removeGameCharFromStock(username, tokenKey, gameCharId);
-
             Message response;
-
-            if (result == ErrorCode.OK) {
-                User user = userController.getUserForUsername(username);
+            try {
+                User user = userController.removeGameCharFromStock(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } else if (result == ErrorCode.USERNAME_INVALID) {
+            } catch (UserController.InvalidUsernameException e) {
                 response = new MessageError("Username was not found.");
-            } else if (result == ErrorCode.VERIFICATION_FAILED) {
+            } catch (UserController.VerificationFailedException e) {
                 response = new MessageError("Verification failed. Please restart the game.");
-            } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
+            } catch (UserController.InvalidGameCharacterIdException e) {
                 response = new MessageError("Game Character was not found.");
-            } else {
-                response = new MessageError(new StringBuilder().append("Unexpected return for putGameCharFromStockToTeam : ").append(result).toString());
             }
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -286,24 +271,19 @@ public class UserService implements Runnable {
         log.debug("GameCharName : '{}'", gameCharId);
 
         if (null != tokenKey && null != username && null != gameCharId) {
-            ErrorCode result = userController.putGameCharFromTeamToStock(username, tokenKey, gameCharId);
-
             Message response;
-
-            if (result == ErrorCode.OK) {
-                User user = userController.getUserForUsername(username);
+            try {
+                User user = userController.putGameCharFromTeamToStock(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } else if (result == ErrorCode.USERNAME_INVALID) {
+            } catch (UserController.InvalidUsernameException e) {
                 response = new MessageError("Username was not found.");
-            } else if (result == ErrorCode.STOCK_IS_FULL) {
-                response = new MessageError("Stock is full. Please unlock some new slots.");
-            } else if (result == ErrorCode.VERIFICATION_FAILED) {
+            } catch (UserController.VerificationFailedException e) {
                 response = new MessageError("Verification failed. Please restart the game.");
-            } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
+            } catch (UserController.InvalidGameCharacterIdException e) {
                 response = new MessageError("Game Character was not found.");
-            } else {
-                response = new MessageError(new StringBuilder().append("Unexpected return for putGameCharFromStockToTeam : ").append(result).toString());
+            } catch (UserController.StockIsFullException e) {
+                response = new MessageError("Username was not found.");
             }
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -325,24 +305,19 @@ public class UserService implements Runnable {
         log.debug("GameCharName : '{}'", gameCharId);
 
         if (null != tokenKey && null != username && null != gameCharId) {
-            ErrorCode result = userController.putGameCharFromStockToTeam(username, tokenKey, gameCharId);
-
             Message response;
-
-            if (result == ErrorCode.OK) {
-                User user = userController.getUserForUsername(username);
+            try {
+                User user = userController.putGameCharFromStockToTeam(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } else if (result == ErrorCode.USERNAME_INVALID) {
+            } catch (UserController.InvalidUsernameException e) {
                 response = new MessageError("Username was not found.");
-            } else if (result == ErrorCode.TEAM_IS_FULL) {
-                response = new MessageError("Team is full. Put some of your characters into stock.");
-            } else if (result == ErrorCode.VERIFICATION_FAILED) {
-                response = new MessageError("Verification failed. Please restart the game.");
-            } else if (result == ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND) {
+            } catch (UserController.InvalidGameCharacterIdException e) {
                 response = new MessageError("Game Character was not found.");
-            } else {
-                response = new MessageError(new StringBuilder().append("Unexpected return for putGameCharFromStockToTeam : ").append(result).toString());
+            } catch (UserController.TeamIsFullException e) {
+                response = new MessageError("Team is full. Put some of your characters into stock.");
+            } catch (UserController.VerificationFailedException e) {
+                response = new MessageError("Verification failed. Please restart the game.");
             }
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
@@ -365,22 +340,19 @@ public class UserService implements Runnable {
         log.debug("ClanType : '{}'", clanType);
 
         if (null != name && null != gender && null != clanType) {
-            ErrorCode result = userController.createGameChar(messageCreateNewGameCharacter.getUsername(), tokenKey, name, clanType, gender);
-
             Message response;
-
-            if (result == ErrorCode.OK) {
-                User user = userController.getUserForUsername(messageCreateNewGameCharacter.getUsername());
+            try {
+                User user = userController.createGameChar(messageCreateNewGameCharacter.getUsername(), tokenKey, name, clanType, gender);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } else if (result == ErrorCode.NAME_IS_EMPTY) {
-                response = new MessageError("Please type in a name.");
-            } else if (result == ErrorCode.VERIFICATION_FAILED) {
-                response = new MessageError("Verification failed. Please restart the game.");
-            } else if (result == ErrorCode.TEAM_IS_FULL) {
+            } catch (UserController.InvalidUsernameException e) {
+                response = new MessageError("Username was not found.");
+            } catch (UserController.TeamIsFullException e) {
                 response = new MessageError("Team is full. Put some of your characters into stock.");
-            } else {
-                response = new MessageError(new StringBuilder().append("Unexpected return for createGameChar : ").append(result).toString());
+            } catch (UserController.VerificationFailedException e) {
+                response = new MessageError("Verification failed. Please restart the game.");
+            } catch (UserController.InvalidNameException e) {
+                response = new MessageError("Please type in a name.");
             }
 
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();

@@ -118,18 +118,18 @@ public class UserController {
     }
 
     /**
-     * Removes the GameCharacter associated with the given gameCharacterId from team.
+     * Sets the new job to the GameCharacter associated with the given gameCharacterId.
      *
+     * @param username        the user's username
      * @param tokenKey        the token key known by the user's client
      * @param gameCharacterId the id of the GameCharacter to handle
      * @param newJob          the job to set to the GameCharacter
-     * @return ErrorCode.OK if everything went well<br/>
-     * ErrorCode.VERIFICATION_FAILED iif the tokenKey and the actual token of user are different<br/>
-     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
-     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     * @return the updated user
+     * @throws InvalidGameCharacterIdException if no GameCharacter is associated to the gameCharacterId
+     * @throws InvalidUsernameException        if the username is not valid
+     * @throws VerificationFailedException     if the tokenKey and the actual token of user are different
      */
-    public ErrorCode setNewJobForGameChar(String username, String tokenKey, ObjectId gameCharacterId, JobType newJob) {
-        ErrorCode result;
+    public User setNewJobForGameChar(String username, String tokenKey, ObjectId gameCharacterId, JobType newJob) throws InvalidGameCharacterIdException, InvalidUsernameException, VerificationFailedException {
         // Get user for username
         User user = getUserForUsername(tokenKey);
         if (null != user) {
@@ -141,18 +141,16 @@ public class UserController {
                     // Set the new Job to the GameCharacterDB
                     gameCharacterDB.setCurrentJob(newJob);
                     // Save User
-                    userRepository.save(user);
-                    result = ErrorCode.OK;
+                    return userRepository.save(user);
                 } else {
-                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                    throw new InvalidGameCharacterIdException();
                 }
             } else {
-                result = ErrorCode.VERIFICATION_FAILED;
+                throw new VerificationFailedException();
             }
         } else {
-            result = ErrorCode.USERNAME_INVALID;
+            throw new InvalidUsernameException();
         }
-        return result;
     }
 
     /**
@@ -163,14 +161,13 @@ public class UserController {
      * @param name     the name of the new character
      * @param clanType the clan of the new character
      * @param gender   the gender of the new character
-     * @return ErrorCode.OK if everything went well<br/>
-     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
-     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
-     * ErrorCode.NAME_IS_EMPTY if the name is empty<br/>
-     * ErrorCode.TEAM_IS_FULL if the team is full<br/>
+     * @return the updated user
+     * @throws InvalidUsernameException    if the username is not valid
+     * @throws VerificationFailedException if the tokenKey and the actual token of user are different
+     * @throws InvalidNameException        if the name is empty
+     * @throws TeamIsFullException         if the team is full
      */
-    public ErrorCode createGameChar(String username, String tokenKey, String name, ClanType clanType, Gender gender) {
-        ErrorCode result;
+    public User createGameChar(String username, String tokenKey, String name, ClanType clanType, Gender gender) throws InvalidUsernameException, VerificationFailedException, InvalidNameException, TeamIsFullException {
         // Get user for username
         User user = getUserForUsername(username);
         if (null != user) {
@@ -184,21 +181,19 @@ public class UserController {
                         GameCharacter gameCharacter = new GameCharacter(name, clanType, gender);
                         GameCharacterDB gameCharacterDB = new GameCharacterDB(gameCharacter);
                         user.addGameCharToTeam(gameCharacterDB);
-                        userRepository.save(user);
-                        result = ErrorCode.OK;
+                        return userRepository.save(user);
                     } else {
-                        result = ErrorCode.TEAM_IS_FULL;
+                        throw new TeamIsFullException();
                     }
                 } else {
-                    result = ErrorCode.NAME_IS_EMPTY;
+                    throw new InvalidNameException();
                 }
             } else {
-                result = ErrorCode.VERIFICATION_FAILED;
+                throw new VerificationFailedException();
             }
         } else {
-            result = ErrorCode.USERNAME_INVALID;
+            throw new InvalidUsernameException();
         }
-        return result;
     }
 
     /**
@@ -207,13 +202,12 @@ public class UserController {
      * @param username        the user's username
      * @param tokenKey        the token key known by the user's client
      * @param gameCharacterId the id of the GameCharacter to handle
-     * @return ErrorCode.OK if everything went well<br/>
-     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
-     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
-     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     * @return the updated user
+     * @throws InvalidGameCharacterIdException if no GameCharacter is associated to the gameCharacterId
+     * @throws VerificationFailedException     if the tokenKey and the actual token of user are different
+     * @throws InvalidUsernameException        if the username is not valid
      */
-    public ErrorCode removeGameCharFromTeam(String username, String tokenKey, ObjectId gameCharacterId) {
-        ErrorCode result;
+    public User removeGameCharFromTeam(String username, String tokenKey, ObjectId gameCharacterId) throws InvalidGameCharacterIdException, VerificationFailedException, InvalidUsernameException {
         // Get user for username
         User user = getUserForUsername(username);
         if (null != user) {
@@ -225,18 +219,16 @@ public class UserController {
                     // remove GameCharacterDB from team
                     user.getTeam().remove(gameCharacterDB);
                     // Save User
-                    userRepository.save(user);
-                    result = ErrorCode.OK;
+                    return userRepository.save(user);
                 } else {
-                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                    throw new InvalidGameCharacterIdException();
                 }
             } else {
-                result = ErrorCode.VERIFICATION_FAILED;
+                throw new VerificationFailedException();
             }
         } else {
-            result = ErrorCode.USERNAME_INVALID;
+            throw new InvalidUsernameException();
         }
-        return result;
     }
 
     /**
@@ -245,13 +237,12 @@ public class UserController {
      * @param username        the user's username
      * @param tokenKey        the token key known by the user's client
      * @param gameCharacterId the id of the GameCharacter to handle
-     * @return ErrorCode.OK if everything went well<br/>
-     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
-     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
-     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     * @return the updated user
+     * @throws InvalidGameCharacterIdException if no GameCharacter is associated to the gameCharacterId
+     * @throws VerificationFailedException     if the tokenKey and the actual token of user are different
+     * @throws InvalidUsernameException        if the username is not valid
      */
-    public ErrorCode removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) {
-        ErrorCode result;
+    public User removeGameCharFromStock(String username, String tokenKey, ObjectId gameCharacterId) throws InvalidGameCharacterIdException, VerificationFailedException, InvalidUsernameException {
         // Get user for username
         User user = getUserForUsername(username);
         if (null != user) {
@@ -263,18 +254,16 @@ public class UserController {
                     // remove GameCharacterDB from stock
                     user.getTeam().remove(gameCharacterDB);
                     // Save User
-                    userRepository.save(user);
-                    result = ErrorCode.OK;
+                    return userRepository.save(user);
                 } else {
-                    result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                    throw new InvalidGameCharacterIdException();
                 }
             } else {
-                result = ErrorCode.VERIFICATION_FAILED;
+                throw new VerificationFailedException();
             }
         } else {
-            result = ErrorCode.USERNAME_INVALID;
+            throw new InvalidUsernameException();
         }
-        return result;
     }
 
 
@@ -284,14 +273,14 @@ public class UserController {
      * @param username        the user's username
      * @param tokenKey        the token key known by the user's client
      * @param gameCharacterId the id of the GameCharacter to handle
-     * @return ErrorCode.OK if everything went well<br/>
-     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
-     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
-     * ErrorCode.STOCK_IS_FULL if stock is full<br/>
-     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     * @return the updated user
+     * @throws VerificationFailedException     if the tokenKey and the actual token of user are different
+     * @throws InvalidUsernameException        if the username is not valid
+     * @throws InvalidGameCharacterIdException if no GameCharacter is associated to the gameCharacterId
+     * @throws StockIsFullException            if stock is full
      */
-    public ErrorCode putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) {
-        ErrorCode result;
+    public User putGameCharFromTeamToStock(String username, String tokenKey, ObjectId gameCharacterId) throws
+            VerificationFailedException, InvalidUsernameException, InvalidGameCharacterIdException, StockIsFullException {
         // Get user for username
         User user = getUserForUsername(username);
         if (null != user) {
@@ -306,21 +295,19 @@ public class UserController {
                         user.getTeam().remove(gameCharacterDB);
                         user.getStock().add(gameCharacterDB);
                         // Save User
-                        userRepository.save(user);
-                        result = ErrorCode.OK;
+                        return userRepository.save(user);
                     } else {
-                        result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                        throw new InvalidGameCharacterIdException();
                     }
                 } else {
-                    result = ErrorCode.STOCK_IS_FULL;
+                    throw new StockIsFullException();
                 }
             } else {
-                result = ErrorCode.VERIFICATION_FAILED;
+                throw new VerificationFailedException();
             }
         } else {
-            result = ErrorCode.USERNAME_INVALID;
+            throw new InvalidUsernameException();
         }
-        return result;
     }
 
     /**
@@ -329,14 +316,14 @@ public class UserController {
      * @param username        the user's username
      * @param tokenKey        the token key known by the user's client
      * @param gameCharacterId the id of the GameCharacter to handle
-     * @return ErrorCode.OK if everything went well<br/>
-     * ErrorCode.VERIFICATION_FAILED if the tokenKey and the actual token of user are different<br/>
-     * ErrorCode.USERNAME_INVALID if the username is not valid<br/>
-     * ErrorCode.TEAM_IS_FULL if team is full<br/>
-     * ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND if no GameCharacter is associated to the gameCharacterId<br/>
+     * @return the updated user
+     * @throws VerificationFailedException     if the tokenKey and the actual token of user are different
+     * @throws InvalidUsernameException        if the username is not valid
+     * @throws InvalidGameCharacterIdException if no GameCharacter is associated to the gameCharacterId
+     * @throws TeamIsFullException             if team is full
      */
-    public ErrorCode putGameCharFromStockToTeam(String username, String tokenKey, ObjectId gameCharacterId) {
-        ErrorCode result;
+    public User putGameCharFromStockToTeam(String username, String tokenKey, ObjectId gameCharacterId) throws
+            VerificationFailedException, InvalidUsernameException, InvalidGameCharacterIdException, TeamIsFullException {
         // Get user for username
         User user = getUserForUsername(username);
         if (null != user) {
@@ -351,21 +338,19 @@ public class UserController {
                         user.getStock().remove(gameCharacterDB);
                         user.getTeam().add(gameCharacterDB);
                         // Save User
-                        userRepository.save(user);
-                        result = ErrorCode.OK;
+                        return userRepository.save(user);
                     } else {
-                        result = ErrorCode.GAME_CHARACTER_WAS_NOT_FOUND;
+                        throw new InvalidGameCharacterIdException();
                     }
                 } else {
-                    result = ErrorCode.TEAM_IS_FULL;
+                    throw new TeamIsFullException();
                 }
             } else {
-                result = ErrorCode.VERIFICATION_FAILED;
+                throw new VerificationFailedException();
             }
         } else {
-            result = ErrorCode.USERNAME_INVALID;
+            throw new InvalidUsernameException();
         }
-        return result;
     }
 
     public User unlockCapacityForJobForGameCharacter(String tokenKey, ObjectId gameCharacterId, JobType jobType, String capacityName) {
@@ -475,14 +460,112 @@ public class UserController {
         return user;
     }
 
-    public enum ErrorCode {
-        OK,
-        USERNAME_INVALID,
-        VERIFICATION_FAILED,
-        NAME_IS_EMPTY,
-        GAME_CHARACTER_WAS_NOT_FOUND,
-        TEAM_IS_FULL,
-        STOCK_IS_FULL;
+    public class InvalidUsernameException extends Exception {
+        public InvalidUsernameException() {
+            super();
+        }
+
+        public InvalidUsernameException(String message) {
+            super(message);
+        }
+
+        public InvalidUsernameException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public InvalidUsernameException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    public class VerificationFailedException extends Exception {
+        public VerificationFailedException() {
+            super();
+        }
+
+        public VerificationFailedException(String message) {
+            super(message);
+        }
+
+        public VerificationFailedException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public VerificationFailedException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    public class TeamIsFullException extends Exception {
+        public TeamIsFullException() {
+            super();
+        }
+
+        public TeamIsFullException(String message) {
+            super(message);
+        }
+
+        public TeamIsFullException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public TeamIsFullException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    public class StockIsFullException extends Exception {
+        public StockIsFullException() {
+            super();
+        }
+
+        public StockIsFullException(String message) {
+            super(message);
+        }
+
+        public StockIsFullException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public StockIsFullException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    public class InvalidGameCharacterIdException extends Exception {
+        public InvalidGameCharacterIdException() {
+            super();
+        }
+
+        public InvalidGameCharacterIdException(String message) {
+            super(message);
+        }
+
+        public InvalidGameCharacterIdException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public InvalidGameCharacterIdException(Throwable cause) {
+            super(cause);
+        }
+    }
+
+    public class InvalidNameException extends Exception {
+        public InvalidNameException() {
+            super();
+        }
+
+        public InvalidNameException(String message) {
+            super(message);
+        }
+
+        public InvalidNameException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public InvalidNameException(Throwable cause) {
+            super(cause);
+        }
     }
 
     public void setTokenKeySize(Integer tokenKeySize) {
