@@ -111,6 +111,17 @@ public abstract class Job implements Serializable {
         }
     }
 
+    public Capacity getCapacity(String capacityName) {
+        Capacity result = null;
+        for (Capacity capacity : getSkillTree()) {
+            if (capacity.getName().equals(capacityName)) {
+                result = capacity;
+                break;
+            }
+        }
+        return result;
+    }
+
     public PrimaryCharacteristics getAggregatedCharacteristics() {
         PrimaryCharacteristics result = new PrimaryCharacteristics();
         for (AmeliorationPrimary ameliorationPrimary : unlockedAmeliorationPrimaries) {

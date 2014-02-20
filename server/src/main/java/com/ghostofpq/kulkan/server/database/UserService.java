@@ -99,6 +99,12 @@ public class UserService implements Runnable {
         }
     }
 
+    private void sendMessageToUser(String tokenKey, Message message) throws IOException {
+        String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
+        channelServiceOut.queueDeclare(queueName, false, false, false, null);
+        channelServiceOut.basicPublish("", queueName, null, message.getBytes());
+    }
+
     private void manageEquipItem(Message message) throws IOException {
         MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = (MessageEquipItemOnGameCharacter) message;
 
@@ -114,12 +120,17 @@ public class UserService implements Runnable {
         log.debug("ItemId : '{}'", itemId);
 
         if (null != tokenKey && null != gameCharId && null != itemId) {
-            User user = userController.equipItem(tokenKey, gameCharId, itemId);
-            Player player = user.toPlayer();
-            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            Message response;
+
+            try {
+                User user = userController.equipItem(username, tokenKey, gameCharId, itemId);
+                Player player = user.toPlayer();
+                response = new MessagePlayerUpdate(player);
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
+            }
+
+            sendMessageToUser(tokenKey, response);
         }
     }
 
@@ -136,13 +147,19 @@ public class UserService implements Runnable {
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("ItemType : '{}'", itemType);
+
         if (null != tokenKey && null != gameCharId && null != itemType) {
-            User user = userController.unequipItem(tokenKey, gameCharId, itemType);
-            Player player = user.toPlayer();
-            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            Message response;
+
+            try {
+                User user = userController.unequipItem(username, tokenKey, gameCharId, itemType);
+                Player player = user.toPlayer();
+                response = new MessagePlayerUpdate(player);
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
+            }
+
+            sendMessageToUser(tokenKey, response);
         }
     }
 
@@ -157,13 +174,19 @@ public class UserService implements Runnable {
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("ItemId : '{}'", itemId);
+
         if (null != tokenKey && null != itemId) {
-            User user = userController.buyItem(username, tokenKey, itemId);
-            Player player = user.toPlayer();
-            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
+            Message response;
+
+            try {
+                User user = userController.buyItem(username, tokenKey, itemId);
+                Player player = user.toPlayer();
+                response = new MessagePlayerUpdate(player);
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
+            }
+
+            sendMessageToUser(tokenKey, response);
         }
     }
 
@@ -180,23 +203,19 @@ public class UserService implements Runnable {
         log.debug("TokenKey : '{}'", tokenKey);
         log.debug("GameCharId : '{}'", gameCharId);
         log.debug("NewJob : '{}'", newJob);
+
         if (null != tokenKey && null != gameCharId && null != newJob) {
             Message response;
+
             try {
                 User user = userController.setNewJobForGameChar(username, tokenKey, gameCharId, newJob);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } catch (UserController.InvalidUsernameException e) {
-                response = new MessageError("Username was not found.");
-            } catch (UserController.VerificationFailedException e) {
-                response = new MessageError("Verification failed. Please restart the game.");
-            } catch (UserController.InvalidGameCharacterIdException e) {
-                response = new MessageError("Game Character was not found.");
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
             }
 
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
+            sendMessageToUser(tokenKey, response);
         }
     }
 
@@ -214,21 +233,16 @@ public class UserService implements Runnable {
 
         if (null != tokenKey && null != username && null != gameCharId) {
             Message response;
+
             try {
                 User user = userController.removeGameCharFromTeam(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } catch (UserController.InvalidUsernameException e) {
-                response = new MessageError("Username was not found.");
-            } catch (UserController.VerificationFailedException e) {
-                response = new MessageError("Verification failed. Please restart the game.");
-            } catch (UserController.InvalidGameCharacterIdException e) {
-                response = new MessageError("Game Character was not found.");
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
             }
 
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
+            sendMessageToUser(tokenKey, response);
         }
     }
 
@@ -242,25 +256,20 @@ public class UserService implements Runnable {
         log.debug("Received a DeleteGameChararacterFromStockRequest");
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
-        log.debug("GameCharName : '{}'", gameCharId);
+        log.debug("GameCharId : '{}'", gameCharId);
 
         if (null != tokenKey && null != username && null != gameCharId) {
             Message response;
+
             try {
                 User user = userController.removeGameCharFromStock(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } catch (UserController.InvalidUsernameException e) {
-                response = new MessageError("Username was not found.");
-            } catch (UserController.VerificationFailedException e) {
-                response = new MessageError("Verification failed. Please restart the game.");
-            } catch (UserController.InvalidGameCharacterIdException e) {
-                response = new MessageError("Game Character was not found.");
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
             }
 
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
+            sendMessageToUser(tokenKey, response);
         }
     }
 
@@ -274,27 +283,20 @@ public class UserService implements Runnable {
         log.debug("Received a PutGameCharacterFromTeamToStockRequest");
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
-        log.debug("GameCharName : '{}'", gameCharId);
+        log.debug("GameCharId : '{}'", gameCharId);
 
         if (null != tokenKey && null != username && null != gameCharId) {
             Message response;
+
             try {
                 User user = userController.putGameCharFromTeamToStock(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } catch (UserController.InvalidUsernameException e) {
-                response = new MessageError("Username was not found.");
-            } catch (UserController.VerificationFailedException e) {
-                response = new MessageError("Verification failed. Please restart the game.");
-            } catch (UserController.InvalidGameCharacterIdException e) {
-                response = new MessageError("Game Character was not found.");
-            } catch (UserController.StockIsFullException e) {
-                response = new MessageError("Username was not found.");
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
             }
 
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
+            sendMessageToUser(tokenKey, response);
         }
     }
 
@@ -308,91 +310,83 @@ public class UserService implements Runnable {
         log.debug("Received a PutGameCharacterFromStockToTeamRequest");
         log.debug("Username : '{}'", username);
         log.debug("TokenKey : '{}'", tokenKey);
-        log.debug("GameCharName : '{}'", gameCharId);
+        log.debug("GameCharId : '{}'", gameCharId);
 
         if (null != tokenKey && null != username && null != gameCharId) {
             Message response;
+
             try {
                 User user = userController.putGameCharFromStockToTeam(username, tokenKey, gameCharId);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } catch (UserController.InvalidUsernameException e) {
-                response = new MessageError("Username was not found.");
-            } catch (UserController.InvalidGameCharacterIdException e) {
-                response = new MessageError("Game Character was not found.");
-            } catch (UserController.TeamIsFullException e) {
-                response = new MessageError("Team is full. Put some of your characters into stock.");
-            } catch (UserController.VerificationFailedException e) {
-                response = new MessageError("Verification failed. Please restart the game.");
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
             }
 
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
+            sendMessageToUser(tokenKey, response);
         }
     }
 
     private void manageCreateGameCharacterRequest(Message message) throws IOException {
         MessageCreateNewGameCharacter messageCreateNewGameCharacter = (MessageCreateNewGameCharacter) message;
 
+        String username = messageCreateNewGameCharacter.getUsername();
         String tokenKey = messageCreateNewGameCharacter.getKeyToken();
         String name = messageCreateNewGameCharacter.getName();
         Gender gender = messageCreateNewGameCharacter.getGender();
         ClanType clanType = messageCreateNewGameCharacter.getClanType();
 
         log.debug("Received a CreateGameCharacterRequest from [{}]", tokenKey);
+        log.debug("Username : '{}'", username);
+        log.debug("TokenKey : '{}'", tokenKey);
         log.debug("Name : '{}'", name);
         log.debug("Gender : '{}'", gender);
         log.debug("ClanType : '{}'", clanType);
 
         if (null != name && null != gender && null != clanType) {
             Message response;
+
             try {
                 User user = userController.createGameChar(messageCreateNewGameCharacter.getUsername(), tokenKey, name, clanType, gender);
                 Player player = user.toPlayer();
                 response = new MessagePlayerUpdate(player);
-            } catch (UserController.InvalidUsernameException e) {
-                response = new MessageError("Username was not found.");
-            } catch (UserController.TeamIsFullException e) {
-                response = new MessageError("Team is full. Put some of your characters into stock.");
-            } catch (UserController.VerificationFailedException e) {
-                response = new MessageError("Verification failed. Please restart the game.");
-            } catch (UserController.InvalidNameException e) {
-                response = new MessageError("Please type in a name.");
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
             }
 
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, response.getBytes());
+            sendMessageToUser(tokenKey, response);
         }
     }
 
     private void manageUnlockCapacityForGameCharacterRequest(Message message) throws IOException {
         MessageUnlockCapacity messageUnlockCapacity = (MessageUnlockCapacity) message;
+
+        String username = messageUnlockCapacity.getUsername();
         String tokenKey = messageUnlockCapacity.getKeyToken();
         ObjectId gameCharId = messageUnlockCapacity.getGameCharId();
-        JobType job = messageUnlockCapacity.getJob();
+        JobType jobType = messageUnlockCapacity.getJob();
         String capacityName = messageUnlockCapacity.getCapacityName();
-        if (null != tokenKey && null != gameCharId && null != job && null != capacityName && !tokenKey.isEmpty() && !capacityName.isEmpty()) {
-            log.debug("Received an UnlockCapacityRequest from [{}]", tokenKey);
-            log.debug("GC Name : '{}'", gameCharId);
-            log.debug("Job : '{}'", job);
-            log.debug("Capacity : '{}'", capacityName);
 
-            User user = userController.unlockCapacityForJobForGameCharacter(tokenKey, gameCharId, job, capacityName);
-            Player player = user.toPlayer();
+        log.debug("Received an UnlockCapacityRequest from [{}]", tokenKey);
+        log.debug("Username : '{}'", username);
+        log.debug("TokenKey : '{}'", tokenKey);
+        log.debug("GameCharId : '{}'", gameCharId);
+        log.debug("JobType : '{}'", jobType);
+        log.debug("CapacityName : '{}'", capacityName);
 
-            MessagePlayerUpdate messagePlayerUpdate = new MessagePlayerUpdate(player);
-            String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            channelServiceOut.queueDeclare(queueName, false, false, false, null);
-            channelServiceOut.basicPublish("", queueName, null, messagePlayerUpdate.getBytes());
-        } else {
-            log.error("Received a bugged UnlockCapacityRequest from [{}]", tokenKey);
-            log.debug("GC Name : '{}'", gameCharId);
-            log.debug("Job : '{}'", job);
-            log.debug("Capacity : '{}'", capacityName);
+        if (null != tokenKey && null != gameCharId && null != jobType && null != capacityName && !tokenKey.isEmpty() && !capacityName.isEmpty()) {
+            Message response;
+
+            try {
+                User user = userController.unlockCapacityForJobForGameCharacter(username, tokenKey, gameCharId, jobType, capacityName);
+                Player player = user.toPlayer();
+                response = new MessagePlayerUpdate(player);
+            } catch (Exception e) {
+                response = new MessageError(e.getMessage());
+            }
+
+            sendMessageToUser(tokenKey, response);
         }
-
     }
 
     // THREAD ROUTINE
