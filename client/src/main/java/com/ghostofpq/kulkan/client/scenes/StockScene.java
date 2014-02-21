@@ -41,6 +41,8 @@ public class StockScene implements Scene {
     private ClientMessenger clientMessenger;
     @Autowired
     private LobbyScene lobbyScene;
+    @Autowired
+    private ManageGameCharacterScene manageGameCharacterScene;
     // BACKGROUND
     private Background background;
     // POPUP
@@ -89,6 +91,8 @@ public class StockScene implements Scene {
                     Button stockCharacterButton = new Button(posX, posY, stockCharacterWidth, stockCharacterHeight, name, textureKey, textureKey) {
                         @Override
                         public void onClick() {
+                            //  clientContext.setSelectedCharacterId(id);
+                            //  client.setCurrentScene(manageGameCharacterScene);
                             actionReactivateCharacter(id);
                         }
                     };

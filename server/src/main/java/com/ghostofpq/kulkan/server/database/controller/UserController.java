@@ -272,7 +272,7 @@ public class UserController {
             String databaseTokenKey = user.getTokenKey();
             if (tokenKey.equals(databaseTokenKey)) {
                 // Check if Team is full
-                if (user.getTeam().size() <= 4) {
+                if (user.getTeam().size() < 4) {
                     // Get the GameCharacterDB associated with gameCharacterId parameter
                     GameCharacterDB gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
                     if (null != gameCharacterDB) {

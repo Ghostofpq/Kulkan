@@ -37,6 +37,20 @@ public class ItemService implements Runnable {
         requestClose = false;
     }
 
+    public void initConnection() throws IOException, InterruptedException {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(hostIp);
+        factory.setPort(hostPort);
+        log.debug("{}:{}", hostIp, hostPort);
+        connection = factory.newConnection();
+        channelServiceIn = connection.createChannel();
+        channelServiceIn.queueDeclare(serviceQueueName, false, false, false, null);
+        channelServiceIn.basicQos(1);
+        consumer = new QueueingConsumer(channelServiceIn);
+        channelServiceIn.basicConsume(serviceQueueName, true, consumer);
+        channelServiceOut = connection.createChannel();
+    }
+
     private void manageMessageItemsByTypeRequest(Message message) throws IOException {
         MessageItemsByTypeRequest messageItemsByTypeRequest = (MessageItemsByTypeRequest) message;
 
@@ -56,19 +70,6 @@ public class ItemService implements Runnable {
         }
     }
 
-    public void initConnection() throws IOException, InterruptedException {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(hostIp);
-        factory.setPort(hostPort);
-        log.debug("{}:{}", hostIp, hostPort);
-        connection = factory.newConnection();
-        channelServiceIn = connection.createChannel();
-        channelServiceIn.queueDeclare(serviceQueueName, false, false, false, null);
-        channelServiceIn.basicQos(1);
-        consumer = new QueueingConsumer(channelServiceIn);
-        channelServiceIn.basicConsume(serviceQueueName, true, consumer);
-        channelServiceOut = connection.createChannel();
-    }
 
     private void receiveMessage() throws InterruptedException, IOException {
         QueueingConsumer.Delivery delivery = consumer.nextDelivery();
