@@ -33,9 +33,11 @@ public class Warrior extends Job {
 
         Move empower = new Move("Empower", "+10 Strength", 0, MoveRangeType.SELF, MoveName.EMPOWER, 20);
         skillTree.add(empower);
+        SecondaryCharacteristics nope = new SecondaryCharacteristics();
+
 
         PrimaryCharacteristics strength1C = new PrimaryCharacteristics(5, 0, 0, 0, 0, 0);
-        SecondaryCharacteristics nope = new SecondaryCharacteristics();
+
         AmeliorationPrimary strength1 = new AmeliorationPrimary("S1", "Add 5 strength", strength1C, nope, 10);
         skillTree.add(strength1);
 
