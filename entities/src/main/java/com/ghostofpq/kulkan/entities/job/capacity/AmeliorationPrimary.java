@@ -1,16 +1,20 @@
 package com.ghostofpq.kulkan.entities.job.capacity;
 
 import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
 
 import java.util.ArrayList;
 
 public class AmeliorationPrimary extends Capacity {
-
     private static final long serialVersionUID = -7036564291741868266L;
-    private PrimaryCharacteristics caracteristics;
+
+    private PrimaryCharacteristics primaryCharacteristics;
+    private SecondaryCharacteristics secondaryCharacteristics;
 
     public AmeliorationPrimary(String name, String description,
-                               PrimaryCharacteristics caracteristics, int price) {
+                               PrimaryCharacteristics primaryCharacteristics,
+                               SecondaryCharacteristics secondaryCharacteristics,
+                               int price) {
         this.prerequisites = new ArrayList<Capacity>();
         this.sons = new ArrayList<Capacity>();
         this.name = name;
@@ -21,17 +25,26 @@ public class AmeliorationPrimary extends Capacity {
         this.price = price;
         this.locked = true;
 
-        this.caracteristics = caracteristics;
+        this.primaryCharacteristics = primaryCharacteristics;
+        this.secondaryCharacteristics = secondaryCharacteristics;
     }
 
     /**
      * Getters and Setters
      */
-    public PrimaryCharacteristics getCaracteristics() {
-        return caracteristics;
+    public PrimaryCharacteristics getPrimaryCharacteristics() {
+        return primaryCharacteristics;
     }
 
-    public void setCaracteristics(PrimaryCharacteristics caracteristics) {
-        this.caracteristics = caracteristics;
+    public void setPrimaryCharacteristics(PrimaryCharacteristics primaryCharacteristics) {
+        this.primaryCharacteristics = primaryCharacteristics;
+    }
+
+    public SecondaryCharacteristics getSecondaryCharacteristics() {
+        return secondaryCharacteristics;
+    }
+
+    public void setSecondaryCharacteristics(SecondaryCharacteristics secondaryCharacteristics) {
+        this.secondaryCharacteristics = secondaryCharacteristics;
     }
 }

@@ -125,7 +125,7 @@ public abstract class Job implements Serializable {
     public PrimaryCharacteristics getAggregatedCharacteristics() {
         PrimaryCharacteristics result = new PrimaryCharacteristics();
         for (AmeliorationPrimary ameliorationPrimary : unlockedAmeliorationPrimaries) {
-            result.plus(ameliorationPrimary.getCaracteristics());
+            result.plus(ameliorationPrimary.getPrimaryCharacteristics());
         }
 
         return result;
