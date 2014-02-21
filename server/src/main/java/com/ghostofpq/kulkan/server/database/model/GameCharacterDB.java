@@ -23,6 +23,8 @@ public class GameCharacterDB {
     private ClanType clanType;
     private Integer lvl;
     private Integer currentXp;
+    private Integer currentJP;
+    private Integer cumulativeJP;
     private JobType currentJob;
     private List<JobStatusDB> jobStatusDBs;
     private String armor;
@@ -46,6 +48,8 @@ public class GameCharacterDB {
         this.clanType = gameCharacter.getClan().getClanType();
         this.lvl = gameCharacter.getLevel();
         this.currentXp = gameCharacter.getExperience();
+        this.currentJP = gameCharacter.getJobPoints();
+        this.cumulativeJP = gameCharacter.getCumulativeJobPoints();
         this.currentJob = gameCharacter.getCurrentJob();
         this.jobStatusDBs = new ArrayList<JobStatusDB>();
         for (Job job : gameCharacter.getJobs()) {
@@ -111,6 +115,7 @@ public class GameCharacterDB {
             Ring ring = (Ring) ItemFactory.createItem(getRing());
             equipment.setRing(ring);
         }
+
         GameCharacter gameCharacter = new GameCharacter(
                 getId(),
                 player,
@@ -119,10 +124,13 @@ public class GameCharacterDB {
                 getGender(),
                 getLvl(),
                 getCurrentXp(),
+                getCurrentJP(),
+                getCumulativeJP(),
                 getCurrentJob(),
                 jobs,
                 equipment
         );
+
         gameCharacter.calculateAggregatedCharacteristics();
         return gameCharacter;
     }
@@ -233,6 +241,22 @@ public class GameCharacterDB {
 
     public void setHelm(String helm) {
         this.helm = helm;
+    }
+
+    public Integer getCurrentJP() {
+        return currentJP;
+    }
+
+    public void setCurrentJP(Integer currentJP) {
+        this.currentJP = currentJP;
+    }
+
+    public Integer getCumulativeJP() {
+        return cumulativeJP;
+    }
+
+    public void setCumulativeJP(Integer cumulativeJP) {
+        this.cumulativeJP = cumulativeJP;
     }
 
     public void equipItem(ItemType itemType, String itemId) {

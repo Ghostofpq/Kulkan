@@ -28,8 +28,6 @@ public class JobStatusDB {
 
     public JobStatusDB(Job job) {
         this.jobType = job.getJobType();
-        this.jobPoints = job.getJobPoints();
-        this.cumulativeJobPoints = job.getCumulativeJobPoints();
         this.skillTreeStatus = job.getSkillTreeStatus();
     }
 
@@ -44,8 +42,6 @@ public class JobStatusDB {
                 break;
         }
         if (null != job) {
-            job.setJobPoints(jobPoints);
-            job.setCumulativeJobPoints(cumulativeJobPoints);
             job.setSkillTreeStatus(skillTreeStatus);
         }
         return job;

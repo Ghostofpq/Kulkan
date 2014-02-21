@@ -369,7 +369,7 @@ public class UserController {
                         Capacity capacityToUnlock = jobToUpdate.getCapacity(capacityName);
                         if (null != gameCharacterToUpdate) {
                             // Unlock Capacity
-                            jobToUpdate.unlockCapacity(capacityToUnlock);
+                            gameCharacterToUpdate.unlockCapacity(jobType, capacityToUnlock);
                             // update GameCharacterDB
                             user.updateGameChar(gameCharacterToUpdate);
                             // Save User

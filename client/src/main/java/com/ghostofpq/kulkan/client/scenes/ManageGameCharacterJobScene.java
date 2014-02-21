@@ -59,8 +59,8 @@ public class ManageGameCharacterJobScene implements Scene {
         widthStep = (client.getWidth() - 5 * widthSeparator) / 5;
         heightStep = (client.getHeight() - 6 * heightSeparator) / 8;
         jobType = new KeyValueRender(widthSeparator, heightSeparator, widthStep, heightStep, "JOB", String.valueOf(gameCharacter.getCurrentJob()), 3);
-        jobPoints = new KeyValueRender(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 7);
-        cumulatedJobPoints = new KeyValueRender(widthSeparator * 3 + 2 * widthStep, heightSeparator, widthStep, heightStep, "TOTAL", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getCumulativeJobPoints()), 7);
+        jobPoints = new KeyValueRender(widthSeparator * 2 + widthStep, heightSeparator, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJobPoints()), 7);
+        cumulatedJobPoints = new KeyValueRender(widthSeparator * 3 + 2 * widthStep, heightSeparator, widthStep, heightStep, "TOTAL", String.valueOf(gameCharacter.getCumulativeJobPoints()), 7);
         selectedCapacityName = new KeyValueRender(widthSeparator * 4 + 3 * widthStep, heightSeparator, widthStep * 2, heightStep, "Capacity", "0", 5);
 
         capacityDescription = new TextArea(widthSeparator * 4 + 3 * widthStep, heightSeparator * 2 + heightStep, widthStep * 2, heightStep, "optimus_princeps_16");
@@ -101,7 +101,7 @@ public class ManageGameCharacterJobScene implements Scene {
             capacityPrice.draw();
             selectedCapacityName.draw();
             capacityDescription.draw();
-            if (selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getActiveJob().getJobPoints())) {
+            if (selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getJobPoints())) {
                 unlockCapacity.draw();
             }
         }
@@ -114,7 +114,7 @@ public class ManageGameCharacterJobScene implements Scene {
                 if (quitButton.isClicked()) {
                     quitButton.onClick();
                 } else if (unlockCapacity.isClicked()) {
-                    if (null != selectedCapacity && selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getActiveJob().getJobPoints())) {
+                    if (null != selectedCapacity && selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getJobPoints())) {
                         unlockCapacity.onClick();
                     }
                 } else if (jobManager.isClicked()) {

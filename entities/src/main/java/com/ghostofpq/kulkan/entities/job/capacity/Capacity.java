@@ -6,6 +6,7 @@ import java.util.List;
 public abstract class Capacity implements Serializable {
 
     private static final long serialVersionUID = 6338786566341517746L;
+
     protected String name;
     protected String description;
     protected CapacityType type;
@@ -43,15 +44,16 @@ public abstract class Capacity implements Serializable {
         return false;
     }
 
+    public void addSon(Capacity son) {
+        sons.add(son);
+    }
+
     /**
      * Getters and Setters
      */
+
     public int getMaxDepth() {
         return maxDepth;
-    }
-
-    public void addSon(Capacity son) {
-        sons.add(son);
     }
 
     public List<Capacity> getSons() {

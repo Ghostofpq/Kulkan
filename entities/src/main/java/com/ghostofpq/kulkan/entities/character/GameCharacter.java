@@ -11,6 +11,7 @@ import com.ghostofpq.kulkan.entities.inventory.Equipment;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.Job;
 import com.ghostofpq.kulkan.entities.job.JobType;
+import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
 import org.bson.types.ObjectId;
@@ -57,6 +58,8 @@ public class GameCharacter implements Serializable {
      */
     private int nextLevel;
 
+    protected int jobPoints;
+    protected int cumulativeJobPoints;
     // Learnings
     /**
      * Current {@link com.ghostofpq.kulkan.entities.job.JobType} of the character
@@ -118,6 +121,8 @@ public class GameCharacter implements Serializable {
         // XP
         this.level = 0;
         this.experience = 0;
+        this.jobPoints = 0;
+        this.cumulativeJobPoints = 0;
         calculateNextLevel();
 
         // Jobs
@@ -146,7 +151,7 @@ public class GameCharacter implements Serializable {
         this.player = player;
     }
 
-    public GameCharacter(ObjectId id, Player player, String name, ClanType clan, Gender gender, int level, int experience, JobType currentJob, List<Job> jobs, Equipment equipment) {
+    public GameCharacter(ObjectId id, Player player, String name, ClanType clan, Gender gender, int level, int experience, int jobPoints, int cumulativeJobPoints, JobType currentJob, List<Job> jobs, Equipment equipment) {
         // Identity
         this.id = id;
         this.name = name;
@@ -157,6 +162,8 @@ public class GameCharacter implements Serializable {
         // XP
         this.level = level;
         this.experience = experience;
+        this.jobPoints = jobPoints;
+        this.cumulativeJobPoints = cumulativeJobPoints;
         calculateNextLevel();
 
         // Jobs
@@ -190,7 +197,8 @@ public class GameCharacter implements Serializable {
     }
 
     public void gainJobPoints(int jobPoints) {
-        getJob(this.currentJob).gainJobPoints(jobPoints);
+        this.jobPoints += jobPoints;
+        this.cumulativeJobPoints += jobPoints;
     }
 
     public boolean canLevelUp() {
@@ -270,6 +278,7 @@ public class GameCharacter implements Serializable {
         }
     }
 
+
     public Job getJob(JobType jobType) {
         for (Job job : jobs) {
             if (jobType.equals(job.getJobType())) {
@@ -277,6 +286,19 @@ public class GameCharacter implements Serializable {
             }
         }
         return null;
+    }
+
+
+    public boolean canUnlockCapacity(Capacity capacity) {
+        return capacity.canBeUnlock(this.jobPoints);
+    }
+
+    public void unlockCapacity(JobType jobType, Capacity capacity) {
+        if (canUnlockCapacity(capacity)) {
+            this.jobPoints -= capacity.getPrice();
+            capacity.setLocked(false);
+            getJob(jobType).unlockCapacity(capacity);
+        }
     }
 
     public Job getActiveJob() {
@@ -374,6 +396,14 @@ public class GameCharacter implements Serializable {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public int getJobPoints() {
+        return jobPoints;
+    }
+
+    public int getCumulativeJobPoints() {
+        return cumulativeJobPoints;
     }
 
     /*

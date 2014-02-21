@@ -19,8 +19,6 @@ public abstract class Job implements Serializable {
 
     private static final long serialVersionUID = 7613901055857944135L;
     protected JobType jobType;
-    protected int jobPoints;
-    protected int cumulativeJobPoints;
     private String name;
     private String description;
     private List<Capacity> skillTree;
@@ -41,9 +39,6 @@ public abstract class Job implements Serializable {
     protected Job(String name, String description) {
         this.name = name;
         this.description = description;
-
-        this.jobPoints = 0;
-        this.cumulativeJobPoints = 0;
 
         this.unlockedMoves = new ArrayList<Move>();
         this.unlockedAmeliorationPrimaries = new ArrayList<AmeliorationPrimary>();
@@ -82,32 +77,20 @@ public abstract class Job implements Serializable {
         }
     }
 
-    public void gainJobPoints(int jobPoints) {
-        this.jobPoints += jobPoints;
-        this.cumulativeJobPoints += jobPoints;
-    }
-
-    public boolean canUnlockCapacity(Capacity capacity) {
-        return capacity.canBeUnlock(this.jobPoints);
-    }
-
     public void unlockCapacity(Capacity capacity) {
-        if (canUnlockCapacity(capacity)) {
-            this.jobPoints -= capacity.getPrice();
-            capacity.setLocked(false);
+        capacity.setLocked(false);
 
-            switch (capacity.getType()) {
-                case AMELIORATION:
-                    if (!unlockedAmeliorationPrimaries.contains((AmeliorationPrimary) capacity)) {
-                        unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
-                    }
-                    break;
-                case MOVE:
-                    if (!unlockedMoves.contains((Move) capacity)) {
-                        unlockedMoves.add((Move) capacity);
-                    }
-                    break;
-            }
+        switch (capacity.getType()) {
+            case AMELIORATION:
+                if (!unlockedAmeliorationPrimaries.contains((AmeliorationPrimary) capacity)) {
+                    unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                }
+                break;
+            case MOVE:
+                if (!unlockedMoves.contains((Move) capacity)) {
+                    unlockedMoves.add((Move) capacity);
+                }
+                break;
         }
     }
 
@@ -185,21 +168,5 @@ public abstract class Job implements Serializable {
 
     public void setUnlockedAmeliorationPrimaries(List<AmeliorationPrimary> unlockedAmeliorationPrimaries) {
         this.unlockedAmeliorationPrimaries = unlockedAmeliorationPrimaries;
-    }
-
-    public int getJobPoints() {
-        return jobPoints;
-    }
-
-    public void setJobPoints(int jobPoints) {
-        this.jobPoints = jobPoints;
-    }
-
-    public int getCumulativeJobPoints() {
-        return cumulativeJobPoints;
-    }
-
-    public void setCumulativeJobPoints(int cumulativeJobPoints) {
-        this.cumulativeJobPoints = cumulativeJobPoints;
     }
 }

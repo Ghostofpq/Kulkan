@@ -86,7 +86,7 @@ public class ManageGameCharacterScene implements Scene {
         xpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 4, widthStep, heightStep, "XP", String.valueOf(gameCharacter.getExperience()), 5);
         lvlRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 4, widthStep, heightStep, "LVL", String.valueOf(gameCharacter.getLevel()), 5);
         currentJobRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 5, widthStep, heightStep, "Job", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getName()), 5);
-        jobPoints = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 5, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJob(gameCharacter.getCurrentJob()).getJobPoints()), 5);
+        jobPoints = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 5, widthStep, heightStep, "JP", String.valueOf(gameCharacter.getJobPoints()), 5);
         manageJobButton = new Button(widthSeparator, heightSeparator + heightStep * 6, widthStep, heightStep, "Manage Job") {
             @Override
             public void onClick() {
