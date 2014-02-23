@@ -30,8 +30,8 @@ public class CombatCalculator {
         }
 
         int armor = (targetedChar.getAggregatedSecondaryCharacteristics().getArmor() - attackingChar.getAggregatedSecondaryCharacteristics().getArmorPenetration());
-        double ratio = 100 / (100 + armor);
-        double estimatedDamageD = ratio * attackingChar.getAttackDamage() * 10;
+        float ratio = 100 / (100 + armor);
+        float estimatedDamageD = ratio * attackingChar.getAttackDamage() * 10;
         estimatedDamage = (int) Math.floor(estimatedDamageD);
 
         int applicableEscapeRate = Math.max(targetedChar.getEscape() - attackingChar.getPrecision(), 0);

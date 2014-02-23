@@ -390,6 +390,7 @@ public class LobbyScene implements Scene {
                 case GAME_START:
                     log.debug(" [x] GAME START");
                     exitLobby();
+                    popUp = null;
                     MessageGameStart messageGameStart = (MessageGameStart) message;
                     client.setCurrentScene(battleScene);
                     battleScene.setBattlefield(messageGameStart.getBattlefield());
@@ -484,7 +485,6 @@ public class LobbyScene implements Scene {
                             popUp = null;
                         } else if (onClick.equals("ACCEPT")) {
                             acceptMatch();
-                            popUp = null;
                         } else if (onClick.equals("REFUSE")) {
                             refuseMatch();
                             popUp = null;

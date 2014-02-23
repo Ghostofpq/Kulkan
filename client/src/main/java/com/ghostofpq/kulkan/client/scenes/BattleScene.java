@@ -5,9 +5,12 @@ import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.*;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
+import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
+import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.HighlightColor;
 import com.ghostofpq.kulkan.client.utils.InputManager;
+import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.PositionAbsolute;
@@ -24,6 +27,7 @@ import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,7 +67,13 @@ public class BattleScene implements Scene {
     private List<GameCharacter> characterListToDeploy;
     private List<GameCharacterRepresentation> characterRepresentationList;
     private Move selectedMove;
-
+    // POPUP
+    private PopUp popUp;
+    // FRAME
+    private Frame frame;
+    private int x;
+    private int y;
+    private boolean frameClicked;
     @Autowired
     private Client client;
     @Autowired
@@ -109,6 +119,9 @@ public class BattleScene implements Scene {
         GraphicsManager.getInstance().setupLights();
         GraphicsManager.getInstance().ready3D();
         GraphicsManager.getInstance().requestCenterPosition(cursor);
+
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
+
     }
 
     public void setBattlefield(Battlefield battlefield) {
@@ -498,8 +511,22 @@ public class BattleScene implements Scene {
                             gameOverButton.onClick();
                         }
                     }
+                    if (frame.isClicked()) {
+                        if (x == -1 && y == -1) {
+                            x = Mouse.getX();
+                            y = (Display.getHeight() - Mouse.getY());
+                            frameClicked = true;
+                        }
+                    }
+                } else if (!Mouse.isButtonDown(0)) {
+                    frameClicked = false;
+                    x = -1;
+                    y = -1;
                 }
             }
+        }
+        if (frameClicked && !clientContext.isFullscreen()) {
+            Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
     }
 
@@ -797,6 +824,7 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.GAME_OVER)) {
             gameOverButton.draw();
         }
+        frame.draw();
     }
 
     private void extractBattlefieldRepresentation(Battlefield battlefield) {
