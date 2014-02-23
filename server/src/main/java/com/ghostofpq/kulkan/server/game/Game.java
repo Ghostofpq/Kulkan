@@ -330,7 +330,6 @@ public class Game implements Runnable {
                                         crit = true;
                                     } else {
                                         damages = combatCalculator.getEstimatedDamage();
-
                                     }
 
                                     log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());

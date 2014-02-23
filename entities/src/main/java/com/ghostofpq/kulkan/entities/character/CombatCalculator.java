@@ -30,8 +30,8 @@ public class CombatCalculator {
         }
 
         int armor = (targetedChar.getAggregatedSecondaryCharacteristics().getArmor() - attackingChar.getAggregatedSecondaryCharacteristics().getArmorPenetration());
-        float ratio = 100 / (100 + armor);
-        float estimatedDamageD = ratio * attackingChar.getAttackDamage() * 10;
+        float ratio = 100f / (100f + armor);
+        float estimatedDamageD = ratio * attackingChar.getAttackDamage();
         estimatedDamage = (int) Math.floor(estimatedDamageD);
 
         int applicableEscapeRate = Math.max(targetedChar.getEscape() - attackingChar.getPrecision(), 0);
@@ -42,6 +42,7 @@ public class CombatCalculator {
         chanceToCriticalHit = (applicableCriticalChance / 100) + critBonus;
         chanceToCriticalHit = Math.min(Math.max(chanceToCriticalHit, 0), 100);
     }
+
 
     public PointOfView getHeadingAngleForAttack(GameCharacter attackingChar, Position attackingCharPosition, Position targetedCharPosition) {
         PointOfView result = attackingChar.getHeadingAngle();

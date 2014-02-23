@@ -119,7 +119,7 @@ public class GameCharacter implements Serializable {
         this.gender = gender;
 
         // XP
-        this.level = 0;
+        this.level = 1;
         this.experience = 0;
         this.jobPoints = 0;
         this.cumulativeJobPoints = 0;
