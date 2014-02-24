@@ -510,6 +510,10 @@ public class BattleScene implements Scene {
             }
             while (Mouse.next()) {
                 if (Mouse.isButtonDown(0)) {
+                    if (null != mousePosition) {
+                        manageInputValidate();
+                    }
+
                     if (currentState.equals(BattleSceneState.GAME_OVER)) {
                         if (gameOverButton.isClicked()) {
                             gameOverButton.onClick();
@@ -811,18 +815,19 @@ public class BattleScene implements Scene {
                 ((Cube) drawableObjectList.get(i)).renderForMousePosition();
             }
         }
-
-        log.debug("MOUSE POSITION : {}/{} ", Mouse.getX(), ClientContext.currentResolution.getHeight() - Mouse.getY());
         ByteBuffer pixel = BufferUtils.createByteBuffer(3);
         GL11.glReadPixels(Mouse.getX(), Mouse.getY(), 1, 1, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, pixel);
-
         if (null != pixel) {
-            log.debug("PIXEL : {}/{}/{} ", pixel.get(0) - 10, pixel.get(1) - 10, pixel.get(2) - 10);
             int x = pixel.get(0) - 10;
             int y = pixel.get(1) - 10;
             int z = pixel.get(2) - 10;
+            if (x >= 0 && y >= 0 && z >= 0) {
+                mousePosition = new Position(x, y, z);
+                setCursor(mousePosition);
+            } else {
+                mousePosition = null;
+            }
         }
-
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
 
@@ -1219,6 +1224,13 @@ public class BattleScene implements Scene {
                 battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.RED);
             }
         }
+    }
+
+    private void setCursor(Position mousePosition) {
+        resetOldHighlight();
+        cursor = new Position(mousePosition);
+        battlefieldRepresentation.get(cursor).setHighlight(HighlightColor.BLUE);
+        updateCursorTarget();
     }
 
     private void cursorUp() {
