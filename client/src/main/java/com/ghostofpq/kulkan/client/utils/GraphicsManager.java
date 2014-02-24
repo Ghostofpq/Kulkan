@@ -107,7 +107,6 @@ public class GraphicsManager {
     }
 
     public void make3D() {
-
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glMatrixMode(GL11.GL_PROJECTION);

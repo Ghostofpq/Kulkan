@@ -25,12 +25,15 @@ import com.ghostofpq.kulkan.entities.messages.game.*;
 import com.ghostofpq.kulkan.entities.messages.game.capacity.MessageCapacityFireball;
 import com.ghostofpq.kulkan.entities.messages.user.MessagePlayerUpdate;
 import lombok.extern.slf4j.Slf4j;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 
 @Slf4j
@@ -39,6 +42,7 @@ public class BattleScene implements Scene {
     private String gameId;
     private int playerNumber;
     // GRAPHICS
+    private Position mousePosition;
     private PositionAbsolute southPointOfView;
     private PositionAbsolute northPointOfView;
     private PositionAbsolute eastPointOfView;
@@ -794,13 +798,36 @@ public class BattleScene implements Scene {
 
     @Override
     public void render() {
+        GraphicsManager.getInstance().update3DMovement();
+        renderForMousePosition();
         render3D();
         render2D();
     }
 
+    private void renderForMousePosition() {
+        GraphicsManager.getInstance().make3D();
+        for (int i = 0; i < drawableObjectList.size(); i++) {
+            if (drawableObjectList.get(i) instanceof Cube) {
+                ((Cube) drawableObjectList.get(i)).renderForMousePosition();
+            }
+        }
+
+        log.debug("MOUSE POSITION : {}/{} ", Mouse.getX(), ClientContext.currentResolution.getHeight() - Mouse.getY());
+        ByteBuffer pixel = BufferUtils.createByteBuffer(3);
+        GL11.glReadPixels(Mouse.getX(), Mouse.getY(), 1, 1, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, pixel);
+
+        if (null != pixel) {
+            log.debug("PIXEL : {}/{}/{} ", pixel.get(0) - 10, pixel.get(1) - 10, pixel.get(2) - 10);
+            int x = pixel.get(0) - 10;
+            int y = pixel.get(1) - 10;
+            int z = pixel.get(2) - 10;
+        }
+
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+    }
+
     private void render3D() {
         GraphicsManager.getInstance().make3D();
-        GraphicsManager.getInstance().update3DMovement();
         for (int i = 0; i < drawableObjectList.size(); i++) {
             drawableObjectList.get(i).draw();
         }
@@ -961,6 +988,7 @@ public class BattleScene implements Scene {
     private void sendEndTurn() {
         MessageCharacterEndTurn messageCharacterEndturn = new MessageCharacterEndTurn(clientContext.getTokenKey(), playerNumber, currentGameCharacterRepresentation.getCharacter());
         postMessage(messageCharacterEndturn);
+
     }
 
     private void sendDeploymentResult() {

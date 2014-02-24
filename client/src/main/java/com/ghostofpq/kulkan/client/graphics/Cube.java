@@ -133,6 +133,15 @@ public class Cube extends DrawableObject implements Serializable {
         }
     }
 
+    public void renderForMousePosition() {
+        if (isVisible()) {
+            float colorX = ((float) position.getX() + 10f) / 255f;
+            float colorY = ((float) position.getY() + 10f) / 255f;
+            float colorZ = ((float) position.getZ() + 10f) / 255f;
+            facetZenith.renderForMousePosition(colorX, colorY, colorZ);
+        }
+    }
+
     public String toString() {
         return "Cube";
     }

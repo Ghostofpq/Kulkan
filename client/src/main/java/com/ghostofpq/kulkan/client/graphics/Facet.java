@@ -63,6 +63,32 @@ public class Facet extends DrawableObject implements Serializable {
         }
     }
 
+    public void renderForMousePosition(float x, float y, float z) {
+        if (isVisible()) {
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glColor3f(x, y, z);
+            GL11.glBegin(GL11.GL_QUADS);
+            GL11.glVertex3d((corner1.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale()
+                    , (corner1.getY() - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale()
+                    , (corner1.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+            GL11.glVertex3d((corner2.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale()
+                    , (corner2.getY() - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale()
+                    , (corner2.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+            GL11.glVertex3d((corner3.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale()
+                    , (corner3.getY() - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale()
+                    , (corner3.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+            GL11.glVertex3d((corner4.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale()
+                    , (corner4.getY() - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale()
+                    , (corner4.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+            GL11.glEnd();
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_LIGHTING);
+        }
+    }
+
     public String toString() {
         return "Facet";
     }
