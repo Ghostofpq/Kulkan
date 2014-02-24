@@ -531,6 +531,11 @@ public class BattleScene implements Scene {
                     x = -1;
                     y = -1;
                 }
+                if (Mouse.isButtonDown(1)) {
+                    if (null != mousePosition) {
+                        GraphicsManager.getInstance().requestCenterPosition(mousePosition);
+                    }
+                }
             }
         }
         if (frameClicked && !clientContext.isFullscreen()) {
