@@ -91,6 +91,7 @@ public class GameCharacterRepresentation extends DrawableObject {
         animationWalk.put(PointOfView.NORTH, animation);
 
         chara = TextureManager.getInstance().getTexture(TextureKey.CHAR);
+
     }
 
     public void update(long deltaTime) {
