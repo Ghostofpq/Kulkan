@@ -1,7 +1,6 @@
 package com.ghostofpq.kulkan.entities.inventory;
 
-import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
@@ -75,49 +74,26 @@ public class Equipment implements Serializable {
         }
     }
 
-    public PrimaryCharacteristics getPrimaryCharacteristics() {
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
+    public Characteristics getCharacteristics() {
+        Characteristics characteristics = new Characteristics();
         if (null != helm) {
-            primaryCharacteristics.plus(helm.getPrimaryCharacteristics());
+            characteristics.plus(helm.getCharacteristics());
         }
         if (null != armor) {
-            primaryCharacteristics.plus(armor.getPrimaryCharacteristics());
+            characteristics.plus(armor.getCharacteristics());
         }
         if (null != weapon) {
-            primaryCharacteristics.plus(weapon.getPrimaryCharacteristics());
+            characteristics.plus(weapon.getCharacteristics());
         }
         if (null != heldItem) {
-            primaryCharacteristics.plus(heldItem.getPrimaryCharacteristics());
+            characteristics.plus(heldItem.getCharacteristics());
         }
         if (null != necklace) {
-            primaryCharacteristics.plus(necklace.getPrimaryCharacteristics());
+            characteristics.plus(necklace.getCharacteristics());
         }
         if (null != ring) {
-            primaryCharacteristics.plus(ring.getPrimaryCharacteristics());
+            characteristics.plus(ring.getCharacteristics());
         }
-        return primaryCharacteristics;
-    }
-
-    public SecondaryCharacteristics getSecondaryCharacteristics() {
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        if (null != helm) {
-            secondaryCharacteristics.plus(helm.getSecondaryCharacteristics());
-        }
-        if (null != armor) {
-            secondaryCharacteristics.plus(armor.getSecondaryCharacteristics());
-        }
-        if (null != weapon) {
-            secondaryCharacteristics.plus(weapon.getSecondaryCharacteristics());
-        }
-        if (null != heldItem) {
-            secondaryCharacteristics.plus(heldItem.getSecondaryCharacteristics());
-        }
-        if (null != necklace) {
-            secondaryCharacteristics.plus(necklace.getSecondaryCharacteristics());
-        }
-        if (null != ring) {
-            secondaryCharacteristics.plus(ring.getSecondaryCharacteristics());
-        }
-        return secondaryCharacteristics;
+        return characteristics;
     }
 }

@@ -1,7 +1,6 @@
 package com.ghostofpq.kulkan.entities.inventory.item;
 
-import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.job.JobType;
 
 import java.io.Serializable;
@@ -12,8 +11,7 @@ public abstract class Item implements Serializable {
     private String itemID;
     private String name;
     private String description;
-    private PrimaryCharacteristics primaryCharacteristics;
-    private SecondaryCharacteristics secondaryCharacteristics;
+    private Characteristics characteristics;
     private List<JobType> authorizedJobs;
     private ItemType itemType;
     private int price;
@@ -79,12 +77,11 @@ public abstract class Item implements Serializable {
     };
 
 
-    protected Item(String itemID, String name, String description, PrimaryCharacteristics primaryCharacteristics, SecondaryCharacteristics secondaryCharacteristics, List<JobType> authorizedJobs, ItemType itemType, int price) {
+    protected Item(String itemID, String name, String description, Characteristics characteristics, List<JobType> authorizedJobs, ItemType itemType, int price) {
         this.itemID = itemID;
         this.name = name;
         this.description = description;
-        this.primaryCharacteristics = primaryCharacteristics;
-        this.secondaryCharacteristics = secondaryCharacteristics;
+        this.characteristics = characteristics;
         this.authorizedJobs = authorizedJobs;
         this.itemType = itemType;
         this.price = price;
@@ -106,12 +103,8 @@ public abstract class Item implements Serializable {
         return description;
     }
 
-    public PrimaryCharacteristics getPrimaryCharacteristics() {
-        return primaryCharacteristics;
-    }
-
-    public SecondaryCharacteristics getSecondaryCharacteristics() {
-        return secondaryCharacteristics;
+    public Characteristics getCharacteristics() {
+        return characteristics;
     }
 
     public List<JobType> getAuthorizedJobs() {

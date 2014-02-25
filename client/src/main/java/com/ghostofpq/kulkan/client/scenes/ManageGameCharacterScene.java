@@ -9,7 +9,6 @@ import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
-import com.ghostofpq.kulkan.client.graphics.PrimaryCharacteristicsRender;
 import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
@@ -36,7 +35,6 @@ public class ManageGameCharacterScene implements Scene {
     private int widthStep;
     private int heightSeparator = 50;
     private int heightStep;
-    private PrimaryCharacteristicsRender primaryCharacteristicsRender;
     private SecondaryCharacteristicsRender secondaryCharacteristicsRender;
     private KeyValueRender hpRender;
     private KeyValueRender mpRender;
@@ -78,8 +76,7 @@ public class ManageGameCharacterScene implements Scene {
         widthStep = (client.getWidth() - 3 * widthSeparator) / 4;
         heightStep = (client.getHeight() - 4 * heightSeparator) / 8;
 
-        primaryCharacteristicsRender = new PrimaryCharacteristicsRender(widthSeparator, heightSeparator, widthStep * 2, heightStep * 3, gameCharacter.getAggregatedCharacteristics());
-        secondaryCharacteristicsRender = new SecondaryCharacteristicsRender(2 * widthSeparator + widthStep * 2, heightSeparator, widthStep * 2, heightStep * 5, gameCharacter.getAggregatedSecondaryCharacteristics());
+        secondaryCharacteristicsRender = new SecondaryCharacteristicsRender(2 * widthSeparator + widthStep * 2, heightSeparator, widthStep * 2, heightStep * 5, gameCharacter.getAggregatedCharacteristics());
 
         hpRender = new KeyValueRender(widthSeparator, heightSeparator + heightStep * 3, widthStep, heightStep, "HP", String.valueOf(gameCharacter.getMaxHealthPoint()), 5);
         mpRender = new KeyValueRender(widthSeparator + widthStep, heightSeparator + heightStep * 3, widthStep, heightStep, "MP", String.valueOf(gameCharacter.getMaxManaPoint()), 5);
@@ -155,7 +152,6 @@ public class ManageGameCharacterScene implements Scene {
     public void render() {
         GraphicsManager.getInstance().make2D();
         background.draw();
-        primaryCharacteristicsRender.draw();
         secondaryCharacteristicsRender.draw();
         hpRender.draw();
         mpRender.draw();

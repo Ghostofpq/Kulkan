@@ -1,7 +1,6 @@
 package com.ghostofpq.kulkan.server.database.model;
 
-import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.utils.Range;
@@ -22,7 +21,7 @@ public class ItemDB {
     @Indexed
     private String name;
     private String description;
-    private Map<CharacteristicName, Integer> bonusCharacteristics;
+    private Map<Characteristics.fields, Integer> bonusCharacteristics;
     private List<JobType> authorizedJobs;
     private int price;
     private Range range;
@@ -38,62 +37,55 @@ public class ItemDB {
         this.authorizedJobs = item.getAuthorizedJobs();
         this.itemType = item.getItemType();
         this.price = item.getPrice();
-        this.bonusCharacteristics = new HashMap<CharacteristicName, Integer>();
+        this.bonusCharacteristics = new HashMap<Characteristics.fields, Integer>();
 
-        if (item.getPrimaryCharacteristics().getStrength() != 0) {
-            bonusCharacteristics.put(CharacteristicName.STRENGTH, item.getPrimaryCharacteristics().getStrength());
+        if (item.getCharacteristics().getAttackDamage() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.ATTACK_DAMAGE, item.getCharacteristics().getAttackDamage());
         }
-        if (item.getPrimaryCharacteristics().getEndurance() != 0) {
-            bonusCharacteristics.put(CharacteristicName.ENDURANCE, item.getPrimaryCharacteristics().getEndurance());
+        if (item.getCharacteristics().getMagicalDamage() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.MAGICAL_DAMAGE, item.getCharacteristics().getMagicalDamage());
         }
-        if (item.getPrimaryCharacteristics().getIntelligence() != 0) {
-            bonusCharacteristics.put(CharacteristicName.INTELLIGENCE, item.getPrimaryCharacteristics().getIntelligence());
+        if (item.getCharacteristics().getArmor() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.ARMOR, item.getCharacteristics().getArmor());
         }
-        if (item.getPrimaryCharacteristics().getWill() != 0) {
-            bonusCharacteristics.put(CharacteristicName.WILL, item.getPrimaryCharacteristics().getWill());
+        if (item.getCharacteristics().getMagicResist() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.MAGIC_RESIST, item.getCharacteristics().getMagicResist());
         }
-        if (item.getPrimaryCharacteristics().getAgility() != 0) {
-            bonusCharacteristics.put(CharacteristicName.AGILITY, item.getPrimaryCharacteristics().getAgility());
+        if (item.getCharacteristics().getArmorPenetration() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.ARMOR_PENETRATION, item.getCharacteristics().getArmorPenetration());
         }
-        if (item.getPrimaryCharacteristics().getMovement() != 0) {
-            bonusCharacteristics.put(CharacteristicName.MOVEMENT, item.getPrimaryCharacteristics().getMovement());
+        if (item.getCharacteristics().getMagicPenetration() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.MAGIC_PENETRATION, item.getCharacteristics().getMagicPenetration());
         }
-
-        if (item.getSecondaryCharacteristics().getAttackDamage() != 0) {
-            bonusCharacteristics.put(CharacteristicName.ATTACK_DAMAGE, item.getSecondaryCharacteristics().getAttackDamage());
+        if (item.getCharacteristics().getMovement() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.MOVEMENT, item.getCharacteristics().getMovement());
         }
-        if (item.getSecondaryCharacteristics().getMagicalDamage() != 0) {
-            bonusCharacteristics.put(CharacteristicName.MAGICAL_DAMAGE, item.getSecondaryCharacteristics().getMagicalDamage());
+        if (item.getCharacteristics().getMovement() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.SPEED, item.getCharacteristics().getSpeed());
         }
-        if (item.getSecondaryCharacteristics().getArmor() != 0) {
-            bonusCharacteristics.put(CharacteristicName.ARMOR, item.getSecondaryCharacteristics().getArmor());
+        if (item.getCharacteristics().getMovement() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.MAX_HEALTH, item.getCharacteristics().getMaxHealthPoint());
         }
-        if (item.getSecondaryCharacteristics().getMagicResist() != 0) {
-            bonusCharacteristics.put(CharacteristicName.MAGIC_RESIST, item.getSecondaryCharacteristics().getMagicResist());
+        if (item.getCharacteristics().getMovement() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.MAX_MANA, item.getCharacteristics().getMaxManaPoint());
         }
-        if (item.getSecondaryCharacteristics().getArmorPenetration() != 0) {
-            bonusCharacteristics.put(CharacteristicName.ARMOR_PENETRATION, item.getSecondaryCharacteristics().getArmorPenetration());
+        if (item.getCharacteristics().getHealthRegeneration() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.LIFE_REGENERATION, item.getCharacteristics().getHealthRegeneration());
         }
-        if (item.getSecondaryCharacteristics().getMagicPenetration() != 0) {
-            bonusCharacteristics.put(CharacteristicName.MAGIC_PENETRATION, item.getSecondaryCharacteristics().getMagicPenetration());
+        if (item.getCharacteristics().getManaRegeneration() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.MANA_REGENERATION, item.getCharacteristics().getManaRegeneration());
         }
-        if (item.getSecondaryCharacteristics().getLifeRegeneration() != 0) {
-            bonusCharacteristics.put(CharacteristicName.LIFE_REGENERATION, item.getSecondaryCharacteristics().getLifeRegeneration());
+        if (item.getCharacteristics().getCriticalStrike() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.CRITICAL_STRIKE, item.getCharacteristics().getCriticalStrike());
         }
-        if (item.getSecondaryCharacteristics().getManaRegeneration() != 0) {
-            bonusCharacteristics.put(CharacteristicName.MANA_REGENERATION, item.getSecondaryCharacteristics().getManaRegeneration());
+        if (item.getCharacteristics().getResilience() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.RESILIENCE, item.getCharacteristics().getResilience());
         }
-        if (item.getSecondaryCharacteristics().getCriticalStrike() != 0) {
-            bonusCharacteristics.put(CharacteristicName.CRITICAL_STRIKE, item.getSecondaryCharacteristics().getCriticalStrike());
+        if (item.getCharacteristics().getPrecision() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.PRECISION, item.getCharacteristics().getPrecision());
         }
-        if (item.getSecondaryCharacteristics().getResilience() != 0) {
-            bonusCharacteristics.put(CharacteristicName.RESILIENCE, item.getSecondaryCharacteristics().getResilience());
-        }
-        if (item.getSecondaryCharacteristics().getPrecision() != 0) {
-            bonusCharacteristics.put(CharacteristicName.PRECISION, item.getSecondaryCharacteristics().getPrecision());
-        }
-        if (item.getSecondaryCharacteristics().getEscape() != 0) {
-            bonusCharacteristics.put(CharacteristicName.ESCAPE, item.getSecondaryCharacteristics().getEscape());
+        if (item.getCharacteristics().getEscape() != 0) {
+            bonusCharacteristics.put(Characteristics.fields.ESCAPE, item.getCharacteristics().getEscape());
         }
 
         if (itemType.equals(ItemType.WEAPON)) {
@@ -105,7 +97,7 @@ public class ItemDB {
         }
     }
 
-    public ItemDB(String id, String name, String description, ItemType itemType, List<JobType> authorizedJobs, int price, Map<CharacteristicName, Integer> bonusCharacteristics, Range range, WeaponType weaponType) {
+    public ItemDB(String id, String name, String description, ItemType itemType, List<JobType> authorizedJobs, int price, Map<Characteristics.fields, Integer> bonusCharacteristics, Range range, WeaponType weaponType) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -120,87 +112,77 @@ public class ItemDB {
     public Item toItem() {
         Item result = null;
 
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        for (CharacteristicName key : bonusCharacteristics.keySet()) {
+        Characteristics characteristics = new Characteristics();
+        for (Characteristics.fields key : bonusCharacteristics.keySet()) {
             switch (key) {
-                case STRENGTH:
-                    primaryCharacteristics.setStrength(bonusCharacteristics.get(key));
-                    break;
-                case ENDURANCE:
-                    primaryCharacteristics.setEndurance(bonusCharacteristics.get(key));
-                    break;
-                case INTELLIGENCE:
-                    primaryCharacteristics.setIntelligence(bonusCharacteristics.get(key));
-                    break;
-                case WILL:
-                    primaryCharacteristics.setWill(bonusCharacteristics.get(key));
-                    break;
-                case AGILITY:
-                    primaryCharacteristics.setAgility(bonusCharacteristics.get(key));
-                    break;
-                case MOVEMENT:
-                    primaryCharacteristics.setMovement(bonusCharacteristics.get(key));
-                    break;
                 case ATTACK_DAMAGE:
-                    secondaryCharacteristics.setAttackDamage(bonusCharacteristics.get(key));
+                    characteristics.setAttackDamage(bonusCharacteristics.get(key));
                     break;
                 case MAGICAL_DAMAGE:
-                    secondaryCharacteristics.setMagicalDamage(bonusCharacteristics.get(key));
+                    characteristics.setMagicalDamage(bonusCharacteristics.get(key));
                     break;
                 case ARMOR:
-                    secondaryCharacteristics.setArmor(bonusCharacteristics.get(key));
+                    characteristics.setArmor(bonusCharacteristics.get(key));
                     break;
                 case MAGIC_RESIST:
-                    secondaryCharacteristics.setMagicResist(bonusCharacteristics.get(key));
+                    characteristics.setMagicResist(bonusCharacteristics.get(key));
                     break;
                 case ARMOR_PENETRATION:
-                    secondaryCharacteristics.setArmorPenetration(bonusCharacteristics.get(key));
+                    characteristics.setArmorPenetration(bonusCharacteristics.get(key));
                     break;
                 case MAGIC_PENETRATION:
-                    secondaryCharacteristics.setMagicPenetration(bonusCharacteristics.get(key));
+                    characteristics.setMagicPenetration(bonusCharacteristics.get(key));
+                    break;
+                case MOVEMENT:
+                    characteristics.setMovement(bonusCharacteristics.get(key));
                     break;
                 case SPEED:
-                    secondaryCharacteristics.setSpeed(bonusCharacteristics.get(key));
+                    characteristics.setSpeed(bonusCharacteristics.get(key));
+                    break;
+                case MAX_HEALTH:
+                    characteristics.setMaxHealthPoint(bonusCharacteristics.get(key));
+                    break;
+                case MAX_MANA:
+                    characteristics.setMaxManaPoint(bonusCharacteristics.get(key));
                     break;
                 case LIFE_REGENERATION:
-                    secondaryCharacteristics.setLifeRegeneration(bonusCharacteristics.get(key));
+                    characteristics.setHealthRegeneration(bonusCharacteristics.get(key));
                     break;
                 case MANA_REGENERATION:
-                    secondaryCharacteristics.setManaRegeneration(bonusCharacteristics.get(key));
+                    characteristics.setManaRegeneration(bonusCharacteristics.get(key));
                     break;
                 case ESCAPE:
-                    secondaryCharacteristics.setEscape(bonusCharacteristics.get(key));
+                    characteristics.setEscape(bonusCharacteristics.get(key));
                     break;
                 case CRITICAL_STRIKE:
-                    secondaryCharacteristics.setCriticalStrike(bonusCharacteristics.get(key));
+                    characteristics.setCriticalStrike(bonusCharacteristics.get(key));
                     break;
                 case PRECISION:
-                    secondaryCharacteristics.setPrecision(bonusCharacteristics.get(key));
+                    characteristics.setPrecision(bonusCharacteristics.get(key));
                     break;
                 case RESILIENCE:
-                    secondaryCharacteristics.setResilience(bonusCharacteristics.get(key));
+                    characteristics.setResilience(bonusCharacteristics.get(key));
                     break;
             }
         }
         switch (itemType) {
             case HELD_ITEM:
-                result = new HeldItem(id.toString(), name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+                result = new HeldItem(id.toString(), name, description, characteristics, authorizedJobs, price);
                 break;
             case ARMOR:
-                result = new Armor(id.toString(), name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+                result = new Armor(id.toString(), name, description, characteristics, authorizedJobs, price);
                 break;
             case HELMET:
-                result = new Helm(id.toString(), name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+                result = new Helm(id.toString(), name, description, characteristics, authorizedJobs, price);
                 break;
             case NECKLACE:
-                result = new Necklace(id.toString(), name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+                result = new Necklace(id.toString(), name, description, characteristics, authorizedJobs, price);
                 break;
             case RING:
-                result = new Ring(id.toString(), name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+                result = new Ring(id.toString(), name, description, characteristics, authorizedJobs, price);
                 break;
             case WEAPON:
-                result = new Weapon(id.toString(), name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price, range, weaponType);
+                result = new Weapon(id.toString(), name, description, characteristics, authorizedJobs, price, range, weaponType);
                 break;
         }
         return result;
@@ -238,11 +220,11 @@ public class ItemDB {
         this.description = description;
     }
 
-    public Map<CharacteristicName, Integer> getBonusCharacteristics() {
+    public Map<Characteristics.fields, Integer> getBonusCharacteristics() {
         return bonusCharacteristics;
     }
 
-    public void setBonusCharacteristics(Map<CharacteristicName, Integer> bonusCharacteristics) {
+    public void setBonusCharacteristics(Map<Characteristics.fields, Integer> bonusCharacteristics) {
         this.bonusCharacteristics = bonusCharacteristics;
     }
 
@@ -278,26 +260,4 @@ public class ItemDB {
         this.weaponType = weaponType;
     }
 
-    public enum CharacteristicName {
-        STRENGTH,
-        ENDURANCE,
-        INTELLIGENCE,
-        WILL,
-        AGILITY,
-        MOVEMENT,
-
-        ATTACK_DAMAGE,
-        MAGICAL_DAMAGE,
-        ARMOR,
-        MAGIC_RESIST,
-        ARMOR_PENETRATION,
-        MAGIC_PENETRATION,
-        SPEED,
-        LIFE_REGENERATION,
-        MANA_REGENERATION,
-        ESCAPE,
-        CRITICAL_STRIKE,
-        PRECISION,
-        RESILIENCE
-    }
 }

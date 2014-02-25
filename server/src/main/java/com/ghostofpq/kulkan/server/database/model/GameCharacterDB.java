@@ -131,7 +131,7 @@ public class GameCharacterDB {
                 equipment
         );
 
-        gameCharacter.calculateAggregatedCharacteristics();
+        gameCharacter.updateAggregatedCharacteristics();
         return gameCharacter;
     }
 

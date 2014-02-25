@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CombatCalculator {
-
-    private final String FONT = "optimus_princeps_16";
     private int estimatedDamage;
     private int chanceToHit;
     private int chanceToCriticalHit;
@@ -29,7 +27,7 @@ public class CombatCalculator {
                 break;
         }
 
-        int armor = (targetedChar.getAggregatedSecondaryCharacteristics().getArmor() - attackingChar.getAggregatedSecondaryCharacteristics().getArmorPenetration());
+        int armor = (targetedChar.getAggregatedCharacteristics().getArmor() - attackingChar.getAggregatedCharacteristics().getArmorPenetration());
         float ratio = 100f / (100f + armor);
         float estimatedDamageD = ratio * attackingChar.getAttackDamage();
         estimatedDamage = (int) Math.floor(estimatedDamageD);

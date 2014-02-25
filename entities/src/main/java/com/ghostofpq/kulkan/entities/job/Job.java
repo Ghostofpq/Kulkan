@@ -1,9 +1,8 @@
 package com.ghostofpq.kulkan.entities.job;
 
-import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
-import com.ghostofpq.kulkan.entities.job.capacity.AmeliorationPrimary;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
+import com.ghostofpq.kulkan.entities.job.capacity.CharacteristicAmelioration;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import com.ghostofpq.kulkan.entities.job.warrior.Warrior;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,7 @@ public abstract class Job implements Serializable {
     private String description;
     private List<Capacity> skillTree;
     private List<Move> unlockedMoves;
-    private List<AmeliorationPrimary> unlockedAmeliorationPrimaries;
+    private List<CharacteristicAmelioration> unlockedAmeliorationPrimaries;
 
     public static Job Job(JobType jobType) {
         switch (jobType) {
@@ -41,7 +40,7 @@ public abstract class Job implements Serializable {
         this.description = description;
 
         this.unlockedMoves = new ArrayList<Move>();
-        this.unlockedAmeliorationPrimaries = new ArrayList<AmeliorationPrimary>();
+        this.unlockedAmeliorationPrimaries = new ArrayList<CharacteristicAmelioration>();
     }
 
     public Map<String, Boolean> getSkillTreeStatus() {
@@ -60,8 +59,8 @@ public abstract class Job implements Serializable {
                 if (!skillTreeStatus.get(capacity.getName())) {
                     switch (capacity.getType()) {
                         case AMELIORATION:
-                            if (!unlockedAmeliorationPrimaries.contains((AmeliorationPrimary) capacity)) {
-                                unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                            if (!unlockedAmeliorationPrimaries.contains((CharacteristicAmelioration) capacity)) {
+                                unlockedAmeliorationPrimaries.add((CharacteristicAmelioration) capacity);
                             }
                             break;
                         case MOVE:
@@ -82,8 +81,8 @@ public abstract class Job implements Serializable {
 
         switch (capacity.getType()) {
             case AMELIORATION:
-                if (!unlockedAmeliorationPrimaries.contains((AmeliorationPrimary) capacity)) {
-                    unlockedAmeliorationPrimaries.add((AmeliorationPrimary) capacity);
+                if (!unlockedAmeliorationPrimaries.contains((CharacteristicAmelioration) capacity)) {
+                    unlockedAmeliorationPrimaries.add((CharacteristicAmelioration) capacity);
                 }
                 break;
             case MOVE:
@@ -105,17 +104,11 @@ public abstract class Job implements Serializable {
         return result;
     }
 
-    public PrimaryCharacteristics getAggregatedCharacteristics() {
-        PrimaryCharacteristics result = new PrimaryCharacteristics();
-        for (AmeliorationPrimary ameliorationPrimary : unlockedAmeliorationPrimaries) {
-            result.plus(ameliorationPrimary.getPrimaryCharacteristics());
+    public Characteristics getCharacteristics() {
+        Characteristics result = new Characteristics();
+        for (CharacteristicAmelioration characteristicAmelioration : unlockedAmeliorationPrimaries) {
+            result.plus(characteristicAmelioration.getCharacteristics());
         }
-
-        return result;
-    }
-
-    public SecondaryCharacteristics getAggregatedSecondaryCharacteristics() {
-        SecondaryCharacteristics result = new SecondaryCharacteristics();
         return result;
     }
 
@@ -162,11 +155,11 @@ public abstract class Job implements Serializable {
         this.unlockedMoves = unlockedMoves;
     }
 
-    public List<AmeliorationPrimary> getUnlockedAmeliorationPrimaries() {
+    public List<CharacteristicAmelioration> getUnlockedAmeliorationPrimaries() {
         return unlockedAmeliorationPrimaries;
     }
 
-    public void setUnlockedAmeliorationPrimaries(List<AmeliorationPrimary> unlockedAmeliorationPrimaries) {
+    public void setUnlockedAmeliorationPrimaries(List<CharacteristicAmelioration> unlockedAmeliorationPrimaries) {
         this.unlockedAmeliorationPrimaries = unlockedAmeliorationPrimaries;
     }
 }

@@ -1,13 +1,14 @@
 package com.ghostofpq.kulkan.entities.job;
 
-import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.*;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Mage extends Job {
     private final static String MAGE_NAME = "Mage";
@@ -34,40 +35,53 @@ public class Mage extends Job {
 
         skillTree.add(magicBallMove);
         this.unlockCapacity(magicBallMove);
-        SecondaryCharacteristics nope = new SecondaryCharacteristics();
-        PrimaryCharacteristics intelligence1C = new PrimaryCharacteristics(5, 0, 0,
-                0, 0, 0);
-        AmeliorationPrimary intelligence1 = new AmeliorationPrimary("I1",
-                "Add 5 Intelligence", intelligence1C, nope, 10);
+        Map<Characteristics.fields, Integer> characteristicsValueMap;
+        Characteristics characteristics;
+
+        characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAGICAL_DAMAGE, 5);
+        characteristics = new Characteristics(characteristicsValueMap);
+
+        CharacteristicAmelioration intelligence1 = new CharacteristicAmelioration("I1",
+                "Add 5 Intelligence", characteristics, 10);
         skillTree.add(intelligence1);
 
-        PrimaryCharacteristics intelligence2C = new PrimaryCharacteristics(10, 0,
-                0, 0, 0, 0);
-        AmeliorationPrimary intelligence2 = new AmeliorationPrimary("I2",
-                "Add 10 Intelligence", intelligence2C, nope, 150);
+        characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAGICAL_DAMAGE, 10);
+        characteristics = new Characteristics(characteristicsValueMap);
+
+        CharacteristicAmelioration intelligence2 = new CharacteristicAmelioration("I2",
+                "Add 10 Intelligence", characteristics, 150);
         skillTree.add(intelligence2);
 
-        PrimaryCharacteristics intelligence3C = new PrimaryCharacteristics(20, 0,
-                0, 0, 0, 0);
-        AmeliorationPrimary intelligence3 = new AmeliorationPrimary("I3",
-                "Add 20 Intelligence", intelligence3C, nope, 500);
+        characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAGICAL_DAMAGE, 20);
+        characteristics = new Characteristics(characteristicsValueMap);
+
+        CharacteristicAmelioration intelligence3 = new CharacteristicAmelioration("I3",
+                "Add 20 Intelligence", characteristics, 500);
         skillTree.add(intelligence3);
 
-        PrimaryCharacteristics endurance1C = new PrimaryCharacteristics(0, 5,
-                0, 0, 0, 0);
-        AmeliorationPrimary endurance1 = new AmeliorationPrimary("E1",
-                "Add 5 endurance", endurance1C, nope, 50);
+        characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAX_HEALTH, 15);
+        characteristics = new Characteristics(characteristicsValueMap);
+
+        CharacteristicAmelioration endurance1 = new CharacteristicAmelioration("E1",
+                "Add 5 endurance", characteristics, 50);
         skillTree.add(endurance1);
 
-        PrimaryCharacteristics endurance2C = new PrimaryCharacteristics(0, 10,
-                0, 0, 0, 0);
-        AmeliorationPrimary endurance2 = new AmeliorationPrimary("E2",
-                "Add 10 endurance", endurance2C, nope, 150);
+        characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAX_HEALTH, 30);
+        characteristics = new Characteristics(characteristicsValueMap);
+        CharacteristicAmelioration endurance2 = new CharacteristicAmelioration("E2",
+                "Add 10 endurance", characteristics, 150);
         skillTree.add(endurance2);
-        PrimaryCharacteristics endurance3C = new PrimaryCharacteristics(0, 20,
-                0, 0, 0, 0);
-        AmeliorationPrimary endurance3 = new AmeliorationPrimary("E3",
-                "Add 20 endurance", endurance3C, nope, 500);
+
+        characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAX_HEALTH, 50);
+        characteristics = new Characteristics(characteristicsValueMap);
+        CharacteristicAmelioration endurance3 = new CharacteristicAmelioration("E3",
+                "Add 20 endurance", characteristics, 500);
         skillTree.add(endurance3);
 
 

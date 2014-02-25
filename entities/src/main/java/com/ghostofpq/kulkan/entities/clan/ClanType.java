@@ -2,16 +2,9 @@ package com.ghostofpq.kulkan.entities.clan;
 
 public enum ClanType {
     GORILLA("Gorilla"),
-    TURTLE("Turtle"),
-    JAGUAR("Jaguar"),
-    MONKEY("Monkey"),
     PANTHER("Panther"),
-    LIZARD("Lizard"),
-    ARA("Ara"),
-    EAGLE("Eagle"),
+    ARA("Ara");
 
-
-    ELVE("Elve"), DWARF("Dwarf"), HUMAN("Human");
     private final String propertyName;
 
     ClanType(String propertyName) {

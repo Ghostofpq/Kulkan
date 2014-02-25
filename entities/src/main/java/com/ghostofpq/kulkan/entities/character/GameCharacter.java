@@ -3,8 +3,7 @@ package com.ghostofpq.kulkan.entities.character;
 
 import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
-import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.clan.Clan;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
 import com.ghostofpq.kulkan.entities.inventory.Equipment;
@@ -70,40 +69,24 @@ public class GameCharacter implements Serializable {
 
     // Caracteristics
     /**
-     * {@link PrimaryCharacteristics} of the character acquired by leveling
-     */
-    private PrimaryCharacteristics characteristics;
-    /**
-     * {@link com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics} of the character acquired by calculation
+     * {@link com.ghostofpq.kulkan.entities.characteristics.Characteristics} of the character acquired by calculation
      * from leveling
      */
-    private SecondaryCharacteristics secondaryCharacteristics;
+    private Characteristics characteristics;
     /**
-     * Aggregated {@link PrimaryCharacteristics} of the character (with job and
-     * equipment)
-     */
-    private PrimaryCharacteristics aggregatedCharacteristics;
-    /**
-     * Aggregated {@link SecondaryCharacteristics} of the character (with job
+     * Aggregated {@link com.ghostofpq.kulkan.entities.characteristics.Characteristics} of the character (with job
      * and equipment)
      */
-    private SecondaryCharacteristics aggregatedSecondaryCharacteristics;
+    private Characteristics aggregatedCharacteristics;
     /**
      * Current Health point of the character
      */
     private int currentHealthPoint;
     /**
-     * Max Health point of the character
-     */
-    private int maxHealthPoint;
-    /**
      * Current Mana point of the character
      */
     private int currentManaPoint;
-    /**
-     * Max Mana point of the character
-     */
-    private int maxManaPoint;
+
     private int hourglass;
     private PointOfView headingAngle;
     private Position position;
@@ -137,9 +120,9 @@ public class GameCharacter implements Serializable {
         for (int i = 0; i < level; i++) {
             this.characteristics.plus(getClan().getLevelUpCharacteristics());
         }
-        this.secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
 
-        updateLifeAndManaPoint();
+        updateAggregatedCharacteristics();
+
         initChar();
     }
 
@@ -176,15 +159,25 @@ public class GameCharacter implements Serializable {
         for (int i = 0; i < level; i++) {
             this.characteristics.plus(getClan().getLevelUpCharacteristics());
         }
-        this.secondaryCharacteristics = new SecondaryCharacteristics(characteristics);
 
-        updateLifeAndManaPoint();
+        updateAggregatedCharacteristics();
+
         initChar();
     }
 
+    public void updateAggregatedCharacteristics() {
+        this.aggregatedCharacteristics = new Characteristics();
+        this.aggregatedCharacteristics.plus(characteristics);
+        for (Job job : jobs) {
+            this.aggregatedCharacteristics.plus(job.getCharacteristics());
+        }
+        this.aggregatedCharacteristics.plus(equipment.getCharacteristics());
+
+    }
+
     public void initChar() {
-        currentHealthPoint = maxHealthPoint;
-        currentManaPoint = maxManaPoint;
+        currentHealthPoint = getMaxHealthPoint();
+        currentManaPoint = getMaxManaPoint();
         position = null;
         isReadyToPlay = false;
     }
@@ -209,34 +202,10 @@ public class GameCharacter implements Serializable {
         level++;
         calculateNextLevel();
         characteristics.plus(getClan().getLevelUpCharacteristics());
-
-        updateLifeAndManaPoint();
     }
 
     private void calculateNextLevel() {
         nextLevel = (int) (LEVEL_BASE * Math.pow(level, LEVEL_COEF));
-    }
-
-    private void updateLifeAndManaPoint() {
-        calculateAggregatedCharacteristics();
-        maxHealthPoint = getEndurance() * 10;
-        maxManaPoint = getWill() * 10;
-    }
-
-    public void calculateAggregatedCharacteristics() {
-        this.aggregatedCharacteristics = new PrimaryCharacteristics();
-
-        this.aggregatedCharacteristics.plus(characteristics);
-        for (Job job : jobs) {
-            this.aggregatedCharacteristics.plus(job.getAggregatedCharacteristics());
-        }
-        this.aggregatedCharacteristics.plus(equipment.getPrimaryCharacteristics());
-
-        this.aggregatedSecondaryCharacteristics = new SecondaryCharacteristics(aggregatedCharacteristics);
-        for (Job job : jobs) {
-            this.aggregatedSecondaryCharacteristics.plus(job.getAggregatedSecondaryCharacteristics());
-        }
-        this.aggregatedSecondaryCharacteristics.plus(equipment.getSecondaryCharacteristics());
     }
 
     public void addHealthPoint(int healthPoint) {
@@ -347,39 +316,24 @@ public class GameCharacter implements Serializable {
 
     public void setCurrentJob(JobType currentJob) {
         this.currentJob = currentJob;
-        updateLifeAndManaPoint();
+        updateAggregatedCharacteristics();
     }
 
-    public PrimaryCharacteristics getCharacteristics() {
+    public Characteristics getCharacteristics() {
         return characteristics;
     }
 
-    public SecondaryCharacteristics getSecondaryCharacteristics() {
-        return secondaryCharacteristics;
-    }
-
-    public PrimaryCharacteristics getAggregatedCharacteristics() {
+    public Characteristics getAggregatedCharacteristics() {
         return aggregatedCharacteristics;
-    }
-
-    public SecondaryCharacteristics getAggregatedSecondaryCharacteristics() {
-        return aggregatedSecondaryCharacteristics;
     }
 
     public int getCurrentHealthPoint() {
         return currentHealthPoint;
     }
 
-    public int getMaxHealthPoint() {
-        return maxHealthPoint;
-    }
 
     public int getCurrentManaPoint() {
         return currentManaPoint;
-    }
-
-    public int getMaxManaPoint() {
-        return maxManaPoint;
     }
 
     public boolean isAlive() {
@@ -409,81 +363,68 @@ public class GameCharacter implements Serializable {
     /*
     * CHARACTERISTICS GETTERS
     */
-
-    public int getStrength() {
-        return getAggregatedCharacteristics().getStrength();
+    public int getAttackDamage() {
+        return getAggregatedCharacteristics().getAttackDamage();
     }
 
-    public int getEndurance() {
-        return getAggregatedCharacteristics().getEndurance();
+    public int getMagicalDamage() {
+        return getAggregatedCharacteristics().getMagicalDamage();
     }
 
-    public int getIntelligence() {
-        return getAggregatedCharacteristics().getIntelligence();
+    public int getArmor() {
+        return getAggregatedCharacteristics().getArmor();
     }
 
-    public int getWill() {
-        return getAggregatedCharacteristics().getWill();
+    public int getMagicResist() {
+        return getAggregatedCharacteristics().getMagicResist();
     }
 
-    public int getAgility() {
-        return getAggregatedCharacteristics().getAgility();
+    public int getArmorPenetration() {
+        return getAggregatedCharacteristics().getArmorPenetration();
+    }
+
+    public int getMagicPenetration() {
+        return getAggregatedCharacteristics().getMagicPenetration();
     }
 
     public int getMovement() {
         return getAggregatedCharacteristics().getMovement();
     }
 
-    public int getAttackDamage() {
-        return getAggregatedSecondaryCharacteristics().getAttackDamage();
-    }
-
-    public int getMagicalDamage() {
-        return getAggregatedSecondaryCharacteristics().getMagicalDamage();
-    }
-
-    public int getArmor() {
-        return getAggregatedSecondaryCharacteristics().getArmor();
-    }
-
-    public int getMagicResist() {
-        return getAggregatedSecondaryCharacteristics().getMagicResist();
-    }
-
-    public int getArmorPenetration() {
-        return getAggregatedSecondaryCharacteristics().getArmorPenetration();
-    }
-
-    public int getMagicPenetration() {
-        return getAggregatedSecondaryCharacteristics().getMagicPenetration();
-    }
-
     public int getSpeed() {
-        return getAggregatedSecondaryCharacteristics().getSpeed();
+        return getAggregatedCharacteristics().getSpeed();
+    }
+
+    public int getMaxHealthPoint() {
+        return characteristics.getMaxHealthPoint();
+    }
+
+    public int getMaxManaPoint() {
+        return characteristics.getMaxManaPoint();
     }
 
     public int getLifeRegeneration() {
-        return getAggregatedSecondaryCharacteristics().getLifeRegeneration();
+        return getAggregatedCharacteristics().getHealthRegeneration();
     }
 
     public int getManaRegeneration() {
-        return getAggregatedSecondaryCharacteristics().getManaRegeneration();
+        return getAggregatedCharacteristics().getManaRegeneration();
     }
 
     public int getEscape() {
-        return getAggregatedSecondaryCharacteristics().getEscape();
+        return getAggregatedCharacteristics().getEscape();
     }
 
     public int getCriticalStrike() {
-        return getAggregatedSecondaryCharacteristics().getCriticalStrike();
+        return getAggregatedCharacteristics().getCriticalStrike();
     }
 
     public int getPrecision() {
-        return getAggregatedSecondaryCharacteristics().getPrecision();
+        return getAggregatedCharacteristics().getPrecision();
     }
 
     public int getResilience() {
-        return getAggregatedSecondaryCharacteristics().getResilience();
+        return getAggregatedCharacteristics().getResilience();
     }
 
     public int getHourglass() {

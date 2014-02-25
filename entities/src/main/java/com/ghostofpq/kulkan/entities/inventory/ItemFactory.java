@@ -1,14 +1,15 @@
 package com.ghostofpq.kulkan.entities.inventory;
 
-import com.ghostofpq.kulkan.entities.characteristics.PrimaryCharacteristics;
-import com.ghostofpq.kulkan.entities.characteristics.SecondaryCharacteristics;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.inventory.item.*;
 import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.utils.Range;
 import com.ghostofpq.kulkan.entities.utils.RangeType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ItemFactory {
 
@@ -47,11 +48,10 @@ public class ItemFactory {
         String name = "Cloth armor";
         // description
         String description = "A really light armor. +5 armor.";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        secondaryCharacteristics.setArmor(5);
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.ARMOR, 5);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -59,7 +59,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new Armor(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new Armor(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createIronHelm() {
@@ -69,18 +69,17 @@ public class ItemFactory {
         String name = "Iron Helm";
         // description
         String description = "An iron helm. +10 armor.";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        secondaryCharacteristics.setArmor(5);
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.ARMOR, 5);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
         // price
         int price = 10;
         // create
-        return new Helm(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new Helm(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createYewWand() {
@@ -89,20 +88,18 @@ public class ItemFactory {
         // name
         String name = "Yew wand";
         // description
-        String description = "A held yew wand. +10 Intelligence. +10 Magic damage.";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        primaryCharacteristics.setIntelligence(10);
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        secondaryCharacteristics.setMagicalDamage(10);
+        String description = "A held yew wand. +10 Magic damage.";
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAGICAL_DAMAGE, 10);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.MAGE);
         // price
         int price = 10;
         // create
-        return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new HeldItem(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createStoneClub() {
@@ -112,11 +109,10 @@ public class ItemFactory {
         String name = "Stone club";
         // description
         String description = "A stone club. +10 attack damage.";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        secondaryCharacteristics.setAttackDamage(10);
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.ATTACK_DAMAGE, 10);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -125,7 +121,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price, range, WeaponType.ONE_HANDED);
+        return new Weapon(id, name, description, characteristics, authorizedJobs, price, range, WeaponType.ONE_HANDED);
     }
 
     private static Item createSling() {
@@ -135,11 +131,10 @@ public class ItemFactory {
         String name = "Sling";
         // description
         String description = "A simple sling. +2 attack damage.";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        secondaryCharacteristics.setAttackDamage(10);
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.ATTACK_DAMAGE, 10);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.MAGE);
@@ -148,7 +143,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price, range, WeaponType.RANGE);
+        return new Weapon(id, name, description, characteristics, authorizedJobs, price, range, WeaponType.RANGE);
     }
 
     private static Item createLifeRing() {
@@ -157,12 +152,11 @@ public class ItemFactory {
         // name
         String name = "Life Ring";
         // description
-        String description = "A ring empowered with life. +10 Endurance. ";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        primaryCharacteristics.setEndurance(10);
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
+        String description = "A ring empowered with life. +15 Max HP. ";
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAX_HEALTH, 15);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -170,7 +164,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new Ring(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createStrengthRing() {
@@ -179,12 +173,11 @@ public class ItemFactory {
         // name
         String name = "Strength Ring";
         // description
-        String description = "A ring empowered with pure strength. +10 Strength. ";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        primaryCharacteristics.setStrength(10);
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
+        String description = "A ring empowered with pure strength. +5 Attack Damage. ";
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.ATTACK_DAMAGE, 5);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -192,7 +185,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new Ring(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new Ring(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createWillNecklace() {
@@ -201,12 +194,11 @@ public class ItemFactory {
         // name
         String name = "Will Necklace";
         // description
-        String description = "A necklace empowered with will. +10 Will. ";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        primaryCharacteristics.setWill(10);
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
+        String description = "A necklace empowered with will. +15 Max MP. ";
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.MAX_MANA, 15);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -214,7 +206,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new Necklace(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createAgilityNecklace() {
@@ -223,12 +215,12 @@ public class ItemFactory {
         // name
         String name = "Agility Necklace";
         // description
-        String description = "A necklace empowered with pure agility. +10 Agility. ";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        primaryCharacteristics.setAgility(10);
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
+        String description = "A necklace empowered with pure agility. +15% Crit +15% Escape. ";
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.CRITICAL_STRIKE, 15);
+        characteristicsValueMap.put(Characteristics.fields.ESCAPE, 15);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -236,7 +228,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new Necklace(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new Necklace(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createWoodenShield() {
@@ -246,11 +238,10 @@ public class ItemFactory {
         String name = "Wooden Shield";
         // description
         String description = "A wooden shield. +10 armor. ";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        secondaryCharacteristics.setArmor(10);
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.ARMOR, 10);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -258,7 +249,7 @@ public class ItemFactory {
         // price
         int price = 10;
         // create
-        return new HeldItem(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price);
+        return new HeldItem(id, name, description, characteristics, authorizedJobs, price);
     }
 
     private static Item createTwoHandedSword() {
@@ -268,11 +259,10 @@ public class ItemFactory {
         String name = "Two Handed Sword";
         // description
         String description = "A two handed sword. +20 attack damage.";
-        // primaryCharacteristics
-        PrimaryCharacteristics primaryCharacteristics = new PrimaryCharacteristics();
-        // secondaryCharacteristics
-        SecondaryCharacteristics secondaryCharacteristics = new SecondaryCharacteristics();
-        secondaryCharacteristics.setAttackDamage(20);
+        // characteristics
+        Map<Characteristics.fields, Integer> characteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+        characteristicsValueMap.put(Characteristics.fields.ATTACK_DAMAGE, 20);
+        Characteristics characteristics = new Characteristics(characteristicsValueMap);
         // authorizedJobs
         List<JobType> authorizedJobs = new ArrayList<JobType>();
         authorizedJobs.add(JobType.WARRIOR);
@@ -281,6 +271,6 @@ public class ItemFactory {
         // price
         int price = 100;
         // create
-        return new Weapon(id, name, description, primaryCharacteristics, secondaryCharacteristics, authorizedJobs, price, range, WeaponType.TWO_HANDED);
+        return new Weapon(id, name, description, characteristics, authorizedJobs, price, range, WeaponType.TWO_HANDED);
     }
 }
