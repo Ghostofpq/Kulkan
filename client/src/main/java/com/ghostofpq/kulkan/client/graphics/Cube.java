@@ -134,11 +134,34 @@ public class Cube extends DrawableObject implements Serializable {
     }
 
     public void renderForMousePosition() {
+        PointOfView pointOfView = GraphicsManager.getInstance().getCurrentPointOfView();
         if (isVisible()) {
             float colorX = ((float) position.getX() + 10f) / 255f;
             float colorY = ((float) position.getY() + 10f) / 255f;
             float colorZ = ((float) position.getZ() + 10f) / 255f;
-            facetZenith.renderForMousePosition(colorX, colorY, colorZ);
+
+            switch (pointOfView) {
+                case SOUTH:
+                    facetSouth.renderBlackForMousePosition();
+                    facetEast.renderBlackForMousePosition();
+                    facetZenith.renderForMousePosition(colorX, colorY, colorZ);
+                    break;
+                case WEST:
+                    facetWest.renderBlackForMousePosition();
+                    facetSouth.renderBlackForMousePosition();
+                    facetZenith.renderForMousePosition(colorX, colorY, colorZ);
+                    break;
+                case NORTH:
+                    facetNorth.renderBlackForMousePosition();
+                    facetWest.renderBlackForMousePosition();
+                    facetZenith.renderForMousePosition(colorX, colorY, colorZ);
+                    break;
+                case EAST:
+                    facetEast.renderBlackForMousePosition();
+                    facetNorth.renderBlackForMousePosition();
+                    facetZenith.renderForMousePosition(colorX, colorY, colorZ);
+                    break;
+            }
         }
     }
 
