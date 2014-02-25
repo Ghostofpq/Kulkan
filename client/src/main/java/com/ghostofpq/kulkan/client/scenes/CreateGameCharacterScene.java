@@ -36,13 +36,8 @@ public class CreateGameCharacterScene implements Scene {
     private Button male;
     private Button female;
     private Button gorilla;
-    private Button jaguar;
-    private Button turtle;
-    private Button monkey;
     private Button panther;
-    private Button lizard;
     private Button ara;
-    private Button eagle;
     private Button validate;
     private Button quit;
     private int widthSeparator = 50;
@@ -142,26 +137,6 @@ public class CreateGameCharacterScene implements Scene {
             }
         };
 
-        jaguar = new Button(jaguarPosX, jaguarPosY, widthStepClan, heightStep, "jaguar") {
-            @Override
-            public void onClick() {
-                jaguarHasFocus();
-            }
-        };
-
-        turtle = new Button(turtlePosX, turtlePosY, widthStepClan, heightStep, "turtle") {
-            @Override
-            public void onClick() {
-                turtleHasFocus();
-            }
-        };
-        monkey = new Button(monkeyPosX, monkeyPosY, widthStepClan, heightStep, "monkey") {
-            @Override
-            public void onClick() {
-                monkeyHasFocus();
-            }
-        };
-
         panther = new Button(pantherPosX, pantherPosY, widthStepClan, heightStep, "panther") {
             @Override
             public void onClick() {
@@ -169,24 +144,10 @@ public class CreateGameCharacterScene implements Scene {
             }
         };
 
-        lizard = new Button(lizardPosX, lizardPosY, widthStepClan, heightStep, "lizard") {
-            @Override
-            public void onClick() {
-                lizardHasFocus();
-            }
-        };
-
         ara = new Button(araPosX, araPosY, widthStepClan, heightStep, "ara") {
             @Override
             public void onClick() {
                 araHasFocus();
-            }
-        };
-
-        eagle = new Button(eaglePosX, eaglePosY, widthStepClan, heightStep, "eagle") {
-            @Override
-            public void onClick() {
-                eagleHasFocus();
             }
         };
 
@@ -238,98 +199,25 @@ public class CreateGameCharacterScene implements Scene {
     public void gorillaHasFocus() {
         clanType = ClanType.GORILLA;
         gorilla.setHasFocus(true);
-        jaguar.setHasFocus(false);
-        turtle.setHasFocus(false);
-        monkey.setHasFocus(false);
         panther.setHasFocus(false);
-        lizard.setHasFocus(false);
         ara.setHasFocus(false);
-        eagle.setHasFocus(false);
     }
 
-    public void jaguarHasFocus() {
-        clanType = ClanType.JAGUAR;
-        gorilla.setHasFocus(false);
-        jaguar.setHasFocus(true);
-        turtle.setHasFocus(false);
-        monkey.setHasFocus(false);
-        panther.setHasFocus(false);
-        lizard.setHasFocus(false);
-        ara.setHasFocus(false);
-        eagle.setHasFocus(false);
-    }
-
-    public void turtleHasFocus() {
-        clanType = ClanType.TURTLE;
-        gorilla.setHasFocus(false);
-        jaguar.setHasFocus(false);
-        turtle.setHasFocus(true);
-        monkey.setHasFocus(false);
-        panther.setHasFocus(false);
-        lizard.setHasFocus(false);
-        ara.setHasFocus(false);
-        eagle.setHasFocus(false);
-    }
-
-    public void monkeyHasFocus() {
-        clanType = ClanType.MONKEY;
-        gorilla.setHasFocus(false);
-        jaguar.setHasFocus(false);
-        turtle.setHasFocus(false);
-        monkey.setHasFocus(true);
-        panther.setHasFocus(false);
-        lizard.setHasFocus(false);
-        ara.setHasFocus(false);
-        eagle.setHasFocus(false);
-    }
 
     public void pantherHasFocus() {
         clanType = ClanType.PANTHER;
         gorilla.setHasFocus(false);
-        jaguar.setHasFocus(false);
-        turtle.setHasFocus(false);
-        monkey.setHasFocus(false);
         panther.setHasFocus(true);
-        lizard.setHasFocus(false);
         ara.setHasFocus(false);
-        eagle.setHasFocus(false);
-    }
-
-    public void lizardHasFocus() {
-        clanType = ClanType.LIZARD;
-        gorilla.setHasFocus(false);
-        jaguar.setHasFocus(false);
-        turtle.setHasFocus(false);
-        monkey.setHasFocus(false);
-        panther.setHasFocus(false);
-        lizard.setHasFocus(true);
-        ara.setHasFocus(false);
-        eagle.setHasFocus(false);
     }
 
     public void araHasFocus() {
         clanType = ClanType.ARA;
         gorilla.setHasFocus(false);
-        jaguar.setHasFocus(false);
-        turtle.setHasFocus(false);
-        monkey.setHasFocus(false);
         panther.setHasFocus(false);
-        lizard.setHasFocus(false);
         ara.setHasFocus(true);
-        eagle.setHasFocus(false);
     }
 
-    public void eagleHasFocus() {
-        clanType = ClanType.EAGLE;
-        gorilla.setHasFocus(false);
-        jaguar.setHasFocus(false);
-        turtle.setHasFocus(false);
-        monkey.setHasFocus(false);
-        panther.setHasFocus(false);
-        lizard.setHasFocus(false);
-        ara.setHasFocus(false);
-        eagle.setHasFocus(true);
-    }
 
     @Override
     public void update(long deltaTime) {
@@ -343,13 +231,8 @@ public class CreateGameCharacterScene implements Scene {
         male.draw();
         female.draw();
         gorilla.draw();
-        jaguar.draw();
-        turtle.draw();
-        monkey.draw();
         panther.draw();
-        lizard.draw();
         ara.draw();
-        eagle.draw();
         name.draw();
         validate.draw();
         quit.draw();
@@ -372,20 +255,10 @@ public class CreateGameCharacterScene implements Scene {
                         female.onClick();
                     } else if (gorilla.isClicked()) {
                         gorilla.onClick();
-                    } else if (jaguar.isClicked()) {
-                        jaguar.onClick();
-                    } else if (turtle.isClicked()) {
-                        turtle.onClick();
-                    } else if (monkey.isClicked()) {
-                        monkey.onClick();
                     } else if (panther.isClicked()) {
                         panther.onClick();
-                    } else if (lizard.isClicked()) {
-                        lizard.onClick();
                     } else if (ara.isClicked()) {
                         ara.onClick();
-                    } else if (eagle.isClicked()) {
-                        eagle.onClick();
                     } else if (validate.isClicked()) {
                         validate.onClick();
                     } else if (quit.isClicked()) {
