@@ -29,6 +29,7 @@ public class GameCharacterRepresentation extends DrawableObject {
     private List<PositionAbsolute> positionsToGo;
     private boolean isJumping;
     private int playerNumber;
+    // private BarRender3D healthBarRender;
 
     public GameCharacterRepresentation(GameCharacter character, Position position, int playerNumber) {
         this.character = character;
@@ -40,6 +41,11 @@ public class GameCharacterRepresentation extends DrawableObject {
         setHasMoved(false);
 
         setHeight(1.5f);
+
+        //healthBarRender = new BarRender3D(character.getCurrentHealthPoint(), character.getMaxHealthPoint(),
+        //        position.toAbsolute().getX(), position.toAbsolute().getY() + 1.8f, position.toAbsolute().getZ(),
+        //        0.8f, 0.2f,
+        //        Color.green, Color.red);
 
         setPosition(position);
         setPositionAbsolute(position.toAbsolute());
@@ -100,7 +106,6 @@ public class GameCharacterRepresentation extends DrawableObject {
                 animation.update(deltaTime);
             }
 
-
             boolean xDifferent = getPositionAbsolute().getX() != getPositionToGo().getX();
             boolean yDifferent = getPositionAbsolute().getY() != getPositionToGo().getY();
             boolean zDifferent = getPositionAbsolute().getZ() != getPositionToGo().getZ();
@@ -139,6 +144,8 @@ public class GameCharacterRepresentation extends DrawableObject {
                 }
             }
         }
+        //healthBarRender.setValue(character.getCurrentHealthPoint());
+        //healthBarRender.setMaxValue(character.getMaxHealthPoint());
     }
 
     private void updatePosition(boolean xDifferent, boolean yDifferent, boolean zDifferent) {
@@ -195,8 +202,9 @@ public class GameCharacterRepresentation extends DrawableObject {
                 }
             }
         }
-
-        setPositionAbsolute(new PositionAbsolute(x, y, z));
+        PositionAbsolute updatedPosition = new PositionAbsolute(x, y, z);
+        setPositionAbsolute(updatedPosition);
+        //healthBarRender.updatePosition(updatedPosition.plusYNew(1.8f));
     }
 
     public void draw() {
@@ -289,6 +297,8 @@ public class GameCharacterRepresentation extends DrawableObject {
         GL11.glTexCoord2d(animation.getCurrentFrame().getTextureOffsetX(), animation.getCurrentFrame().getTextureOffsetY() + animation.getCurrentFrame().getTextureHeight());
         GL11.glVertex3d(corner4.getX(), corner4.getY(), corner4.getZ());
         GL11.glEnd();
+
+        //healthBarRender.render();
     }
 
     public String toString() {
@@ -319,6 +329,7 @@ public class GameCharacterRepresentation extends DrawableObject {
         if (zFromPositionAbsolute != this.getPosition().getZ()) {
             this.getPosition().setZ(zFromPositionAbsolute);
         }
+        //healthBarRender.updatePosition(positionAbsolute.plusYNew(1.8f));
     }
 
     private PointOfView getEquivalentPointOfView(PointOfView boardPointOfView, PointOfView charPointOfView) {
