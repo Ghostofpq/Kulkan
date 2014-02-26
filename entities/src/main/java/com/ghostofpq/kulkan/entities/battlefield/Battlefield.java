@@ -232,11 +232,6 @@ public class Battlefield implements Serializable {
         Tree<Position> positionTree = new Tree<Position>(position);
         List<Position> result = new ArrayList<Position>();
 
-        log.debug("Getting the possible position to attack from {}", position.toString());
-
-        log.debug("type {}", range.getRangeType());
-        log.debug("minRange {}", range.getMinRange());
-        log.debug("maxRange {}", range.getMaxRange());
         switch (range.getRangeType()) {
             case CIRCLE:
                 getPossiblePositions(position, positionTree.getRoot(), range.getMaxRange(), range.getMaxRange(), 1, false, PointOfView.NORTH);
@@ -265,10 +260,7 @@ public class Battlefield implements Serializable {
                 result = positionTree.getAllElements();
                 break;
         }
-        log.debug("Result:");
-        for (Position pos : result) {
-            log.debug(pos.toString());
-        }
+
         return result;
     }
 
@@ -277,7 +269,6 @@ public class Battlefield implements Serializable {
         for (Position position : battlefieldElementMap.keySet()) {
             if ((position.getX() == x) && (position.getZ() == z)) {
                 if (canMoveTo(position, height)) {
-                    log.debug("adding {}", position.toString());
                     possiblePositions.add(position);
                 }
             }
