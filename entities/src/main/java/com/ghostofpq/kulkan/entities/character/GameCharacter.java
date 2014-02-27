@@ -96,6 +96,16 @@ public class GameCharacter implements Serializable {
     private Equipment equipment;
 
     public GameCharacter(String name, ClanType clan, Gender gender) {
+        if (null == name) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (null == clan) {
+            throw new IllegalArgumentException("Clan cannot be null");
+        }
+        if (null == gender) {
+            throw new IllegalArgumentException("Gender cannot be null");
+        }
+
         // Identity
         this.name = name;
         this.clan = Clan.Clan(clan);
@@ -127,14 +137,36 @@ public class GameCharacter implements Serializable {
     }
 
     public void setId(ObjectId id) {
+        if (null == id) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
         this.id = id;
     }
 
     public void setPlayer(Player player) {
+        if (null == player) {
+            throw new IllegalArgumentException("Player cannot be null");
+        }
         this.player = player;
     }
 
     public GameCharacter(ObjectId id, Player player, String name, ClanType clan, Gender gender, int level, int experience, int jobPoints, int cumulativeJobPoints, JobType currentJob, List<Job> jobs, Equipment equipment) {
+        if (null == id) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+        if (null == player) {
+            throw new IllegalArgumentException("Player cannot be null");
+        }
+        if (null == name) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+        if (null == clan) {
+            throw new IllegalArgumentException("Clan cannot be null");
+        }
+        if (null == gender) {
+            throw new IllegalArgumentException("Gender cannot be null");
+        }
+
         // Identity
         this.id = id;
         this.name = name;
@@ -172,7 +204,6 @@ public class GameCharacter implements Serializable {
             this.aggregatedCharacteristics.plus(job.getCharacteristics());
         }
         this.aggregatedCharacteristics.plus(equipment.getCharacteristics());
-
     }
 
     public void initChar() {
@@ -210,6 +241,9 @@ public class GameCharacter implements Serializable {
 
     public void addHealthPoint(int healthPoint) {
         currentHealthPoint += healthPoint;
+        if (currentHealthPoint > getMaxHealthPoint()) {
+            currentHealthPoint = getMaxHealthPoint();
+        }
         if (currentHealthPoint < 0) {
             currentHealthPoint = 0;
         }
@@ -217,6 +251,9 @@ public class GameCharacter implements Serializable {
 
     public void addManaPoint(int manaPoint) {
         currentManaPoint += manaPoint;
+        if (currentManaPoint > getMaxManaPoint()) {
+            currentManaPoint = getMaxManaPoint();
+        }
         if (currentManaPoint < 0) {
             currentManaPoint = 0;
         }

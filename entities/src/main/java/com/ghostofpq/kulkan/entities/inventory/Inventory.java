@@ -30,7 +30,7 @@ public class Inventory implements Serializable {
         add(itemId, 1);
     }
 
-    public void remove(String itemId, int quantity) throws IllegalArgumentException {
+    public void remove(String itemId, int quantity) {
         if (itemIdQuantityMap.keySet().contains(itemId)) {
             Integer currentQuantity = itemIdQuantityMap.get(itemId);
             Integer newQuantity = currentQuantity - quantity;
@@ -44,7 +44,7 @@ public class Inventory implements Serializable {
         }
     }
 
-    public void removeOne(String itemId) throws IllegalArgumentException {
+    public void removeOne(String itemId) {
         remove(itemId, 1);
     }
 
