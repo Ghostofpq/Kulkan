@@ -131,6 +131,8 @@ public class GameCharacter implements Serializable {
             this.characteristics.plus(getClan().getLevelUpCharacteristics());
         }
 
+        alterations = new ArrayList<Alteration>();
+
         updateAggregatedCharacteristics();
 
         initChar();
@@ -191,6 +193,8 @@ public class GameCharacter implements Serializable {
         for (int i = 0; i < level; i++) {
             this.characteristics.plus(getClan().getLevelUpCharacteristics());
         }
+
+        alterations = new ArrayList<Alteration>();
 
         updateAggregatedCharacteristics();
 
