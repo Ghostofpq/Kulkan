@@ -54,26 +54,20 @@ public class MatchmakingManager implements Runnable {
         matchMap = new HashMap<String, Match>();
     }
 
-    public void initConnections() {
-        try {
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(hostIp);
-            factory.setPort(hostPort);
-            connection = factory.newConnection();
-            channelOut = connection.createChannel();
-            channelMatchmakingIn = connection.createChannel();
-            channelMatchmakingIn.queueDeclare(MATCHMAKING_SERVER_QUEUE_NAME_BASE, false, false, false, null);
-            matchmakingConsumer = new QueueingConsumer(channelMatchmakingIn);
-            channelMatchmakingIn.basicConsume(MATCHMAKING_SERVER_QUEUE_NAME_BASE, true, matchmakingConsumer);
-            log.debug(" [-] OPENING QUEUE : {}", MATCHMAKING_SERVER_QUEUE_NAME_BASE);
-            QueueingConsumer.Delivery delivery = matchmakingConsumer.nextDelivery(1);
-            while (null != delivery) {
-                delivery = matchmakingConsumer.nextDelivery(1);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public void initConnections() throws IOException, InterruptedException {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(hostIp);
+        factory.setPort(hostPort);
+        connection = factory.newConnection();
+        channelOut = connection.createChannel();
+        channelMatchmakingIn = connection.createChannel();
+        channelMatchmakingIn.queueDeclare(MATCHMAKING_SERVER_QUEUE_NAME_BASE, false, false, false, null);
+        matchmakingConsumer = new QueueingConsumer(channelMatchmakingIn);
+        channelMatchmakingIn.basicConsume(MATCHMAKING_SERVER_QUEUE_NAME_BASE, true, matchmakingConsumer);
+        log.debug(" [-] OPENING QUEUE : {}", MATCHMAKING_SERVER_QUEUE_NAME_BASE);
+
+        while (matchmakingConsumer.nextDelivery(0) != null) {
+            // purge
         }
     }
 

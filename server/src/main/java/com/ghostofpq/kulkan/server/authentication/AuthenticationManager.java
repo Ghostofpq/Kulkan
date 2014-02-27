@@ -52,6 +52,10 @@ public class AuthenticationManager implements Runnable {
         channelAuthenticating.basicQos(1);
         consumer = new QueueingConsumer(channelAuthenticating);
         channelAuthenticating.basicConsume(authenticationQueueName, false, consumer);
+
+        while (consumer.nextDelivery(0) != null) {
+            // purge
+        }
     }
 
     public User authenticate(String username, String password) {

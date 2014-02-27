@@ -49,6 +49,10 @@ public class ItemService implements Runnable {
         consumer = new QueueingConsumer(channelServiceIn);
         channelServiceIn.basicConsume(serviceQueueName, true, consumer);
         channelServiceOut = connection.createChannel();
+
+        while (consumer.nextDelivery(0) != null) {
+            // purge
+        }
     }
 
     private void manageMessageItemsByTypeRequest(Message message) throws IOException {

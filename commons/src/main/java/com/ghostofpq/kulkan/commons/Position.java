@@ -20,6 +20,37 @@ public class Position implements Serializable, Comparable<Position> {
         this.setZ(position.getZ());
     }
 
+    public PointOfView getHeadingAngleFor(Position targetedPosition) {
+        PointOfView result = null;
+
+        if (Math.abs(targetedPosition.getX() - getX()) >= Math.abs(targetedPosition.getZ() - getZ())) {
+            if (targetedPosition.getX() > getX()) {
+                result = PointOfView.EAST;
+            } else if (targetedPosition.getX() == getX()) {
+                if (targetedPosition.getZ() > getZ()) {
+                    result = PointOfView.SOUTH;
+                } else if (targetedPosition.getZ() < getZ()) {
+                    result = PointOfView.NORTH;
+                }
+            } else {
+                result = PointOfView.WEST;
+            }
+        } else {
+            if (targetedPosition.getZ() > getZ()) {
+                result = PointOfView.SOUTH;
+            } else if (targetedPosition.getZ() == getZ()) {
+                if (targetedPosition.getX() > getX()) {
+                    result = PointOfView.EAST;
+                } else if (targetedPosition.getX() < getX()) {
+                    result = PointOfView.WEST;
+                }
+            } else {
+                result = PointOfView.NORTH;
+            }
+        }
+        return result;
+    }
+
     public PositionAbsolute toAbsolute() {
         return new PositionAbsolute((float) x, (float) y, (float) z);
     }

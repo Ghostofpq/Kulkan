@@ -46,26 +46,20 @@ public class LobbyManager implements Runnable {
         lastTimePing = System.currentTimeMillis();
     }
 
-    public void initConnections() {
-        try {
-            ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(hostIp);
-            factory.setPort(hostPort);
-            connection = factory.newConnection();
-            channelOut = connection.createChannel();
-            channelLobbyIn = connection.createChannel();
-            channelLobbyIn.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
-            lobbyConsumer = new QueueingConsumer(channelLobbyIn);
-            channelLobbyIn.basicConsume(LOBBY_SERVER_QUEUE_NAME_BASE, true, lobbyConsumer);
-            log.debug(" [-] OPENING QUEUE : {}", LOBBY_SERVER_QUEUE_NAME_BASE);
-            QueueingConsumer.Delivery delivery = lobbyConsumer.nextDelivery(1);
-            while (null != delivery) {
-                delivery = lobbyConsumer.nextDelivery(1);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public void initConnections() throws IOException, InterruptedException {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(hostIp);
+        factory.setPort(hostPort);
+        connection = factory.newConnection();
+        channelOut = connection.createChannel();
+        channelLobbyIn = connection.createChannel();
+        channelLobbyIn.queueDeclare(LOBBY_SERVER_QUEUE_NAME_BASE, false, false, false, null);
+        lobbyConsumer = new QueueingConsumer(channelLobbyIn);
+        channelLobbyIn.basicConsume(LOBBY_SERVER_QUEUE_NAME_BASE, true, lobbyConsumer);
+        log.debug(" [-] OPENING QUEUE : {}", LOBBY_SERVER_QUEUE_NAME_BASE);
+
+        while (lobbyConsumer.nextDelivery(0) != null) {
+            // purge
         }
     }
 

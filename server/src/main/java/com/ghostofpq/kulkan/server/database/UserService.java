@@ -53,6 +53,10 @@ public class UserService implements Runnable {
         consumer = new QueueingConsumer(channelServiceIn);
         channelServiceIn.basicConsume(serviceQueueName, true, consumer);
         channelServiceOut = connection.createChannel();
+
+        while (consumer.nextDelivery(0) != null) {
+            // purge
+        }
     }
 
     private void receiveMessage() throws InterruptedException, IOException {

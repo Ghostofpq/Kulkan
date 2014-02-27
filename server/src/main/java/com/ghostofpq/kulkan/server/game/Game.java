@@ -82,9 +82,8 @@ public class Game implements Runnable {
         gameConsumer = new QueueingConsumer(channelGameIn);
         channelGameIn.basicConsume(queueNameIn, true, gameConsumer);
 
-        QueueingConsumer.Delivery delivery = gameConsumer.nextDelivery(0);
-        while (null != delivery) {
-            delivery = gameConsumer.nextDelivery(0);
+        while (gameConsumer.nextDelivery(0) != null) {
+            // purge
         }
 
         channelGameOut = connection.createChannel();

@@ -28,7 +28,7 @@ public class CombatCalculator {
         }
 
         int armor = (targetedChar.getAggregatedCharacteristics().getArmor() - attackingChar.getAggregatedCharacteristics().getArmorPenetration());
-        float ratio = 100f / (100f + armor);
+        float ratio = 150f / (150f + armor);
         float estimatedDamageD = ratio * attackingChar.getAttackDamage();
         estimatedDamage = (int) Math.floor(estimatedDamageD);
 
