@@ -1,4 +1,4 @@
-package com.ghostofpq.kulkan.client.graphics;
+package com.ghostofpq.kulkan.client.graphics.ingame;
 
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.SpritesheetManager;

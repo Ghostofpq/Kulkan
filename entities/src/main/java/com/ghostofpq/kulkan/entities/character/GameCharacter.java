@@ -66,7 +66,7 @@ public class GameCharacter implements Serializable {
     private JobType currentJob;
 
     private List<Job> jobs;
-
+    private List<Alteration> alterations;
     // Caracteristics
     /**
      * {@link com.ghostofpq.kulkan.entities.characteristics.Characteristics} of the character acquired by calculation
@@ -203,6 +203,9 @@ public class GameCharacter implements Serializable {
         for (Job job : jobs) {
             this.aggregatedCharacteristics.plus(job.getCharacteristics());
         }
+        for (Alteration alteration : alterations) {
+            this.aggregatedCharacteristics.plus(alteration.getCharacteristics());
+        }
         this.aggregatedCharacteristics.plus(equipment.getCharacteristics());
     }
 
@@ -211,6 +214,7 @@ public class GameCharacter implements Serializable {
         currentManaPoint = getMaxManaPoint();
         position = null;
         isReadyToPlay = false;
+        alterations = new ArrayList<Alteration>();
     }
 
     public void gainXp(double experience) {
@@ -276,6 +280,7 @@ public class GameCharacter implements Serializable {
                 hourglass = 100 - delta;
                 setHasMoved(false);
                 setHasActed(false);
+
                 isReadyToPlay = true;
             }
         } else {
@@ -397,9 +402,13 @@ public class GameCharacter implements Serializable {
         return cumulativeJobPoints;
     }
 
+    public List<Alteration> getAlterations() {
+        return alterations;
+    }
+
     /*
-    * CHARACTERISTICS GETTERS
-    */
+        * CHARACTERISTICS GETTERS
+        */
     public int getAttackDamage() {
         return getAggregatedCharacteristics().getAttackDamage();
     }
@@ -440,7 +449,7 @@ public class GameCharacter implements Serializable {
         return characteristics.getMaxManaPoint();
     }
 
-    public int getLifeRegeneration() {
+    public int getHealthRegeneration() {
         return getAggregatedCharacteristics().getHealthRegeneration();
     }
 

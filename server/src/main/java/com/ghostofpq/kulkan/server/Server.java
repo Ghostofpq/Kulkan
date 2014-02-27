@@ -86,7 +86,7 @@ public class Server {
         pingManagerThread = new Thread(pingManager);
         pingManagerThread.start();
 
-        watchdog = new PingWatchdog(pingManagerThread, 30000);
+        watchdog = new PingWatchdog(pingManagerThread, 10000);
         watchdogThread = new Thread(watchdog);
         watchdogThread.start();
     }

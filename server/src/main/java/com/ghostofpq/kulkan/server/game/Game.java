@@ -5,6 +5,7 @@ import com.ghostofpq.kulkan.commons.PointOfView;
 import com.ghostofpq.kulkan.commons.Position;
 import com.ghostofpq.kulkan.commons.Tree;
 import com.ghostofpq.kulkan.entities.battlefield.Battlefield;
+import com.ghostofpq.kulkan.entities.character.Alteration;
 import com.ghostofpq.kulkan.entities.character.CombatCalculator;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
@@ -23,10 +24,7 @@ import com.rabbitmq.client.QueueingConsumer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class Game implements Runnable {
@@ -153,7 +151,6 @@ public class Game implements Runnable {
                 }
             }
             if (readyGameCharactersList.isEmpty()) {
-                log.error(" [X] NO CHAR READY, TICK HOURGLASS");
                 for (Player player : playerList) {
                     for (GameCharacter gameCharacter : player.getTeam()) {
                         gameCharacter.tickHourglass();
@@ -162,6 +159,7 @@ public class Game implements Runnable {
             } else {
                 log.debug(" [-] {} CHAR ARE TO PLAY : ", readyGameCharactersList.size());
                 result = readyGameCharactersList.get(0);
+
                 for (GameCharacter gameCharacter : readyGameCharactersList) {
                     log.debug("{} M:{} A:{}", gameCharacter.getName(), gameCharacter.hasMoved(), gameCharacter.hasActed());
                     if (result.getHourglass() > gameCharacter.getHourglass()) {
@@ -271,8 +269,8 @@ public class Game implements Runnable {
             Position currentPosition = getCharacterPosition(characterToMove).plusYNew(-1);
             if (!currentPosition.equals(positionToMove)) {
                 log.debug(" [C] {} MOVES TO {}", characterToMove.getName(), positionToMove.toString());
-                Tree<Position> possiblePositionsToMoveTree2 = getPossiblePositionsToMoveTree(characterToMove);
-                List<Node<Position>> nodeList = possiblePositionsToMoveTree2.find(positionToMove);
+                Tree<Position> possiblePositionsToMoveTree = getPossiblePositionsToMoveTree(characterToMove);
+                List<Node<Position>> nodeList = possiblePositionsToMoveTree.find(positionToMove);
                 if (!nodeList.isEmpty()) {
                     characterToMove.setHasMoved(true);
                     // the position is on the floor, set the char position to position +Y1
@@ -631,6 +629,32 @@ public class Game implements Runnable {
         Player playerToPlay = getPlayerForCharacter(charToPlay);
         log.debug("charToPlay : {}", charToPlay);
         log.debug("playerToPlay : {}", playerToPlay);
+
+        Iterator<Alteration> alterationsIterator = charToPlay.getAlterations().iterator();
+        while (alterationsIterator.hasNext()) {
+            Alteration alteration = alterationsIterator.next();
+            if (alteration.isActive()) {
+                if (alteration.getCharacteristics().getHealthRegeneration() != 0) {
+                    log.debug("{} gains {} HP due to {}", charToPlay.getName(), alteration.getCharacteristics().getHealthRegeneration(), alteration.getName());
+                    charToPlay.addHealthPoint(alteration.getCharacteristics().getHealthRegeneration());
+                    MessageCharacterGainsHP messageCharacterGainsHP = new MessageCharacterGainsHP(charToPlay, alteration.getCharacteristics().getHealthRegeneration());
+                    sendToAll(messageCharacterGainsHP);
+                } else if (alteration.getCharacteristics().getManaRegeneration() != 0) {
+                    log.debug("{} gains {} MP due to {}", charToPlay.getName(), alteration.getCharacteristics().getManaRegeneration(), alteration.getName());
+                    charToPlay.addManaPoint(alteration.getCharacteristics().getManaRegeneration());
+                    MessageCharacterGainsMP messageCharacterGainsMP = new MessageCharacterGainsMP(charToPlay, alteration.getCharacteristics().getManaRegeneration());
+                    sendToAll(messageCharacterGainsMP);
+                }
+            } else {
+                alterationsIterator.remove();
+                MessageCharacterAlteration messageCharacterAlteration = new MessageCharacterAlteration(charToPlay, alteration, false);
+                sendToAll(messageCharacterAlteration);
+            }
+        }
+
+        charToPlay.updateAggregatedCharacteristics();
+
+
         List<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
         for (Player player : playerList) {
             allGameCharacters.addAll(player.getTeam());
