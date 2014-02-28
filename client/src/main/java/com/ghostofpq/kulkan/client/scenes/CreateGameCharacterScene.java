@@ -325,7 +325,9 @@ public class CreateGameCharacterScene implements Scene {
                     List<String> options = new ArrayList<String>();
                     options.add("OK");
                     MessageError messageError = (MessageError) message;
-                    popUp = new PopUp(options, messageError.getError());
+                    if (messageError.getError() != null) {
+                        popUp = new PopUp(options, messageError.getError());
+                    }
                     break;
             }
         }
