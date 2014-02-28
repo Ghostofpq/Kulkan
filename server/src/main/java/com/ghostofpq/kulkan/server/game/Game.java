@@ -630,6 +630,20 @@ public class Game implements Runnable {
         log.debug("charToPlay : {}", charToPlay);
         log.debug("playerToPlay : {}", playerToPlay);
 
+        if (charToPlay.getCharacteristics().getHealthRegeneration() != 0) {
+            log.debug("{} gains {} HP ", charToPlay.getName(), charToPlay.getCharacteristics().getHealthRegeneration());
+            charToPlay.addHealthPoint(charToPlay.getCharacteristics().getHealthRegeneration());
+            MessageCharacterGainsHP messageCharacterGainsHP = new MessageCharacterGainsHP(charToPlay, charToPlay.getCharacteristics().getHealthRegeneration());
+            sendToAll(messageCharacterGainsHP);
+        }
+
+        if (charToPlay.getCharacteristics().getManaRegeneration() != 0) {
+            log.debug("{} gains {} MP ", charToPlay.getName(), charToPlay.getCharacteristics().getManaRegeneration());
+            charToPlay.addHealthPoint(charToPlay.getCharacteristics().getManaRegeneration());
+            MessageCharacterGainsMP messageCharacterGainsMP = new MessageCharacterGainsMP(charToPlay, charToPlay.getCharacteristics().getManaRegeneration());
+            sendToAll(messageCharacterGainsMP);
+        }
+
         Iterator<Alteration> alterationsIterator = charToPlay.getAlterations().iterator();
         while (alterationsIterator.hasNext()) {
             Alteration alteration = alterationsIterator.next();
@@ -653,7 +667,6 @@ public class Game implements Runnable {
         }
 
         charToPlay.updateAggregatedCharacteristics();
-
 
         List<GameCharacter> allGameCharacters = new ArrayList<GameCharacter>();
         for (Player player : playerList) {
