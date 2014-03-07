@@ -25,6 +25,7 @@ public enum TextureKey {
     ACTION_1,
     ACTION_1_BACK,
     ACTION_1_HOVERED,
+    ACTION_1_USED,
 
     EARTH_TOP_00,
     EARTH_TOP_01,

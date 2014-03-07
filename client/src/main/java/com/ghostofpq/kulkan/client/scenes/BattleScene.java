@@ -65,6 +65,9 @@ public class BattleScene implements Scene {
     private Button gameOverButton;
     private MenuSelectCapacity menuSelectCapacity;
     private ActionButton actionButtonMove;
+    private ActionButton actionButtonAttack;
+    private ActionButton actionButtonCapacity;
+    private ActionButton actionButtonEndTurn;
 
     // LOGIC
     private BattleSceneState currentState;
@@ -355,6 +358,7 @@ public class BattleScene implements Scene {
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
                 || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.ACTION)
                 || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
@@ -379,6 +383,7 @@ public class BattleScene implements Scene {
                 || currentState.equals(BattleSceneState.MOVE)
                 || currentState.equals(BattleSceneState.ATTACK)
                 || currentState.equals(BattleSceneState.PENDING)
+                || currentState.equals(BattleSceneState.ACTION)
                 || currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             switch (GraphicsManager.getInstance().getCurrentPointOfView()) {
                 case EAST:
@@ -406,26 +411,27 @@ public class BattleScene implements Scene {
                 deployCharacterHeadingAngle();
                 break;
             case ACTION:
-                if (actionButtonMove != null) {
+                if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
                     if (actionButtonMove.isHovered()) {
                         sendPositionToMoveRequest();
                         currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
-                        drawableObjectList.remove(actionButtonMove);
-                        actionButtonMove = null;
-                    }
-                } else {
-                    if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.MOVE)) {
-                        sendPositionToMoveRequest();
-                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
-                    } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.ATTACK)) {
+                    } else if (actionButtonAttack.isHovered()) {
                         sendPositionToAttackRequest();
                         currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
-                    } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.CAPACITY)) {
+                    } else if (actionButtonCapacity.isHovered()) {
                         menuSelectCapacity = new MenuSelectCapacity(300, 0, 200, 100, 2, currentGameCharacter.getJob(currentGameCharacter.getCurrentJob()).getUnlockedMoves(), currentGameCharacter.getCurrentManaPoint());
                         currentState = BattleSceneState.CAPACITY_SELECT;
-                    } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.END_TURN)) {
+                    } else if (actionButtonEndTurn.isHovered()) {
                         currentState = BattleSceneState.END_TURN;
                     }
+                    drawableObjectList.remove(actionButtonMove);
+                    drawableObjectList.remove(actionButtonAttack);
+                    drawableObjectList.remove(actionButtonCapacity);
+                    drawableObjectList.remove(actionButtonEndTurn);
+                    actionButtonMove = null;
+                    actionButtonAttack = null;
+                    actionButtonCapacity = null;
+                    actionButtonEndTurn = null;
                 }
                 break;
             case MOVE:
@@ -525,13 +531,13 @@ public class BattleScene implements Scene {
             }
             while (Mouse.next()) {
                 if (Mouse.isButtonDown(0)) {
-                    if (null != mousePosition) {
-                        manageInputValidate();
-                    }
-                    if (actionButtonMove != null) {
-                        if (actionButtonMove.isHovered()) {
+
+                    if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
+                        if (actionButtonMove.isHovered() || actionButtonAttack.isHovered() || actionButtonCapacity.isHovered() || actionButtonEndTurn.isHovered()) {
                             manageInputValidate();
                         }
+                    } else if (null != mousePosition) {
+                        manageInputValidate();
                     }
 
                     if (currentState.equals(BattleSceneState.GAME_OVER)) {
@@ -626,14 +632,25 @@ public class BattleScene implements Scene {
         updateCursorTarget();
         menuSelectAction.reinitMenu();
         selectedMove = null;
+
+        actionButtonMove = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.MOVE);
+        actionButtonAttack = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.ATTACK);
+        actionButtonCapacity = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.CAPACITY);
+        actionButtonEndTurn = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.END_TURN);
+
+        drawableObjectList.add(actionButtonMove);
+        drawableObjectList.add(actionButtonAttack);
+        drawableObjectList.add(actionButtonCapacity);
+        drawableObjectList.add(actionButtonEndTurn);
+
         if (messageCharacterToPlay.getCharacterToPlay().hasMoved()) {
             menuSelectAction.setHasMoved();
-        } else {
-            actionButtonMove = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.MOVE);
-            drawableObjectList.add(actionButtonMove);
+            actionButtonMove.setUsed(true);
         }
         if (messageCharacterToPlay.getCharacterToPlay().hasActed()) {
             menuSelectAction.setHasActed();
+            actionButtonAttack.setUsed(true);
+            actionButtonCapacity.setUsed(true);
         }
 
         currentState = BattleSceneState.ACTION;
@@ -847,7 +864,21 @@ public class BattleScene implements Scene {
             if (drawableObjectList.get(i) instanceof Cube) {
                 ((Cube) drawableObjectList.get(i)).renderForMousePosition();
             } else if (drawableObjectList.get(i) instanceof ActionButton) {
-                ((ActionButton) drawableObjectList.get(i)).renderForMousePosition(9.0f, 0.0f, 0.0f);
+                ActionButton actionButton = (ActionButton) drawableObjectList.get(i);
+                switch (actionButton.getActionButtonType()) {
+                    case MOVE:
+                        actionButton.renderForMousePosition(0.0f, 0.0f, 50.0f);
+                        break;
+                    case ATTACK:
+                        actionButton.renderForMousePosition(0.0f, 0.0f, 60.0f);
+                        break;
+                    case CAPACITY:
+                        actionButton.renderForMousePosition(0.0f, 0.0f, 70.0f);
+                        break;
+                    case END_TURN:
+                        actionButton.renderForMousePosition(0.0f, 0.0f, 80.0f);
+                        break;
+                }
             }
         }
         ByteBuffer pixel = BufferUtils.createByteBuffer(3);
@@ -869,6 +900,27 @@ public class BattleScene implements Scene {
                         actionButtonMove.setHovered(true);
                     } else {
                         actionButtonMove.setHovered(false);
+                    }
+                }
+                if (actionButtonAttack != null) {
+                    if (x == actionButtonAttack.getR() && y == actionButtonAttack.getG() && z == actionButtonAttack.getB()) {
+                        actionButtonAttack.setHovered(true);
+                    } else {
+                        actionButtonAttack.setHovered(false);
+                    }
+                }
+                if (actionButtonCapacity != null) {
+                    if (x == actionButtonCapacity.getR() && y == actionButtonCapacity.getG() && z == actionButtonCapacity.getB()) {
+                        actionButtonCapacity.setHovered(true);
+                    } else {
+                        actionButtonCapacity.setHovered(false);
+                    }
+                }
+                if (actionButtonEndTurn != null) {
+                    if (x == actionButtonEndTurn.getR() && y == actionButtonEndTurn.getG() && z == actionButtonEndTurn.getB()) {
+                        actionButtonEndTurn.setHovered(true);
+                    } else {
+                        actionButtonEndTurn.setHovered(false);
                     }
                 }
                 mousePosition = null;

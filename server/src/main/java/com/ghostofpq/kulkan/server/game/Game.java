@@ -489,8 +489,8 @@ public class Game implements Runnable {
                     }
                     for (GameCharacter targetedChar : targets) {
                         int magicArmor = (targetedChar.getAggregatedCharacteristics().getMagicResist() - character.getAggregatedCharacteristics().getMagicPenetration());
-                        double ratio = 100 / (100 - magicArmor);
-                        double estimatedDamage = ratio * character.getMagicalDamage() * 10;
+                        double ratio = 100.0 / (100.0 - (double) magicArmor);
+                        double estimatedDamage = ratio * (double) character.getMagicalDamage() * 10.0;
                         int damage = (int) Math.floor(estimatedDamage);
                         gameCharacterDamageMap.put(targetedChar, damage);
                         targetedChar.addHealthPoint(-damage);

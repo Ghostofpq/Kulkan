@@ -15,8 +15,9 @@ public class ActionButton extends DrawableObject {
     private TextureKey textureKey;
     private TextureKey textureKeyForMouseDetection;
     private TextureKey textureKeyHovered;
+    private TextureKey textureKeyUsed;
     private boolean hovered;
-
+    private boolean used;
     private float r;
     private float g;
     private float b;
@@ -25,6 +26,8 @@ public class ActionButton extends DrawableObject {
     private PositionAbsolute corner2;
     private PositionAbsolute corner3;
     private PositionAbsolute corner4;
+
+    private PositionAbsolute typePosition;
 
     public ActionButton(Position position, ActionButtonType actionButtonType) {
         this.position = position;
@@ -35,9 +38,36 @@ public class ActionButton extends DrawableObject {
                 textureKey = TextureKey.ACTION_1;
                 textureKeyForMouseDetection = TextureKey.ACTION_1_BACK;
                 textureKeyHovered = TextureKey.ACTION_1_HOVERED;
+                textureKeyUsed = TextureKey.ACTION_1_USED;
+                typePosition = new PositionAbsolute(0.0f, 0.0f, 0.0f);
+                break;
+
+            case ATTACK:
+                textureKey = TextureKey.ACTION_1;
+                textureKeyForMouseDetection = TextureKey.ACTION_1_BACK;
+                textureKeyHovered = TextureKey.ACTION_1_HOVERED;
+                typePosition = new PositionAbsolute(0.25f, 0.2f, 0.25f);
+                textureKeyUsed = TextureKey.ACTION_1_USED;
+                break;
+
+            case CAPACITY:
+                textureKey = TextureKey.ACTION_1;
+                textureKeyForMouseDetection = TextureKey.ACTION_1_BACK;
+                textureKeyHovered = TextureKey.ACTION_1_HOVERED;
+                typePosition = new PositionAbsolute(0.5f, 0.2f, 0.5f);
+                textureKeyUsed = TextureKey.ACTION_1_USED;
+                break;
+
+            case END_TURN:
+                textureKey = TextureKey.ACTION_1;
+                textureKeyForMouseDetection = TextureKey.ACTION_1_BACK;
+                textureKeyHovered = TextureKey.ACTION_1_HOVERED;
+                typePosition = new PositionAbsolute(0.75f, 0.0f, 0.75f);
+                textureKeyUsed = TextureKey.ACTION_1_USED;
                 break;
         }
         this.hovered = false;
+        this.used = false;
     }
 
     private void calculateCorners() {
@@ -45,72 +75,72 @@ public class ActionButton extends DrawableObject {
 
         if (pointOfView.equals(PointOfView.SOUTH)) {
             corner1 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 1.0f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner2 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() + 0.25f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 0.75f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner3 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() + 0.25f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 0.75f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner4 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 1.0f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
         } else if (pointOfView.equals(PointOfView.NORTH)) {
             corner1 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 0.75f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() + 0.25f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner2 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 1.0f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner3 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 1.0f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner4 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 0.75f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() + 0.25f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
         } else if (pointOfView.equals(PointOfView.WEST)) {
             corner1 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner2 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() + 0.25f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() + 0.25f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner3 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() + 0.25f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() + 0.25f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner4 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() + typePosition.getX() - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() + typePosition.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
         } else if (pointOfView.equals(PointOfView.EAST)) {
             corner1 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 0.75f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 0.75f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner2 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 3f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 2f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner3 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 1f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 1f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             corner4 = new PositionAbsolute(
-                    (this.getPositionAbsolute().getX() + 0.9f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
-                    (this.getPositionAbsolute().getZ() + 0.9f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
+                    (this.getPositionAbsolute().getX() - typePosition.getX() + 0.75f - GraphicsManager.getInstance().getOriginX()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getY() + typePosition.getY() + 1.5f - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale(),
+                    (this.getPositionAbsolute().getZ() - typePosition.getZ() + 0.75f - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
         }
     }
 
@@ -120,10 +150,15 @@ public class ActionButton extends DrawableObject {
 
         GL11.glColor4f(1f, 1f, 1f, 1f);
         Texture texture;
-        if (isHovered()) {
-            texture = TextureManager.getInstance().getTexture(textureKeyHovered);
+
+        if (used) {
+            texture = TextureManager.getInstance().getTexture(textureKeyUsed);
         } else {
-            texture = TextureManager.getInstance().getTexture(textureKey);
+            if (isHovered()) {
+                texture = TextureManager.getInstance().getTexture(textureKeyHovered);
+            } else {
+                texture = TextureManager.getInstance().getTexture(textureKey);
+            }
         }
         texture.bind();
         GL11.glBegin(GL11.GL_QUADS);
@@ -191,12 +226,24 @@ public class ActionButton extends DrawableObject {
         return result;
     }
 
+    public ActionButtonType getActionButtonType() {
+        return actionButtonType;
+    }
+
     public boolean isHovered() {
         return hovered;
     }
 
     public void setHovered(boolean hovered) {
         this.hovered = hovered;
+    }
+
+    public boolean isUsed() {
+        return used;
+    }
+
+    public void setUsed(boolean used) {
+        this.used = used;
     }
 
     public float getR() {
