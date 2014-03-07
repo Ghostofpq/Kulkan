@@ -50,6 +50,15 @@ public class TextureManager {
             Texture charShadow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Character-shadow.png"));
             textureMap.put(TextureKey.LOBBY_CHAR_SHADOW, charShadow);
 
+            Texture action1 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/action.png"));
+            textureMap.put(TextureKey.ACTION_1, action1);
+
+            Texture action1Back = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionBack.png"));
+            textureMap.put(TextureKey.ACTION_1_BACK, action1Back);
+
+            Texture action1Hovered = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionHovered.png"));
+            textureMap.put(TextureKey.ACTION_1_HOVERED, action1Hovered);
+
             Texture earthTop00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_00.png"));
             Texture earthTop01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_01.png"));
             Texture earthTop02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_02.png"));

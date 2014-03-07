@@ -22,6 +22,10 @@ public enum TextureKey {
     COMMON_EXT_FRAME,
     COMMON_BACKGROUND_BASIC,
 
+    ACTION_1,
+    ACTION_1_BACK,
+    ACTION_1_HOVERED,
+
     EARTH_TOP_00,
     EARTH_TOP_01,
     EARTH_TOP_02,

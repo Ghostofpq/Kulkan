@@ -9,9 +9,7 @@ import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
 import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
 import com.ghostofpq.kulkan.client.graphics.MenuSelectAction;
 import com.ghostofpq.kulkan.client.graphics.MenuSelectCapacity;
-import com.ghostofpq.kulkan.client.graphics.ingame.Cube;
-import com.ghostofpq.kulkan.client.graphics.ingame.DrawableObject;
-import com.ghostofpq.kulkan.client.graphics.ingame.GameCharacterRepresentation;
+import com.ghostofpq.kulkan.client.graphics.ingame.*;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.HighlightColor;
 import com.ghostofpq.kulkan.client.utils.InputManager;
@@ -66,6 +64,8 @@ public class BattleScene implements Scene {
     private MenuSelectAction menuSelectAction;
     private Button gameOverButton;
     private MenuSelectCapacity menuSelectCapacity;
+    private ActionButton actionButtonMove;
+
     // LOGIC
     private BattleSceneState currentState;
     private List<Position> possiblePositionsToMove;
@@ -115,6 +115,7 @@ public class BattleScene implements Scene {
         characterRenderRight = null;
         menuSelectAction = new MenuSelectAction(300, 0, 200, 100, 2);
         menuSelectCapacity = null;
+        actionButtonMove = null;
         // LOGIC
         currentState = BattleSceneState.PENDING;
         possiblePositionsToMove = new ArrayList<Position>();
@@ -405,17 +406,26 @@ public class BattleScene implements Scene {
                 deployCharacterHeadingAngle();
                 break;
             case ACTION:
-                if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.MOVE)) {
-                    sendPositionToMoveRequest();
-                    currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
-                } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.ATTACK)) {
-                    sendPositionToAttackRequest();
-                    currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
-                } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.CAPACITY)) {
-                    menuSelectCapacity = new MenuSelectCapacity(300, 0, 200, 100, 2, currentGameCharacter.getJob(currentGameCharacter.getCurrentJob()).getUnlockedMoves(), currentGameCharacter.getCurrentManaPoint());
-                    currentState = BattleSceneState.CAPACITY_SELECT;
-                } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.END_TURN)) {
-                    currentState = BattleSceneState.END_TURN;
+                if (actionButtonMove != null) {
+                    if (actionButtonMove.isHovered()) {
+                        sendPositionToMoveRequest();
+                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
+                        drawableObjectList.remove(actionButtonMove);
+                        actionButtonMove = null;
+                    }
+                } else {
+                    if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.MOVE)) {
+                        sendPositionToMoveRequest();
+                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
+                    } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.ATTACK)) {
+                        sendPositionToAttackRequest();
+                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
+                    } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.CAPACITY)) {
+                        menuSelectCapacity = new MenuSelectCapacity(300, 0, 200, 100, 2, currentGameCharacter.getJob(currentGameCharacter.getCurrentJob()).getUnlockedMoves(), currentGameCharacter.getCurrentManaPoint());
+                        currentState = BattleSceneState.CAPACITY_SELECT;
+                    } else if (menuSelectAction.getSelectedOption().equals(MenuSelectAction.MenuSelectActions.END_TURN)) {
+                        currentState = BattleSceneState.END_TURN;
+                    }
                 }
                 break;
             case MOVE:
@@ -518,6 +528,11 @@ public class BattleScene implements Scene {
                     if (null != mousePosition) {
                         manageInputValidate();
                     }
+                    if (actionButtonMove != null) {
+                        if (actionButtonMove.isHovered()) {
+                            manageInputValidate();
+                        }
+                    }
 
                     if (currentState.equals(BattleSceneState.GAME_OVER)) {
                         if (gameOverButton.isClicked()) {
@@ -596,7 +611,6 @@ public class BattleScene implements Scene {
         MessageCharacterToPlay messageCharacterToPlay = (MessageCharacterToPlay) message;
         log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharacterToPlay().getName());
 
-
         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
             if (characterRepresentation.getCharacter().equals(messageCharacterToPlay.getCharacterToPlay())) {
                 currentGameCharacterRepresentation = characterRepresentation;
@@ -614,10 +628,14 @@ public class BattleScene implements Scene {
         selectedMove = null;
         if (messageCharacterToPlay.getCharacterToPlay().hasMoved()) {
             menuSelectAction.setHasMoved();
+        } else {
+            actionButtonMove = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.MOVE);
+            drawableObjectList.add(actionButtonMove);
         }
         if (messageCharacterToPlay.getCharacterToPlay().hasActed()) {
             menuSelectAction.setHasActed();
         }
+
         currentState = BattleSceneState.ACTION;
     }
 
@@ -828,18 +846,31 @@ public class BattleScene implements Scene {
         for (int i = 0; i < drawableObjectList.size(); i++) {
             if (drawableObjectList.get(i) instanceof Cube) {
                 ((Cube) drawableObjectList.get(i)).renderForMousePosition();
+            } else if (drawableObjectList.get(i) instanceof ActionButton) {
+                ((ActionButton) drawableObjectList.get(i)).renderForMousePosition(9.0f, 0.0f, 0.0f);
             }
         }
         ByteBuffer pixel = BufferUtils.createByteBuffer(3);
         GL11.glReadPixels(Mouse.getX(), Mouse.getY(), 1, 1, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, pixel);
         if (null != pixel) {
-            int x = pixel.get(0) - 10;
-            int y = pixel.get(1) - 10;
-            int z = pixel.get(2) - 10;
-            if (x >= 0 && y >= 0 && z >= 0) {
+            int x = pixel.get(0);
+            int y = pixel.get(1);
+            int z = pixel.get(2);
+
+            if (x >= 10 && y >= 10 && z >= 10) {
+                x -= 10;
+                y -= 10;
+                z -= 10;
                 mousePosition = new Position(x, y, z);
                 setCursor(mousePosition);
             } else {
+                if (actionButtonMove != null) {
+                    if (x == actionButtonMove.getR() && y == actionButtonMove.getG() && z == actionButtonMove.getB()) {
+                        actionButtonMove.setHovered(true);
+                    } else {
+                        actionButtonMove.setHovered(false);
+                    }
+                }
                 mousePosition = null;
             }
         }

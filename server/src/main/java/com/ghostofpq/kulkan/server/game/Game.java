@@ -122,7 +122,7 @@ public class Game implements Runnable {
 
     private void sendMessageToPlayer(Player player, Message message) {
         try {
-            log.debug(" [S] SENDING {} TO {}", message.toString(), playerChannelMap.get(player));
+            log.debug("SENDING to {} : {}", playerChannelMap.get(player), message.toString());
             channelGameOut.basicPublish("", playerChannelMap.get(player), null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,7 +132,7 @@ public class Game implements Runnable {
     private void sendMessageToChannel(String tokenKey, Message message) {
         try {
             String queueName = new StringBuilder().append(CLIENT_QUEUE_NAME_BASE).append(tokenKey).toString();
-            log.debug(" [S] SENDING {} TO {}", message.toString(), queueName);
+            log.debug("SENDING to {} : {}", queueName, message.toString());
             channelGameOut.basicPublish("", queueName, null, message.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
