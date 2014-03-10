@@ -64,8 +64,8 @@ public class TextureManager {
             Texture lobbyNewsOverlay = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_News-overlay.png"));
             textureMap.put(TextureKey.LOBBY_NEWS_OVERLAY, lobbyNewsOverlay);
 
-            Texture charShadow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Character-shadow.png"));
-            textureMap.put(TextureKey.LOBBY_CHAR_SHADOW, charShadow);
+            Texture charShadow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_Character-shadow.png"));
+            textureMap.put(TextureKey.COMMON_CHAR_SHADOW, charShadow);
 
             // MANAGE CHAR VIEW
             Texture manageCharMenu = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/ManageChar/MANAGE-CHAR_Menu.jpg"));

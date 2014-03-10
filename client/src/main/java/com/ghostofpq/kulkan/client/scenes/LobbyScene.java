@@ -200,7 +200,7 @@ public class LobbyScene implements Scene {
         int teamCharacter1Width = clientContext.getCurrentResolution().getWidth() / 10;
         int teamCharacter1Height = clientContext.getCurrentResolution().getHeight() / 3;
         if (clientContext.getPlayer().getTeam().size() > 0 && null != clientContext.getPlayer().getTeam().get(0)) {
-            teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, clientContext.getPlayer().getTeam().get(0).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+            teamCharacter1 = new Button(teamCharacter1PosX, teamCharacter1PosY, teamCharacter1Width, teamCharacter1Height, clientContext.getPlayer().getTeam().get(0).getName(), TextureKey.COMMON_CHAR_SHADOW, TextureKey.COMMON_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
                     manageCharacter1();
@@ -221,7 +221,7 @@ public class LobbyScene implements Scene {
         int teamCharacter2Width = teamCharacter1Width;
         int teamCharacter2Height = teamCharacter1Height;
         if (clientContext.getPlayer().getTeam().size() > 1 && null != clientContext.getPlayer().getTeam().get(1)) {
-            teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, clientContext.getPlayer().getTeam().get(1).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+            teamCharacter2 = new Button(teamCharacter2PosX, teamCharacter2PosY, teamCharacter2Width, teamCharacter2Height, clientContext.getPlayer().getTeam().get(1).getName(), TextureKey.COMMON_CHAR_SHADOW, TextureKey.COMMON_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
                     manageCharacter2();
@@ -242,7 +242,7 @@ public class LobbyScene implements Scene {
         int teamCharacter3Width = teamCharacter1Width;
         int teamCharacter3Height = teamCharacter1Height;
         if (clientContext.getPlayer().getTeam().size() > 2 && null != clientContext.getPlayer().getTeam().get(2)) {
-            teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, clientContext.getPlayer().getTeam().get(2).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+            teamCharacter3 = new Button(teamCharacter3PosX, teamCharacter3PosY, teamCharacter3Width, teamCharacter3Height, clientContext.getPlayer().getTeam().get(2).getName(), TextureKey.COMMON_CHAR_SHADOW, TextureKey.COMMON_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
                     manageCharacter3();
@@ -263,7 +263,7 @@ public class LobbyScene implements Scene {
         int teamCharacter4Width = teamCharacter1Width;
         int teamCharacter4Height = teamCharacter1Height;
         if (clientContext.getPlayer().getTeam().size() > 3 && null != clientContext.getPlayer().getTeam().get(3)) {
-            teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, clientContext.getPlayer().getTeam().get(3).getName(), TextureKey.LOBBY_CHAR_SHADOW, TextureKey.LOBBY_CHAR_SHADOW) {
+            teamCharacter4 = new Button(teamCharacter4PosX, teamCharacter4PosY, teamCharacter4Width, teamCharacter4Height, clientContext.getPlayer().getTeam().get(3).getName(), TextureKey.COMMON_CHAR_SHADOW, TextureKey.COMMON_CHAR_SHADOW) {
                 @Override
                 public void onClick() {
                     manageCharacter4();

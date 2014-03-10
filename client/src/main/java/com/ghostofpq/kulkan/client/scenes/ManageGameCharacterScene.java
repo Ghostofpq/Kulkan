@@ -5,10 +5,7 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
-import com.ghostofpq.kulkan.client.graphics.HUD.Button;
-import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
-import com.ghostofpq.kulkan.client.graphics.HUD.HUDTexturedElement;
-import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
+import com.ghostofpq.kulkan.client.graphics.HUD.*;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
@@ -47,6 +44,8 @@ public class ManageGameCharacterScene implements Scene {
 
     // OVERLAYS
     private HUDTexturedElement nameHolder;
+    private TextZone name;
+    private TextZone level;
     private HUDTexturedElement xpBackground;
     private HUDTexturedElement xp;
     private HUDTexturedElement menu;
@@ -90,8 +89,28 @@ public class ManageGameCharacterScene implements Scene {
         int nameHolderPosX = clientContext.getCurrentResolution().getWidth() / 64;
         int nameHolderPosY = (clientContext.getCurrentResolution().getHeight() * 3) / 10;
         int nameHolderWidth = menuPosX - nameHolderPosX;
-        int nameHolderHeight = clientContext.getCurrentResolution().getWidth() / 10;
+        int nameHolderHeight = clientContext.getCurrentResolution().getWidth() / 12;
         nameHolder = new HUDTexturedElement(nameHolderPosX, nameHolderPosY, nameHolderWidth, nameHolderHeight, TextureKey.MANAGE_CHAR_NAME_HOLDER, TextureKey.MANAGE_CHAR_NAME_HOLDER);
+
+        // NAME
+        int nameWidth = (int) (145f * nameHolderWidth / 685f);
+        int nameHeight = (int) (40 * nameHolderHeight / 120f);
+        int namePosX = nameHolderPosX + (int) (288f * nameHolderWidth / 685f);
+        int namePosY = nameHolderPosY + (int) (65f * nameHolderHeight / 120f);
+
+        name = new TextZone(namePosX, namePosY, nameWidth, nameHeight, gameCharacter.getName());
+        // name.setFontName("arial_12");
+        name.setAlignment(TextAlignment.CENTER);
+
+        // LEVEL
+        int levelWidth = (int) (80f * nameHolderWidth / 685f);
+        int levelHeight = (int) (30f * nameHolderHeight / 120f);
+        int levelPosX = nameHolderPosX + (int) (320f * nameHolderWidth / 685f);
+        int levelPosY = nameHolderPosY + (int) (10f * nameHolderHeight / 120f);
+
+        level = new TextZone(levelPosX, levelPosY, levelWidth, levelHeight, String.valueOf(gameCharacter.getLevel()));
+        //level.setFontName("arial_12");
+        level.setAlignment(TextAlignment.CENTER);
 
         // XP BACKGROUND
         int xpBackgroundPosX = clientContext.getCurrentResolution().getWidth() / 64;
@@ -195,6 +214,8 @@ public class ManageGameCharacterScene implements Scene {
         background.draw();
         menu.draw();
         nameHolder.draw();
+        name.draw();
+        level.draw();
         xpBackground.draw();
         xp.draw();
         secondaryCharacteristicsRender.draw();

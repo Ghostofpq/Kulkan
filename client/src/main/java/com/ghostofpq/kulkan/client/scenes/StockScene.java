@@ -86,7 +86,7 @@ public class StockScene implements Scene {
                 if (clientContext.getPlayer().getStock().size() > i && null != clientContext.getPlayer().getStock().get(i)) {
                     GameCharacter gameCharacter = clientContext.getPlayer().getStock().get(i);
                     String name = gameCharacter.getName();
-                    TextureKey textureKey = TextureKey.LOBBY_CHAR_SHADOW;
+                    TextureKey textureKey = TextureKey.COMMON_CHAR_SHADOW;
                     final ObjectId id = gameCharacter.getId();
                     Button stockCharacterButton = new Button(posX, posY, stockCharacterWidth, stockCharacterHeight, name, textureKey, textureKey) {
                         @Override
