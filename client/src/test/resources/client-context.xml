@@ -1,0 +1,43 @@
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Properties file. -->
+    <context:property-placeholder
+            location="classpath:application.properties"/>
+    <context:annotation-config/>
+
+    <bean id="client" class="com.ghostofpq.kulkan.client.Client"/>
+
+    <bean id="clientContext" class="com.ghostofpq.kulkan.client.ClientContext">
+        <property name="pathOfClientPropertiesFile" value="${path.of.client.properties.file}"/>
+    </bean>
+
+    <bean id="clientMessenger" class="com.ghostofpq.kulkan.client.ClientMessenger">
+        <property name="hostIp" value="${hostIp.ip}"/>
+        <property name="hostPort" value="${hostIp.hostPort}"/>
+    </bean>
+
+    <bean id="createGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.CreateGameCharacterScene"/>
+    <bean id="manageGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterScene"/>
+    <bean id="manageGameCharacterJobScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterJobScene"/>
+    <bean id="manageGameCharacterChangeJobScene"
+          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterChangeJobScene"/>
+    <bean id="manageGameCharacterEquipmentScene"
+          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipmentScene"/>
+    <bean id="manageGameCharacterEquipItemScene"
+          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipItemScene"/>
+
+    <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
+    <bean id="lobbyScene" class="com.ghostofpq.kulkan.client.scenes.LobbyScene"/>
+    <bean id="optionScene" class="com.ghostofpq.kulkan.client.scenes.OptionScene"/>
+    <bean id="shopScene" class="com.ghostofpq.kulkan.client.scenes.ShopScene"/>
+    <bean id="stockScene" class="com.ghostofpq.kulkan.client.scenes.StockScene"/>
+
+    <bean id="battleScene" class="com.ghostofpq.kulkan.client.scenes.BattleScene"/>
+</beans>
