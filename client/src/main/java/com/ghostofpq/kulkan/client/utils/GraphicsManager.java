@@ -125,7 +125,7 @@ public class GraphicsManager {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
 
-        GL11.glOrtho(-1, 1, -1, 1, -10, 1000);
+        GL11.glOrtho(-1, 1, -1, 1, -100, 100);
 
         GL11.glRotatef((float) Math.toDegrees(Math.atan(0.5)), 1, 0, 0);
         GL11.glRotatef(-45.0f, 0, 1, 0);
@@ -152,6 +152,7 @@ public class GraphicsManager {
         focusXToGo = position.getX() - originX;
         focusYToGo = position.getY() - originY;
         focusZToGo = position.getZ() - originZ;
+        isBusy = true;
     }
 
     public void requestPointOfView(PointOfView v) {
@@ -253,11 +254,9 @@ public class GraphicsManager {
         }
 
         if (rotationToGo != 0) {
-
             GL11.glTranslated(scale / 2, 0, scale / 2);
             if (rotationToGo < 0) {
                 GL11.glRotatef(STEP_ROTATION, 0, 1, 0);
-                updateLights();
                 if (rotationToGo + STEP_ROTATION > 0) {
                     rotationToGo = 0;
                 } else {
@@ -266,7 +265,6 @@ public class GraphicsManager {
             }
             if (rotationToGo > 0) {
                 GL11.glRotatef(-STEP_ROTATION, 0, 1, 0);
-                updateLights();
                 if (rotationToGo - STEP_ROTATION < 0) {
                     rotationToGo = 0;
                 } else {
@@ -310,6 +308,9 @@ public class GraphicsManager {
                 }
             }
             result = true;
+        }
+        if (result) {
+            updateLights();
         }
         isBusy = result;
         return result;

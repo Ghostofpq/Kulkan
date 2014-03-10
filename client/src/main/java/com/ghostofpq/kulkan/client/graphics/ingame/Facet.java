@@ -60,6 +60,7 @@ public class Facet extends DrawableObject implements Serializable {
                     , (corner4.getY() - GraphicsManager.getInstance().getOriginY()) * GraphicsManager.getInstance().getScale()
                     , (corner4.getZ() - GraphicsManager.getInstance().getOriginZ()) * GraphicsManager.getInstance().getScale());
             GL11.glEnd();
+
         }
     }
 

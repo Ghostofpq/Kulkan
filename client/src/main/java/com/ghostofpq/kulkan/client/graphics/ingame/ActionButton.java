@@ -174,6 +174,7 @@ public class ActionButton extends DrawableObject {
     }
 
     public void renderForMousePosition(float r, float g, float b) {
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
         calculateCorners();
 
         this.r = r;
@@ -193,6 +194,7 @@ public class ActionButton extends DrawableObject {
         GL11.glTexCoord2d(0, texture.getHeight());
         GL11.glVertex3d(corner4.getX(), corner4.getY(), corner4.getZ());
         GL11.glEnd();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 
     @Override
@@ -211,16 +213,16 @@ public class ActionButton extends DrawableObject {
 
         switch (pointOfView) {
             case NORTH:
-                result = getPositionAbsolute().plusNew(0.5f, 0, 0.5f);
+                result = getPositionAbsolute();
                 break;
             case SOUTH:
-                result = getPositionAbsolute().plusNew(0, 0, 0);
+                result = getPositionAbsolute();
                 break;
             case EAST:
-                result = getPositionAbsolute().plusNew(0, 0, 0.5f);
+                result = getPositionAbsolute();
                 break;
             case WEST:
-                result = getPositionAbsolute().plusNew(0.5f, 0, 0);
+                result = getPositionAbsolute();
                 break;
         }
         return result;
