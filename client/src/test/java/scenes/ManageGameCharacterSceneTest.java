@@ -36,6 +36,7 @@ public class ManageGameCharacterSceneTest {
         GameCharacter gameCharacter = new GameCharacter("John", ClanType.GORILLA, Gender.MALE);
         gameCharacter.setId(id);
         gameCharacter.setPlayer(player);
+        gameCharacter.gainXp(20);
         player.getTeam().add(gameCharacter);
         ctx.setPlayer(player);
         ctx.setSelectedCharacterId(id);

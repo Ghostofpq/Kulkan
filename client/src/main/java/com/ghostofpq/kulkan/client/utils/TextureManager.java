@@ -38,6 +38,23 @@ public class TextureManager {
             textureMap.put(TextureKey.COMMON_BACKGROUND_BASIC, background);
 
 
+            Texture action1 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/action.png"));
+            textureMap.put(TextureKey.ACTION_1, action1);
+
+            Texture action1Back = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionBack.png"));
+            textureMap.put(TextureKey.ACTION_1_BACK, action1Back);
+
+            Texture action1Hovered = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionHovered.png"));
+            textureMap.put(TextureKey.ACTION_1_HOVERED, action1Hovered);
+
+            Texture action1Used = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionUsed.png"));
+            textureMap.put(TextureKey.ACTION_1_USED, action1Used);
+
+            Texture blood = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_Blood.jpg"));
+            textureMap.put(TextureKey.COMMON_BLOOD, blood);
+
+
+            // LOBBY VIEW
             Texture lobbyBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Background_169.jpg"));
             textureMap.put(TextureKey.LOBBY_BACKGROUND_169, lobbyBackground);
 
@@ -50,17 +67,15 @@ public class TextureManager {
             Texture charShadow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Character-shadow.png"));
             textureMap.put(TextureKey.LOBBY_CHAR_SHADOW, charShadow);
 
-            Texture action1 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/action.png"));
-            textureMap.put(TextureKey.ACTION_1, action1);
+            // MANAGE CHAR VIEW
+            Texture manageCharMenu = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/ManageChar/MANAGE-CHAR_Menu.jpg"));
+            textureMap.put(TextureKey.MANAGE_CHAR_MENU, manageCharMenu);
 
-            Texture action1Back = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionBack.png"));
-            textureMap.put(TextureKey.ACTION_1_BACK, action1Back);
+            Texture manageCharNameHolder = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/ManageChar/MANAGE-CHAR_Name-holder.png"));
+            textureMap.put(TextureKey.MANAGE_CHAR_NAME_HOLDER, manageCharNameHolder);
 
-            Texture action1Hovered = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionHovered.png"));
-            textureMap.put(TextureKey.ACTION_1_HOVERED, action1Hovered);
-
-            Texture action1Used = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionUsed.png"));
-            textureMap.put(TextureKey.ACTION_1_USED, action1Used);
+            Texture manageCharXpBackground = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/ManageChar/MANAGE-CHAR_XP-background.png"));
+            textureMap.put(TextureKey.MANAGE_CHAR_XP_BACKGROUND, manageCharXpBackground);
 
             Texture earthTop00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_00.png"));
             Texture earthTop01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_01.png"));

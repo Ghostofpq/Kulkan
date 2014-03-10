@@ -7,6 +7,7 @@ import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
+import com.ghostofpq.kulkan.client.graphics.HUD.HUDTexturedElement;
 import com.ghostofpq.kulkan.client.graphics.HUD.PopUp;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.graphics.SecondaryCharacteristicsRender;
@@ -42,6 +43,14 @@ public class ManageGameCharacterScene implements Scene {
     private KeyValueRender lvlRender;
     private KeyValueRender currentJobRender;
     private KeyValueRender jobPoints;
+
+
+    // OVERLAYS
+    private HUDTexturedElement nameHolder;
+    private HUDTexturedElement xpBackground;
+    private HUDTexturedElement xp;
+    private HUDTexturedElement menu;
+
     // BACKGROUND
     private Background background;
     // POPUP
@@ -67,9 +76,41 @@ public class ManageGameCharacterScene implements Scene {
 
     @Override
     public void init() {
-        background = new Background(TextureKey.BACKGROUND_BASIC);
-        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
+        background = new Background(TextureKey.BACKGROUND_BASIC);
+
+        // MENU
+        int menuWidth = clientContext.getCurrentResolution().getWidth() / 8;
+        int menuPosX = (clientContext.getCurrentResolution().getWidth() - menuWidth) / 2;
+        int menuPosY = 0;
+        int menuHeight = clientContext.getCurrentResolution().getHeight();
+        menu = new HUDTexturedElement(menuPosX, menuPosY, menuWidth, menuHeight, TextureKey.MANAGE_CHAR_MENU, TextureKey.MANAGE_CHAR_MENU);
+
+        // NAME HOLDER
+        int nameHolderPosX = clientContext.getCurrentResolution().getWidth() / 64;
+        int nameHolderPosY = (clientContext.getCurrentResolution().getHeight() * 3) / 10;
+        int nameHolderWidth = menuPosX - nameHolderPosX;
+        int nameHolderHeight = clientContext.getCurrentResolution().getWidth() / 10;
+        nameHolder = new HUDTexturedElement(nameHolderPosX, nameHolderPosY, nameHolderWidth, nameHolderHeight, TextureKey.MANAGE_CHAR_NAME_HOLDER, TextureKey.MANAGE_CHAR_NAME_HOLDER);
+
+        // XP BACKGROUND
+        int xpBackgroundPosX = clientContext.getCurrentResolution().getWidth() / 64;
+        int xpBackgroundPosY = nameHolderPosY + nameHolderHeight;
+        int xpBackgroundWidth = menuPosX - xpBackgroundPosX;
+        int xpBackgroundHeight = clientContext.getCurrentResolution().getWidth() / 30;
+        xpBackground = new HUDTexturedElement(xpBackgroundPosX, xpBackgroundPosY, xpBackgroundWidth, xpBackgroundHeight, TextureKey.MANAGE_CHAR_XP_BACKGROUND, TextureKey.MANAGE_CHAR_XP_BACKGROUND);
+
+        // XP
+        int xpPosX = xpBackgroundPosX + (int) (37f * xpBackgroundWidth / 685f);
+        int xpPosY = xpBackgroundPosY + (int) (7f * xpBackgroundHeight / 30f);
+        float xpRatio = ((float) gameCharacter.getExperience() / (float) gameCharacter.getNextLevel());
+        int xpWidth = (int) (xpRatio * (611f * xpBackgroundWidth / 685f));
+        int xpHeight = (int) (11f * xpBackgroundHeight / 30f);
+        xp = new HUDTexturedElement(xpPosX, xpPosY, xpWidth, xpHeight, TextureKey.COMMON_BLOOD, TextureKey.COMMON_BLOOD);
+
+
+        frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
+
 
         widthSeparator = client.getWidth() / 20;
         heightSeparator = client.getHeight() / 20;
@@ -152,6 +193,10 @@ public class ManageGameCharacterScene implements Scene {
     public void render() {
         GraphicsManager.getInstance().make2D();
         background.draw();
+        menu.draw();
+        nameHolder.draw();
+        xpBackground.draw();
+        xp.draw();
         secondaryCharacteristicsRender.draw();
         hpRender.draw();
         mpRender.draw();
