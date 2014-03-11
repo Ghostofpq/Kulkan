@@ -12,7 +12,6 @@ import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
-import com.ghostofpq.kulkan.entities.job.JobType;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
@@ -366,7 +365,7 @@ public class ManageGameCharacterScene implements Scene {
 
     public void actionUnlockSelectedCapacity() {
         if (null != selectedCapacity) {
-            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedCharacterId(), JobType.WARRIOR, selectedCapacity.getName());
+            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedCharacterId(), clientContext.getSelectedGameCharacter().getCurrentJob(), selectedCapacity.getName());
             clientMessenger.sendMessageToUserService(messageUnlockCapacity);
         }
     }
