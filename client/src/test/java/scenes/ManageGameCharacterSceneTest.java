@@ -33,7 +33,7 @@ public class ManageGameCharacterSceneTest {
         ObjectId id = new ObjectId();
         g.init();
         Player player = new Player("Marcel");
-        GameCharacter gameCharacter = new GameCharacter("John", ClanType.GORILLA, Gender.MALE);
+        GameCharacter gameCharacter = new GameCharacter("Johny boy le killeur de zoulettes", ClanType.GORILLA, Gender.MALE);
         gameCharacter.setId(id);
         gameCharacter.setPlayer(player);
         gameCharacter.gainXp(20);

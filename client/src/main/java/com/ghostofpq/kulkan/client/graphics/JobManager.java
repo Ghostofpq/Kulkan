@@ -61,16 +61,8 @@ public class JobManager extends HUDElement {
             int slotHeight = (this.height / 5);
             int posXButton = posX + (slotWidth / 5) + capacitySlot * slotWidth;
             int posYButton = posY + slotHeight * capacity.getMaxDepth();
-            int buttonWidth = 3 * (slotWidth / 5);
-            int buttonHeigth = 2 * (slotHeight / 3);
             String buttonLabel = capacity.getName();
-            if (capacity.isAvailable()) {
-                buttonLabel = new StringBuilder().append(buttonLabel).append("_").append("Av").toString();
-            }
-            if (capacity.isLocked()) {
-                buttonLabel = new StringBuilder().append(buttonLabel).append("_").append("Lc").toString();
-            }
-            Button buttonCapacity = new Button(posXButton, posYButton, buttonWidth, buttonHeigth, buttonLabel) {
+            Button buttonCapacity = new Button(posXButton, posYButton, 60, 60, buttonLabel) {
                 @Override
                 public void onClick() {
 
@@ -101,6 +93,18 @@ public class JobManager extends HUDElement {
         }
 
         return clickedCapacity;
+    }
+
+    public Capacity hoveredCapacity() {
+        Capacity hoveredCapacity = null;
+
+        for (Capacity capacity : capacities.keySet()) {
+            if (capacities.get(capacity).isHovered()) {
+                hoveredCapacity = capacity;
+            }
+        }
+
+        return hoveredCapacity;
     }
 
 }

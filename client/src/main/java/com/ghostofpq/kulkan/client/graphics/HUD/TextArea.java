@@ -17,6 +17,18 @@ public class TextArea extends HUDElement {
     private int numberOfLineToShow;
     private FontManager fontManager = FontManager.getInstance();
 
+    public TextArea(int posX, int posY, int width, int height) {
+        this.posX = posX;
+        this.posY = posY;
+        this.width = width;
+        this.height = height;
+        this.maxLength = width / (fontManager.getFontMap().get(fontName).getWidth("a"));
+        this.hasFocus = false;
+        this.numberOfLineToShow = height / (fontManager.getFontMap().get(fontName).getHeight("A"));
+        log.debug("New Text Area : {},{} {}x{} maxLength {} numberOfLineToShow {}", this.posX, this.posY, width, height, maxLength, numberOfLineToShow);
+        textInputs = new ArrayList<String>();
+    }
+
     public TextArea(int posX, int posY, int width, int height, String fontName) {
         this.posX = posX;
         this.posY = posY;

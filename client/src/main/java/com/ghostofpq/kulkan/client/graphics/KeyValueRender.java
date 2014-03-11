@@ -1,21 +1,12 @@
 package com.ghostofpq.kulkan.client.graphics;
 
 import com.ghostofpq.kulkan.client.graphics.HUD.HUDElement;
-import com.ghostofpq.kulkan.client.utils.FontManager;
-import org.newdawn.slick.Color;
+import com.ghostofpq.kulkan.client.graphics.HUD.TextAlignment;
+import com.ghostofpq.kulkan.client.graphics.HUD.TextZone;
 
 public class KeyValueRender extends HUDElement {
-    private final String FONT = "optimus_princeps_16";
-    private String key;
-    private String value;
-    // Key Position
-    private int posXKey;
-    private int posYKey;
-    // Value Position
-    private int posXValue;
-    private int posYValue;
-
-    private FontManager fontManager = FontManager.getInstance();
+    private TextZone key;
+    private TextZone value;
 
     public KeyValueRender(int posX, int posY, int width, int height, String key, String value, int ratio) {
         this.posX = posX;
@@ -23,26 +14,39 @@ public class KeyValueRender extends HUDElement {
 
         this.width = width;
         this.height = height;
-        this.key = key;
-        this.value = value;
 
-        int widthStep = width / 10;
-        int fontStep = (height - fontManager.getFontMap().get(FONT).getHeight(value)) / 2;
+        int keyWidth = ratio * width / 10;
 
-        posXKey = posX;
-        posYKey = posY + fontStep;
+        this.key = new TextZone(posX, posY, keyWidth, height, key);
+        this.key.setAlignment(TextAlignment.LEFT);
 
-        posXValue = posX + ratio * widthStep;
-        posYValue = posY + fontStep;
+        int valuePosX = posX + keyWidth;
+        int valueWidth = width - keyWidth;
+
+        this.value = new TextZone(valuePosX, posY, valueWidth, height, value);
+        this.value.setAlignment(TextAlignment.LEFT);
     }
 
     @Override
     public void draw() {
-        fontManager.drawString(FONT, posXKey, posYKey, key, Color.white);
-        fontManager.drawString(FONT, posXValue, posYValue, value, Color.white);
+        this.key.draw();
+        this.value.draw();
+    }
+
+    public TextZone getKey() {
+        return key;
+    }
+
+    public TextZone getValue() {
+        return value;
     }
 
     public void setValue(String value) {
-        this.value = value;
+        this.value.setLabel(value);
+    }
+
+    public void setFont(String font) {
+        this.value.setFontName(font);
+        this.key.setFontName(font);
     }
 }
