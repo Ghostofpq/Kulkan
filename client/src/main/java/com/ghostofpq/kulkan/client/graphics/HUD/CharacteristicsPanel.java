@@ -1,8 +1,6 @@
-package com.ghostofpq.kulkan.client.graphics;
+package com.ghostofpq.kulkan.client.graphics.HUD;
 
-import com.ghostofpq.kulkan.client.graphics.HUD.HUDElement;
-import com.ghostofpq.kulkan.client.graphics.HUD.HUDTexturedElement;
-import com.ghostofpq.kulkan.client.graphics.HUD.TextAlignment;
+import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 

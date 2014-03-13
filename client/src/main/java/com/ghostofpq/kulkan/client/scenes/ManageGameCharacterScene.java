@@ -5,7 +5,6 @@ import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
 import com.ghostofpq.kulkan.client.graphics.Background;
-import com.ghostofpq.kulkan.client.graphics.CharacteristicsPanel;
 import com.ghostofpq.kulkan.client.graphics.HUD.*;
 import com.ghostofpq.kulkan.client.graphics.JobManager;
 import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
@@ -229,7 +228,6 @@ public class ManageGameCharacterScene implements Scene {
         int characteristicsPanelPosY = (xpBackgroundPosY + (xpBackgroundWidth / 2)) - (characteristicsPanelWidth / 2);
         int characteristicsPanelHeight = clientContext.getCurrentResolution().getHeight() - (characteristicsPanelPosY + clientContext.getCurrentResolution().getHeight() / 32);
         characteristicsPanel = new CharacteristicsPanel(characteristicsPanelPosX, characteristicsPanelPosY, characteristicsPanelWidth, characteristicsPanelHeight, gameCharacter.getCharacteristics());
-
 
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
