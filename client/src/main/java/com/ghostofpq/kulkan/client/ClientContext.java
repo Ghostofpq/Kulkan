@@ -209,11 +209,20 @@ public class ClientContext {
                 offsetY = 0;
             }
             try {
-                resolutionRatio = ResolutionRatio.valueOf(props.getProperty("window.display.ratio"));
+                if (null == props.getProperty("window.display.ratio")) {
+                    resolutionRatio = null;
+                } else {
+                    resolutionRatio = ResolutionRatio.valueOf(props.getProperty("window.display.ratio"));
+                }
             } catch (IllegalArgumentException e) {
                 resolutionRatio = null;
             }
-            currentResolution = new Resolution(width, height, offsetX, offsetY, resolutionRatio);
+            if(height==0 || width==0 || resolutionRatio==null){
+                selectDefaultResolution();
+                saveClientProperties();
+            }else {
+                currentResolution = new Resolution(width, height, offsetX, offsetY, resolutionRatio);
+            }
 
             pseudo = props.getProperty("client.pseudo");
             log.debug("Loading properties {}", props);
