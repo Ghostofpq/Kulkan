@@ -59,6 +59,8 @@ public class ManageGameCharacterScene implements Scene {
     private CharacteristicsPanel characteristicsPanel;
     private EquipmentManager equipmentManager;
     private EquipItemPanel equipItemPanel;
+    private Item selectedItem;
+    private ItemType selectedItemType;
     // BACKGROUND
     private Background background;
     // POPUP
@@ -365,10 +367,10 @@ public class ManageGameCharacterScene implements Scene {
                         }
                     } else if (mode == Mode.STUFF) {
                         if (equipmentManager.isClicked()) {
-                            ItemType type = equipmentManager.getClickedItemType();
-                            if (null != type) {
-                                List<Item> itemList = new ArrayList<Item>();
-                                switch (type) {
+                            selectedItemType = equipmentManager.getSelectedItemType();
+                            List<Item> itemList = new ArrayList<Item>();
+                            if (null != selectedItemType) {
+                                switch (selectedItemType) {
                                     case HELMET:
                                         itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELMET);
                                         break;
@@ -389,7 +391,13 @@ public class ManageGameCharacterScene implements Scene {
                                         break;
                                 }
                                 equipItemPanel.setItemList(itemList);
+                            } else {
+                                itemList = clientContext.getPlayer().getInventory().getAll();
+                                equipItemPanel.setItemList(itemList);
                             }
+                        }
+                        if (equipItemPanel.isClicked()) {
+                            selectedItem = equipItemPanel.getClickedItem();
                         }
                     }
                 } else if (popUp.isClicked()) {
@@ -401,6 +409,10 @@ public class ManageGameCharacterScene implements Scene {
                             actionUnlockSelectedCapacity();
                             popUp = null;
                         } else if (onClick.equals("CANCEL")) {
+                            popUp = null;
+                        } else if (onClick.equals("UNEQUIP")) {
+                            popUp = null;
+                        } else if (onClick.equals("EQUIP")) {
                             popUp = null;
                         }
                     }

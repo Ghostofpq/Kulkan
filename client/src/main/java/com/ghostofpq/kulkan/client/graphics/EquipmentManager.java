@@ -110,7 +110,7 @@ public class EquipmentManager extends HUDElement {
         this.selectedItemType = null;
     }
 
-    public ItemType getClickedItemType() {
+    public ItemType getSelectedItemType() {
         if (equipHelm.isHovered()) {
             selectedItemType = ItemType.HELMET;
         } else if (equipArmor.isHovered()) {

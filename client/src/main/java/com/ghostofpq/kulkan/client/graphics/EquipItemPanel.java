@@ -54,6 +54,13 @@ public class EquipItemPanel extends HUDElement {
     }
 
     public Item getClickedItem() {
+        selectedItem = null;
+        for (Button button : itemButtonList) {
+            if (button.isClicked()) {
+                button.onClick();
+                break;
+            }
+        }
         return selectedItem;
     }
 
