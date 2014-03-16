@@ -68,4 +68,15 @@ public class Inventory implements Serializable {
         }
         return itemList;
     }
+
+    public List<Item> getAll() {
+        List<Item> itemList = new ArrayList<Item>();
+        for (String itemId : itemIdQuantityMap.keySet()) {
+            Item item = ItemFactory.createItem(itemId);
+            if (itemIdQuantityMap.get(itemId) > 0) {
+                itemList.add(item);
+            }
+        }
+        return itemList;
+    }
 }

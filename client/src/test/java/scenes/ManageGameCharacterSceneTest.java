@@ -8,6 +8,8 @@ import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Gender;
 import com.ghostofpq.kulkan.entities.character.Player;
 import com.ghostofpq.kulkan.entities.clan.ClanType;
+import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
+import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -24,16 +26,24 @@ public class ManageGameCharacterSceneTest {
 
     @Test
     public void test() {
-        /*
+
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("client-context.xml");
         Client g = ((Client) context.getBean("client"));
-        ManageGameCharacterScene scene = ((ManageGameCharacterScene) context.getBean("manageGameCharacterScene"));
         ClientContext ctx = ((ClientContext) context.getBean("clientContext"));
 
         ObjectId id = new ObjectId();
         g.init();
         Player player = new Player("Marcel");
+        player.getInventory().add("001",1);
+        player.getInventory().add("002",1);
+        player.getInventory().add("003",1);
+        player.getInventory().add("004",1);
+        player.getInventory().add("005",1);
+        player.getInventory().add("006",1);
+        player.getInventory().add("007",1);
+        player.getInventory().add("008",1);
+        player.getInventory().add("009",1);
         GameCharacter gameCharacter = new GameCharacter("Johny boy le killeur de zoulettes", ClanType.GORILLA, Gender.MALE);
         gameCharacter.setId(id);
         gameCharacter.setPlayer(player);
@@ -42,12 +52,13 @@ public class ManageGameCharacterSceneTest {
         ctx.setPlayer(player);
         ctx.setSelectedCharacterId(id);
 
+        ManageGameCharacterScene scene = ((ManageGameCharacterScene) context.getBean("manageGameCharacterScene"));
         g.setCurrentScene(scene);
         try {
             g.run();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } */
+        }
     }
 
 }

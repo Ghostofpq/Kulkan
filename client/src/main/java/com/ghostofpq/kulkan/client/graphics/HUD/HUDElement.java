@@ -59,6 +59,22 @@ public abstract class HUDElement {
         return hasFocus;
     }
 
+    public int getPosX() {
+        return posX;
+    }
+
+    public int getPosY() {
+        return posY;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     public void setHasFocus(boolean hasFocus) {
         this.hasFocus = hasFocus;
     }

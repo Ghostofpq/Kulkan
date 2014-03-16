@@ -4,14 +4,14 @@ package com.ghostofpq.kulkan.client.scenes;
 import com.ghostofpq.kulkan.client.Client;
 import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.ClientMessenger;
-import com.ghostofpq.kulkan.client.graphics.Background;
+import com.ghostofpq.kulkan.client.graphics.*;
 import com.ghostofpq.kulkan.client.graphics.HUD.*;
-import com.ghostofpq.kulkan.client.graphics.JobManager;
-import com.ghostofpq.kulkan.client.graphics.KeyValueRender;
 import com.ghostofpq.kulkan.client.utils.GraphicsManager;
 import com.ghostofpq.kulkan.client.utils.TextureKey;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.inventory.item.Item;
+import com.ghostofpq.kulkan.entities.inventory.item.ItemType;
 import com.ghostofpq.kulkan.entities.job.capacity.Capacity;
 import com.ghostofpq.kulkan.entities.messages.Message;
 import com.ghostofpq.kulkan.entities.messages.user.*;
@@ -57,7 +57,8 @@ public class ManageGameCharacterScene implements Scene {
     private TextArea capacityDescription;
 
     private CharacteristicsPanel characteristicsPanel;
-
+    private EquipmentManager equipmentManager;
+    private EquipItemPanel equipItemPanel;
     // BACKGROUND
     private Background background;
     // POPUP
@@ -156,6 +157,9 @@ public class ManageGameCharacterScene implements Scene {
         int jobManagerHeight = clientContext.getCurrentResolution().getHeight() / 2;
         jobManager = new JobManager(jobManagerPosX, jobManagerPosY, jobManagerWidth, jobManagerHeight, gameCharacter.getActiveJob());
 
+        equipmentManager = new EquipmentManager(jobManagerPosX, jobManagerPosY, jobManagerWidth, jobManagerHeight, gameCharacter);
+        List<Item> itemList = clientContext.getPlayer().getInventory().getAll();
+        equipItemPanel = new EquipItemPanel(jobManagerPosX, jobManagerPosY + jobManagerHeight, jobManagerWidth, clientContext.getCurrentResolution().getHeight() / 4, itemList);
 
         int capacityDescriptionPosX = menuPosX + menuWidth;
         int capacityDescriptionPosY = jobManagerPosY + jobManagerHeight;
@@ -228,6 +232,7 @@ public class ManageGameCharacterScene implements Scene {
         int characteristicsPanelPosY = (xpBackgroundPosY + (xpBackgroundWidth / 2)) - (characteristicsPanelWidth / 2);
         int characteristicsPanelHeight = clientContext.getCurrentResolution().getHeight() - (characteristicsPanelPosY + clientContext.getCurrentResolution().getHeight() / 32);
         characteristicsPanel = new CharacteristicsPanel(characteristicsPanelPosX, characteristicsPanelPosY, characteristicsPanelWidth, characteristicsPanelHeight, gameCharacter.getCharacteristics());
+
 
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
@@ -304,6 +309,9 @@ public class ManageGameCharacterScene implements Scene {
                 capacityDescription.draw();
                 capacityPrice.draw();
             }
+        } else if (mode == Mode.STUFF) {
+            equipmentManager.draw();
+            equipItemPanel.draw();
         }
         if (null != popUp) {
             popUp.draw();
@@ -355,18 +363,44 @@ public class ManageGameCharacterScene implements Scene {
                                 }
                             }
                         }
+                    } else if (mode == Mode.STUFF) {
+                        if (equipmentManager.isClicked()) {
+                            ItemType type = equipmentManager.getClickedItemType();
+                            if (null != type) {
+                                List<Item> itemList = new ArrayList<Item>();
+                                switch (type) {
+                                    case HELMET:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELMET);
+                                        break;
+                                    case ARMOR:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.ARMOR);
+                                        break;
+                                    case NECKLACE:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.NECKLACE);
+                                        break;
+                                    case RING:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.RING);
+                                        break;
+                                    case WEAPON:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.WEAPON);
+                                        break;
+                                    case HELD_ITEM:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELD_ITEM);
+                                        break;
+                                }
+                                equipItemPanel.setItemList(itemList);
+                            }
+                        }
                     }
                 } else if (popUp.isClicked()) {
                     String onClick = popUp.onClick();
                     if (null != onClick) {
                         if (onClick.equals("OK")) {
-
                             popUp = null;
                         } else if (onClick.equals("UNLOCK")) {
                             actionUnlockSelectedCapacity();
                             popUp = null;
                         } else if (onClick.equals("CANCEL")) {
-
                             popUp = null;
                         }
                     }
