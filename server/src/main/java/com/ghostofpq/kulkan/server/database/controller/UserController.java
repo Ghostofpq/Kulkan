@@ -456,7 +456,7 @@ public class UserController {
             String databaseTokenKey = user.getTokenKey();
             if (tokenKey.equals(databaseTokenKey)) {
                 // Get the GameCharacterDB associated with gameCharacterId parameter
-                GameCharacterDB gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
+                GameCharacterDB gameCharacterDB = getGameCharacterDB(user, gameCharacterId);
                 if (null != gameCharacterDB) {
                     Item item = itemController.getItemById(itemId);
                     if (null != item) {
@@ -496,7 +496,7 @@ public class UserController {
             String databaseTokenKey = user.getTokenKey();
             if (tokenKey.equals(databaseTokenKey)) {
                 // Get the GameCharacterDB associated with gameCharacterId parameter
-                GameCharacterDB gameCharacterDB = getGameCharacterDBFromStock(user, gameCharacterId);
+                GameCharacterDB gameCharacterDB = getGameCharacterDB(user, gameCharacterId);
                 if (null != gameCharacterDB) {
                     user.unequipItem(itemType, gameCharacterDB);
                     return userRepository.save(user);

@@ -18,6 +18,24 @@ public class Equipment implements Serializable {
     public Equipment() {
     }
 
+    public Item get(ItemType itemType) {
+        switch (itemType) {
+            case HELMET:
+                return getHelm();
+            case ARMOR:
+                return getArmor();
+            case NECKLACE:
+                return getNecklace();
+            case RING:
+                return getRing();
+            case WEAPON:
+                return getWeapon();
+            case HELD_ITEM:
+                return getHeldItem();
+        }
+        return null;
+    }
+
     public Helm getHelm() {
         return helm;
     }

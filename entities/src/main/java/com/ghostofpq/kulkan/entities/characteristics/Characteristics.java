@@ -41,8 +41,8 @@ public class Characteristics implements Serializable {
         this.movement = 0;
         this.speed = 0;
 
-        this.maxHealthPoint = 100;
-        this.maxManaPoint = 20;
+        this.maxHealthPoint = 0;
+        this.maxManaPoint = 0;
         this.healthRegeneration = 0;
         this.manaRegeneration = 0;
 

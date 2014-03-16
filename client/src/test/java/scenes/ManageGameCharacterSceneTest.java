@@ -26,7 +26,7 @@ public class ManageGameCharacterSceneTest {
 
     @Test
     public void test() {
-
+                     /*
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("client-context.xml");
         Client g = ((Client) context.getBean("client"));
@@ -35,19 +35,22 @@ public class ManageGameCharacterSceneTest {
         ObjectId id = new ObjectId();
         g.init();
         Player player = new Player("Marcel");
-        player.getInventory().add("001",1);
-        player.getInventory().add("002",1);
-        player.getInventory().add("003",1);
-        player.getInventory().add("004",1);
-        player.getInventory().add("005",1);
-        player.getInventory().add("006",1);
-        player.getInventory().add("007",1);
-        player.getInventory().add("008",1);
-        player.getInventory().add("009",1);
+        player.getInventory().add("001", 1);
+        player.getInventory().add("002", 1);
+        player.getInventory().add("003", 1);
+        player.getInventory().add("004", 1);
+        player.getInventory().add("005", 1);
+        player.getInventory().add("006", 1);
+        player.getInventory().add("007", 1);
+        player.getInventory().add("008", 1);
+        player.getInventory().add("009", 1);
         GameCharacter gameCharacter = new GameCharacter("Johny boy le killeur de zoulettes", ClanType.GORILLA, Gender.MALE);
         gameCharacter.setId(id);
         gameCharacter.setPlayer(player);
         gameCharacter.gainXp(20);
+
+        Item helm = ItemFactory.createItem("001");
+        gameCharacter.equip(helm);
         player.getTeam().add(gameCharacter);
         ctx.setPlayer(player);
         ctx.setSelectedCharacterId(id);
@@ -58,7 +61,7 @@ public class ManageGameCharacterSceneTest {
             g.run();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }           */
     }
 
 }

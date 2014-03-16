@@ -47,7 +47,7 @@ public class ManageGameCharacterScene implements Scene {
     private HUDTexturedElement xpBar;
     private TextZone xp;
 
-    private Mode mode;
+    private Mode mode = Mode.JOB;
 
     private JobManager jobManager;
     private TextZone jobType;
@@ -86,7 +86,6 @@ public class ManageGameCharacterScene implements Scene {
 
     @Override
     public void init() {
-        mode = Mode.JOB;
 
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         background = new Background(TextureKey.BACKGROUND_BASIC);
@@ -233,7 +232,7 @@ public class ManageGameCharacterScene implements Scene {
         int characteristicsPanelWidth = clientContext.getCurrentResolution().getWidth() / 3;
         int characteristicsPanelPosY = (xpBackgroundPosY + (xpBackgroundWidth / 2)) - (characteristicsPanelWidth / 2);
         int characteristicsPanelHeight = clientContext.getCurrentResolution().getHeight() - (characteristicsPanelPosY + clientContext.getCurrentResolution().getHeight() / 32);
-        characteristicsPanel = new CharacteristicsPanel(characteristicsPanelPosX, characteristicsPanelPosY, characteristicsPanelWidth, characteristicsPanelHeight, gameCharacter.getCharacteristics());
+        characteristicsPanel = new CharacteristicsPanel(characteristicsPanelPosX, characteristicsPanelPosY, characteristicsPanelWidth, characteristicsPanelHeight, gameCharacter.getAggregatedCharacteristics());
 
 
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
@@ -248,10 +247,19 @@ public class ManageGameCharacterScene implements Scene {
         mode = Mode.STUFF;
     }
 
+    private void actionEquipItem() {
+        MessageEquipItemOnGameCharacter messageEquipItemOnGameCharacter = new MessageEquipItemOnGameCharacter(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedGameCharacter().getId(), selectedItem.getItemID());
+        clientMessenger.sendMessageToUserService(messageEquipItemOnGameCharacter);
+    }
+
+    private void actionUnequipItem() {
+        MessageUnequipItemOnGameCharacter messageUnequipItemOnGameCharacter = new MessageUnequipItemOnGameCharacter(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedGameCharacter().getId(), selectedItemType);
+        clientMessenger.sendMessageToUserService(messageUnequipItemOnGameCharacter);
+    }
 
     public void actionUnlockSelectedCapacity() {
         if (null != selectedCapacity) {
-            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedCharacterId(), clientContext.getSelectedGameCharacter().getCurrentJob(), selectedCapacity.getName());
+            MessageUnlockCapacity messageUnlockCapacity = new MessageUnlockCapacity(clientContext.getTokenKey(), clientContext.getUsername(), clientContext.getSelectedGameCharacter().getId(), clientContext.getSelectedGameCharacter().getCurrentJob(), selectedCapacity.getName());
             clientMessenger.sendMessageToUserService(messageUnlockCapacity);
         }
     }
@@ -264,18 +272,17 @@ public class ManageGameCharacterScene implements Scene {
         Player player = clientContext.getPlayer();
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         if (player.getTeam().contains(gameCharacter)) {
-            MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(clientContext.getTokenKey(), player.getPseudo(), gameCharacter.getId());
+            MessageDeleteGameCharacterFromTeam messageDeleteGameCharacterFromTeam = new MessageDeleteGameCharacterFromTeam(clientContext.getTokenKey(), player.getPseudo(), clientContext.getSelectedGameCharacter().getId());
             clientMessenger.sendMessageToUserService(messageDeleteGameCharacterFromTeam);
         } else {
-            MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(clientContext.getTokenKey(), player.getPseudo(), gameCharacter.getId());
+            MessageDeleteGameCharacterFromStock messageDeleteGameCharacterFromStock = new MessageDeleteGameCharacterFromStock(clientContext.getTokenKey(), player.getPseudo(), clientContext.getSelectedGameCharacter().getId());
             clientMessenger.sendMessageToUserService(messageDeleteGameCharacterFromStock);
         }
     }
 
     private void actionStock() {
         Player player = clientContext.getPlayer();
-        GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
-        MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(clientContext.getTokenKey(), player.getPseudo(), gameCharacter.getId());
+        MessagePutGameCharacterFromTeamToStock putGameCharacterFromTeamToStock = new MessagePutGameCharacterFromTeamToStock(clientContext.getTokenKey(), player.getPseudo(), clientContext.getSelectedGameCharacter().getId());
         clientMessenger.sendMessageToUserService(putGameCharacterFromTeamToStock);
     }
 
@@ -398,6 +405,13 @@ public class ManageGameCharacterScene implements Scene {
                         }
                         if (equipItemPanel.isClicked()) {
                             selectedItem = equipItemPanel.getClickedItem();
+                            if (selectedItem != null) {
+                                String text = new StringBuilder().append("Equip ").append(selectedItem.getName()).append("?").toString();
+                                List<String> options = new ArrayList<String>();
+                                options.add("EQUIP");
+                                options.add("CANCEL");
+                                popUp = new PopUp(options, text);
+                            }
                         }
                     }
                 } else if (popUp.isClicked()) {
@@ -411,8 +425,10 @@ public class ManageGameCharacterScene implements Scene {
                         } else if (onClick.equals("CANCEL")) {
                             popUp = null;
                         } else if (onClick.equals("UNEQUIP")) {
+                            actionUnequipItem();
                             popUp = null;
                         } else if (onClick.equals("EQUIP")) {
+                            actionEquipItem();
                             popUp = null;
                         }
                     }
@@ -421,6 +437,20 @@ public class ManageGameCharacterScene implements Scene {
                         x = Mouse.getX();
                         y = (Display.getHeight() - Mouse.getY());
                         frameClicked = true;
+                    }
+                }
+            } else if (Mouse.isButtonDown(1)) {
+                if (equipmentManager.isClicked()) {
+                    selectedItemType = equipmentManager.getSelectedItemType();
+                    if (selectedItemType != null) {
+                        Item equippedItem = clientContext.getSelectedGameCharacter().getEquipment().get(selectedItemType);
+                        if (equippedItem != null) {
+                            String text = new StringBuilder().append("Unequip ").append(equippedItem.getName()).append("?").toString();
+                            List<String> options = new ArrayList<String>();
+                            options.add("UNEQUIP");
+                            options.add("CANCEL");
+                            popUp = new PopUp(options, text);
+                        }
                     }
                 }
             } else if (!Mouse.isButtonDown(0)) {
@@ -432,12 +462,14 @@ public class ManageGameCharacterScene implements Scene {
         if (frameClicked && !clientContext.isFullscreen()) {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
-        if (mode == Mode.JOB) {
+        if ((mode == Mode.JOB) && (popUp == null)) {
             selectedCapacity = jobManager.hoveredCapacity();
             if (null != selectedCapacity) {
                 capacityDescription.clear();
                 capacityDescription.addLine(selectedCapacity.getDescription());
-                capacityPrice.setValue(String.valueOf(selectedCapacity.getPrice()));
+                if (selectedCapacity.isLocked()) {
+                    capacityPrice.setValue(String.valueOf(selectedCapacity.getPrice()));
+                }
             }
         }
     }
