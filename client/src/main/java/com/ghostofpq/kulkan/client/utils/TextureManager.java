@@ -16,82 +16,82 @@ public class TextureManager {
         textureMap = new HashMap<TextureKey, Texture>();
 
         try {
-            Texture grass = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/Grass.PNG"));
-            Texture earth = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/Earth.PNG"));
+            Texture grass = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/Grass.PNG"));
+            Texture earth = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/Earth.PNG"));
 
-            Texture highlightB = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/HighlightB.PNG"));
-            Texture highlightG = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/HighlightG.PNG"));
-            Texture highlightR = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/HighlightR.PNG"));
+            Texture highlightB = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/HighlightB.PNG"));
+            Texture highlightG = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/HighlightG.PNG"));
+            Texture highlightR = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/HighlightR.PNG"));
 
-            Texture textfieldNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_not_selected.png"));
-            Texture textfieldFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/field_selected.png"));
+            Texture textfieldNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/field_not_selected.png"));
+            Texture textfieldFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/field_selected.png"));
 
-            Texture buttonFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/homepage_800-600-button-rollover.png"));
-            Texture buttonNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/homepage_800-600-button-basic.png"));
+            Texture buttonFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/homepage_800-600-button-rollover.png"));
+            Texture buttonNoFocus = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/homepage_800-600-button-basic.png"));
 
-            Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/login_background.jpg"));
-            Texture backgroundBasic = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/background_basic.jpg"));
+            Texture loginBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("graphics/HUD/login_background.jpg"));
+            Texture backgroundBasic = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("graphics/HUD/background_basic.jpg"));
 
-            Texture frameExt = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_ExtFrame.png"));
+            Texture frameExt = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/Common/COMMON_ExtFrame.png"));
             textureMap.put(TextureKey.COMMON_EXT_FRAME, frameExt);
-            Texture background = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_Background.jpg"));
+            Texture background = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("graphics/HUD/Common/COMMON_Background.jpg"));
             textureMap.put(TextureKey.COMMON_BACKGROUND_BASIC, background);
 
 
-            Texture action1 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/action.png"));
+            Texture action1 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/action.png"));
             textureMap.put(TextureKey.ACTION_1, action1);
 
-            Texture action1Back = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionBack.png"));
+            Texture action1Back = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/actionBack.png"));
             textureMap.put(TextureKey.ACTION_1_BACK, action1Back);
 
-            Texture action1Hovered = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionHovered.png"));
+            Texture action1Hovered = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/actionHovered.png"));
             textureMap.put(TextureKey.ACTION_1_HOVERED, action1Hovered);
 
-            Texture action1Used = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/actionUsed.png"));
+            Texture action1Used = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/actionUsed.png"));
             textureMap.put(TextureKey.ACTION_1_USED, action1Used);
 
-            Texture blood = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_Blood.jpg"));
+            Texture blood = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("graphics/HUD/Common/COMMON_Blood.jpg"));
             textureMap.put(TextureKey.COMMON_BLOOD, blood);
 
 
             // LOBBY VIEW
-            Texture lobbyBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Background_169.jpg"));
+            Texture lobbyBackground = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("graphics/HUD/Lobby/LOBBY_Background_169.jpg"));
             textureMap.put(TextureKey.LOBBY_BACKGROUND_169, lobbyBackground);
 
-            Texture lobbyChatOverlay = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_Chat-overlay.png"));
+            Texture lobbyChatOverlay = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/Lobby/LOBBY_Chat-overlay.png"));
             textureMap.put(TextureKey.LOBBY_CHAT_OVERLAY, lobbyChatOverlay);
 
-            Texture lobbyNewsOverlay = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Lobby/LOBBY_News-overlay.png"));
+            Texture lobbyNewsOverlay = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/Lobby/LOBBY_News-overlay.png"));
             textureMap.put(TextureKey.LOBBY_NEWS_OVERLAY, lobbyNewsOverlay);
 
-            Texture charShadow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/Common/COMMON_Character-shadow.png"));
+            Texture charShadow = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/Common/COMMON_Character-shadow.png"));
             textureMap.put(TextureKey.COMMON_CHAR_SHADOW, charShadow);
 
             // MANAGE CHAR VIEW
-            Texture manageCharMenu = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("resources/HUD/ManageChar/MANAGE-CHAR_Menu.jpg"));
+            Texture manageCharMenu = TextureLoader.getTexture("JPG", ResourceLoader.getResourceAsStream("graphics/HUD/ManageChar/MANAGE-CHAR_Menu.jpg"));
             textureMap.put(TextureKey.MANAGE_CHAR_MENU, manageCharMenu);
 
-            Texture manageCharNameHolder = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/ManageChar/MANAGE-CHAR_Name-holder.png"));
+            Texture manageCharNameHolder = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/ManageChar/MANAGE-CHAR_Name-holder.png"));
             textureMap.put(TextureKey.MANAGE_CHAR_NAME_HOLDER, manageCharNameHolder);
 
-            Texture manageCharXpBackground = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/HUD/ManageChar/MANAGE-CHAR_XP-background.png"));
+            Texture manageCharXpBackground = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/HUD/ManageChar/MANAGE-CHAR_XP-background.png"));
             textureMap.put(TextureKey.MANAGE_CHAR_XP_BACKGROUND, manageCharXpBackground);
 
-            Texture earthTop00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_00.png"));
-            Texture earthTop01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_01.png"));
-            Texture earthTop02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_02.png"));
-            Texture earthTop03 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_03.png"));
-            Texture earthTop04 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_04.png"));
-            Texture earthTop05 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_05.png"));
-            Texture earthTop06 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_06.png"));
-            Texture earthTop07 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_07.png"));
-            Texture earthTop08 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_08.png"));
-            Texture earthTop09 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/TOP/earth_top_09.png"));
+            Texture earthTop00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_00.png"));
+            Texture earthTop01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_01.png"));
+            Texture earthTop02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_02.png"));
+            Texture earthTop03 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_03.png"));
+            Texture earthTop04 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_04.png"));
+            Texture earthTop05 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_05.png"));
+            Texture earthTop06 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_06.png"));
+            Texture earthTop07 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_07.png"));
+            Texture earthTop08 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_08.png"));
+            Texture earthTop09 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/TOP/earth_top_09.png"));
 
-            Texture earthSide00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_00.png"));
-            Texture earthSide01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_01.png"));
-            Texture earthSide02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_02.png"));
-            Texture earthSide03 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("resources/textures/EARTH/SIDE/earth_side_03.png"));
+            Texture earthSide00 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/SIDE/earth_side_00.png"));
+            Texture earthSide01 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/SIDE/earth_side_01.png"));
+            Texture earthSide02 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/SIDE/earth_side_02.png"));
+            Texture earthSide03 = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("graphics/textures/EARTH/SIDE/earth_side_03.png"));
 
 
             textureMap.put(TextureKey.GRASS, grass);

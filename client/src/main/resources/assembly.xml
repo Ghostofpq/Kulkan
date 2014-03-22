@@ -5,16 +5,20 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>target/natives</directory>
-            <outputDirectory>natives</outputDirectory>
+            <directory>src/main/resources/graphics</directory>
+            <outputDirectory>graphics</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/conf</directory>
+            <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/lib</directory>
             <outputDirectory>lib</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>src/main/resources/conf</directory>
-            <outputDirectory>conf</outputDirectory>
+            <directory>target/natives</directory>
+            <outputDirectory>natives</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target</directory>
@@ -25,21 +29,10 @@
         </fileSet>
         <fileSet>
             <directory>src/main/resources</directory>
-            <outputDirectory>resources</outputDirectory>
-            <excludes>
-                <exclude>client.xml</exclude>
-                <exclude>assembly.xml</exclude>
-                <exclude>conf/**</exclude>
-                <exclude>debug.bat</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>src/main/resources</directory>
             <outputDirectory>.</outputDirectory>
             <includes>
                 <include>debug.bat</include>
             </includes>
         </fileSet>
-
     </fileSets>
 </assembly>

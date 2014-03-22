@@ -15,8 +15,8 @@ public class SpritesheetManager {
     private SpritesheetManager() {
         spriteSheetMap = new HashMap<String, SpriteSheet>();
         try {
-            SpriteSheet sheet = new SpriteSheet("./resources/spritesheets/ramza.png", 32, 42);
-            SpriteSheet sheet2 = new SpriteSheet("./resources/spritesheets/characters.png", 32, 42, new Color(0, 128, 128));
+            SpriteSheet sheet = new SpriteSheet("./graphics/spritesheets/ramza.png", 32, 42);
+            SpriteSheet sheet2 = new SpriteSheet("./graphics/spritesheets/characters.png", 32, 42, new Color(0, 128, 128));
             spriteSheetMap.put("Ramza", sheet);
             spriteSheetMap.put("Arthur", sheet2);
         } catch (SlickException e) {

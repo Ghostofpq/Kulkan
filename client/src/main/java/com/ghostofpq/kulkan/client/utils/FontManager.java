@@ -33,9 +33,9 @@ public class FontManager {
 
     private void init() {
         try {
-            fontMap.put("arial_16", new AngelCodeFont("resources/HUD/font/Arial/arial_16_white.fnt", "resources/HUD/font/Arial/arial_16_white.png"));
-            fontMap.put("arial_12", new AngelCodeFont("resources/HUD/font/Arial/arial_12_white.fnt", "resources/HUD/font/Arial/arial_12_white.png"));
-            fontMap.put("optimus_princeps_16", new AngelCodeFont("resources/HUD/font/optimus_princeps/optimus_princeps_16.fnt", "resources/HUD/font/optimus_princeps/optimus_princeps_16.png"));
+            fontMap.put("arial_16", new AngelCodeFont("graphics/HUD/font/Arial/arial_16_white.fnt", "graphics/HUD/font/Arial/arial_16_white.png"));
+            fontMap.put("arial_12", new AngelCodeFont("graphics/HUD/font/Arial/arial_12_white.fnt", "graphics/HUD/font/Arial/arial_12_white.png"));
+            fontMap.put("optimus_princeps_16", new AngelCodeFont("graphics/HUD/font/optimus_princeps/optimus_princeps_16.fnt", "graphics/HUD/font/optimus_princeps/optimus_princeps_16.png"));
         } catch (SlickException e) {
             e.printStackTrace();
         }

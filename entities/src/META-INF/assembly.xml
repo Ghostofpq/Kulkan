@@ -13,8 +13,8 @@
 
     <fileSets>
         <fileSet>
-            <directory>src/main/resources</directory>
-            <outputDirectory>resources</outputDirectory>
+            <directory>src/main/graphics</directory>
+            <outputDirectory>graphics</outputDirectory>
         </fileSet>
 
         <fileSet>
