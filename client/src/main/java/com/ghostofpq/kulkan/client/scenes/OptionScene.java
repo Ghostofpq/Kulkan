@@ -5,11 +5,11 @@ import com.ghostofpq.kulkan.client.ClientContext;
 import com.ghostofpq.kulkan.client.graphics.Background;
 import com.ghostofpq.kulkan.client.graphics.HUD.Button;
 import com.ghostofpq.kulkan.client.graphics.HUD.Frame;
+import com.ghostofpq.kulkan.client.graphics.HUD.TextField;
 import com.ghostofpq.kulkan.client.graphics.HUD.TextZone;
-import com.ghostofpq.kulkan.client.utils.GraphicsManager;
-import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
-import com.ghostofpq.kulkan.client.utils.TextureKey;
+import com.ghostofpq.kulkan.client.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,9 @@ public class OptionScene implements Scene {
     private ClientContext clientContext;
     @Autowired
     private Client client;
+    @Autowired
+    private LoginScene loginScene;
+
     private Scene lastScene;
     private Button applyButton;
     private Button backButton;
@@ -31,6 +34,10 @@ public class OptionScene implements Scene {
     private Button nextButton;
     private Button prevButton;
     private Button switchRatioButton;
+    // NETWORK
+    private TextField serverIP;
+    private TextField serverPort;
+
     // BACKGROUND
     private Background background;
     // FRAME
@@ -122,27 +129,29 @@ public class OptionScene implements Scene {
                     };
         }
 
+        int posXServerIP = clientContext.getCurrentResolution().getWidth() / 2 - (buttonWidth / 2);
+        int posYServerIP = heightStep * 4;
+
+        serverIP = new TextField(posXServerIP, posYServerIP, buttonWidth, buttonHeight, 14);
+        serverIP.setLabel(clientContext.getServerIP());
+
+        int posXServerPort = clientContext.getCurrentResolution().getWidth() / 2 - (buttonWidth / 2);
+        int posYServerPort = heightStep * 5;
+
+        serverPort = new TextField(posXServerPort, posYServerPort, buttonWidth, buttonHeight, 6);
+        serverPort.setLabel(String.valueOf(clientContext.getServerPort()));
+
         int posXApply = clientContext.getCurrentResolution().getWidth() / 2 - (3 * buttonWidth / 2);
-        int posYApply = heightStep * 5;
+        int posYApply = heightStep * 8;
         applyButton = new Button(posXApply, posYApply, buttonWidth, buttonHeight, "APPLY") {
             @Override
             public void onClick() {
-                switch (resolutionRatio) {
-                    case RATIO_4_3:
-                        clientContext.setCurrentResolution(clientContext.getResolutions43().get(index));
-                        client.updateDisplay();
-                        break;
-                    case RATIO_16_9:
-                        clientContext.setCurrentResolution(clientContext.getResolutions169().get(index));
-                        client.updateDisplay();
-                        break;
-                }
-                updateFields();
+                actionApply();
             }
         };
 
         int posXBackButton = clientContext.getCurrentResolution().getWidth() / 2 + (buttonWidth / 2);
-        int posYBackButton = heightStep * 5;
+        int posYBackButton = heightStep * 8;
         backButton = new Button(posXBackButton, posYBackButton, buttonWidth, buttonHeight, "BACK") {
             @Override
             public void onClick() {
@@ -151,6 +160,27 @@ public class OptionScene implements Scene {
         };
         updateFields();
     }
+
+    private void actionApply() {
+        switch (resolutionRatio) {
+            case RATIO_4_3:
+                clientContext.setCurrentResolution(clientContext.getResolutions43().get(index));
+                client.updateDisplay();
+                break;
+            case RATIO_16_9:
+                clientContext.setCurrentResolution(clientContext.getResolutions169().get(index));
+                client.updateDisplay();
+                break;
+        }
+
+        if (!serverPort.getLabel().equals(String.valueOf(clientContext.getServerPort())) || (!serverIP.getLabel().equals(String.valueOf(clientContext.getServerIP())))) {
+            clientContext.setServer(serverIP.getLabel(), Integer.valueOf(serverPort.getLabel()));
+            setLastScene(loginScene);
+        }
+
+        updateFields();
+    }
+
 
     private void updateFields() {
         String text = "";
@@ -175,6 +205,8 @@ public class OptionScene implements Scene {
                 break;
         }
         resolution.setLabel(text);
+        serverIP.setLabel(clientContext.getServerIP());
+        serverPort.setLabel(String.valueOf(clientContext.getServerPort()));
     }
 
     @Override
@@ -189,6 +221,8 @@ public class OptionScene implements Scene {
         prevButton.draw();
         nextButton.draw();
         resolution.draw();
+        serverIP.draw();
+        serverPort.draw();
         if (null != switchRatioButton) {
             switchRatioButton.draw();
         }
@@ -200,6 +234,32 @@ public class OptionScene implements Scene {
 
     @Override
     public void manageInput() {
+        while (Keyboard.next()) {
+            if (Keyboard.getEventKeyState()) {
+                if (InputManager.getInstance().getInput(Keyboard.getEventKey()) != null) {
+                    if (InputManager.getInstance().getInput(Keyboard.getEventKey()).equals(InputMap.Input.CANCEL)) {
+                        if (serverIP.hasFocus()) {
+                            serverIP.deleteLastChar();
+                        } else if (serverPort.hasFocus()) {
+                            serverPort.deleteLastChar();
+                        }
+                    } else {
+                        if (serverIP.hasFocus()) {
+                            serverIP.writeChar(Keyboard.getEventCharacter());
+                        } else if (serverPort.hasFocus()) {
+                            serverPort.writeChar(Keyboard.getEventCharacter());
+                        }
+                    }
+                } else {
+                    if (serverIP.hasFocus()) {
+                        serverIP.writeChar(Keyboard.getEventCharacter());
+                    } else if (serverPort.hasFocus()) {
+                        serverPort.writeChar(Keyboard.getEventCharacter());
+                    }
+                }
+            }
+        }
+
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
                 if (nextButton.isClicked()) {
@@ -210,6 +270,12 @@ public class OptionScene implements Scene {
                     applyButton.onClick();
                 } else if (backButton.isClicked()) {
                     backButton.onClick();
+                } else if (serverIP.isClicked()) {
+                    serverIP.setHasFocus(true);
+                    serverPort.setHasFocus(false);
+                } else if (serverPort.isClicked()) {
+                    serverIP.setHasFocus(false);
+                    serverPort.setHasFocus(true);
                 } else if (null != switchRatioButton && switchRatioButton.isClicked()) {
                     switchRatioButton.onClick();
                 } else if (frame.isClicked()) {

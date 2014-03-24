@@ -35,9 +35,6 @@ public class ClientMessenger {
     private QueueingConsumer channelAuthenticatingConsumer;
     private String authenticationReplyQueueName;
     private long ping;
-    // SERVER
-    private String hostIp;
-    private int hostPort;
     @Autowired
     private Client client;
     @Autowired
@@ -48,9 +45,9 @@ public class ClientMessenger {
 
     public void initConnection() throws IOException {
         ConnectionFactory factory = new ConnectionFactory();
-        log.debug("Opening connection on [{}:{}]", hostIp, hostPort);
-        factory.setHost(hostIp);
-        factory.setPort(hostPort);
+        log.debug("Opening connection on [{}:{}]", clientContext.getServerIP(), clientContext.getServerPort());
+        factory.setHost(clientContext.getServerIP());
+        factory.setPort(clientContext.getServerPort());
         connection = factory.newConnection();
 
         log.debug("Opening channel authenticating");
@@ -76,19 +73,21 @@ public class ClientMessenger {
 
     public Message requestOnAuthenticationChannel(Message message) throws IOException, InterruptedException {
         Message response = null;
-        String corrId = java.util.UUID.randomUUID().toString();
-        AMQP.BasicProperties props = new AMQP.BasicProperties
-                .Builder()
-                .correlationId(corrId)
-                .replyTo(authenticationReplyQueueName)
-                .build();
-        log.debug("Publish on [{}] : {}", AUTHENTICATION_SERVICE_QUEUE_NAME, message.toString());
-        channelAuthentication.basicPublish("", AUTHENTICATION_SERVICE_QUEUE_NAME, props, message.getBytes());
-        QueueingConsumer.Delivery delivery = channelAuthenticatingConsumer.nextDelivery(1000);
-        if (null != delivery) {
-            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
-                response = Message.loadFromBytes(delivery.getBody());
-                log.debug("Receive response from [{}] : {}", AUTHENTICATION_SERVICE_QUEUE_NAME, response.toString());
+        if (null != connection) {
+            String corrId = java.util.UUID.randomUUID().toString();
+            AMQP.BasicProperties props = new AMQP.BasicProperties
+                    .Builder()
+                    .correlationId(corrId)
+                    .replyTo(authenticationReplyQueueName)
+                    .build();
+            log.debug("Publish on [{}] : {}", AUTHENTICATION_SERVICE_QUEUE_NAME, message.toString());
+            channelAuthentication.basicPublish("", AUTHENTICATION_SERVICE_QUEUE_NAME, props, message.getBytes());
+            QueueingConsumer.Delivery delivery = channelAuthenticatingConsumer.nextDelivery(1000);
+            if (null != delivery) {
+                if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                    response = Message.loadFromBytes(delivery.getBody());
+                    log.debug("Receive response from [{}] : {}", AUTHENTICATION_SERVICE_QUEUE_NAME, response.toString());
+                }
             }
         }
         return response;
@@ -175,7 +174,9 @@ public class ClientMessenger {
         if (null != channelPing) {
             channelPing.close();
         }
-        connection.close();
+        if (null != connection) {
+            connection.close();
+        }
     }
 
     public Message receiveMessage() {
@@ -265,14 +266,6 @@ public class ClientMessenger {
             e.printStackTrace();
             client.quit();
         }
-    }
-
-    public void setHostIp(String hostIp) {
-        this.hostIp = hostIp;
-    }
-
-    public void setHostPort(int hostPort) {
-        this.hostPort = hostPort;
     }
 
     public Connection getConnection() {

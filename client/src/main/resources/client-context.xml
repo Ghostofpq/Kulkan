@@ -18,10 +18,7 @@
         <property name="pathOfClientPropertiesFile" value="${path.of.client.properties.file}"/>
     </bean>
 
-    <bean id="clientMessenger" class="com.ghostofpq.kulkan.client.ClientMessenger">
-        <property name="hostIp" value="${hostIp.ip}"/>
-        <property name="hostPort" value="${hostIp.hostPort}"/>
-    </bean>
+    <bean id="clientMessenger" class="com.ghostofpq.kulkan.client.ClientMessenger"/>
 
     <bean id="createGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.CreateGameCharacterScene"/>
     <bean id="manageGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterScene"/>

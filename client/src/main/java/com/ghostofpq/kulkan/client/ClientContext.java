@@ -8,6 +8,7 @@ import com.ghostofpq.kulkan.client.utils.Resolution;
 import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.lwjgl.LWJGLException;
@@ -31,6 +32,9 @@ public class ClientContext {
     private Player player;
     private String tokenKey;
     private ObjectId selectedCharacterId;
+    // NETWORK
+    private String serverIP;
+    private Integer serverPort;
 
     @Autowired
     private ManageGameCharacterScene manageGameCharacterScene;
@@ -40,6 +44,9 @@ public class ClientContext {
     private ManageGameCharacterJobScene manageGameCharacterJobScene;
     @Autowired
     private ManageGameCharacterChangeJobScene manageGameCharacterChangeJobScene;
+    @Autowired
+    private ClientMessenger clientMessenger;
+
 
     public void init() {
         determineAvailableDisplayModes();
@@ -69,41 +76,45 @@ public class ClientContext {
     }
 
     private void selectDisplayMode() {
-        if (null != currentResolution.getResolutionRatio()) {
-            switch (currentResolution.getResolutionRatio()) {
-                case RATIO_16_9:
-                    if (!resolutions169.isEmpty()) {
-                        for (Resolution resolution : resolutions169) {
-                            if (resolution.getWidth() == currentResolution.getWidth() && resolution.getHeight() == currentResolution.getWidth()) {
-                                log.debug("Setting display {}x{} (16/9) from client preferences", currentResolution.getWidth(), currentResolution.getWidth());
-                                setCurrentResolution(resolution);
+        if (null != currentResolution) {
+            if (null != currentResolution.getResolutionRatio()) {
+                switch (currentResolution.getResolutionRatio()) {
+                    case RATIO_16_9:
+                        if (!resolutions169.isEmpty()) {
+                            for (Resolution resolution : resolutions169) {
+                                if (resolution.getWidth() == currentResolution.getWidth() && resolution.getHeight() == currentResolution.getWidth()) {
+                                    log.debug("Setting display {}x{} (16/9) from client preferences", currentResolution.getWidth(), currentResolution.getWidth());
+                                    setCurrentResolution(resolution);
+                                }
                             }
-                        }
-                        if (null == currentResolution) {
+                            if (null == currentResolution) {
+                                selectDefaultResolution();
+                            }
+                        } else {
                             selectDefaultResolution();
                         }
-                    } else {
-                        selectDefaultResolution();
-                    }
-                    break;
-                case RATIO_4_3:
-                    if (!resolutions43.isEmpty()) {
-                        for (Resolution resolution : resolutions43) {
-                            if (resolution.getWidth() == currentResolution.getWidth() && resolution.getHeight() == currentResolution.getWidth()) {
-                                log.debug("Setting display {}x{} (4/3) from client preferences", currentResolution.getWidth(), currentResolution.getWidth());
-                                setCurrentResolution(resolution);
+                        break;
+                    case RATIO_4_3:
+                        if (!resolutions43.isEmpty()) {
+                            for (Resolution resolution : resolutions43) {
+                                if (resolution.getWidth() == currentResolution.getWidth() && resolution.getHeight() == currentResolution.getWidth()) {
+                                    log.debug("Setting display {}x{} (4/3) from client preferences", currentResolution.getWidth(), currentResolution.getWidth());
+                                    setCurrentResolution(resolution);
+                                }
                             }
-                        }
-                        if (null == currentResolution) {
+                            if (null == currentResolution) {
+                                selectDefaultResolution();
+                            }
+                        } else {
                             selectDefaultResolution();
                         }
-                    } else {
+                        break;
+                    default:
                         selectDefaultResolution();
-                    }
-                    break;
-                default:
-                    selectDefaultResolution();
-                    break;
+                        break;
+                }
+            } else {
+                selectDefaultResolution();
             }
         } else {
             selectDefaultResolution();
@@ -217,14 +228,24 @@ public class ClientContext {
             } catch (IllegalArgumentException e) {
                 resolutionRatio = null;
             }
-            if(height==0 || width==0 || resolutionRatio==null){
+
+            if (height == 0 || width == 0 || resolutionRatio == null) {
                 selectDefaultResolution();
                 saveClientProperties();
-            }else {
+            } else {
                 currentResolution = new Resolution(width, height, offsetX, offsetY, resolutionRatio);
             }
 
-            pseudo = props.getProperty("client.pseudo");
+            try {
+                serverPort = Integer.valueOf(props.getProperty("server.port"));
+            } catch (IllegalArgumentException e) {
+                serverPort = 5672;
+            }
+
+            serverIP = (Strings.isNullOrEmpty(props.getProperty("server.ip")) || props.getProperty("server.ip").equals("null")) ? "localhost" : props.getProperty("server.ip");
+
+            pseudo = (Strings.isNullOrEmpty(props.getProperty("client.pseudo")) || props.getProperty("client.pseudo").equals("null")) ? "" : props.getProperty("client.pseudo");
+
             log.debug("Loading properties {}", props);
         } catch (FileNotFoundException e) {
             log.warn("No client.properties file.");
@@ -258,6 +279,9 @@ public class ClientContext {
             props.setProperty("window.display.offsetY", String.valueOf(currentResolution.getOffsetY()));
             props.setProperty("window.display.ratio", String.valueOf(currentResolution.getResolutionRatio()));
             props.setProperty("client.pseudo", String.valueOf(pseudo));
+            props.setProperty("server.ip", String.valueOf(serverIP));
+            props.setProperty("server.port", String.valueOf(serverPort));
+
             log.debug("Saving properties {}", props);
 
             props.store(out, null);
@@ -352,4 +376,32 @@ public class ClientContext {
     public void setPathOfClientPropertiesFile(String pathOfClientPropertiesFile) {
         this.pathOfClientPropertiesFile = pathOfClientPropertiesFile;
     }
+
+    public String getServerIP() {
+        return serverIP;
+    }
+
+    public Integer getServerPort() {
+        return serverPort;
+    }
+
+    public void setServer(String ip, Integer port) {
+        String oldServerIP = this.serverIP;
+        Integer oldServerPort = this.serverPort;
+
+        this.serverIP = ip;
+        this.serverPort = port;
+
+        try {
+            clientMessenger.closeConnection();
+            clientMessenger.initConnection();
+            log.debug("Changing Server IP/Port : {}:{}", ip, port);
+
+        } catch (IOException e) {
+            log.error("Invalid Server IP/Port : {}:{}", ip, port);
+            this.serverIP = oldServerIP;
+            this.serverPort = oldServerPort;
+        }
+    }
+
 }

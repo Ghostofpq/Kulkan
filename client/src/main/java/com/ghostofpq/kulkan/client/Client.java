@@ -90,8 +90,7 @@ public class Client {
         try {
             clientMessenger.initConnection();
         } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(0);
+            log.error("Can't connect to server, please change network configuration in Option");
         }
 
         setCurrentScene(loginScene);
