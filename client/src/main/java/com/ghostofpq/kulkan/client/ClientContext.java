@@ -396,7 +396,7 @@ public class ClientContext {
             clientMessenger.closeConnection();
             clientMessenger.initConnection();
             log.debug("Changing Server IP/Port : {}:{}", ip, port);
-
+            saveClientProperties();
         } catch (IOException e) {
             log.error("Invalid Server IP/Port : {}:{}", ip, port);
             this.serverIP = oldServerIP;
