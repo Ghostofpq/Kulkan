@@ -22,13 +22,6 @@
 
     <bean id="createGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.CreateGameCharacterScene"/>
     <bean id="manageGameCharacterScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterScene"/>
-    <bean id="manageGameCharacterJobScene" class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterJobScene"/>
-    <bean id="manageGameCharacterChangeJobScene"
-          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterChangeJobScene"/>
-    <bean id="manageGameCharacterEquipmentScene"
-          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipmentScene"/>
-    <bean id="manageGameCharacterEquipItemScene"
-          class="com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipItemScene"/>
 
     <bean id="loginScene" class="com.ghostofpq.kulkan.client.scenes.LoginScene"/>
     <bean id="lobbyScene" class="com.ghostofpq.kulkan.client.scenes.LobbyScene"/>

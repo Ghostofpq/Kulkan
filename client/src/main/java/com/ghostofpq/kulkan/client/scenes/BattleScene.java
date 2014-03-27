@@ -320,6 +320,18 @@ public class BattleScene implements Scene {
         }
     }
 
+    private void cleanActionButtons() {
+        drawableObjectList.remove(actionButtonMove);
+        drawableObjectList.remove(actionButtonAttack);
+        drawableObjectList.remove(actionButtonCapacity);
+        drawableObjectList.remove(actionButtonEndTurn);
+        actionButtonMove = null;
+        actionButtonAttack = null;
+        actionButtonCapacity = null;
+        actionButtonEndTurn = null;
+        sortToDrawList();
+    }
+
     private void manageInputValidate() {
         switch (currentState) {
             case DEPLOY_POSITION:
@@ -330,27 +342,22 @@ public class BattleScene implements Scene {
                 break;
             case ACTION:
                 if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
-                    if (actionButtonMove.isHovered()) {
+                    if (actionButtonMove.isHovered() && !actionButtonMove.isUsed()) {
                         sendPositionToMoveRequest();
                         currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
-                    } else if (actionButtonAttack.isHovered()) {
+                        cleanActionButtons();
+                    } else if (actionButtonAttack.isHovered() && !actionButtonAttack.isUsed()) {
                         sendPositionToAttackRequest();
                         currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
-                    } else if (actionButtonCapacity.isHovered()) {
+                        cleanActionButtons();
+                    } else if (actionButtonCapacity.isHovered() && !actionButtonCapacity.isUsed()) {
                         menuSelectCapacity = new MenuSelectCapacity(300, 0, 200, 100, 2, currentGameCharacter.getJob(currentGameCharacter.getCurrentJob()).getUnlockedMoves(), currentGameCharacter.getCurrentManaPoint());
                         currentState = BattleSceneState.CAPACITY_SELECT;
+                        cleanActionButtons();
                     } else if (actionButtonEndTurn.isHovered()) {
                         currentState = BattleSceneState.END_TURN;
+                        cleanActionButtons();
                     }
-                    drawableObjectList.remove(actionButtonMove);
-                    drawableObjectList.remove(actionButtonAttack);
-                    drawableObjectList.remove(actionButtonCapacity);
-                    drawableObjectList.remove(actionButtonEndTurn);
-                    actionButtonMove = null;
-                    actionButtonAttack = null;
-                    actionButtonCapacity = null;
-                    actionButtonEndTurn = null;
-                    sortToDrawList();
                 }
                 break;
             case MOVE:
@@ -450,7 +457,6 @@ public class BattleScene implements Scene {
             }
             while (Mouse.next()) {
                 if (Mouse.isButtonDown(0)) {
-
                     if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
                         if (actionButtonMove.isHovered() || actionButtonAttack.isHovered() || actionButtonCapacity.isHovered() || actionButtonEndTurn.isHovered()) {
                             manageInputValidate();
@@ -479,6 +485,13 @@ public class BattleScene implements Scene {
                 if (Mouse.isButtonDown(1)) {
                     if (null != mousePosition) {
                         GraphicsManager.getInstance().requestCenterPosition(mousePosition);
+                    }
+                }
+                if (currentState == BattleSceneState.END_TURN || currentState == BattleSceneState.DEPLOY_HEADING_ANGLE ||
+                        currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE ||
+                        currentState == BattleSceneState.CAPACITY_PLACE || currentState == BattleSceneState.CAPACITY_USE) {
+                    if (null != mousePosition) {
+                        currentGameCharacterRepresentation.setHeadingAngle(currentGameCharacter.getPosition().getHeadingAngleFor(mousePosition));
                     }
                 }
             }
@@ -539,7 +552,7 @@ public class BattleScene implements Scene {
         for (GameCharacterRepresentation characterRepresentation : characterRepresentationList) {
             if (characterRepresentation.getCharacter().equals(messageCharacterToPlay.getCharacterToPlay())) {
                 currentGameCharacterRepresentation = characterRepresentation;
-                currentGameCharacter = currentGameCharacterRepresentation.getCharacter();
+                currentGameCharacter = messageCharacterToPlay.getCharacterToPlay();
                 break;
             }
         }

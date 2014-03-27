@@ -544,7 +544,9 @@ public class GameCharacterRepresentation extends DrawableObject {
     }
 
     public void setHeadingAngle(PointOfView headingAngle) {
-        character.setHeadingAngle(headingAngle);
+        if (null != headingAngle) {
+            character.setHeadingAngle(headingAngle);
+        }
     }
 
     public Position getFootPosition() {

@@ -154,6 +154,12 @@ public class Characteristics implements Serializable {
             case MAGIC_PENETRATION:
                 this.magicPenetration += value;
                 break;
+            case MAX_HEALTH:
+                this.maxHealthPoint += value;
+                break;
+            case MAX_MANA:
+                this.maxManaPoint += value;
+                break;
             case LIFE_REGENERATION:
                 this.healthRegeneration += value;
                 break;

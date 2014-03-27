@@ -79,10 +79,6 @@ public class ManageGameCharacterScene implements Scene {
     private LobbyScene lobbyScene;
     @Autowired
     private ClientMessenger clientMessenger;
-    @Autowired
-    private ManageGameCharacterEquipmentScene manageGameCharacterEquipmentScene;
-    @Autowired
-    private ManageGameCharacterJobScene manageGameCharacterJobScene;
 
     @Override
     public void init() {

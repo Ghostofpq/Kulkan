@@ -93,6 +93,7 @@ public class Player implements Serializable {
         for (GameCharacter gameCharacter : team) {
             if (gameCharacter.isAlive()) {
                 result = true;
+                break;
             }
         }
         return result;

@@ -1,8 +1,5 @@
 package com.ghostofpq.kulkan.client;
 
-import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterChangeJobScene;
-import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterEquipmentScene;
-import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterJobScene;
 import com.ghostofpq.kulkan.client.scenes.ManageGameCharacterScene;
 import com.ghostofpq.kulkan.client.utils.Resolution;
 import com.ghostofpq.kulkan.client.utils.ResolutionRatio;
@@ -38,12 +35,6 @@ public class ClientContext {
 
     @Autowired
     private ManageGameCharacterScene manageGameCharacterScene;
-    @Autowired
-    private ManageGameCharacterEquipmentScene manageGameCharacterEquipmentScene;
-    @Autowired
-    private ManageGameCharacterJobScene manageGameCharacterJobScene;
-    @Autowired
-    private ManageGameCharacterChangeJobScene manageGameCharacterChangeJobScene;
     @Autowired
     private ClientMessenger clientMessenger;
 

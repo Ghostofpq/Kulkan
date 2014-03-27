@@ -46,6 +46,8 @@ public class Game implements Runnable {
     private Player playerToPlay;
     private GameCharacter currentCharToPlay;
     private Connection connection;
+    private boolean deploymentIsOver;
+
 
     public Game(Battlefield battlefield, String gameID, Map<String, Player> keyTokenPlayerMap, GameManager gameManager, String hostIp, int hostPort) {
         this.battlefield = battlefield;
@@ -64,6 +66,7 @@ public class Game implements Runnable {
         this.playerChannelMap = new HashMap<Player, String>();
         this.hostIp = hostIp;
         this.hostPort = hostPort;
+        this.deploymentIsOver = false;
     }
 
     public void initConnections() throws IOException, InterruptedException {
@@ -228,7 +231,7 @@ public class Game implements Runnable {
         if (deployIsComplete()) {
             log.debug(" [S] DEPLOYMENT IS COMPLETE");
             completeDeployment();
-            newTurn();
+            deploymentIsOver = true;
         }
     }
 
@@ -265,30 +268,36 @@ public class Game implements Runnable {
         MessageCharacterActionMove messageCharacterActionMove = (MessageCharacterActionMove) message;
         GameCharacter characterToMove = getEquivalentCharacter(messageCharacterActionMove.getCharacter());
         if (characterToMove.equals(currentCharToPlay)) {
-            Position positionToMove = messageCharacterActionMove.getPositionToMove();
-            Position currentPosition = getCharacterPosition(characterToMove).plusYNew(-1);
-            if (!currentPosition.equals(positionToMove)) {
-                log.debug(" [C] {} MOVES TO {}", characterToMove.getName(), positionToMove.toString());
-                Tree<Position> possiblePositionsToMoveTree = getPossiblePositionsToMoveTree(characterToMove);
-                List<Node<Position>> nodeList = possiblePositionsToMoveTree.find(positionToMove);
-                if (!nodeList.isEmpty()) {
-                    characterToMove.setHasMoved(true);
-                    // the position is on the floor, set the char position to position +Y1
-                    Player player = playerList.get(messageCharacterActionMove.getPlayerNumber());
-                    player.getGameCharacter(characterToMove).setPosition(positionToMove.plusYNew(1));
-                    List<Position> path = nodeList.get(0).getPathFromTop();
-                    MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
-                    sendToAll(messageCharacterMoves);
-                    MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
-                    sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+            if (!currentCharToPlay.hasMoved()) {
+                Position positionToMove = messageCharacterActionMove.getPositionToMove();
+                Position currentPosition = getCharacterPosition(characterToMove).plusYNew(-1);
+                if (!currentPosition.equals(positionToMove)) {
+                    log.debug(" [C] {} MOVES TO {}", characterToMove.getName(), positionToMove.toString());
+                    Tree<Position> possiblePositionsToMoveTree = getPossiblePositionsToMoveTree(characterToMove);
+                    List<Node<Position>> nodeList = possiblePositionsToMoveTree.find(positionToMove);
+                    if (!nodeList.isEmpty()) {
+                        characterToMove.setHasMoved(true);
+                        // the position is on the floor, set the char position to position +Y1
+                        Player player = playerList.get(messageCharacterActionMove.getPlayerNumber());
+                        player.getGameCharacter(characterToMove).setPosition(positionToMove.plusYNew(1));
+                        List<Position> path = nodeList.get(0).getPathFromTop();
+                        MessageCharacterMoves messageCharacterMoves = new MessageCharacterMoves(characterToMove, path);
+                        sendToAll(messageCharacterMoves);
+                        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, positionToMove);
+                        sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+                    } else {
+                        log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
+                        MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, currentPosition);
+                        sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
+                    }
                 } else {
-                    log.error(" [X] NOT VALID POSITION TO MOVE : {}", positionToMove.toString());
+                    log.error(" [X] NOT MOVING : {}", positionToMove.toString());
                     MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, currentPosition);
                     sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
                 }
             } else {
-                log.error(" [X] NOT MOVING : {}", positionToMove.toString());
-                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, currentPosition);
+                log.error(" [X] CHARACTER HAS ALREADY MOVE THIS TURN");
+                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(currentCharToPlay, currentCharToPlay.getPosition());
                 sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
             }
         } else {
@@ -382,7 +391,8 @@ public class Game implements Runnable {
         if (character.equals(currentCharToPlay)) {
             log.debug(" [C] END TURN FOR {}", character.getName());
             character.setHeadingAngle(messageCharacterEndTurn.getCharacter().getHeadingAngle());
-            newTurn();
+            currentCharToPlay = null;
+            playerToPlay = null;
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
         }
@@ -713,10 +723,14 @@ public class Game implements Runnable {
             if (player.isAlive()) {
                 numberOfPlayerAlive++;
                 playerAlive = player;
+                if (numberOfPlayerAlive > 1) {
+                    break;
+                }
             }
         }
         if (numberOfPlayerAlive == 1) {
             result = playerAlive;
+            log.debug("{} is the only one alive");
         }
         return result;
     }
@@ -743,6 +757,9 @@ public class Game implements Runnable {
         sendDeployMessage();
         Player winnerPlayer = getWinnerPlayer();
         while (null == winnerPlayer) {
+            if (deploymentIsOver && null == currentCharToPlay) {
+                newTurn();
+            }
             try {
                 receiveMessage();
             } catch (InterruptedException e) {
