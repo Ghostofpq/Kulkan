@@ -116,11 +116,11 @@ public class ManageGameCharacterScene implements Scene {
             }
         };
 
-        int deleteGameCharButtonPosY = clientContext.getCurrentResolution().getHeight() / 2;
+        int deleteGameCharButtonPosY = clientContext.getCurrentResolution().getHeight() - 4 * (buttonHeight + padding);
         deleteGameCharButton = new Button(menuPosX, deleteGameCharButtonPosY, menuWidth, buttonHeight, "Delete Char", null, null) {
             @Override
             public void onClick() {
-                actionDelete();
+                popupDelete();
             }
         };
 
@@ -129,7 +129,7 @@ public class ManageGameCharacterScene implements Scene {
         putInStock = new Button(menuPosX, putInStockPosY, menuWidth, buttonHeight, "Stock", null, null) {
             @Override
             public void onClick() {
-                actionStock();
+                popupStock();
             }
         };
 
@@ -237,6 +237,22 @@ public class ManageGameCharacterScene implements Scene {
 
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
+    }
+
+    private void popupDelete() {
+        String text = new StringBuilder().append("Are you sure you want to delete ").append(clientContext.getSelectedGameCharacter().getName()).append(" ?").toString();
+        List<String> options = new ArrayList<String>();
+        options.add("DELETE");
+        options.add("CANCEL");
+        popUp = new PopUp(options, text);
+    }
+
+    private void popupStock() {
+        String text = new StringBuilder().append("Are you sure you want to put ").append(clientContext.getSelectedGameCharacter().getName()).append(" in the stock ?").toString();
+        List<String> options = new ArrayList<String>();
+        options.add("STOCK");
+        options.add("CANCEL");
+        popUp = new PopUp(options, text);
     }
 
     private void actionManageJob() {
@@ -430,6 +446,12 @@ public class ManageGameCharacterScene implements Scene {
                         } else if (onClick.equals("EQUIP")) {
                             actionEquipItem();
                             popUp = null;
+                        } else if (onClick.equals("DELETE")) {
+                            actionDelete();
+                            popUp = null;
+                        } else if (onClick.equals("STOCK")) {
+                            actionStock();
+                            popUp = null;
                         }
                     }
                 } else if (frame.isClicked()) {
@@ -483,6 +505,8 @@ public class ManageGameCharacterScene implements Scene {
                     MessagePlayerUpdate response = (MessagePlayerUpdate) message;
                     clientContext.setPlayer(response.getPlayer());
                     if (null == clientContext.getSelectedGameCharacter()) {
+                        client.setCurrentScene(lobbyScene);
+                    } else if (clientContext.getPlayer().getStock().contains(clientContext.getSelectedGameCharacter())) {
                         client.setCurrentScene(lobbyScene);
                     } else {
                         init();

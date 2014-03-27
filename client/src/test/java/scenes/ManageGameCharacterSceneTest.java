@@ -12,6 +12,7 @@ import com.ghostofpq.kulkan.entities.inventory.ItemFactory;
 import com.ghostofpq.kulkan.entities.inventory.item.Item;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -25,8 +26,8 @@ import java.io.File;
 public class ManageGameCharacterSceneTest {
 
     @Test
-    public void test() {
-                     /*
+    @Ignore
+    public void manageGameCharacterSceneTest() {
         System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
         ApplicationContext context = new ClassPathXmlApplicationContext("client-context.xml");
         Client g = ((Client) context.getBean("client"));
@@ -61,7 +62,7 @@ public class ManageGameCharacterSceneTest {
             g.run();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }           */
+        }
     }
 
 }
