@@ -85,6 +85,10 @@ public class BattleScene implements Scene {
     private int x;
     private int y;
     private boolean frameClicked;
+
+    private long lastTimeMouseWasClicked = System.currentTimeMillis();
+    private long deltaMillis = 100;
+
     @Autowired
     private Client client;
     @Autowired
@@ -153,6 +157,10 @@ public class BattleScene implements Scene {
 
     @Override
     public void update(long deltaTime) {
+        for (DrawableObject drawableObject : drawableObjectList) {
+            drawableObject.update(deltaTime);
+        }
+
         boolean busy = false;
         for (DrawableObject drawableObject : drawableObjectList) {
             if (drawableObject.isMoving()) {
@@ -168,9 +176,7 @@ public class BattleScene implements Scene {
             sortToDrawList();
         }
         setEngineIsBusy(busy);
-        for (DrawableObject drawableObject : drawableObjectList) {
-            drawableObject.update(deltaTime);
-        }
+
         setHighlights();
     }
 
@@ -320,17 +326,6 @@ public class BattleScene implements Scene {
         }
     }
 
-    private void cleanActionButtons() {
-        drawableObjectList.remove(actionButtonMove);
-        drawableObjectList.remove(actionButtonAttack);
-        drawableObjectList.remove(actionButtonCapacity);
-        drawableObjectList.remove(actionButtonEndTurn);
-        actionButtonMove = null;
-        actionButtonAttack = null;
-        actionButtonCapacity = null;
-        actionButtonEndTurn = null;
-        sortToDrawList();
-    }
 
     private void manageInputValidate() {
         switch (currentState) {
@@ -456,35 +451,45 @@ public class BattleScene implements Scene {
                 }
             }
             while (Mouse.next()) {
-                if (Mouse.isButtonDown(0)) {
-                    if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
-                        if (actionButtonMove.isHovered() || actionButtonAttack.isHovered() || actionButtonCapacity.isHovered() || actionButtonEndTurn.isHovered()) {
+                if (okClick()) {
+                    if (Mouse.isButtonDown(0)) {
+                        if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
+                            if (actionButtonMove.isHovered() || actionButtonAttack.isHovered() || actionButtonCapacity.isHovered() || actionButtonEndTurn.isHovered()) {
+                                manageInputValidate();
+                            }
+                        } else if (null != mousePosition) {
                             manageInputValidate();
                         }
-                    } else if (null != mousePosition) {
-                        manageInputValidate();
-                    }
-
-                    if (currentState.equals(BattleSceneState.GAME_OVER)) {
-                        if (gameOverButton.isClicked()) {
-                            gameOverButton.onClick();
+                        if (currentState.equals(BattleSceneState.GAME_OVER)) {
+                            if (gameOverButton.isClicked()) {
+                                gameOverButton.onClick();
+                            }
                         }
-                    }
-                    if (frame.isClicked()) {
-                        if (x == -1 && y == -1) {
-                            x = Mouse.getX();
-                            y = (Display.getHeight() - Mouse.getY());
-                            frameClicked = true;
+                        if (frame.isClicked()) {
+                            if (x == -1 && y == -1) {
+                                x = Mouse.getX();
+                                y = (Display.getHeight() - Mouse.getY());
+                                frameClicked = true;
+                            }
                         }
+                    } else if (!Mouse.isButtonDown(0)) {
+                        frameClicked = false;
+                        x = -1;
+                        y = -1;
                     }
-                } else if (!Mouse.isButtonDown(0)) {
-                    frameClicked = false;
-                    x = -1;
-                    y = -1;
-                }
-                if (Mouse.isButtonDown(1)) {
-                    if (null != mousePosition) {
-                        GraphicsManager.getInstance().requestCenterPosition(mousePosition);
+                    if (Mouse.isButtonDown(1)) {
+                        if (currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE || currentState == BattleSceneState.CAPACITY_PLACE || currentState == BattleSceneState.CAPACITY_USE || currentState == BattleSceneState.END_TURN) {
+                            cleanHighlightPossiblePositionsToAttack();
+                            cleanHighlightPossiblePositionsToMove();
+                            cleanHighlightCapacityAreaOfEffect();
+                            cleanHighlightPossiblePositionsToUseCapacity();
+                            prepareActionButtons();
+                            currentState = BattleSceneState.ACTION;
+                        } else {
+                            if (null != mousePosition) {
+                                GraphicsManager.getInstance().requestCenterPosition(mousePosition);
+                            }
+                        }
                     }
                 }
                 if (currentState == BattleSceneState.END_TURN || currentState == BattleSceneState.DEPLOY_HEADING_ANGLE ||
@@ -562,10 +567,33 @@ public class BattleScene implements Scene {
         menuSelectAction.reinitMenu();
         selectedMove = null;
 
-        actionButtonMove = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.MOVE);
-        actionButtonAttack = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.ATTACK);
-        actionButtonCapacity = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.CAPACITY);
-        actionButtonEndTurn = new ActionButton(messageCharacterToPlay.getCharacterToPlay().getPosition(), ActionButtonType.END_TURN);
+        if (currentGameCharacter.hasMoved()) {
+            menuSelectAction.setHasMoved();
+        }
+        if (currentGameCharacter.hasActed()) {
+            menuSelectAction.setHasActed();
+        }
+        prepareActionButtons();
+        currentState = BattleSceneState.ACTION;
+    }
+
+    private void cleanActionButtons() {
+        drawableObjectList.remove(actionButtonMove);
+        drawableObjectList.remove(actionButtonAttack);
+        drawableObjectList.remove(actionButtonCapacity);
+        drawableObjectList.remove(actionButtonEndTurn);
+        actionButtonMove = null;
+        actionButtonAttack = null;
+        actionButtonCapacity = null;
+        actionButtonEndTurn = null;
+        sortToDrawList();
+    }
+
+    private void prepareActionButtons() {
+        actionButtonMove = new ActionButton(currentGameCharacterRepresentation.getPosition(), ActionButtonType.MOVE);
+        actionButtonAttack = new ActionButton(currentGameCharacterRepresentation.getPosition(), ActionButtonType.ATTACK);
+        actionButtonCapacity = new ActionButton(currentGameCharacterRepresentation.getPosition(), ActionButtonType.CAPACITY);
+        actionButtonEndTurn = new ActionButton(currentGameCharacterRepresentation.getPosition(), ActionButtonType.END_TURN);
 
         drawableObjectList.add(actionButtonMove);
         drawableObjectList.add(actionButtonAttack);
@@ -574,17 +602,13 @@ public class BattleScene implements Scene {
 
         sortToDrawList();
 
-        if (messageCharacterToPlay.getCharacterToPlay().hasMoved()) {
-            menuSelectAction.setHasMoved();
+        if (currentGameCharacter.hasMoved()) {
             actionButtonMove.setUsed(true);
         }
-        if (messageCharacterToPlay.getCharacterToPlay().hasActed()) {
-            menuSelectAction.setHasActed();
+        if (currentGameCharacter.hasActed()) {
             actionButtonAttack.setUsed(true);
             actionButtonCapacity.setUsed(true);
         }
-
-        currentState = BattleSceneState.ACTION;
     }
 
     private void manageMessageCharacterPositionToMoveResponse(Message message) {
@@ -1295,6 +1319,17 @@ public class BattleScene implements Scene {
             }
         }
         return cursor;
+    }
+
+    private boolean okClick() {
+        boolean okClick;
+        if (System.currentTimeMillis() - lastTimeMouseWasClicked < deltaMillis) {
+            okClick = false;
+        } else {
+            lastTimeMouseWasClicked = System.currentTimeMillis();
+            okClick = true;
+        }
+        return okClick;
     }
 
     public boolean engineIsBusy() {

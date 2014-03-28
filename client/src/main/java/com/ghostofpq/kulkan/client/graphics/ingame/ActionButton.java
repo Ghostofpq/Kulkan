@@ -68,6 +68,7 @@ public class ActionButton extends DrawableObject {
         }
         this.hovered = false;
         this.used = false;
+        calculateCorners();
     }
 
     private void calculateCorners() {
@@ -146,8 +147,6 @@ public class ActionButton extends DrawableObject {
 
     @Override
     public void draw() {
-        calculateCorners();
-
         GL11.glColor4f(1f, 1f, 1f, 1f);
         Texture texture;
 
@@ -199,7 +198,7 @@ public class ActionButton extends DrawableObject {
 
     @Override
     public void update(long deltaTime) {
-
+        calculateCorners();
     }
 
     @Override
@@ -209,23 +208,7 @@ public class ActionButton extends DrawableObject {
 
     @Override
     public PositionAbsolute getPositionToCompare(PointOfView pointOfView) {
-        PositionAbsolute result = null;
-
-        switch (pointOfView) {
-            case NORTH:
-                result = getPositionAbsolute();
-                break;
-            case SOUTH:
-                result = getPositionAbsolute();
-                break;
-            case EAST:
-                result = getPositionAbsolute();
-                break;
-            case WEST:
-                result = getPositionAbsolute();
-                break;
-        }
-        return result;
+        return positionAbsolute.plusNew(0.5f, 0.5f, 0.5f);
     }
 
     public ActionButtonType getActionButtonType() {

@@ -537,6 +537,7 @@ public class GameCharacterRepresentation extends DrawableObject {
         for (PositionAbsolute positionAbs : positionsToGo) {
             GameCharacterRepresentation.log.debug("{}", positionAbs.toString());
         }
+        setMoving(true);
     }
 
     public PointOfView getHeadingAngle() {

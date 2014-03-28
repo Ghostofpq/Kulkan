@@ -340,6 +340,7 @@ public class Game implements Runnable {
 
                                     log.debug("{} takes {} damages from {}", characterAttacked.getName(), damages, characterWhoAttacks.getName());
                                     characterAttacked.addHealthPoint(-damages);
+                                    log.debug("{} : {}/{}", characterAttacked.getName(), characterAttacked.getCurrentHealthPoint(), characterAttacked.getMaxHealthPoint());
                                     hit = true;
                                 } else {
                                     log.debug("missed");
