@@ -109,12 +109,19 @@ public class Game implements Runnable {
         }
     }
 
-    private void sendDeployMessage() {
+    private void sendDeployMessageToAll() {
         for (Player player : playerList) {
-            List<GameCharacter> characterList = player.getTeam();
-            MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
-            sendMessageToPlayer(player, messageDeploymentStart);
+            sendDeployMessageTo(player);
         }
+    }
+
+    private void sendDeployMessageTo(Player player) {
+        for (GameCharacter gameCharacter : player.getTeam()) {
+            gameCharacter.setPosition(null);
+        }
+        List<GameCharacter> characterList = player.getTeam();
+        MessageDeploymentStart messageDeploymentStart = new MessageDeploymentStart(characterList, playerList.indexOf(player));
+        sendMessageToPlayer(player, messageDeploymentStart);
     }
 
     private void sendToAll(Message message) {
@@ -224,15 +231,22 @@ public class Game implements Runnable {
         for (GameCharacter gameCharacter : messageDeploymentFinishedForPlayer.getCharactersList()) {
             log.debug("PLACING -> {} : {}", gameCharacter.getName(), gameCharacter.getPosition().toString());
             Player player = playerList.get(messageDeploymentFinishedForPlayer.getPlayerNumber());
-            player.getGameCharacter(gameCharacter).setPosition(gameCharacter.getPosition());
-            player.getGameCharacter(gameCharacter).setHeadingAngle(gameCharacter.getHeadingAngle());
+            Position position = gameCharacter.getPosition();
+            if (!battlefield.positionIsOccupied(position) && getGameCharacterAtPosition(position.plusYNew(-1)) == null) {
+                player.getGameCharacter(gameCharacter).setPosition(position);
+                player.getGameCharacter(gameCharacter).setHeadingAngle(gameCharacter.getHeadingAngle());
+            } else {
+                log.error("ERROR on deployment of {}:{} on {}", player.getPseudo(), gameCharacter.getName(), gameCharacter.getPosition());
+                sendDeployMessageTo(player);
+                break;
+            }
         }
-
         if (deployIsComplete()) {
             log.debug(" [S] DEPLOYMENT IS COMPLETE");
             completeDeployment();
             deploymentIsOver = true;
         }
+
     }
 
     private void manageMessageCharRequestToMove(ClientMessage message) {
@@ -584,10 +598,12 @@ public class Game implements Runnable {
         GameCharacter result = null;
         for (Player player : playerList) {
             for (GameCharacter character : player.getTeam()) {
-                Position footPositionOfChar = character.getPosition().plusYNew(-1);
-                if (footPositionOfChar.equals(position)) {
-                    result = character;
-                    break;
+                if (character.getPosition() != null) {
+                    Position footPositionOfChar = character.getPosition().plusYNew(-1);
+                    if (footPositionOfChar.equals(position)) {
+                        result = character;
+                        break;
+                    }
                 }
             }
         }
@@ -755,7 +771,7 @@ public class Game implements Runnable {
         log.debug("keyTokenPlayerNumberMap : {}", keyTokenPlayerNumberMap);
         log.debug("playerChannelMap : {}", playerChannelMap);
         log.debug("playerList : {}", playerList);
-        sendDeployMessage();
+        sendDeployMessageToAll();
         Player winnerPlayer = getWinnerPlayer();
         while (null == winnerPlayer) {
             if (deploymentIsOver && null == currentCharToPlay) {

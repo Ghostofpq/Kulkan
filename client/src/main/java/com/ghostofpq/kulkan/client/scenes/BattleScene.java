@@ -136,8 +136,8 @@ public class BattleScene implements Scene {
         GraphicsManager.getInstance().requestCenterPosition(new Position(4, 0, 4));
 
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
-
     }
+
 
     public void setBattlefield(Battlefield battlefield) {
         this.battlefield = battlefield;
@@ -326,7 +326,6 @@ public class BattleScene implements Scene {
         }
     }
 
-
     private void manageInputValidate() {
         switch (currentState) {
             case DEPLOY_POSITION:
@@ -512,6 +511,15 @@ public class BattleScene implements Scene {
 
     private void manageMessageStartDeployment(Message message) {
         log.debug(" [-] START_DEPLOYMENT");
+        characterRepresentationList = new ArrayList<GameCharacterRepresentation>();
+        Iterator<DrawableObject> iterator = drawableObjectList.iterator();
+        while (iterator.hasNext()) {
+            DrawableObject drawableObject = iterator.next();
+            if (drawableObject instanceof GameCharacterRepresentation) {
+                iterator.remove();
+            }
+        }
+
         MessageDeploymentStart messageDeploymentStart = (MessageDeploymentStart) message;
         characterListToDeploy = messageDeploymentStart.getCharacterList();
         playerNumber = messageDeploymentStart.getPlayerNumber();

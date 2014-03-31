@@ -186,6 +186,10 @@ public class Battlefield implements Serializable {
         return path;
     }
 
+    public boolean positionIsOccupied(Position position) {
+        return getBattlefieldElementMap().containsKey(position);
+    }
+
     public Tree<Position> getPositionTree(Position position, int dist, int heightLimit, int jumpLimit, boolean straight, PointOfView pointOfView) {
         Tree<Position> positionTree = new Tree<Position>(position);
         getPossiblePositions(position, positionTree.getRoot(), dist, heightLimit, jumpLimit, straight, pointOfView);
