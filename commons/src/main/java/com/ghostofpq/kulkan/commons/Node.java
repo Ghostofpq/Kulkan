@@ -132,7 +132,7 @@ public class Node<T> implements Comparable<Node<T>> {
     /**
      * Get all the element contained in the subtree with this Node as the root Node.
      *
-     * @return all the element contained as a List of element.
+     * @return all the element contained as a Set of element.
      */
     public Set<T> getAllElements() {
         Set<T> result = new LinkedHashSet<T>();

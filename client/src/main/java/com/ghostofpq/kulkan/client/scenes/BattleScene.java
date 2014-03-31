@@ -326,67 +326,22 @@ public class BattleScene implements Scene {
         }
     }
 
-    private void manageInputValidate() {
-        switch (currentState) {
-            case DEPLOY_POSITION:
-                deployCharacterPosition();
-                break;
-            case DEPLOY_HEADING_ANGLE:
-                deployCharacterHeadingAngle();
-                break;
-            case ACTION:
-                if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
-                    if (actionButtonMove.isHovered() && !actionButtonMove.isUsed()) {
-                        sendPositionToMoveRequest();
-                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
-                        cleanActionButtons();
-                    } else if (actionButtonAttack.isHovered() && !actionButtonAttack.isUsed()) {
-                        sendPositionToAttackRequest();
-                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
-                        cleanActionButtons();
-                    } else if (actionButtonCapacity.isHovered() && !actionButtonCapacity.isUsed()) {
-                        menuSelectCapacity = new MenuSelectCapacity(300, 0, 200, 100, 2, currentGameCharacter.getJob(currentGameCharacter.getCurrentJob()).getUnlockedMoves(), currentGameCharacter.getCurrentManaPoint());
-                        currentState = BattleSceneState.CAPACITY_SELECT;
-                        cleanActionButtons();
-                    } else if (actionButtonEndTurn.isHovered()) {
-                        currentState = BattleSceneState.END_TURN;
-                        cleanActionButtons();
-                    }
-                }
-                break;
-            case MOVE:
-                sendActionMove();
-                cleanHighlightPossiblePositionsToMove();
-                possiblePositionsToMove = new ArrayList<Position>();
-                currentState = BattleSceneState.PENDING;
-                break;
-            case ATTACK:
-                sendActionAttack();
-                cleanHighlightPossiblePositionsToAttack();
-                possiblePositionsToAttack = new ArrayList<Position>();
-                currentState = BattleSceneState.PENDING;
-                break;
-            case CAPACITY_SELECT:
-                selectedMove = menuSelectCapacity.getSelectedOption();
-                sendPositionToUseCapacityRequest();
-                menuSelectCapacity = null;
-                currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY;
-                break;
-            case CAPACITY_PLACE:
-                sendCapacityAOERequest();
-                cleanHighlightPossiblePositionsToUseCapacity();
-                currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE;
-                break;
-            case CAPACITY_USE:
-                sendActionCapacity();
-                cleanHighlightCapacityAreaOfEffect();
-                currentState = BattleSceneState.PENDING;
-                break;
-            case END_TURN:
-                sendEndTurn();
-                currentState = BattleSceneState.PENDING;
-                currentGameCharacter = null;
-                break;
+    private void manageInputAction() {
+        if (actionButtonMove.isHovered() && !actionButtonMove.isUsed()) {
+            sendPositionToMoveRequest();
+            currentState = BattleSceneState.WAITING_SERVER_RESPONSE_MOVE;
+            cleanActionButtons();
+        } else if (actionButtonAttack.isHovered() && !actionButtonAttack.isUsed()) {
+            sendPositionToAttackRequest();
+            currentState = BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK;
+            cleanActionButtons();
+        } else if (actionButtonCapacity.isHovered() && !actionButtonCapacity.isUsed()) {
+            menuSelectCapacity = new MenuSelectCapacity(300, 0, 200, 100, 2, currentGameCharacter.getJob(currentGameCharacter.getCurrentJob()).getUnlockedMoves(), currentGameCharacter.getCurrentManaPoint());
+            currentState = BattleSceneState.CAPACITY_SELECT;
+            cleanActionButtons();
+        } else if (actionButtonEndTurn.isHovered()) {
+            currentState = BattleSceneState.END_TURN;
+            cleanActionButtons();
         }
     }
 
@@ -394,7 +349,7 @@ public class BattleScene implements Scene {
         switch (currentState) {
             case CAPACITY_USE:
                 currentState = BattleSceneState.ACTION;
-                cleanHighlightCapacityAreaOfEffect();
+                capacityAreaOfEffect = new ArrayList<Position>();
                 battlefieldRepresentation.get(mousePosition).setHighlight(HighlightColor.NONE);
                 mousePosition = currentGameCharacter.getPosition().plusYNew(-1);
                 battlefieldRepresentation.get(mousePosition).setHighlight(HighlightColor.BLUE);
@@ -436,9 +391,6 @@ public class BattleScene implements Scene {
                             case ZOOM_OUT:
                                 GraphicsManager.getInstance().zoomOut();
                                 break;
-                            case VALIDATE:
-                                manageInputValidate();
-                                break;
                             case CANCEL:
                                 manageInputCancel();
                                 break;
@@ -454,10 +406,60 @@ public class BattleScene implements Scene {
                     if (Mouse.isButtonDown(0)) {
                         if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
                             if (actionButtonMove.isHovered() || actionButtonAttack.isHovered() || actionButtonCapacity.isHovered() || actionButtonEndTurn.isHovered()) {
-                                manageInputValidate();
+                                manageInputAction();
                             }
-                        } else if (null != mousePosition) {
-                            manageInputValidate();
+                        } else {
+                            switch (currentState) {
+                                case DEPLOY_POSITION:
+                                    if (null != mousePosition) {
+                                        deployCharacterPosition();
+                                    }
+                                    break;
+                                case DEPLOY_HEADING_ANGLE:
+                                    deployCharacterHeadingAngle();
+                                    break;
+                                case MOVE:
+                                    if (null != mousePosition) {
+                                        possiblePositionsToMove = new ArrayList<Position>();
+                                        sendActionMove();
+                                        possiblePositionsToMove = new ArrayList<Position>();
+                                        currentState = BattleSceneState.PENDING;
+                                    }
+                                    break;
+                                case ATTACK:
+                                    if (null != mousePosition) {
+                                        possiblePositionsToAttack = new ArrayList<Position>();
+                                        sendActionAttack();
+                                        possiblePositionsToAttack = new ArrayList<Position>();
+                                        currentState = BattleSceneState.PENDING;
+                                        break;
+                                    }
+                                case CAPACITY_SELECT:
+                                    selectedMove = menuSelectCapacity.getSelectedOption();
+                                    sendPositionToUseCapacityRequest();
+                                    menuSelectCapacity = null;
+                                    currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY;
+                                    break;
+                                case CAPACITY_PLACE:
+                                    if (null != mousePosition) {
+                                        possiblePositionsToUseCapacity = new ArrayList<Position>();
+                                        sendCapacityAOERequest();
+                                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE;
+                                        break;
+                                    }
+                                case CAPACITY_USE:
+                                    if (null != mousePosition) {
+                                        capacityAreaOfEffect = new ArrayList<Position>();
+                                        sendActionCapacity();
+                                        currentState = BattleSceneState.PENDING;
+                                        break;
+                                    }
+                                case END_TURN:
+                                    sendEndTurn();
+                                    currentState = BattleSceneState.PENDING;
+                                    currentGameCharacter = null;
+                                    break;
+                            }
                         }
                         if (currentState.equals(BattleSceneState.GAME_OVER)) {
                             if (gameOverButton.isClicked()) {
@@ -478,10 +480,10 @@ public class BattleScene implements Scene {
                     }
                     if (Mouse.isButtonDown(1)) {
                         if (currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE || currentState == BattleSceneState.CAPACITY_PLACE || currentState == BattleSceneState.CAPACITY_USE || currentState == BattleSceneState.END_TURN) {
-                            cleanHighlightPossiblePositionsToAttack();
-                            cleanHighlightPossiblePositionsToMove();
-                            cleanHighlightCapacityAreaOfEffect();
-                            cleanHighlightPossiblePositionsToUseCapacity();
+                            possiblePositionsToAttack = new ArrayList<Position>();
+                            possiblePositionsToMove = new ArrayList<Position>();
+                            capacityAreaOfEffect = new ArrayList<Position>();
+                            possiblePositionsToUseCapacity = new ArrayList<Position>();
                             prepareActionButtons();
                             currentState = BattleSceneState.ACTION;
                         } else {
@@ -525,7 +527,6 @@ public class BattleScene implements Scene {
         playerNumber = messageDeploymentStart.getPlayerNumber();
         currentGameCharacter = characterListToDeploy.get(0);
         characterRenderLeft = new CharacterRender(0, 0, 300, 100, 2, currentGameCharacter);
-        highlightDeploymentZone();
         currentState = BattleSceneState.DEPLOY_POSITION;
     }
 
@@ -624,7 +625,6 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_MOVE)) {
             log.debug(" [-] RECEIVED POSITIONS TO MOVE");
             possiblePositionsToMove = messagePositionToMoveResponse.getPossiblePositionsToMove();
-            highlightPossiblePositionsToMove();
             currentState = BattleSceneState.MOVE;
         } else {
             log.error(" [-] RECEIVED POSITIONS TO MOVE");
@@ -647,7 +647,6 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_ATTACK)) {
             log.debug(" [-] RECEIVED POSITIONS TO ATTACK");
             possiblePositionsToAttack = messagePositionToAttackResponse.getPossiblePositionsToAttack();
-            highlightPossiblePositionsToAttack();
             currentState = BattleSceneState.ATTACK;
         } else {
             log.error(" [-] RECEIVED POSITIONS TO ATTACK");
@@ -693,7 +692,6 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY)) {
             log.debug(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
             possiblePositionsToUseCapacity = messageCharacterPositionToUseCapacityResponse.getPossiblePositionsToUseCapacity();
-            highlightPossiblePositionsToUseCapacity();
             currentState = BattleSceneState.CAPACITY_PLACE;
         } else {
             log.error(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
@@ -705,7 +703,6 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE)) {
             log.debug(" [-] RECEIVED CAPACITY AOE");
             capacityAreaOfEffect = messageCapacityAOEResponse.getAreaOfEffect();
-            highlightCapacityAreaOfEffect();
             currentState = BattleSceneState.CAPACITY_USE;
         } else {
             log.error(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
@@ -1021,8 +1018,6 @@ public class BattleScene implements Scene {
         if (characterListToDeploy.isEmpty()) {
             characterRenderLeft = null;
             sendDeploymentResult();
-            cleanHighlightDeploymentZone();
-
             currentGameCharacter = null;
 
             currentState = BattleSceneState.PENDING;
@@ -1086,93 +1081,6 @@ public class BattleScene implements Scene {
         log.debug(" [-] DEPLOYMENT FINISHED FOR {}", messageDeploymentFinishedForPlayer.getKeyToken());
         postMessage(messageDeploymentFinishedForPlayer);
 
-    }
-
-    private void highlightDeploymentZone() {
-        List<Position> deploymentZonePlayer = battlefield.getDeploymentZones().get(playerNumber);
-        for (Position deploymentPosition : deploymentZonePlayer) {
-            battlefieldRepresentation.get(deploymentPosition).setHighlight(HighlightColor.GREEN);
-        }
-    }
-
-    private void cleanHighlightDeploymentZone() {
-        List<Position> deploymentZonePlayer = battlefield.getDeploymentZones().get(playerNumber);
-        for (Position deploymentPosition : deploymentZonePlayer) {
-            if (battlefieldRepresentation.get(deploymentPosition).getHighlight().equals(HighlightColor.GREEN)) {
-                battlefieldRepresentation.get(deploymentPosition).setHighlight(HighlightColor.NONE);
-            }
-        }
-    }
-
-    private void highlightPossiblePositionsToMove() {
-        for (Position possiblePositionToMove : possiblePositionsToMove) {
-            if (battlefieldRepresentation.containsKey(possiblePositionToMove)) {
-                log.debug("highlight green {}", possiblePositionToMove.toString());
-                battlefieldRepresentation.get(possiblePositionToMove).setHighlight(HighlightColor.GREEN);
-            } else {
-                log.error("{} can't be highlighted", possiblePositionToMove.toString());
-            }
-        }
-    }
-
-    private void cleanHighlightPossiblePositionsToMove() {
-        for (Position possiblePositionToMove : possiblePositionsToMove) {
-            if (battlefieldRepresentation.get(possiblePositionToMove).getHighlight().equals(HighlightColor.GREEN)) {
-                battlefieldRepresentation.get(possiblePositionToMove).setHighlight(HighlightColor.NONE);
-            }
-        }
-    }
-
-    private void highlightPossiblePositionsToAttack() {
-        for (Position possiblePositionToAttack : possiblePositionsToAttack) {
-            battlefieldRepresentation.get(possiblePositionToAttack).setHighlight(HighlightColor.RED);
-        }
-    }
-
-    private void cleanHighlightPossiblePositionsToAttack() {
-        for (Position possiblePositionToAttack : possiblePositionsToAttack) {
-            if (battlefieldRepresentation.get(possiblePositionToAttack).getHighlight().equals(HighlightColor.RED)) {
-                battlefieldRepresentation.get(possiblePositionToAttack).setHighlight(HighlightColor.NONE);
-            }
-        }
-    }
-
-    private void highlightPossiblePositionsToUseCapacity() {
-        for (Position possiblePositionToUseCapacity : possiblePositionsToUseCapacity) {
-            if (battlefieldRepresentation.containsKey(possiblePositionToUseCapacity)) {
-                log.debug("highlight red {}", possiblePositionToUseCapacity.toString());
-                battlefieldRepresentation.get(possiblePositionToUseCapacity).setHighlight(HighlightColor.RED);
-            } else {
-                log.error("{} can't be highlighted", possiblePositionToUseCapacity.toString());
-            }
-        }
-    }
-
-    private void cleanHighlightPossiblePositionsToUseCapacity() {
-        for (Position possiblePositionToUseCapacity : possiblePositionsToUseCapacity) {
-            if (battlefieldRepresentation.get(possiblePositionToUseCapacity).getHighlight().equals(HighlightColor.RED)) {
-                battlefieldRepresentation.get(possiblePositionToUseCapacity).setHighlight(HighlightColor.NONE);
-            }
-        }
-    }
-
-    private void highlightCapacityAreaOfEffect() {
-        for (Position position : capacityAreaOfEffect) {
-            if (battlefieldRepresentation.containsKey(position)) {
-                log.debug("highlight green {}", position.toString());
-                battlefieldRepresentation.get(position).setHighlight(HighlightColor.GREEN);
-            } else {
-                log.error("{} can't be highlighted", position.toString());
-            }
-        }
-    }
-
-    private void cleanHighlightCapacityAreaOfEffect() {
-        for (Position position : capacityAreaOfEffect) {
-            if (battlefieldRepresentation.get(position).getHighlight().equals(HighlightColor.GREEN)) {
-                battlefieldRepresentation.get(position).setHighlight(HighlightColor.NONE);
-            }
-        }
     }
 
     private int comparePositionForNorthPointOfView(PositionAbsolute thisPosition, PositionAbsolute otherPosition) {
@@ -1272,10 +1180,12 @@ public class BattleScene implements Scene {
     private void updateTarget() {
         targetGameCharacterRepresentation = null;
         characterRenderRight = null;
-        for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
-            if (mousePosition.equals(gameCharacterRepresentation.getFootPosition())) {
-                targetGameCharacterRepresentation = gameCharacterRepresentation;
-                characterRenderRight = new CharacterRender(500, 0, 300, 100, 2, targetGameCharacterRepresentation.getCharacter());
+        if (mousePosition != null) {
+            for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
+                if (mousePosition.equals(gameCharacterRepresentation.getFootPosition())) {
+                    targetGameCharacterRepresentation = gameCharacterRepresentation;
+                    characterRenderRight = new CharacterRender(500, 0, 300, 100, 2, targetGameCharacterRepresentation.getCharacter());
+                }
             }
         }
     }
@@ -1302,6 +1212,11 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.CAPACITY_PLACE)) {
             for (Position position : possiblePositionsToUseCapacity) {
                 battlefieldRepresentation.get(position).setHighlight(HighlightColor.RED);
+            }
+        }
+        if (currentState.equals(BattleSceneState.CAPACITY_USE)) {
+            for (Position position : capacityAreaOfEffect) {
+                battlefieldRepresentation.get(position).setHighlight(HighlightColor.GREEN);
             }
         }
         if (mousePosition != null) {
