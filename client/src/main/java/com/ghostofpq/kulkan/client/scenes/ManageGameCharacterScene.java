@@ -26,45 +26,28 @@ import java.util.List;
 @Slf4j
 public class ManageGameCharacterScene implements Scene {
 
-    private int widthSeparator = 50;
-    private int widthStep;
-    private int heightSeparator = 50;
-    private int heightStep;
-
-    // MENU
-    private HUDTexturedElement menu;
-    private Button manageJobButton;
-    private Button manageEquipmentButton;
-    private Button quitButton;
-    private Button deleteGameCharButton;
-    private Button putInStock;
-
-    // OVERLAYS
-    private HUDTexturedElement nameHolder;
-    private TextZone name;
-    private TextZone level;
-    private HUDTexturedElement xpBackground;
-    private HUDTexturedElement xpBar;
-    private TextZone xp;
-
     private Mode mode = Mode.JOB;
 
     private JobManager jobManager;
-    private TextZone jobType;
-    private KeyValueRender jobPoints;
+    private EquipmentManager equipmentManager;
+
+    private TextArea capacityDescription;
     private KeyValueRender capacityPrice;
     private Capacity selectedCapacity;
-    private TextArea capacityDescription;
 
-    private CharacteristicsPanel characteristicsPanel;
-    private EquipmentManager equipmentManager;
     private EquipItemPanel equipItemPanel;
     private Item selectedItem;
     private ItemType selectedItemType;
+
+    private List<HUDElement> hudElements;
+    private List<HUDElement> hudElementJobMode;
+    private List<HUDElement> hudElementStuffMode;
     // BACKGROUND
     private Background background;
+
     // POPUP
     private PopUp popUp;
+
     // FRAME
     private Frame frame;
     private int x;
@@ -82,6 +65,24 @@ public class ManageGameCharacterScene implements Scene {
 
     @Override
     public void init() {
+        // MENU
+        HUDTexturedElement menu;
+        Button manageJobButton;
+        Button manageEquipmentButton;
+        Button quitButton;
+        Button deleteGameCharButton;
+        Button putInStock;
+        // OVERLAYS
+        HUDTexturedElement nameHolder;
+        TextZone name;
+        TextZone level;
+        HUDTexturedElement xpBackground;
+        HUDTexturedElement xpBar;
+        TextZone xp;
+
+        CharacteristicsPanel characteristicsPanel;
+        TextZone jobType;
+        KeyValueRender jobPoints;
 
         GameCharacter gameCharacter = clientContext.getSelectedGameCharacter();
         background = new Background(TextureKey.BACKGROUND_BASIC);
@@ -160,9 +161,8 @@ public class ManageGameCharacterScene implements Scene {
 
         int capacityDescriptionPosX = menuPosX + menuWidth;
         int capacityDescriptionPosY = jobManagerPosY + jobManagerHeight;
-        int capacityDescriptionWidth = jobManagerWidth;
         int capacityDescriptionHeight = clientContext.getCurrentResolution().getHeight() / 4;
-        capacityDescription = new TextArea(capacityDescriptionPosX, capacityDescriptionPosY, capacityDescriptionWidth, capacityDescriptionHeight, "arial_16");
+        capacityDescription = new TextArea(capacityDescriptionPosX, capacityDescriptionPosY, jobManagerWidth, capacityDescriptionHeight, "arial_16");
 
 
         int capacityPricePosX = jobTypePosX + jobTypeWidth + jobPointsWidth;
@@ -230,9 +230,32 @@ public class ManageGameCharacterScene implements Scene {
         int characteristicsPanelHeight = clientContext.getCurrentResolution().getHeight() - (characteristicsPanelPosY + clientContext.getCurrentResolution().getHeight() / 32);
         characteristicsPanel = new CharacteristicsPanel(characteristicsPanelPosX, characteristicsPanelPosY, characteristicsPanelWidth, characteristicsPanelHeight, gameCharacter.getAggregatedCharacteristics());
 
-
         frame = new Frame(0, 0, clientContext.getCurrentResolution().getWidth(), clientContext.getCurrentResolution().getHeight(), clientContext.getCurrentResolution().getWidth() / 64, clientContext.getCurrentResolution().getWidth() / 64, TextureKey.COMMON_EXT_FRAME);
 
+        hudElements = new ArrayList<HUDElement>();
+        hudElements.add(menu);
+        hudElements.add(manageJobButton);
+        hudElements.add(manageEquipmentButton);
+        hudElements.add(quitButton);
+        hudElements.add(deleteGameCharButton);
+        hudElements.add(putInStock);
+
+        hudElements.add(nameHolder);
+        hudElements.add(name);
+        hudElements.add(level);
+        hudElements.add(xpBackground);
+        hudElements.add(xpBar);
+        hudElements.add(xp);
+        hudElements.add(characteristicsPanel);
+
+        hudElementJobMode = new ArrayList<HUDElement>();
+        hudElementJobMode.add(jobManager);
+        hudElementJobMode.add(jobType);
+        hudElementJobMode.add(jobPoints);
+
+        hudElementStuffMode = new ArrayList<HUDElement>();
+        hudElementStuffMode.add(equipmentManager);
+        hudElementStuffMode.add(equipItemPanel);
     }
 
     private void popupDelete() {
@@ -306,33 +329,21 @@ public class ManageGameCharacterScene implements Scene {
     public void render() {
         GraphicsManager.getInstance().make2D();
         background.draw();
-        menu.draw();
-        nameHolder.draw();
-        name.draw();
-        level.draw();
-        xpBackground.draw();
-        xpBar.draw();
-        xp.draw();
-
-        characteristicsPanel.draw();
-
-        manageJobButton.draw();
-        manageEquipmentButton.draw();
-        deleteGameCharButton.draw();
-        quitButton.draw();
-        putInStock.draw();
-
+        for (HUDElement element : hudElements) {
+            element.draw();
+        }
         if (mode == Mode.JOB) {
-            jobManager.draw();
-            jobType.draw();
-            jobPoints.draw();
+            for (HUDElement element : hudElementJobMode) {
+                element.draw();
+            }
             if (null != selectedCapacity) {
                 capacityDescription.draw();
                 capacityPrice.draw();
             }
         } else if (mode == Mode.STUFF) {
-            equipmentManager.draw();
-            equipItemPanel.draw();
+            for (HUDElement element : hudElementStuffMode) {
+                element.draw();
+            }
         }
         if (null != popUp) {
             popUp.draw();
@@ -345,81 +356,76 @@ public class ManageGameCharacterScene implements Scene {
         while (Mouse.next()) {
             if (Mouse.isButtonDown(0)) {
                 if (null == popUp) {
-                    if (quitButton.isClicked()) {
-                        quitButton.onClick();
-                    } else if (deleteGameCharButton.isClicked()) {
-                        deleteGameCharButton.onClick();
-                    } else if (manageEquipmentButton.isClicked()) {
-                        manageEquipmentButton.onClick();
-                    } else if (manageJobButton.isClicked()) {
-                        manageJobButton.onClick();
-                    } else if (putInStock.isClicked()) {
-                        putInStock.onClick();
-                    } else {
-                        if (mode == Mode.JOB) {
-                            if (jobManager.isClicked()) {
-                                Capacity capacity = jobManager.hoveredCapacity();
-                                if (null != capacity) {
-                                    selectedCapacity = capacity;
-                                    if (!selectedCapacity.isLocked()) {
-                                        String text = new StringBuilder().append("You already know this capacity.").toString();
-                                        List<String> options = new ArrayList<String>();
-                                        options.add("OK");
-                                        popUp = new PopUp(options, text);
-                                    } else if (selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getJobPoints())) {
-                                        String text = new StringBuilder().append("Unlock ").append(selectedCapacity.getName()).append(" for ").append(selectedCapacity.getPrice()).append(" job points?").toString();
-                                        List<String> options = new ArrayList<String>();
-                                        options.add("UNLOCK");
-                                        options.add("CANCEL");
-                                        popUp = new PopUp(options, text);
-                                    } else {
-                                        String text = new StringBuilder().append("You don't have enough Job points.").toString();
-                                        List<String> options = new ArrayList<String>();
-                                        options.add("OK");
-                                        popUp = new PopUp(options, text);
-                                    }
-                                }
+                    for (HUDElement element : hudElements) {
+                        if (element.isClicked()) {
+                            if (element instanceof Button) {
+                                ((Button) element).onClick();
                             }
-                        } else if (mode == Mode.STUFF) {
-                            if (equipmentManager.isClicked()) {
-                                selectedItemType = equipmentManager.getSelectedItemType();
-                                List<Item> itemList = new ArrayList<Item>();
-                                if (null != selectedItemType) {
-                                    switch (selectedItemType) {
-                                        case HELMET:
-                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELMET);
-                                            break;
-                                        case ARMOR:
-                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.ARMOR);
-                                            break;
-                                        case NECKLACE:
-                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.NECKLACE);
-                                            break;
-                                        case RING:
-                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.RING);
-                                            break;
-                                        case WEAPON:
-                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.WEAPON);
-                                            break;
-                                        case HELD_ITEM:
-                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELD_ITEM);
-                                            break;
-                                    }
-                                    equipItemPanel.setItemList(itemList);
-                                } else {
-                                    itemList = clientContext.getPlayer().getInventory().getAll();
-                                    equipItemPanel.setItemList(itemList);
-                                }
-                            }
-                            if (equipItemPanel.isClicked()) {
-                                selectedItem = equipItemPanel.getClickedItem();
-                                if (selectedItem != null) {
-                                    String text = new StringBuilder().append("Equip ").append(selectedItem.getName()).append("?").toString();
+                        }
+                    }
+                    if (mode == Mode.JOB) {
+                        if (jobManager.isClicked()) {
+                            Capacity capacity = jobManager.hoveredCapacity();
+                            if (null != capacity) {
+                                selectedCapacity = capacity;
+                                if (!selectedCapacity.isLocked()) {
+                                    String text = new StringBuilder().append("You already know this capacity.").toString();
                                     List<String> options = new ArrayList<String>();
-                                    options.add("EQUIP");
+                                    options.add("OK");
+                                    popUp = new PopUp(options, text);
+                                } else if (selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getJobPoints())) {
+                                    String text = new StringBuilder().append("Unlock ").append(selectedCapacity.getName()).append(" for ").append(selectedCapacity.getPrice()).append(" job points?").toString();
+                                    List<String> options = new ArrayList<String>();
+                                    options.add("UNLOCK");
                                     options.add("CANCEL");
                                     popUp = new PopUp(options, text);
+                                } else {
+                                    String text = new StringBuilder().append("You don't have enough Job points.").toString();
+                                    List<String> options = new ArrayList<String>();
+                                    options.add("OK");
+                                    popUp = new PopUp(options, text);
                                 }
+                            }
+                        }
+                    } else if (mode == Mode.STUFF) {
+                        if (equipmentManager.isClicked()) {
+                            selectedItemType = equipmentManager.getSelectedItemType();
+                            List<Item> itemList = new ArrayList<Item>();
+                            if (null != selectedItemType) {
+                                switch (selectedItemType) {
+                                    case HELMET:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELMET);
+                                        break;
+                                    case ARMOR:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.ARMOR);
+                                        break;
+                                    case NECKLACE:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.NECKLACE);
+                                        break;
+                                    case RING:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.RING);
+                                        break;
+                                    case WEAPON:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.WEAPON);
+                                        break;
+                                    case HELD_ITEM:
+                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELD_ITEM);
+                                        break;
+                                }
+                                equipItemPanel.setItemList(itemList);
+                            } else {
+                                itemList = clientContext.getPlayer().getInventory().getAll();
+                                equipItemPanel.setItemList(itemList);
+                            }
+                        }
+                        if (equipItemPanel.isClicked()) {
+                            selectedItem = equipItemPanel.getClickedItem();
+                            if (selectedItem != null) {
+                                String text = new StringBuilder().append("Equip ").append(selectedItem.getName()).append("?").toString();
+                                List<String> options = new ArrayList<String>();
+                                options.add("EQUIP");
+                                options.add("CANCEL");
+                                popUp = new PopUp(options, text);
                             }
                         }
                     }
