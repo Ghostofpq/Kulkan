@@ -990,19 +990,32 @@ public class BattleScene implements Scene {
             log.debug(" [-] PLACE CHARACTER AT {}", mousePosition.toString());
             Position position = new Position(mousePosition);
             position.plusY(1);
-            currentGameCharacter.setHeadingAngle(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
-            GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(currentGameCharacter, position, playerNumber);
-            currentGameCharacterRepresentation = gameCharacterRepresentation;
-            characterRepresentationList.add(gameCharacterRepresentation);
-            drawableObjectList.add(gameCharacterRepresentation);
-            sortToDrawList();
-            currentState = BattleSceneState.DEPLOY_HEADING_ANGLE;
+            if (positionIsEmpty(position)) {
+                currentGameCharacter.setHeadingAngle(battlefield.getStartingPointsOfViewForPlayer(playerNumber));
+                GameCharacterRepresentation gameCharacterRepresentation = new GameCharacterRepresentation(currentGameCharacter, position, playerNumber);
+                currentGameCharacterRepresentation = gameCharacterRepresentation;
+                characterRepresentationList.add(gameCharacterRepresentation);
+                drawableObjectList.add(gameCharacterRepresentation);
+                sortToDrawList();
+                currentState = BattleSceneState.DEPLOY_HEADING_ANGLE;
+            } else {
+                log.error("[-] CAN'T PLACE CHARACTER AT {}", mousePosition.toString());
+            }
         }
+    }
+
+    private boolean positionIsEmpty(Position position) {
+        for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
+            if (position.equals(gameCharacterRepresentation.getPosition())) {
+                return false;
+            }
+        }
+        return !battlefield.positionIsOccupied(position);
     }
 
     public void deployCharacterHeadingAngle() {
         characterListToDeploy.remove(currentGameCharacter);
-        battlefield.getDeploymentZones().get(playerNumber).remove(mousePosition);
+        battlefield.getDeploymentZones().get(playerNumber).remove(currentGameCharacter.getPosition().plusYNew(-1));
         currentGameCharacterRepresentation = null;
         updateTarget();
         if (characterListToDeploy.isEmpty()) {

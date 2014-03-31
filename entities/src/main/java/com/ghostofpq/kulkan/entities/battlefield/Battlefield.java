@@ -8,10 +8,7 @@ import com.ghostofpq.kulkan.entities.utils.Range;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class Battlefield implements Serializable {
@@ -232,9 +229,9 @@ public class Battlefield implements Serializable {
         }
     }
 
-    public List<Position> getPossiblePositionsToAttack(Position position, Range range) {
+    public Set<Position> getPossiblePositionsToAttack(Position position, Range range) {
         Tree<Position> positionTree = new Tree<Position>(position);
-        List<Position> result = new ArrayList<Position>();
+        Set<Position> result = new LinkedHashSet<Position>();
 
         switch (range.getRangeType()) {
             case CIRCLE:

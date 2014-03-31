@@ -255,10 +255,11 @@ public class Game implements Runnable {
         if (characterToMove.equals(currentCharToPlay)) {
             log.debug(" [C] {} REQUESTS POSSIBLE POSITIONS TO MOVE", characterToMove.getName());
             Tree<Position> possiblePositionsToMoveTree = getPossiblePositionsToMoveTree(characterToMove);
-            List<Position> possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
+            Set<Position> possiblePositionsToMove = possiblePositionsToMoveTree.getAllElements();
             possiblePositionsToMove.remove(getCharacterPosition(characterToMove).plusYNew(-1));
 
-            MessagePositionToMoveResponse messagePositionToMoveResponse = new MessagePositionToMoveResponse(possiblePositionsToMove);
+            List<Position> possiblePositionsToMoveList = new ArrayList<Position>(possiblePositionsToMove);
+            MessagePositionToMoveResponse messagePositionToMoveResponse = new MessagePositionToMoveResponse(possiblePositionsToMoveList);
             sendMessageToChannel(messagePositionToMoveRequest.getKeyToken(), messagePositionToMoveResponse);
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
@@ -435,9 +436,10 @@ public class Game implements Runnable {
 
             }
             Position characterPosition = getCharacterPosition(character).plusYNew(-1);
-            List<Position> possiblePositionsToUseCapacity = battlefield.getPossiblePositionsToAttack(characterPosition, rangeToUse);
+            Set<Position> possiblePositionsToUseCapacity = battlefield.getPossiblePositionsToAttack(characterPosition, rangeToUse);
 
-            MessageCharacterPositionToUseCapacityResponse messageCharacterPositionToUseCapacityResponse = new MessageCharacterPositionToUseCapacityResponse(possiblePositionsToUseCapacity);
+            List<Position> possiblePositionsToUseCapacityList = new ArrayList<Position>(possiblePositionsToUseCapacity);
+            MessageCharacterPositionToUseCapacityResponse messageCharacterPositionToUseCapacityResponse = new MessageCharacterPositionToUseCapacityResponse(possiblePositionsToUseCapacityList);
             sendMessageToChannel(characterPositionToUseCapacityRequest.getKeyToken(), messageCharacterPositionToUseCapacityResponse);
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
@@ -467,9 +469,10 @@ public class Game implements Runnable {
                     rangeToUse = move.getAreaOfEffect();
                     break;
             }
-            List<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(messageCapacityAOERequest.getPosition(), rangeToUse);
+            Set<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(messageCapacityAOERequest.getPosition(), rangeToUse);
 
-            MessageCapacityAOEResponse messageCapacityAOEResponse = new MessageCapacityAOEResponse(areaOfEffect);
+            List<Position> areaOfEffectList = new ArrayList<Position>(areaOfEffect);
+            MessageCapacityAOEResponse messageCapacityAOEResponse = new MessageCapacityAOEResponse(areaOfEffectList);
             sendMessageToChannel(messageCapacityAOERequest.getKeyToken(), messageCapacityAOEResponse);
         } else {
             log.error(" [X] UNEXPECTED CHAR TO PLAY");
@@ -500,7 +503,8 @@ public class Game implements Runnable {
                     rangeToUse = move.getAreaOfEffect();
                     break;
             }
-            List<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(positionToUse, rangeToUse);
+            Set<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(positionToUse, rangeToUse);
+            List<Position> areaOfEffectList = new ArrayList<Position>(areaOfEffect);
             int totalDamage = 0;
             switch (move.getMoveName()) {
                 case FIREBALL:
@@ -521,7 +525,7 @@ public class Game implements Runnable {
                         targetedChar.addHealthPoint(-damage);
                         totalDamage += damage;
                     }
-                    MessageCapacityFireball messageCapacityFireball = new MessageCapacityFireball(character, gameCharacterDamageMap, positionToUse, areaOfEffect, move.getManaCost());
+                    MessageCapacityFireball messageCapacityFireball = new MessageCapacityFireball(character, gameCharacterDamageMap, positionToUse, areaOfEffectList, move.getManaCost());
                     sendToAll(messageCapacityFireball);
                     break;
                 case EMPOWER:
@@ -629,9 +633,10 @@ public class Game implements Runnable {
     private List<Position> getPossiblePositionsToAttack(GameCharacter gameCharacter) {
         Position characterPosition = getCharacterPosition(gameCharacter).plusYNew(-1);
         Range range = gameCharacter.getRange();
-        List<Position> result = battlefield.getPossiblePositionsToAttack(characterPosition, range);
-        result.remove(characterPosition);
-        return result;
+        Set<Position> result = battlefield.getPossiblePositionsToAttack(characterPosition, range);
+        List<Position> possiblePositionsToAttack = new ArrayList<Position>(result);
+        possiblePositionsToAttack.remove(characterPosition);
+        return possiblePositionsToAttack;
     }
 
     private void completeDeployment() {

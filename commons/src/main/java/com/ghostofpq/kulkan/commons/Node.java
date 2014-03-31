@@ -1,8 +1,6 @@
 package com.ghostofpq.kulkan.commons;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Element of @link{com.ghostofpq.kulkan.commons.Tree}.<br/>
@@ -136,8 +134,8 @@ public class Node<T> implements Comparable<Node<T>> {
      *
      * @return all the element contained as a List of element.
      */
-    public List<T> getAllElements() {
-        List<T> result = new ArrayList<T>();
+    public Set<T> getAllElements() {
+        Set<T> result = new LinkedHashSet<T>();
         result.add(getData());
         for (Node<T> child : getChildren()) {
             result.addAll(child.getAllElements());

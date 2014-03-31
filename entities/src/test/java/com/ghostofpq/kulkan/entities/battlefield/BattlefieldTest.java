@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RunWith(JUnit4.class)
@@ -21,7 +21,7 @@ public class BattlefieldTest {
 
         Range range = new Range(RangeType.SQUARE, 0, 2);
 
-        List<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
+        Set<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
 
         //   0 1 2 3 4 X
         // 0     X
@@ -66,7 +66,7 @@ public class BattlefieldTest {
 
         Range range = new Range(RangeType.CIRCLE, 1, 2);
 
-        List<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
+        Set<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
 
         //   0 1 2 3 4 X
         // 0     X
@@ -111,7 +111,7 @@ public class BattlefieldTest {
 
         Range range = new Range(RangeType.CROSS, 0, 2);
 
-        List<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
+        Set<Position> result = battlefield.getPossiblePositionsToAttack(originPoint, range);
 
         //   0 1 2 3 4 X
         // 0     X

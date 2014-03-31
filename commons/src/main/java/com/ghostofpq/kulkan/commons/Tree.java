@@ -3,6 +3,7 @@ package com.ghostofpq.kulkan.commons;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class Tree<T> implements Serializable {
     private Node<T> root;
@@ -26,7 +27,7 @@ public class Tree<T> implements Serializable {
         return result;
     }
 
-    public List<T> getAllElements() {
+    public Set<T> getAllElements() {
         return root.getAllElements();
     }
 
