@@ -347,82 +347,79 @@ public class ManageGameCharacterScene implements Scene {
                 if (null == popUp) {
                     if (quitButton.isClicked()) {
                         quitButton.onClick();
-                    }
-                    if (deleteGameCharButton.isClicked()) {
+                    } else if (deleteGameCharButton.isClicked()) {
                         deleteGameCharButton.onClick();
-                    }
-                    if (manageEquipmentButton.isClicked()) {
+                    } else if (manageEquipmentButton.isClicked()) {
                         manageEquipmentButton.onClick();
-                    }
-                    if (manageJobButton.isClicked()) {
+                    } else if (manageJobButton.isClicked()) {
                         manageJobButton.onClick();
-                    }
-                    if (putInStock.isClicked()) {
+                    } else if (putInStock.isClicked()) {
                         putInStock.onClick();
-                    }
-                    if (mode == Mode.JOB) {
-                        if (jobManager.isClicked()) {
-                            Capacity capacity = jobManager.hoveredCapacity();
-                            if (null != capacity) {
-                                selectedCapacity = capacity;
-                                if (!selectedCapacity.isLocked()) {
-                                    String text = new StringBuilder().append("You already know this capacity.").toString();
+                    } else {
+                        if (mode == Mode.JOB) {
+                            if (jobManager.isClicked()) {
+                                Capacity capacity = jobManager.hoveredCapacity();
+                                if (null != capacity) {
+                                    selectedCapacity = capacity;
+                                    if (!selectedCapacity.isLocked()) {
+                                        String text = new StringBuilder().append("You already know this capacity.").toString();
+                                        List<String> options = new ArrayList<String>();
+                                        options.add("OK");
+                                        popUp = new PopUp(options, text);
+                                    } else if (selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getJobPoints())) {
+                                        String text = new StringBuilder().append("Unlock ").append(selectedCapacity.getName()).append(" for ").append(selectedCapacity.getPrice()).append(" job points?").toString();
+                                        List<String> options = new ArrayList<String>();
+                                        options.add("UNLOCK");
+                                        options.add("CANCEL");
+                                        popUp = new PopUp(options, text);
+                                    } else {
+                                        String text = new StringBuilder().append("You don't have enough Job points.").toString();
+                                        List<String> options = new ArrayList<String>();
+                                        options.add("OK");
+                                        popUp = new PopUp(options, text);
+                                    }
+                                }
+                            }
+                        } else if (mode == Mode.STUFF) {
+                            if (equipmentManager.isClicked()) {
+                                selectedItemType = equipmentManager.getSelectedItemType();
+                                List<Item> itemList = new ArrayList<Item>();
+                                if (null != selectedItemType) {
+                                    switch (selectedItemType) {
+                                        case HELMET:
+                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELMET);
+                                            break;
+                                        case ARMOR:
+                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.ARMOR);
+                                            break;
+                                        case NECKLACE:
+                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.NECKLACE);
+                                            break;
+                                        case RING:
+                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.RING);
+                                            break;
+                                        case WEAPON:
+                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.WEAPON);
+                                            break;
+                                        case HELD_ITEM:
+                                            itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELD_ITEM);
+                                            break;
+                                    }
+                                    equipItemPanel.setItemList(itemList);
+                                } else {
+                                    itemList = clientContext.getPlayer().getInventory().getAll();
+                                    equipItemPanel.setItemList(itemList);
+                                }
+                            }
+                            if (equipItemPanel.isClicked()) {
+                                selectedItem = equipItemPanel.getClickedItem();
+                                if (selectedItem != null) {
+                                    String text = new StringBuilder().append("Equip ").append(selectedItem.getName()).append("?").toString();
                                     List<String> options = new ArrayList<String>();
-                                    options.add("OK");
-                                    popUp = new PopUp(options, text);
-                                } else if (selectedCapacity.canBeUnlock(clientContext.getSelectedGameCharacter().getJobPoints())) {
-                                    String text = new StringBuilder().append("Unlock ").append(selectedCapacity.getName()).append(" for ").append(selectedCapacity.getPrice()).append(" job points?").toString();
-                                    List<String> options = new ArrayList<String>();
-                                    options.add("UNLOCK");
+                                    options.add("EQUIP");
                                     options.add("CANCEL");
                                     popUp = new PopUp(options, text);
-                                } else {
-                                    String text = new StringBuilder().append("You don't have enough Job points.").toString();
-                                    List<String> options = new ArrayList<String>();
-                                    options.add("OK");
-                                    popUp = new PopUp(options, text);
                                 }
-                            }
-                        }
-                    } else if (mode == Mode.STUFF) {
-                        if (equipmentManager.isClicked()) {
-                            selectedItemType = equipmentManager.getSelectedItemType();
-                            List<Item> itemList = new ArrayList<Item>();
-                            if (null != selectedItemType) {
-                                switch (selectedItemType) {
-                                    case HELMET:
-                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELMET);
-                                        break;
-                                    case ARMOR:
-                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.ARMOR);
-                                        break;
-                                    case NECKLACE:
-                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.NECKLACE);
-                                        break;
-                                    case RING:
-                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.RING);
-                                        break;
-                                    case WEAPON:
-                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.WEAPON);
-                                        break;
-                                    case HELD_ITEM:
-                                        itemList = clientContext.getPlayer().getInventory().getItemsByType(ItemType.HELD_ITEM);
-                                        break;
-                                }
-                                equipItemPanel.setItemList(itemList);
-                            } else {
-                                itemList = clientContext.getPlayer().getInventory().getAll();
-                                equipItemPanel.setItemList(itemList);
-                            }
-                        }
-                        if (equipItemPanel.isClicked()) {
-                            selectedItem = equipItemPanel.getClickedItem();
-                            if (selectedItem != null) {
-                                String text = new StringBuilder().append("Equip ").append(selectedItem.getName()).append("?").toString();
-                                List<String> options = new ArrayList<String>();
-                                options.add("EQUIP");
-                                options.add("CANCEL");
-                                popUp = new PopUp(options, text);
                             }
                         }
                     }
@@ -450,7 +447,8 @@ public class ManageGameCharacterScene implements Scene {
                             popUp = null;
                         }
                     }
-                } else if (frame.isClicked()) {
+                }
+                if (frame.isClicked()) {
                     if (x == -1 && y == -1) {
                         x = Mouse.getX();
                         y = (Display.getHeight() - Mouse.getY());

@@ -272,7 +272,8 @@ public class CreateGameCharacterScene implements Scene {
                         }
                     }
 
-                } else if (frame.isClicked()) {
+                }
+                if (frame.isClicked()) {
                     if (x == -1 && y == -1) {
                         x = Mouse.getX();
                         y = (Display.getHeight() - Mouse.getY());
