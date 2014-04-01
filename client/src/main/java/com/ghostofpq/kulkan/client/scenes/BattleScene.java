@@ -402,69 +402,71 @@ public class BattleScene implements Scene {
                 }
             }
             while (Mouse.next()) {
-                if (okClick()) {
-                    if (Mouse.isButtonDown(0)) {
-                        if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
-                            if (actionButtonMove.isHovered() || actionButtonAttack.isHovered() || actionButtonCapacity.isHovered() || actionButtonEndTurn.isHovered()) {
-                                manageInputAction();
-                            }
-                        } else {
-                            switch (currentState) {
-                                case DEPLOY_POSITION:
-                                    if (null != mousePosition) {
-                                        deployCharacterPosition();
+                //LEFT CLICK
+                if (Mouse.isButtonDown(0)) {
+                    if (okClick()) {
+                        switch (currentState) {
+                            case ACTION:
+                                if (actionButtonMove != null && actionButtonAttack != null && actionButtonCapacity != null && actionButtonEndTurn != null) {
+                                    if (actionButtonMove.isHovered() || actionButtonAttack.isHovered() || actionButtonCapacity.isHovered() || actionButtonEndTurn.isHovered()) {
+                                        manageInputAction();
                                     }
-                                    break;
-                                case DEPLOY_HEADING_ANGLE:
-                                    deployCharacterHeadingAngle();
-                                    break;
-                                case MOVE:
-                                    if (null != mousePosition) {
-                                        possiblePositionsToMove = new ArrayList<Position>();
-                                        sendActionMove();
-                                        possiblePositionsToMove = new ArrayList<Position>();
-                                        currentState = BattleSceneState.PENDING;
-                                    }
-                                    break;
-                                case ATTACK:
-                                    if (null != mousePosition) {
-                                        possiblePositionsToAttack = new ArrayList<Position>();
-                                        sendActionAttack();
-                                        possiblePositionsToAttack = new ArrayList<Position>();
-                                        currentState = BattleSceneState.PENDING;
-                                        break;
-                                    }
-                                case CAPACITY_SELECT:
-                                    selectedMove = menuSelectCapacity.getSelectedOption();
-                                    sendPositionToUseCapacityRequest();
-                                    menuSelectCapacity = null;
-                                    currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY;
-                                    break;
-                                case CAPACITY_PLACE:
-                                    if (null != mousePosition) {
-                                        possiblePositionsToUseCapacity = new ArrayList<Position>();
-                                        sendCapacityAOERequest();
-                                        currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE;
-                                        break;
-                                    }
-                                case CAPACITY_USE:
-                                    if (null != mousePosition) {
-                                        capacityAreaOfEffect = new ArrayList<Position>();
-                                        sendActionCapacity();
-                                        currentState = BattleSceneState.PENDING;
-                                        break;
-                                    }
-                                case END_TURN:
-                                    sendEndTurn();
+                                }
+                                break;
+                            case DEPLOY_POSITION:
+                                if (null != mousePosition) {
+                                    deployCharacterPosition();
+                                }
+                                break;
+                            case DEPLOY_HEADING_ANGLE:
+                                deployCharacterHeadingAngle();
+                                break;
+                            case MOVE:
+                                if (null != mousePosition) {
+                                    possiblePositionsToMove = new ArrayList<Position>();
+                                    sendActionMove();
+                                    possiblePositionsToMove = new ArrayList<Position>();
                                     currentState = BattleSceneState.PENDING;
-                                    currentGameCharacter = null;
+                                }
+                                break;
+                            case ATTACK:
+                                if (null != mousePosition) {
+                                    possiblePositionsToAttack = new ArrayList<Position>();
+                                    sendActionAttack();
+                                    possiblePositionsToAttack = new ArrayList<Position>();
+                                    currentState = BattleSceneState.PENDING;
                                     break;
-                            }
-                        }
-                        if (currentState.equals(BattleSceneState.GAME_OVER)) {
-                            if (gameOverButton.isClicked()) {
-                                gameOverButton.onClick();
-                            }
+                                }
+                            case CAPACITY_SELECT:
+                                selectedMove = menuSelectCapacity.getSelectedOption();
+                                sendPositionToUseCapacityRequest();
+                                menuSelectCapacity = null;
+                                currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY;
+                                break;
+                            case CAPACITY_PLACE:
+                                if (null != mousePosition) {
+                                    possiblePositionsToUseCapacity = new ArrayList<Position>();
+                                    sendCapacityAOERequest();
+                                    currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE;
+                                    break;
+                                }
+                            case CAPACITY_USE:
+                                if (null != mousePosition) {
+                                    capacityAreaOfEffect = new ArrayList<Position>();
+                                    sendActionCapacity();
+                                    currentState = BattleSceneState.PENDING;
+                                    break;
+                                }
+                            case END_TURN:
+                                sendEndTurn();
+                                currentState = BattleSceneState.PENDING;
+                                currentGameCharacter = null;
+                                break;
+                            case GAME_OVER:
+                                if (gameOverButton.isClicked()) {
+                                    gameOverButton.onClick();
+                                }
+                                break;
                         }
                         if (frame.isClicked()) {
                             if (x == -1 && y == -1) {
@@ -473,25 +475,30 @@ public class BattleScene implements Scene {
                                 frameClicked = true;
                             }
                         }
-                    } else if (!Mouse.isButtonDown(0)) {
+                        //RIGHT CLICK
+                    } else if (Mouse.isButtonDown(1)) {
+                        if (okClick()) {
+                            if (currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE || currentState == BattleSceneState.CAPACITY_PLACE ||
+                                    currentState == BattleSceneState.CAPACITY_USE || currentState == BattleSceneState.CAPACITY_SELECT || currentState == BattleSceneState.END_TURN) {
+                                possiblePositionsToAttack = new ArrayList<Position>();
+                                possiblePositionsToMove = new ArrayList<Position>();
+                                capacityAreaOfEffect = new ArrayList<Position>();
+                                possiblePositionsToUseCapacity = new ArrayList<Position>();
+                                prepareActionButtons();
+                                currentState = BattleSceneState.ACTION;
+                            } else {
+                                if (null != mousePosition) {
+                                    GraphicsManager.getInstance().requestCenterPosition(mousePosition);
+                                }
+                            }
+                        }
+                    } else {
                         frameClicked = false;
                         x = -1;
                         y = -1;
                     }
-                    if (Mouse.isButtonDown(1)) {
-                        if (currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE || currentState == BattleSceneState.CAPACITY_PLACE || currentState == BattleSceneState.CAPACITY_USE || currentState == BattleSceneState.END_TURN) {
-                            possiblePositionsToAttack = new ArrayList<Position>();
-                            possiblePositionsToMove = new ArrayList<Position>();
-                            capacityAreaOfEffect = new ArrayList<Position>();
-                            possiblePositionsToUseCapacity = new ArrayList<Position>();
-                            prepareActionButtons();
-                            currentState = BattleSceneState.ACTION;
-                        } else {
-                            if (null != mousePosition) {
-                                GraphicsManager.getInstance().requestCenterPosition(mousePosition);
-                            }
-                        }
-                    }
+                } else {
+                    log.debug("click ignored");
                 }
                 if (currentState == BattleSceneState.END_TURN || currentState == BattleSceneState.DEPLOY_HEADING_ANGLE ||
                         currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE ||
@@ -502,9 +509,13 @@ public class BattleScene implements Scene {
                 }
             }
         }
-        if (frameClicked && !clientContext.isFullscreen()) {
+
+        if (frameClicked && !clientContext.isFullscreen())
+
+        {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
+
     }
 
     public void postMessage(ClientMessage message) {
