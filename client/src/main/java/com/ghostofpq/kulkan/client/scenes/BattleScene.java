@@ -497,8 +497,6 @@ public class BattleScene implements Scene {
                         x = -1;
                         y = -1;
                     }
-                } else {
-                    log.debug("click ignored");
                 }
                 if (currentState == BattleSceneState.END_TURN || currentState == BattleSceneState.DEPLOY_HEADING_ANGLE ||
                         currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE ||
