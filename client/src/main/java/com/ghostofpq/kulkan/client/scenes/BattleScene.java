@@ -435,8 +435,8 @@ public class BattleScene implements Scene {
                                     sendActionAttack();
                                     possiblePositionsToAttack = new ArrayList<Position>();
                                     currentState = BattleSceneState.PENDING;
-                                    break;
                                 }
+                                break;
                             case CAPACITY_SELECT:
                                 selectedMove = menuSelectCapacity.getSelectedOption();
                                 sendPositionToUseCapacityRequest();
@@ -448,15 +448,15 @@ public class BattleScene implements Scene {
                                     possiblePositionsToUseCapacity = new ArrayList<Position>();
                                     sendCapacityAOERequest();
                                     currentState = BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY_AOE;
-                                    break;
                                 }
+                                break;
                             case CAPACITY_USE:
                                 if (null != mousePosition) {
                                     capacityAreaOfEffect = new ArrayList<Position>();
                                     sendActionCapacity();
                                     currentState = BattleSceneState.PENDING;
-                                    break;
                                 }
+                                break;
                             case END_TURN:
                                 sendEndTurn();
                                 currentState = BattleSceneState.PENDING;

@@ -483,72 +483,81 @@ public class Game implements Runnable {
         MessageCharacterActionCapacity messageCharacterActionCapacity = (MessageCharacterActionCapacity) message;
         GameCharacter character = getEquivalentCharacter(messageCharacterActionCapacity.getCharacter());
         if (character.equals(currentCharToPlay)) {
+
             Position positionToUse = messageCharacterActionCapacity.getPositionToUseCapacity();
             Move move = messageCharacterActionCapacity.getMove();
-            Range rangeToUse = null;
-            switch (move.getMoveRangeType()) {
-                case RANGE:
-                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
-                    break;
-                case RANGE_AOE:
-                    rangeToUse = move.getAreaOfEffect();
-                    break;
-                case SELF:
-                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
-                    break;
-                case WEAPON:
-                    rangeToUse = new Range(RangeType.CROSS, 0, 0);
-                    break;
-                case WEAPON_AOE:
-                    rangeToUse = move.getAreaOfEffect();
-                    break;
-            }
-            Set<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(positionToUse, rangeToUse);
-            List<Position> areaOfEffectList = new ArrayList<Position>(areaOfEffect);
-            int totalDamage = 0;
-            switch (move.getMoveName()) {
-                case FIREBALL:
-                    List<GameCharacter> targets = new ArrayList<GameCharacter>();
-                    Map<GameCharacter, Integer> gameCharacterDamageMap = new HashMap<GameCharacter, Integer>();
-                    for (Position position : areaOfEffect) {
-                        GameCharacter target = getGameCharacterAtPosition(position);
-                        if (null != target) {
-                            targets.add(target);
+            if (move.getManaCost() <= currentCharToPlay.getCurrentManaPoint()) {
+                currentCharToPlay.addManaPoint(-move.getManaCost());
+                MessageCharacterGainsMP messageCharacterGainsMP = new MessageCharacterGainsMP(character, -move.getManaCost());
+                sendToAll(messageCharacterGainsMP);
+
+                Range rangeToUse = null;
+                switch (move.getMoveRangeType()) {
+                    case RANGE:
+                        rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                        break;
+                    case RANGE_AOE:
+                        rangeToUse = move.getAreaOfEffect();
+                        break;
+                    case SELF:
+                        rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                        break;
+                    case WEAPON:
+                        rangeToUse = new Range(RangeType.CROSS, 0, 0);
+                        break;
+                    case WEAPON_AOE:
+                        rangeToUse = move.getAreaOfEffect();
+                        break;
+                }
+                Set<Position> areaOfEffect = battlefield.getPossiblePositionsToAttack(positionToUse, rangeToUse);
+                List<Position> areaOfEffectList = new ArrayList<Position>(areaOfEffect);
+                int totalDamage = 0;
+                switch (move.getMoveName()) {
+                    case FIREBALL:
+                        List<GameCharacter> targets = new ArrayList<GameCharacter>();
+                        Map<GameCharacter, Integer> gameCharacterDamageMap = new HashMap<GameCharacter, Integer>();
+                        for (Position position : areaOfEffect) {
+                            GameCharacter target = getGameCharacterAtPosition(position);
+                            if (null != target) {
+                                targets.add(target);
+                            }
                         }
-                    }
-                    for (GameCharacter targetedChar : targets) {
-                        int magicArmor = (targetedChar.getAggregatedCharacteristics().getMagicResist() - character.getAggregatedCharacteristics().getMagicPenetration());
-                        double ratio = 100.0 / (100.0 - (double) magicArmor);
-                        double estimatedDamage = ratio * (double) character.getMagicalDamage() * 10.0;
-                        int damage = (int) Math.floor(estimatedDamage);
-                        gameCharacterDamageMap.put(targetedChar, damage);
-                        targetedChar.addHealthPoint(-damage);
-                        totalDamage += damage;
-                    }
-                    MessageCapacityFireball messageCapacityFireball = new MessageCapacityFireball(character, gameCharacterDamageMap, positionToUse, areaOfEffectList, move.getManaCost());
-                    sendToAll(messageCapacityFireball);
-                    break;
-                case EMPOWER:
-                    // SET STATUS STRENGTH 10
-                    break;
-                case DASH:
-                    break;
-                case KNOCKUP:
-                    break;
+                        for (GameCharacter targetedChar : targets) {
+                            int magicArmor = (targetedChar.getAggregatedCharacteristics().getMagicResist() - character.getAggregatedCharacteristics().getMagicPenetration());
+                            double ratio = 100.0 / (100.0 - (double) magicArmor);
+                            double estimatedDamage = ratio * (double) character.getMagicalDamage();
+                            int damage = (int) Math.floor(estimatedDamage);
+                            gameCharacterDamageMap.put(targetedChar, damage);
+                            targetedChar.addHealthPoint(-damage);
+                            totalDamage += damage;
+                        }
+                        MessageCapacityFireball messageCapacityFireball = new MessageCapacityFireball(character, gameCharacterDamageMap, positionToUse, areaOfEffectList, move.getManaCost());
+                        sendToAll(messageCapacityFireball);
+                        break;
+                    case EMPOWER:
+                        // SET STATUS STRENGTH 10
+                        break;
+                    case DASH:
+                        break;
+                    case KNOCKUP:
+                        break;
+                }
+
+
+                character.setHasActed(true);
+                character.gainXp(totalDamage);
+                character.gainJobPoints(5);
+                MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(character, totalDamage, 5);
+                sendToAll(messageCharacterGainsXP);
+
+                Position characterPosition = character.getPosition().plusYNew(-1);
+                MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(character, characterPosition);
+                sendMessageToChannel(messageCharacterActionCapacity.getKeyToken(), messageCharacterToPlay);
+            } else {
+                log.error(" [X] UNEXPECTED CHAR TO PLAY");
             }
-
-
-            character.setHasActed(true);
-            character.gainXp(totalDamage);
-            character.gainJobPoints(5);
-            MessageCharacterGainsXP messageCharacterGainsXP = new MessageCharacterGainsXP(character, totalDamage, 5);
-            sendToAll(messageCharacterGainsXP);
-
-            Position characterPosition = character.getPosition().plusYNew(-1);
-            MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(character, characterPosition);
-            sendMessageToChannel(messageCharacterActionCapacity.getKeyToken(), messageCharacterToPlay);
         } else {
-            log.error(" [X] UNEXPECTED CHAR TO PLAY");
+            log.error(" [X] Not enough MANA");
         }
     }
 
