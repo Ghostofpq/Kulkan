@@ -475,45 +475,41 @@ public class BattleScene implements Scene {
                                 frameClicked = true;
                             }
                         }
-                        //RIGHT CLICK
-                    } else if (Mouse.isButtonDown(1)) {
-                        if (okClick()) {
-                            if (currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE || currentState == BattleSceneState.CAPACITY_PLACE ||
-                                    currentState == BattleSceneState.CAPACITY_USE || currentState == BattleSceneState.CAPACITY_SELECT || currentState == BattleSceneState.END_TURN) {
-                                possiblePositionsToAttack = new ArrayList<Position>();
-                                possiblePositionsToMove = new ArrayList<Position>();
-                                capacityAreaOfEffect = new ArrayList<Position>();
-                                possiblePositionsToUseCapacity = new ArrayList<Position>();
-                                prepareActionButtons();
-                                currentState = BattleSceneState.ACTION;
-                            } else {
-                                if (null != mousePosition) {
-                                    GraphicsManager.getInstance().requestCenterPosition(mousePosition);
-                                }
+                    }
+                    //RIGHT CLICK
+                } else if (Mouse.isButtonDown(1)) {
+                    if (okClick()) {
+                        if (currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE || currentState == BattleSceneState.CAPACITY_PLACE ||
+                                currentState == BattleSceneState.CAPACITY_USE || currentState == BattleSceneState.CAPACITY_SELECT || currentState == BattleSceneState.END_TURN) {
+                            possiblePositionsToAttack = new ArrayList<Position>();
+                            possiblePositionsToMove = new ArrayList<Position>();
+                            capacityAreaOfEffect = new ArrayList<Position>();
+                            possiblePositionsToUseCapacity = new ArrayList<Position>();
+                            prepareActionButtons();
+                            currentState = BattleSceneState.ACTION;
+                        } else {
+                            if (null != mousePosition) {
+                                GraphicsManager.getInstance().requestCenterPosition(mousePosition);
                             }
                         }
-                    } else {
-                        frameClicked = false;
-                        x = -1;
-                        y = -1;
                     }
+                } else {
+                    frameClicked = false;
+                    x = -1;
+                    y = -1;
                 }
-                if (currentState == BattleSceneState.END_TURN || currentState == BattleSceneState.DEPLOY_HEADING_ANGLE ||
-                        currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE ||
-                        currentState == BattleSceneState.CAPACITY_PLACE || currentState == BattleSceneState.CAPACITY_USE) {
-                    if (null != mousePosition) {
-                        currentGameCharacterRepresentation.setHeadingAngle(currentGameCharacter.getPosition().getHeadingAngleFor(mousePosition));
-                    }
+            }
+            if (currentState == BattleSceneState.END_TURN || currentState == BattleSceneState.DEPLOY_HEADING_ANGLE ||
+                    currentState == BattleSceneState.ATTACK || currentState == BattleSceneState.MOVE ||
+                    currentState == BattleSceneState.CAPACITY_PLACE || currentState == BattleSceneState.CAPACITY_USE) {
+                if (null != mousePosition) {
+                    currentGameCharacterRepresentation.setHeadingAngle(currentGameCharacter.getPosition().getHeadingAngleFor(mousePosition));
                 }
             }
         }
-
-        if (frameClicked && !clientContext.isFullscreen())
-
-        {
+        if (frameClicked && !clientContext.isFullscreen()) {
             Display.setLocation(Display.getX() + (Mouse.getX()) - x, (Display.getY() + (Display.getHeight() - Mouse.getY())) - y);
         }
-
     }
 
     public void postMessage(ClientMessage message) {
