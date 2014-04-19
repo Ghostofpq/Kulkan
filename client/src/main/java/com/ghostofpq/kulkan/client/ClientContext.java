@@ -241,6 +241,8 @@ public class ClientContext {
         } catch (FileNotFoundException e) {
             log.warn("No client.properties file.");
             File clientPropertyFile = new File(pathOfClientPropertiesFile);
+            serverPort = 5672;
+            serverIP = "localhost";
             try {
                 clientPropertyFile.createNewFile();
             } catch (IOException e1) {
