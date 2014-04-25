@@ -28,6 +28,7 @@
         <slf4j.version>1.7.5</slf4j.version>
         <finalName>${project.artifactId}-${project.version}</finalName>
     </properties>
+
     <repositories>
         <repository>
             <id>mavenNatives</id>
@@ -44,6 +45,7 @@
             <url>http://slick.cokeandcode.com/mavenrepo</url>
         </repository>
     </repositories>
+
     <dependencyManagement>
         <dependencies>
             <!-- LWJGL -->
@@ -143,6 +145,7 @@
                 <artifactId>cglib</artifactId>
                 <version>2.2.2</version>
             </dependency>
+
             <!-- Mongo DB -->
             <dependency>
                 <groupId>org.mongodb</groupId>

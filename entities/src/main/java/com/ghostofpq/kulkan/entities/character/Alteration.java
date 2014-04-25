@@ -2,7 +2,9 @@ package com.ghostofpq.kulkan.entities.character;
 
 import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 
-public class Alteration {
+import java.io.Serializable;
+
+public class Alteration implements Serializable {
     private String name;
     private String description;
     private Characteristics characteristics;
@@ -20,7 +22,7 @@ public class Alteration {
     }
 
     public boolean isActive() {
-        return duration < 0;
+        return duration > 0;
     }
 
     public String getName() {

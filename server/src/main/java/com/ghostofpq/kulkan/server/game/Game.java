@@ -9,6 +9,7 @@ import com.ghostofpq.kulkan.entities.character.Alteration;
 import com.ghostofpq.kulkan.entities.character.CombatCalculator;
 import com.ghostofpq.kulkan.entities.character.GameCharacter;
 import com.ghostofpq.kulkan.entities.character.Player;
+import com.ghostofpq.kulkan.entities.characteristics.Characteristics;
 import com.ghostofpq.kulkan.entities.job.capacity.Move;
 import com.ghostofpq.kulkan.entities.messages.ClientMessage;
 import com.ghostofpq.kulkan.entities.messages.Message;
@@ -306,7 +307,7 @@ public class Game implements Runnable {
                         sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
                     }
                 } else {
-                    log.error(" [X] NOT MOVING : {}", positionToMove.toString());
+                    log.error("[X] NOT MOVING : {}", positionToMove.toString());
                     MessageCharacterToPlay messageCharacterToPlay = new MessageCharacterToPlay(characterToMove, currentPosition);
                     sendMessageToChannel(messageCharacterActionMove.getKeyToken(), messageCharacterToPlay);
                 }
@@ -414,7 +415,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void manageMessageCharRequestToUseCapacity(ClientMessage message) {
+    private void manageMessageCharRequestPositionToUseCapacity(ClientMessage message) {
         MessageCharacterPositionToUseCapacityRequest characterPositionToUseCapacityRequest = (MessageCharacterPositionToUseCapacityRequest) message;
         GameCharacter character = getEquivalentCharacter(characterPositionToUseCapacityRequest.getCharacter());
         if (character.equals(currentCharToPlay)) {
@@ -433,7 +434,6 @@ public class Game implements Runnable {
                 case WEAPON:
                     rangeToUse = character.getRange();
                     break;
-
             }
             Position characterPosition = getCharacterPosition(character).plusYNew(-1);
             Set<Position> possiblePositionsToUseCapacity = battlefield.getPossiblePositionsToAttack(characterPosition, rangeToUse);
@@ -535,7 +535,18 @@ public class Game implements Runnable {
                         sendToAll(messageCapacityFireball);
                         break;
                     case EMPOWER:
-                        // SET STATUS STRENGTH 10
+                        String empowerAlterationName = "Empower";
+                        String empowerAlterationDescription = "Character is pimped to the max. +10 attack damage.";
+                        Map<Characteristics.fields, Integer> empowerAlterationCharacteristicsValueMap = new HashMap<Characteristics.fields, Integer>();
+                        empowerAlterationCharacteristicsValueMap.put(Characteristics.fields.ATTACK_DAMAGE, 10);
+                        Characteristics empowerAlterationCharacteristics = new Characteristics(empowerAlterationCharacteristicsValueMap);
+                        int empowerAlterationActiveTurn = 3;
+                        Alteration empower = new Alteration(empowerAlterationName, empowerAlterationDescription, empowerAlterationCharacteristics, empowerAlterationActiveTurn);
+
+                        MessageCharacterAlteration messageCharacterAlteration = new MessageCharacterAlteration(character, empower, true);
+                        character.getAlterations().add(empower);
+                        sendToAll(messageCharacterAlteration);
+
                         break;
                     case DASH:
                         break;
@@ -581,7 +592,7 @@ public class Game implements Runnable {
                         manageMessageCharRequestToAttack(message);
                         break;
                     case CHARACTER_POSITION_TO_USE_CAPACITY_REQUEST:
-                        manageMessageCharRequestToUseCapacity(message);
+                        manageMessageCharRequestPositionToUseCapacity(message);
                         break;
                     case CHARACTER_CAPACITY_AOE_REQUEST:
                         manageMessageCapacityAOERequest(message);
@@ -689,6 +700,8 @@ public class Game implements Runnable {
         while (alterationsIterator.hasNext()) {
             Alteration alteration = alterationsIterator.next();
             if (alteration.isActive()) {
+                alteration.tick();
+                log.debug("{} is active ({})", alteration.getName(), alteration.getDuration());
                 if (alteration.getCharacteristics().getHealthRegeneration() != 0) {
                     log.debug("{} gains {} HP due to {}", charToPlay.getName(), alteration.getCharacteristics().getHealthRegeneration(), alteration.getName());
                     charToPlay.addHealthPoint(alteration.getCharacteristics().getHealthRegeneration());
@@ -701,6 +714,7 @@ public class Game implements Runnable {
                     sendToAll(messageCharacterGainsMP);
                 }
             } else {
+                log.debug("{} becomes inactive", alteration.getName());
                 alterationsIterator.remove();
                 MessageCharacterAlteration messageCharacterAlteration = new MessageCharacterAlteration(charToPlay, alteration, false);
                 sendToAll(messageCharacterAlteration);

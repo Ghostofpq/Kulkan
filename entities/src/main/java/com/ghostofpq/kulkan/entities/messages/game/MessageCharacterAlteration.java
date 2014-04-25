@@ -13,7 +13,7 @@ public class MessageCharacterAlteration extends Message implements Serializable 
     private boolean status;
 
     public MessageCharacterAlteration(GameCharacter character, Alteration alteration, boolean status) {
-        type = MessageType.CHARACTER_MOVES;
+        type = MessageType.CHARACTER_ALTERATION;
         this.character = character;
         this.alteration = alteration;
         this.status = status;

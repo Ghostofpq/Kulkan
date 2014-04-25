@@ -564,6 +564,17 @@ public class BattleScene implements Scene {
         }
     }
 
+    private void manageMessageCharacterAlteration(Message message) {
+        MessageCharacterAlteration messageCharacterAlteration = (MessageCharacterAlteration) message;
+        GameCharacter gameCharacter = messageCharacterAlteration.getCharacter();
+        for (GameCharacterRepresentation gameCharacterRepresentation : characterRepresentationList) {
+            if (gameCharacterRepresentation.getCharacter().equals(gameCharacter)) {
+                log.debug("Updating {} characteristics due to {} alteration", gameCharacterRepresentation.getCharacter().getName(), messageCharacterAlteration.getAlteration().getName());
+                gameCharacterRepresentation.getCharacter().updateAggregatedCharacteristics();
+            }
+        }
+    }
+
     private void manageMessageCharacterToPlay(Message message) {
         MessageCharacterToPlay messageCharacterToPlay = (MessageCharacterToPlay) message;
         log.debug(" [-] CHARACTER TO PLAY : {}", messageCharacterToPlay.getCharacterToPlay().getName());
@@ -697,7 +708,23 @@ public class BattleScene implements Scene {
         if (currentState.equals(BattleSceneState.WAITING_SERVER_RESPONSE_CAPACITY)) {
             log.debug(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
             possiblePositionsToUseCapacity = messageCharacterPositionToUseCapacityResponse.getPossiblePositionsToUseCapacity();
-            currentState = BattleSceneState.CAPACITY_PLACE;
+            switch (selectedMove.getMoveRangeType()) {
+                case RANGE:
+                    currentState = BattleSceneState.CAPACITY_USE;
+                    break;
+                case RANGE_AOE:
+                    currentState = BattleSceneState.CAPACITY_PLACE;
+                    break;
+                case SELF:
+                    currentState = BattleSceneState.CAPACITY_USE;
+                    break;
+                case WEAPON:
+                    currentState = BattleSceneState.CAPACITY_USE;
+                    break;
+                case WEAPON_AOE:
+                    currentState = BattleSceneState.CAPACITY_PLACE;
+                    break;
+            }
         } else {
             log.error(" [-] RECEIVED POSSIBLE POSITION FOR CAPACITY USE");
         }
@@ -798,10 +825,13 @@ public class BattleScene implements Scene {
                         MessagePlayerUpdate messagePlayerUpdate = (MessagePlayerUpdate) message;
                         clientContext.setPlayer(messagePlayerUpdate.getPlayer());
                         break;
+
+                    case CHARACTER_ALTERATION:
+                        manageMessageCharacterAlteration(message);
+                        break;
                     case CAPACITY_FIREBALL:
                         manageCapacityFireball(message);
                         break;
-
                     default:
                         log.error(" [X] UNEXPECTED MESSAGE : {}", message.getType());
                         break;
